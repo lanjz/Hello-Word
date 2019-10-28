@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>第5题：介绍下深度优先遍历和广度优先遍历，如何实现？</title>
+</head>
+<body>
+<script>
+    let nodes = {
+      children: [],
+      name: 0
+    }
+    function createNote(node, scope, deep, preName = '') {
+      for(let i = 1; i <= scope; i ++) {
+        const curNode = {
+          name: preName+i,
+          children: []
+        }
+        node.push(curNode)
+        if(deep) {
+          createNote(curNode.children, scope, deep-1, curNode.name+'-')
+        }
+      }
+    }
+    console.log('---------生成一个Tree--------')
+    createNote(nodes.children, 3, 3)
+    console.log(nodes)
+    console.log('---------广度优先遍历--------')
+    function scopeTraversal(getNodes){
+      const arr = [getNodes]
+      let getNodeItem = arr.shift()
+      while(getNodeItem) {
+        console.log(getNodeItem.name)
+        getNodeItem.children.forEach(item => {
+          arr.push(item)
+        })
+        getNodeItem = arr.shift()
+      }
+    }
+    scopeTraversal(nodes)
+    console.log('---------深度优先遍历--------')
+    function deepTraversal(data) {
+      console.log(data.name)
+      data.children.forEach(item => {
+        deepTraversal(item)
+      })
+    }
+    deepTraversal(nodes)
+</script>
+</body>
+</html>
