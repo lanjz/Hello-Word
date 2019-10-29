@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    function getType(data) {
+        const typeToString = Object.prototype.toString.call(data)
+        if(typeToString === '[object Object]') {
+        	return 'object'
+        } else if(typeToString === '[object Array]') {
+        	return 'array'
+        } else if(typeToString === '[object String]') {
+        	return 'string'
+		} else if(typeToString === '[object Function]') {
+        	return 'function'
+		} else if(typeToString === '[object Array]') {
+
+		}
+	}
+</script>
+</body>
+</html>
