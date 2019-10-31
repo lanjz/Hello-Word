@@ -20,6 +20,47 @@
 
 		}
 	}
+	
+	function breadthCopy(data) {
+      if(!data) {
+        return data
+      }
+      const obj = {}
+      const weakMapObj = new WeakMap() // 判断是否有对象被循环引用
+      for(let item in data) {
+        const type = getType(data[item])
+        if(type === 'object' || type === 'array') {
+          // console.log('weakMapObj.has(data[item])', weakMapObj.has(data[item]))
+          if(weakMapObj.has(data[item])){
+            obj[item] = weakMapObj.get(data[item])
+          } else {
+            obj[item] =  breadthCopy(data[item])
+            weakMapObj.set(obj[item], obj[item])
+          }
+        }
+      }
+    }
+    function isObj(obj) {
+      return (typeof obj === 'object' || typeof obj === 'function') && obj !== null
+    }
+    function deepCopy(obj, hash = new WeakMap()) {
+      if(hash.has(obj)) return hash.get(obj)
+      let cloneObj = Array.isArray(obj) ? [] : {}
+      hash.set(obj, cloneObj)
+      for (let key in obj) {
+        cloneObj[key] = isObj(obj[key]) ? deepCopy(obj[key], hash) : obj[key];
+      }
+      return cloneObj
+    }
+    const obj = {
+      a: 1,
+    }
+    obj.b = obj
+    console.log(obj)
+    console.log('--------------')
+    console.log(breadthCopy(obj))
+    console.log(deepCopy(obj))
+    // JSON.parse(JSON.stringify(obj))
 </script>
 </body>
 </html>
