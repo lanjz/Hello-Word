@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>观察者模式实现数据双向绑定demo</title>
+</head>
+<body>
+    <h2>观察者模式实现数据双向绑定demo</h2>
+    <div>number<input type="text" data-bind-objId="number" style="border: 1px solid #ccc; width:200px; height: 24px; " /></div>
+    <div>name<input type="text" data-bind-objId="name" style="border: 1px solid #ccc; width:200px; height: 24px; " /></div>
+    <div>NUMBER:<span data-bind-objId="number" ></span></div>
+    <div>NAME:<span data-bind-objId="name" ></span></div>
+    <button id="btn">model的变化导致view的变化</button>
+</body>
+<script>
+    const Observer = function () {
+        this.obs = {}
+        this.listen = function (key, fn) {
+        	if(!this.obs[key]) {
+				this.obs[key] = []
+            }
+			this.obs[key].push(fn)
+			console.log(`${key}成功添加订阅消息${fn}`)
+		}
+		this.public = function () {
+			// 取第一个参数
+			const key = Array.prototype.shift.call(arguments)
+			const listObs = this.obs[key]
+			if(listObs) {
+				listObs.forEach((fn) => {
+					fn(...arguments)
+				})
+			}
+		}
+	}
+	function DataBinder(dataId) {
+		// 添加订阅者，查找所有绑定这个dataId的元素，并改变值
+        const newObj = new Observer()
+		newObj.listen(dataId, function (key, newVal) {
+			const elements = document.querySelectorAll(`[data-bind-${dataId}=${key}]`)
+            elements.forEach(item => {
+            	let tagName = item.tagName.toLowerCase();
+				if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
+					item.value = newVal;
+				} else {
+					item.innerHTML = newVal;
+				}
+            })
+		})
+		function changeHandler(e) {
+			const target = e.target
+			const attrName = target.getAttribute("data-bind-"+dataId);
+			newObj.public(dataId, attrName, target.value);
+		}
+		document.addEventListener('input', changeHandler, false);
+        return newObj
+	}
+
+	function ModelData(dataKey) {
+		const binder = new DataBinder(dataKey)
+        const user = {
+			attrs: {},
+			set: function (key, value) {
+				this.attrs[key] = value;
+				// 当前发生变化后，通过订阅者
+				binder.public(dataKey, key, value);
+			},
+			get: function (key) {
+				return this.attrs[key];
+			}
+        }
+		return user;
+	}
+	// 测试demo
+	const user = new ModelData("objId");
+	user.set("number", 1);
+	// 测试模型的变化到视图层的变化
+	const btn = document.getElementById("btn");
+	const inputId = document.getElementById("inputId");
+	btn.onclick = function () {
+		const value = inputId.value;
+		user.set("number", parseInt(value) + 1);
+	};
+	console.log('user', user)
+</script>
+</html>
