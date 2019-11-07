@@ -94,3 +94,17 @@ const fooPrint = new foo.print(); // TypeError: foo.print is not a constructor
 ```
 
 ## 必须使用 `new` 调用 `class`
+
+```
+function Bar() {
+  this.bar = 42;
+}
+const bar = Bar(); // it's ok
+
+class Foo {
+  constructor() {
+    this.foo = 42;
+  }
+}
+const foo = Foo(); // TypeError: Class constructor Foo cannot be invoked without 'new'
+```
