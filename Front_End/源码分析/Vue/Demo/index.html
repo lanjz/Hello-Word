@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script src="./dep.js"></script>
+<script>
+    const data = {
+    	test: 134,
+        abc: 'abc'
+    }
+
+    class Observer {
+    	constructor(value) {
+    		this.value = value
+            this.walk(value)
+        }
+        walk(obj) {
+    		const keys = Object.keys(obj)
+            for(let i = 0; i<keys.length; i++) {
+    			this.defineReactive(obj, keys[i])
+            }
+        }
+		defineReactive(obj, key, val) {
+			const dep = new Dep()
+			Object.defineProperty(obj, key, {
+				enumerable: true,
+				configurable: true,
+				get: function () {
+					if(Dep.target) {
+						dep.depend()
+					}
+					return value
+				},
+				set: function (newVal) {
+					if(newVal === value) {
+						return
+					}
+					dep.notify()
+				}
+			})
+
+		}
+    }
+</script>
+</html>
