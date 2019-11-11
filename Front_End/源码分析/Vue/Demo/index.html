@@ -3,48 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        #app{
+            text-align: center;
+        }
+        input{
+            height: 25px;
+            width: 400px;
+            padding: 0 10px;
+            margin-top: 100px;
+        }
+    </style>
 </head>
 <body>
-
+    <div id="app">
+        <input v-model ="name"/>
+        <h1 class="name">{{name}}</h1>
+    </div>
 </body>
 <script src="./dep.js"></script>
+<script src="./watch.js"></script>
+<script src="./compile.js"></script>
+<script src="./Mvue.js"></script>
 <script>
-    const data = {
-    	test: 134,
-        abc: 'abc'
-    }
-
-    class Observer {
-    	constructor(value) {
-    		this.value = value
-            this.walk(value)
-        }
-        walk(obj) {
-    		const keys = Object.keys(obj)
-            for(let i = 0; i<keys.length; i++) {
-    			this.defineReactive(obj, keys[i])
-            }
-        }
-		defineReactive(obj, key, val) {
-			const dep = new Dep()
-			Object.defineProperty(obj, key, {
-				enumerable: true,
-				configurable: true,
-				get: function () {
-					if(Dep.target) {
-						dep.depend()
-					}
-					return value
-				},
-				set: function (newVal) {
-					if(newVal === value) {
-						return
-					}
-					dep.notify()
-				}
-			})
-
+	const vm = new Mvue({
+		el: "#app",
+		data: {
+			name: "我是摩登"
 		}
-    }
+	});
+	console.log('vm', vm)
 </script>
 </html>
