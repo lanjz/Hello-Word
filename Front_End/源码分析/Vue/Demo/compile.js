@@ -24,60 +24,44 @@ Compile.prototype = {
 	compileNode: function (fragment) {
 		let childNodes = fragment.childNodes;
 		[...childNodes].forEach(node => {
-			
-			if (this.isElementNode(node)) {
-				this.compile(node);
+			let nodeAttrs = node.attributes; // 获取所有属性
+			let nodeType = node.nodeType; // 获取标签类型
+			let nodeName = node.nodeName; // 获取标签名
+			const findVModel = nodeAttrs ? [ ...nodeAttrs ].find(item => item.name === 'v-model') : false
+			// input且有v-model
+			if(nodeName.toUpperCase() === 'INPUT' && findVModel) {
+				this.compileModel(node, findVModel.value);
 			}
-			
-			let reg = /\{\{(.*)\}\}/;
-			let text = node.textContent;
-			
-			
-			
-			if (reg.test(text)) {
-				let prop = reg.exec(text)[1];
-				this.compileText(node, prop); //替换模板
+			if(nodeType === 3) {
+				let reg = /\{\{(.*)\}\}/;
+				let text = node.textContent;
+				if (reg.test(text)) {
+					let prop = reg.exec(text)[1];
+					this.compileText(node, prop); //替换模板
+				}
 			}
-			
 			//编译子节点
 			if (node.childNodes && node.childNodes.length) {
 				this.compileNode(node);
 			}
 		});
 	},
-	compile: function (node) {
-		let nodeAttrs = node.attributes;
-		[...nodeAttrs].forEach(attr => {
-			let name = attr.name;
-			if (this.isDirective(name)) {
-				let value = attr.value;
-				if (name === "v-model") {
-					this.compileModel(node, value);
-				}
-			}
-		});
-	},
 	compileModel: function (node, prop) {
-		let val = this.vm.$data[prop];
-		this.updateModel(node, val);
-		
 		new Watcher(this.vm, prop, (value) => {
-			this.updateModel(node, value);
+			let val = this.vm._data[prop];
+			this.updateModel(node, val);
 		});
 		
 		node.addEventListener('input', e => {
 			let newValue = e.target.value;
-			if (val === newValue) {
-				return;
-			}
-			this.vm.$data[prop] = newValue;
+			this.vm._data[prop] = newValue;
 		});
 	},
 	compileText: function (node, prop) {
-		let text = this.vm.$data[prop];
-		this.updateView(node, text);
+		// this.updateView(node, text);
 		new Watcher(this.vm, prop, (value) => {
-			this.updateView(node, value);
+			let text = this.vm._data[prop];
+			this.updateView(node, text);
 		});
 	},
 	

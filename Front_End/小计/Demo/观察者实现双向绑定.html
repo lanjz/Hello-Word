@@ -69,9 +69,29 @@
         return newObj
 	}
 
+	function Compiler(model, key) {
+		const elements = document.querySelectorAll(`[data-bind-${model.id}=${key}]`)
+		elements.forEach(item => {
+			let tagName = item.tagName.toLowerCase();
+			if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') {
+				item.value = model[key];
+				item.addEventListener('input', changeHandler, false)
+			} else {
+				item.innerHTML = model[key];
+			}
+		})
+		function changeHandler(e) {
+			const target = e.target
+			const attrName = target.getAttribute("data-bind-"+dataId);
+			newObj.public(dataId, attrName, target.value);
+		}
+		// 全局监听Input事件，其实只要兼容绑定了模型的input框就可以了，这里为了方便
+		document.addEventListener('input', changeHandler, false);
+    }
+
 	function ModelData(dataKey) {
 		const binder = new DataBinder(dataKey)
-        const user = {
+        const Obj = {
 			attrs: {},
 			set: function (key, value) {
 				this.attrs[key] = value;
@@ -82,10 +102,10 @@
 				return this.attrs[key];
 			}
         }
-		return user;
+		return Obj;
 	}
 	// 测试demo
-	const user = new ModelData("objId");
+	const user = new ModelData("user");
 	user.set("number", 1);
 	// 测试模型的变化到视图层的变化
 	const btn = document.getElementById("btn");

@@ -1,11 +1,9 @@
-function Mvue(options, prop) {
-	this.$options = options;
-	this.$data = options.data;
-	this.$prop = prop;
+function Mvue(options) {
+	this._data = options.data;
 	this.$el = document.querySelector(options.el);
 	this.init();
 }
 Mvue.prototype.init = function () {
-	new Observer(this.$data);
+	new Observer(this._data);
 	new Compile(this);
 }

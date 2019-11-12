@@ -1,6 +1,7 @@
 let uid = 0
 function defineReactive(obj, key, val) {
 	const dep = new Dep()
+	console.log('dep', dep)
 	Object.defineProperty(obj, key, {
 		enumerable: true,
 		configurable: true,
@@ -23,14 +24,12 @@ function defineReactive(obj, key, val) {
 
 class Observer {
 	constructor(value) {
-		this.value = value
-		// this.dep = new Dep()
 		this.walk(value)
 	}
 	walk(obj) {
 		const keys = Object.keys(obj)
 		for (let i = 0; i < keys.length; i++) {
-			defineReactive(obj, keys[i])
+			defineReactive(obj, keys[i], obj[keys])
 		}
 	}
 }
@@ -65,8 +64,6 @@ class Dep {
 	}
 	depend() {
 		if(Dep.target) {
-			console.log('Dep.target', Dep.target)
-			console.log('this', this)
 			Dep.target.addDep(this)
 		}
 	}
