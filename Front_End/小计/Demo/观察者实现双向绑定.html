@@ -20,8 +20,8 @@
 
 <body>
     <h2>观察者模式实现数据双向绑定demo</h2>
-    <div><span class="label">数字：</span><input type="text" data-bind-user="number" style="border: 1px solid #ccc; width:200px; height: 24px; " /><span data-bind-objId="number" ></span></div>
-    <div><span class="label">姓名：</span><input type="text" data-bind-user="name" style="border: 1px solid #ccc; width:200px; height: 24px; " /><span data-bind-objId="name" ></span></div>
+    <div><span class="label">数字：</span><input type="text" data-bind-user="number" style="border: 1px solid #ccc; width:200px; height: 24px; " /><span data-bind-user="number" ></span></div>
+    <div><span class="label">姓名：</span><input type="text" data-bind-user="name" style="border: 1px solid #ccc; width:200px; height: 24px; " /><span data-bind-user="name" ></span></div>
     <button id="btn">model的变化导致view的变化</button>
 </body>
 <script>
@@ -46,7 +46,6 @@
 		}
 	}
 	function DataBinder(modal) {
-    	console.log('model', modal)
 		// 添加订阅者，查找所有绑定这个dataId的元素，并根据属性改变值
         const newObj = new Observer()
 		newObj.listen(modal.id, function (key, newVal) {
@@ -63,7 +62,7 @@
 		function changeHandler(e) {
 			const target = e.target
 			const attrName = target.getAttribute("data-bind-"+modal.id);
-			modal.set(attrName, target)
+			modal.set(attrName, target.value)
 		}
 		// 全局监听Input事件，其实只要兼容绑定了模型的input框就可以了，这里为了方便
 		document.addEventListener('input', changeHandler, false);
@@ -85,33 +84,13 @@
 			return this.attr[key];
         }
     }
-/*	function ModelData(dataKey) {
-    	const Obj = {
-    		id: dataKey,
-			attr: {}
-		}
-		const binder = new DataBinder(Obj)
-        Obj.prototype = {
-			set: function (key, value) {
-				this.attr[key] = value;
-				// 当前发生变化后，通过订阅者
-				binder.public(dataKey, key, value);
-			},
-			get: function (key) {
-				return this.attr[key];
-			}
-        }
-		return Obj;
-	}*/
 	// 测试demo
 	const user = new ModelData("user");
 	user.set("number", 1);
 	// 测试模型的变化到视图层的变化
 	const btn = document.getElementById("btn");
-	const inputId = document.getElementById("inputId");
 	btn.onclick = function () {
-		const value = inputId.value;
-		user.set("number", parseInt(value) + 1);
+		user.set("number", user.get('number')*1 + 1);
 	};
 	console.log('user', user)
 </script>
