@@ -1,0 +1,119 @@
+> MDN-HTTP缓存[](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Caching_FAQ)
+
+HTTP/1.1定义的`Cache-Control`头用来区分对缓存机制的支持情况，有以下几个属性
+
+- no-store：禁止进行缓存
+
+- no-cache：(强制确认缓存)服务器端会验证请求中所描述的缓存是否过期，若未过期（注：实际就是返回304），则缓存才使用本地缓存副本。
+
+- private：`Cache-Control`默认值，响应只会被某个用户缓存，中间人（CDN、代理等）不缓存
+
+- publish：响应除了被某个用户缓存，还可以被中间人（CDN、代理等）缓存
+
+- max-age={seconds}：表示资源能够被缓存的最大时间。相对`Expires`给的是具体的绝对时间，`max-age`是距离发起时间的秒数。
+
+- must-revalidate：当使用了 `must-revalidate` 指令，那就意味着缓存在考虑使用一个陈旧的资源时，必须先验证它的状态，已过期的缓存将不被使用。
+
+# 使用理解
+
+首先将HTTP缓存体系分为以下二个部分：缓存存储策略、缓存更新策略
+
+## 缓存存储策略
+
+即确定HTTP响应内容是否要被客户端缓存，以及被哪些客户端缓存，上面讲的几个`Cache-Control`属性中`no-cache`、`max-age`、`Publish`、`Private`、`must-revalidate`，都是指明对响应内容会做缓存，`no-store`表示不缓存响应内容。
+
+设置缓存之后，那么问题来了，服务器上的资源是会更新的，客户端如果一直使用缓存的资源，那么就不即时更新服务端上的新资源了，所以客户端什么时候用缓存的资源，什么时候拉取新的资源。这就是下面要讲的缓存更新策略。
+
+## 缓存更新策略
+
+缓存更新策略主要两大类：强缓存和协商缓存
+
+### 强缓存
+
+就是给资源指定一个过期时间，超过这个时间就重新获取资源，要不然就从缓存中获取。Headers中间`expires`字段和`Cache-Control`中的`max-age`，都可以用来设置这个过期时间。他们区别如下：
+
+1. `expires`设置是一个具体的绝对时间，`Cache-Control`中的`max-age`设置是一个从请求发起时间开始算的相对秒数，如当值为`max-age=300`时，300秒内都能缓存中获取资源
+
+2. 当它前同时存在时，使用`Cache-Control`中的`max-age`
+
+3. Expiress是http1.0的产物，Cache-Control是http1.1的产物
+
+4. 如果有浏览器不支持Cache-Control，则会使用Expiress
+
+使用强缓存的方式不够灵活，因为就算缓存时间到了，资源也不一定是更新了的，而且资源也可以是在缓存时间内更新的，这样就不能即使更新资源了
+
+注：
+
+如果max-age和expires属性都没有，找找头里的Last-Modified信息。如果有，缓存的寿命就等于头里面Date的值减去Last-Modified的值除以10（注：根据rfc2626其实也就是乘以10%）
+
+缓存失效时间计算公式如下：
+
+`expirationTime = responseTime + freshnessLifetime - currentAge`
+
+### 协商缓存
+
+协商缓存就是，服务器的资源更新了才去更新资源，否则就取缓存中的资源
+
+那么怎么知道资源是否更新了呢？配合Headers中的两个字段`Last-Modified` 和 `if-modified-since`或者`ETag`字段。
+
+协商缓存的思路如下：
+
+- 第一次请求时，服务器返回资源时，会传递一个`Last-Modified`字段，其内容是这个资源的修改时间。之后再次请求这个资源时，会自带一个`if-Modified-Since`字段，它的值是上一次传递过来的`Lost-Modified`的值，服务器将与这个值与现在的文件的最后修改时间做对比，如果相等，就不用重新拉取这个资源，返回304浏览器读缓存里的资源。否则就重新拉取
+
+![](https://lc-gold-cdn.xitu.io/464786ff92e750ee776c?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+node实现可缓存的服务
+
+```
+http.createServer(function(req,res){
+    var pathname = url.parse(req.url).pathname
+    var fsPath = __dirname + pathname
+    fs.access(fsPath, fs.constants.R_OK, function(err){ //fs.constants.R_OK - path 文件可被调用进程读取
+        if(err) {
+          console.log(err) //可返回404，在此简略代码不再演示
+        }else {
+          var file = fs.statSync(fsPath) //文件信息
+          var lastModified = file.mtime.toUTCString()
+          var ifModifiedSince = req.headers['if-modified-since']
+          //传回Last-Modified后，再请求服务器会携带if-modified-since值来和服务器中的Last-Modified比较
+          var maxAgeTime = 3 //设置超时时间
+          if(ifModifiedSince && lastModified == ifModifiedSince) { //客户端修改时间和服务端修改时间对比
+              res.writeHead(304,"Not Modified")
+              res.end()
+          } else {
+            fs.readFile(fsPath, function(err,file){
+                if(err) {
+                  console.log('readFileError:', err)
+                }else {
+                    res.writeHead(200,{
+                        "Cache-Control": 'max-age=' + maxAgeTime,
+                        "Last-Modified" : lastModified
+                    })
+                    res.end(file)
+                }
+            })
+          }
+        }
+    })
+}).listen(3030)
+```
+
+`Last-Modifily`和`if-Modified-Since`是根据最后修改时间来判断是否需要重新拉取数据，还有一个使用`Etag`的方式，根据内容是否变化来判断是否需要重新资源
+
+### ETag 
+
+ETag一般是由文件内容`hash`生成的，也就是说它可以保证资源的唯一性，资源内容改变了那么`hash`也会改变
+
+思路跟上面一样：服务器第一次返回时会带上ETag标识。之后再请求资源时会带上`If-no-match`字段将这个ETag带回服务器中，服务器跟这个ETag与当前资源的`hash`进行比较。来判断是否需要重新返回该资源
+
+Last-Modified 和 ETag 是可以同时设置的，服务器会优先校验 ETag ，如果 ETag 相等就会继续比对 Last-Modified，最后才会决定是否返回 304。
+
+## 总结
+
+当浏览器访问一个已经访问过的资源时，它会这样做
+
+1. 看看是否命中强缓存，如果命中，它直接使用缓存
+
+2. 如果没有命中强缓存，就发请求到服务器是否命中协商缓存
+
+3. 如果协商缓存命中，则返回304，告诉浏览器使用本地缓存，否则返回最新资源
