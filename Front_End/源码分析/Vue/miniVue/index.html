@@ -18,21 +18,14 @@
 <body>
     <div id="app">
         <div class="1">
-            <div class="1-1">AAA</div>
+            <div class="1-1">AAAA</div>
         </div>
         <input v-model ="name" class="2"/>
         <h1 class="name">{{name}}</h1>
     </div>
 </body>
-<script src="./utils/index.js"></script>
-<script src="./core/instance/init.js"></script>
-<script src="./core/instance/render.js"></script>
-<script src="./core/instance/lifecycle.js"></script>
-<script src="./dep.js"></script>
-<script src="./watch.js"></script>
-<script src="./compile.js"></script>
-<script src="./Mvue.js"></script>
-<script>
+<script type="module">
+    import { test } from './test/test1.js'
 	const vm = new Mvue({
 		el: "#app",
 		data: {

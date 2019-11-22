@@ -1,6 +1,8 @@
-// todo
+import { defineReactive } from '../../utils/index.js'
+import { createElement } from '../vdom/create-element.js'
 
-function initRender(vm) {
+// todo
+export function initRender(vm) {
 	const options = vm.$options
 	const parentVnode = vm.$vnode = options._parentVnode // the placeholder node in parent tree
 	vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)
@@ -11,9 +13,10 @@ function initRender(vm) {
 }
 
 
-function renderMixin(Vue) {
+export function renderMixin(Vue) {
 	Vue.prototype._render = function () {
 		const vm = this
+		// todo
 		const { render, _parentVnode } = vm.$options
 		vm.$vnode = _parentVnode
 		let vnode

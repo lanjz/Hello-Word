@@ -1,7 +1,7 @@
-function isDef (v) {
+export function isDef (v) {
 	return v !== undefined && v !== null
 }
-function isPromise (val){
+export function isPromise (val){
 	return (
 		isDef(val) &&
 		typeof val.then === 'function' &&
@@ -9,5 +9,27 @@ function isPromise (val){
 	)
 }
 
-function noop() {}
-const emptyObject = Object.freeze({})
+export function noop() {}
+export const emptyObject = Object.freeze({})
+
+export function defineReactive(obj, key, val) {
+	const dep = new Dep()
+	Object.defineProperty(obj, key, {
+		enumerable: true,
+		configurable: true,
+		get: function () {
+			if(Dep.target) {
+				dep.depend()
+			}
+			return val
+		},
+		set: function (newVal) {
+			if(newVal === val) {
+				return
+			}
+			val = newVal;
+			dep.notify()
+		}
+	})
+	
+}
