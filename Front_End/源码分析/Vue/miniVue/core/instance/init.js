@@ -6,17 +6,12 @@ export function initMixin(Vue) {
 		vm._uid = uid ++
 		vm._self = vm
 		vm.$options = options // 合并配置
-		
 		vm._renderProxy = vm
-		
 		initRender(vm) // _render()
 		if(vm.$options.el) {
 			// vm.$mount()在主文件中定义
 			vm.$mount(vm.$options.el)
 		}
-		// initRender(vm) // 添加render方法
-		/*	new Observer(this._data);
-			new Compile(this);*/
 	}
 	
 }

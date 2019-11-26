@@ -37,10 +37,11 @@ export function callHook(vm, hook) {
 
 
 // mountComponent 核心就是先实例化一个渲染Watcher，在它的回调函数中会调用 updateComponent 方法，
-// 在此方法中调用 vm._render 方法先生成虚拟 Node，最终调用 vm._update 更新 DOM
+// 在此方法中调用 vm._render 方法先生成虚拟 VNode，最终调用 vm._update 更新 DOM
 export function mountComponent(vm, el) {
 	vm.$el = el
 	if(!vm.$options.render) {
+		console.log('$mount方法中应该生成了render方法，到这一步不应该有这提示了')
 		// todo
 	}
 	callHook(vm, 'beforeMount')

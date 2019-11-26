@@ -4,7 +4,7 @@ import { renderMixin } from './render.js'
 import { createPatchFunction } from '../vdom/patch.js'
 import * as nodeOps from '../vdom/node-ops.js'
 
-function Vue(options) {
+export default function Vue(options) {
 	this._init()
 }
 
@@ -14,11 +14,13 @@ Mvue.prototype.$mount = function(el) {
 	if(!options.render) {
 		let template = options.template
 		if(options.template) {
-		
+			// 如果是组件
 		} else if(el) {
+			// 获取el字符串
 			template = getOuterHTML(el)
 		}
 		if(template) {
+			// 把`el`、`template`转换为render方法
 			const { render, staticRenderFns } = compileToFunctions(template, {
 				outputSourceRange: process.env.NODE_ENV !== 'production',
 				shouldDecodeNewlines,

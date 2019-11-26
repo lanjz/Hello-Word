@@ -1,6 +1,8 @@
 export function isDef (v) {
 	return v !== undefined && v !== null
 }
+
+// 判断是否promise
 export function isPromise (val){
 	return (
 		isDef(val) &&
@@ -32,4 +34,79 @@ export function defineReactive(obj, key, val) {
 		}
 	})
 	
+}
+
+// 判断是否是基本属性
+export function isPrimitive (value) {
+	return (
+		typeof value === 'string' ||
+		typeof value === 'number' ||
+		// $flow-disable-line
+		typeof value === 'symbol' ||
+		typeof value === 'boolean'
+	)
+}
+
+export function makeMap (str, expectsLowerCase){
+	const map = Object.create(null)
+	const list = str.split(',')
+	for (let i = 0; i < list.length; i++) {
+		map[list[i]] = true
+	}
+	return expectsLowerCase
+		? val => map[val.toLowerCase()]
+		: val => map[val]
+}
+
+export const isPreTag = (tag) => tag === 'pre'
+
+const acceptValue = makeMap('input,textarea,option,select,progress')
+
+export const mustUseProp = (tag, type, attr) => {
+	return (
+		(attr === 'value' && acceptValue(tag)) && type !== 'button' ||
+		(attr === 'value' && acceptValue(tag)) && type !== 'button' ||
+		(attr === 'selected' && tag === 'option') ||
+		(attr === 'checked' && tag === 'input') ||
+		(attr === 'muted' && tag === 'video')
+	)
+}
+
+export const isPreTag = (tag) => tag === 'pre'
+
+
+export const isHTMLTag = makeMap(
+	'html,body,base,head,link,meta,style,title,' +
+	'address,article,aside,footer,header,h1,h2,h3,h4,h5,h6,hgroup,nav,section,' +
+	'div,dd,dl,dt,figcaption,figure,picture,hr,img,li,main,ol,p,pre,ul,' +
+	'a,b,abbr,bdi,bdo,br,cite,code,data,dfn,em,i,kbd,mark,q,rp,rt,rtc,ruby,' +
+	's,samp,small,span,strong,sub,sup,time,u,var,wbr,area,audio,map,track,video,' +
+	'embed,object,param,source,canvas,script,noscript,del,ins,' +
+	'caption,col,colgroup,table,thead,tbody,td,th,tr,' +
+	'button,datalist,fieldset,form,input,label,legend,meter,optgroup,option,' +
+	'output,progress,select,textarea,' +
+	'details,dialog,menu,menuitem,summary,' +
+	'content,element,shadow,template,blockquote,iframe,tfoot'
+)
+
+export const isSVG = makeMap(
+	'svg,animate,circle,clippath,cursor,defs,desc,ellipse,filter,font-face,' +
+	'foreignObject,g,glyph,image,line,marker,mask,missing-glyph,path,pattern,' +
+	'polygon,polyline,rect,switch,symbol,text,textpath,tspan,use,view',
+	true
+)
+
+export function getTagNamespace (tag: string): ?string {
+	if (isSVG(tag)) {
+		return 'svg'
+	}
+	// basic support for MathML
+	// note it doesn't support other MathML elements being component roots
+	if (tag === 'math') {
+		return 'math'
+	}
+}
+
+export const isReservedTag = (tag) => {
+	return isHTMLTag(tag) || isSVG(tag)
 }
