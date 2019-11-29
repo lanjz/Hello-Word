@@ -1,5 +1,5 @@
 import { makeMap } from '../../utils/index.js'
-
+import { no } from './helper/index.js'
 export const isPlainTextElement = makeMap('script,style,textarea', true)
 export const unicodeRegExp = /a-zA-Z\u00B7\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u037D\u037F-\u1FFF\u200C-\u200D\u203F-\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD/
 // Regular Expressions for parsing tags and attributes
@@ -15,13 +15,35 @@ const doctype = /^<!DOCTYPE [^>]+>/i
 const comment = /^<!\--/
 const conditionalComment = /^<!\[/
 
+// Special Elements (can contain anything)
+const reCache = {}
+
+const decodingMap = {
+	'&lt;': '<',
+	'&gt;': '>',
+	'&quot;': '"',
+	'&amp;': '&',
+	'&#10;': '\n',
+	'&#9;': '\t',
+	'&#39;': "'"
+}
+const encodedAttr = /&(?:lt|gt|quot|amp|#39);/g
+const encodedAttrWithNewLines = /&(?:lt|gt|quot|amp|#39|#10|#9);/g
+
+const isIgnoreNewlineTag = makeMap('pre,textarea', true)
+const shouldIgnoreFirstNewline = (tag, html) => tag && isIgnoreNewlineTag(tag) && html[0] === '\n'
+function decodeAttr (value, shouldDecodeNewlines) {
+	const re = shouldDecodeNewlines ? encodedAttrWithNewLines : encodedAttr
+	return value.replace(re, match => decodingMap[match])
+}
+
 export function parserHTML(html, options = {}) {
+	const stack = []
+	const expectHTML = options.expectHTML
+	const isUnaryTag = options.isUnaryTag || no
+	const canBeLeftOpenTag = options.canBeLeftOpenTag || no
 	let index = 0
 	let last, lastTag
-	function advance (n) {
-		index += n
-		html = html.substring(n)
-	}
 	while (html) {
 		last = html
 		if(!lastTag || !isPlainTextElement(lastTag)){
@@ -101,8 +123,64 @@ export function parserHTML(html, options = {}) {
 			if(text) {
 				advance(text.length)
 			}
+			if (options.chars && text) {
+				options.chars(text, index - text.length, index)
+			}
 		} else {
-		
+			let endTagLength = 0
+			const stackedTag = lastTag.toLowerCase()
+			const reStackedTag = reCache[stackedTag] || (reCache[stackedTag] = new RegExp('([\\s\\S]*?)(</' + stackedTag + '[^>]*>)', 'i'))
+			const rest = html.replace(reStackedTag, function (all, text, endTag) {
+				endTagLength = endTag.length
+				if (!isPlainTextElement(stackedTag) && stackedTag !== 'noscript') {
+					text = text
+						.replace(/<!\--([\s\S]*?)-->/g, '$1') // #7298
+						.replace(/<!\[CDATA\[([\s\S]*?)]]>/g, '$1')
+				}
+				if (shouldIgnoreFirstNewline(stackedTag, text)) {
+					text = text.slice(1)
+				}
+				if (options.chars) {
+					options.chars(text)
+				}
+				return ''
+			})
+			index += html.length - rest.length
+			html = rest
+			parseEndTag(stackedTag, index - endTagLength, index)
+		}
+		if (html === last) {
+			options.chars && options.chars(html)
+			break
+		}
+	}
+	parseEndTag()
+	function advance (n) {
+		index += n
+		html = html.substring(n)
+	}
+	function parseStartTag () {
+		const start = html.match(startTagOpen)
+		if (start) {
+			const match = {
+				tagName: start[1],
+				attrs: [],
+				start: index
+			}
+			advance(start[0].length)
+			let end, attr
+			while (!(end = html.match(startTagClose)) && (attr = html.match(dynamicArgAttribute) || html.match(attribute))) {
+				attr.start = index
+				advance(attr[0].length)
+				attr.end = index
+				match.attrs.push(attr)
+			}
+			if (end) {
+				match.unarySlash = end[1]
+				advance(end[0].length)
+				match.end = index
+				return match
+			}
 		}
 	}
 	function handleStartTag (match) {
@@ -132,10 +210,6 @@ export function parserHTML(html, options = {}) {
 				name: args[1],
 				value: decodeAttr(value, shouldDecodeNewlines)
 			}
-			if (process.env.NODE_ENV !== 'production' && options.outputSourceRange) {
-				attrs[i].start = args.start + args[0].match(/^\s*/).length
-				attrs[i].end = args.end
-			}
 		}
 		
 		if (!unary) {
@@ -145,30 +219,6 @@ export function parserHTML(html, options = {}) {
 		
 		if (options.start) {
 			options.start(tagName, attrs, unary, match.start, match.end)
-		}
-	}
-	function parseStartTag () {
-		const start = html.match(startTagOpen)
-		if (start) {
-			const match = {
-				tagName: start[1],
-				attrs: [],
-				start: index
-			}
-			advance(start[0].length)
-			let end, attr
-			while (!(end = html.match(startTagClose)) && (attr = html.match(dynamicArgAttribute) || html.match(attribute))) {
-				attr.start = index
-				advance(attr[0].length)
-				attr.end = index
-				match.attrs.push(attr)
-			}
-			if (end) {
-				match.unarySlash = end[1]
-				advance(end[0].length)
-				match.end = index
-				return match
-			}
 		}
 	}
 	/**
@@ -197,6 +247,15 @@ export function parserHTML(html, options = {}) {
 		if (pos >= 0) {
 			// Close all the open elements, up the stack
 			for (let i = stack.length - 1; i >= pos; i--) {
+				if (process.env.NODE_ENV !== 'production' &&
+					(i > pos || !tagName) &&
+					options.warn
+				) {
+					options.warn(
+						`tag <${stack[i].tag}> has no matching end tag.`,
+						{ start: stack[i].start, end: stack[i].end }
+					)
+				}
 				if (options.end) {
 					options.end(stack[i].tag, start, end)
 				}
@@ -209,7 +268,7 @@ export function parserHTML(html, options = {}) {
 			if (options.start) {
 				options.start(tagName, [], true, start, end)
 			}
-		} else if (lowerCasedTagName === 'p') { // 原来P标签也可以不用成对出现
+		} else if (lowerCasedTagName === 'p') {
 			if (options.start) {
 				options.start(tagName, [], false, start, end)
 			}

@@ -72,7 +72,6 @@ export const mustUseProp = (tag, type, attr) => {
 	)
 }
 
-export const isPreTag = (tag) => tag === 'pre'
 
 
 export const isHTMLTag = makeMap(
@@ -96,7 +95,7 @@ export const isSVG = makeMap(
 	true
 )
 
-export function getTagNamespace (tag: string): ?string {
+export function getTagNamespace (tag) {
 	if (isSVG(tag)) {
 		return 'svg'
 	}
