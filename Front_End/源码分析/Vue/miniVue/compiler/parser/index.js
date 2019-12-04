@@ -1,12 +1,25 @@
 import { parserHTML } from './html-parser.js'
 import { parseText } from './text-parser.js'
-import { transformNode } from './modules/class.js'
+import { parseFilters } from './filter-parser.js'
 import { preTransformNode } from './modules/model.js'
+import { transformNode } from './modules/class.js'
 import { getAndRemoveAttr, extend, getBindingAttr, addDirective, getRawBindingAttr, addHandler, addProp, no } from './helper/index.js'
 import { isIE } from './helper/env.js'
 
+export const dirRE = /^v-|^@|^:/
 export const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/
 const dynamicArgRE = /^\[.*\]$/
+const slotRE = /^v-slot(:|$)|^#/
+
+export const bindRE = /^:|^\.|^v-bind:/
+const propBindRE = /^\./
+const modifierRE = /\.[^.\]]+(?=[^\]]*$)/g
+
+const lineBreakRE = /[\r\n]/
+const whitespaceRE = /\s+/g
+
+const invalidAttributeRE = /[\s"'<>\/=]/
+
 let warn
 let delimiters
 let transforms
@@ -16,12 +29,38 @@ let platformIsPreTag
 let platformMustUseProp
 let platformGetTagNamespace
 let maybeComponent
+
 export function processFor (el) {
 	let exp
 	if ((exp = getAndRemoveAttr(el, 'v-for'))) {
 		const res = parseFor(exp)
 		if (res) {
 			extend(el, res)
+		}
+	}
+}
+function processOnce (el) {
+	const once = getAndRemoveAttr(el, 'v-once')
+	if (once != null) {
+		el.once = true
+	}
+}
+
+function processIf (el) {
+	const exp = getAndRemoveAttr(el, 'v-if')
+	if (exp) {
+		el.if = exp
+		addIfCondition(el, {
+			exp: exp,
+			block: el
+		})
+	} else {
+		if (getAndRemoveAttr(el, 'v-else') != null) {
+			el.else = true
+		}
+		const elseif = getAndRemoveAttr(el, 'v-else-if')
+		if (elseif) {
+			el.elseif = elseif
 		}
 	}
 }
@@ -74,6 +113,9 @@ function isForbiddenTag (el) {
 			el.attrsMap.type === 'text/javascript'
 		))
 	)
+}
+function isTextTag (el) {
+	return el.tag === 'script' || el.tag === 'style'
 }
 
 function guardIESVGBug (attrs) {
@@ -170,7 +212,13 @@ function parseString (chr) {
 		}
 	}
 }
-
+export function addAttr (el, name, value, range, dynamic) {
+	const attrs = dynamic
+		? (el.dynamicAttrs || (el.dynamicAttrs = []))
+		: (el.attrs || (el.attrs = []))
+	attrs.push(rangeSetItem({ name, value, dynamic }, range))
+	el.plain = false
+}
 function parseBracket (chr) {
 	let inBracket = 1
 	expressionPos = index
@@ -259,7 +307,7 @@ function processAttrs (el) {
 			// modifiers
 			modifiers = parseModifiers(name.replace(dirRE, ''))
 			// support .foo shorthand syntax for the .prop modifier
-			if (process.env.VBIND_PROP_SHORTHAND && propBindRE.test(name)) {
+			if (propBindRE.test(name)) {
 				(modifiers || (modifiers = {})).prop = true
 				name = `.` + name.slice(1).replace(modifierRE, '')
 			} else if (modifiers) {
@@ -395,45 +443,15 @@ function processSlotContent (el) {
 		}
 	}
 	
-	// 2.6 v-slot syntax
-	if (process.env.NEW_SLOT_SYNTAX) {
-		if (el.tag === 'template') {
-			// v-slot on <template>
-			const slotBinding = getAndRemoveAttrByRegex(el, slotRE)
-			if (slotBinding) {
-				const { name, dynamic } = getSlotName(slotBinding)
-				el.slotTarget = name
-				el.slotTargetDynamic = dynamic
-				el.slotScope = slotBinding.value || emptySlotScopeToken // force it into a scoped slot for perf
-			}
-		} else {
-			// v-slot on component, denotes default slot
-			const slotBinding = getAndRemoveAttrByRegex(el, slotRE)
-			if (slotBinding) {
-				// add the component's children to its default slot
-				const slots = el.scopedSlots || (el.scopedSlots = {})
-				const { name, dynamic } = getSlotName(slotBinding)
-				const slotContainer = slots[name] = createASTElement('template', [], el)
-				slotContainer.slotTarget = name
-				slotContainer.slotTargetDynamic = dynamic
-				slotContainer.children = el.children.filter((c) => {
-					if (!c.slotScope) {
-						c.parent = slotContainer
-						return true
-					}
-				})
-				slotContainer.slotScope = slotBinding.value || emptySlotScopeToken
-				// remove children as they are returned from scopedSlots now
-				el.children = []
-				// mark el non-plain so data gets generated
-				el.plain = false
-			}
-		}
-	}
 }
 
 
 
+function processPre (el) {
+	if (getAndRemoveAttr(el, 'v-pre') != null) {
+		el.pre = true
+	}
+}
 export function parse(template, options) {
 	warn = options.warn
 	
@@ -443,9 +461,9 @@ export function parse(template, options) {
 	const isReservedTag = options.isReservedTag || no
 	maybeComponent = (el) => !!el.component || !isReservedTag(el.tag)
 	
-	// transforms = pluckModuleFunction(options.modules, '')
-	preTransforms = preTransformNode
-	// postTransforms = pluckModuleFunction(options.modules, 'postTransformNode')
+	transforms = [preTransformNode]
+	preTransforms = [preTransformNode]
+	postTransforms = []
 	
 	delimiters = options.delimiters
 	
@@ -586,9 +604,6 @@ export function parse(template, options) {
 			
 			if (!root) {
 				root = element
-				if (process.env.NODE_ENV !== 'production') {
-					checkRootConstraints(root)
-				}
 			}
 			if (!unary) {
 				currentParent = element
@@ -615,7 +630,7 @@ export function parse(template, options) {
 			}
 			const children = currentParent.children
 			if (inPre || text.trim()) {
-				text = isTextTag(currentParent) ? text : decodeHTMLCached(text)
+				text = isTextTag(currentParent) ? text : 'decodeHTMLCached(text)'
 			} else if (!children.length) {
 				// remove the whitespace-only node right after an opening tag
 				text = ''
@@ -664,13 +679,24 @@ export function parse(template, options) {
 					text,
 					isComment: true
 				}
-				if (process.env.NODE_ENV !== 'production' && options.outputSourceRange) {
-					child.start = start
-					child.end = end
-				}
 				currentParent.children.push(child)
 			}
 		}
 	})
 	return root
+}
+
+function rangeSetItem (
+	item,
+	range={ start, end }
+) {
+	if (range) {
+		if (range.start != null) {
+			item.start = range.start
+		}
+		if (range.end != null) {
+			item.end = range.end
+		}
+	}
+	return item
 }
