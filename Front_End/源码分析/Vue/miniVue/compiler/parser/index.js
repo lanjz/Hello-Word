@@ -3,14 +3,16 @@ import { parseText } from './text-parser.js'
 import { parseFilters } from './filter-parser.js'
 import { preTransformNode } from './modules/model.js'
 import { transformNode } from './modules/class.js'
-import { getAndRemoveAttr, extend, getBindingAttr, addDirective, getRawBindingAttr, addHandler, addProp, no } from './helper/index.js'
+import { getAndRemoveAttr, extend, getBindingAttr, addDirective, getRawBindingAttr, addHandler, addProp, no, getTagNamespace } from './helper/index.js'
+export const onRE = /^@|^v-on:/
 import { isIE } from './helper/env.js'
-
+const stripParensRE = /^\(|\)$/g
+export const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
 export const dirRE = /^v-|^@|^:/
 export const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/
 const dynamicArgRE = /^\[.*\]$/
 const slotRE = /^v-slot(:|$)|^#/
-
+const argRE = /:(.*)$/
 export const bindRE = /^:|^\.|^v-bind:/
 const propBindRE = /^\./
 const modifierRE = /\.[^.\]]+(?=[^\]]*$)/g
@@ -452,6 +454,27 @@ function processPre (el) {
 		el.pre = true
 	}
 }
+function processRawAttrs (el) {
+	const list = el.attrsList
+	const len = list.length
+	if (len) {
+		const attrs = el.attrs = new Array(len)
+		for (let i = 0; i < len; i++) {
+			attrs[i] = {
+				name: list[i].name,
+				value: JSON.stringify(list[i].value)
+			}
+			if (list[i].start != null) {
+				attrs[i].start = list[i].start
+				attrs[i].end = list[i].end
+			}
+		}
+	} else if (!el.pre) {
+		// non root node in pre blocks with no attributes
+		el.plain = true
+	}
+}
+
 export function parse(template, options) {
 	warn = options.warn
 	
@@ -461,7 +484,7 @@ export function parse(template, options) {
 	const isReservedTag = options.isReservedTag || no
 	maybeComponent = (el) => !!el.component || !isReservedTag(el.tag)
 	
-	transforms = [preTransformNode]
+	transforms = [transformNode]
 	preTransforms = [preTransformNode]
 	postTransforms = []
 	
@@ -525,6 +548,7 @@ export function parse(template, options) {
 		if (element.pre) {
 			inVPre = false
 		}
+		// 标签名是否是pre
 		if (platformIsPreTag(element.tag)) {
 			inPre = false
 		}
@@ -585,6 +609,7 @@ export function parse(template, options) {
 				element = preTransforms[i](element, options) || element
 			}
 			if (!inVPre) {
+				// 处理v-pre指定，如果有v-pre指定那么跳过这个元素和它的子元素的编译过程
 				processPre(element)
 				if (element.pre) {
 					inVPre = true
@@ -630,7 +655,7 @@ export function parse(template, options) {
 			}
 			const children = currentParent.children
 			if (inPre || text.trim()) {
-				text = isTextTag(currentParent) ? text : 'decodeHTMLCached(text)'
+				text = isTextTag(currentParent) ? text : text
 			} else if (!children.length) {
 				// remove the whitespace-only node right after an opening tag
 				text = ''

@@ -1,14 +1,15 @@
 import { makeMap } from '../../utils/index.js'
 import { no } from './helper/index.js'
+import { shouldDecodeNewlines, shouldDecodeNewlinesForHref, decodeAttr } from './helper/compat.js'
 export const isPlainTextElement = makeMap('script,style,textarea', true)
 export const unicodeRegExp = /a-zA-Z\u00B7\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u037D\u037F-\u1FFF\u200C-\u200D\u203F-\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD/
 // Regular Expressions for parsing tags and attributes
-const attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/
-const dynamicArgAttribute = /^\s*((?:v-[\w-]+:|@|:|#)\[[^=]+\][^\s"'<>\/=]*)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/
+const attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/ // 匹配属性
+const dynamicArgAttribute = /^\s*((?:v-[\w-]+:|@|:|#)\[[^=]+\][^\s"'<>\/=]*)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/ // 匹配动态属性
 const ncname = `[a-zA-Z_][\\-\\.0-9_a-zA-Z${unicodeRegExp.source}]*`
 const qnameCapture = `((?:${ncname}\\:)?${ncname})`
-const startTagOpen = new RegExp(`^<${qnameCapture}`)
-const startTagClose = /^\s*(\/?)>/
+const startTagOpen = new RegExp(`^<${qnameCapture}`) // 匹配开始标签如<div、<p
+const startTagClose = /^\s*(\/?)>/ // 匹配>
 const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`)
 const doctype = /^<!DOCTYPE [^>]+>/i
 // #7298: escape - to avoid being pased as HTML comment when inlined in page
@@ -18,28 +19,15 @@ const conditionalComment = /^<!\[/
 // Special Elements (can contain anything)
 const reCache = {}
 
-const decodingMap = {
-	'&lt;': '<',
-	'&gt;': '>',
-	'&quot;': '"',
-	'&amp;': '&',
-	'&#10;': '\n',
-	'&#9;': '\t',
-	'&#39;': "'"
-}
-const encodedAttr = /&(?:lt|gt|quot|amp|#39);/g
-const encodedAttrWithNewLines = /&(?:lt|gt|quot|amp|#39|#10|#9);/g
 
 const isIgnoreNewlineTag = makeMap('pre,textarea', true)
 const shouldIgnoreFirstNewline = (tag, html) => tag && isIgnoreNewlineTag(tag) && html[0] === '\n'
-function decodeAttr (value, shouldDecodeNewlines) {
-	const re = shouldDecodeNewlines ? encodedAttrWithNewLines : encodedAttr
-	return value.replace(re, match => decodingMap[match])
-}
 
 export function parserHTML(html, options = {}) {
+	options.shouldDecodeNewlinesForHref = shouldDecodeNewlinesForHref
+	options.shouldDecodeNewlines = shouldDecodeNewlines
 	const stack = []
-	const expectHTML = options.expectHTML
+	const expectHTML = options.expectHTML //todo 啥作用
 	const isUnaryTag = options.isUnaryTag || no
 	const canBeLeftOpenTag = options.canBeLeftOpenTag || no
 	let index = 0
@@ -208,7 +196,7 @@ export function parserHTML(html, options = {}) {
 				: options.shouldDecodeNewlines
 			attrs[i] = {
 				name: args[1],
-				value: decodeAttr(value, shouldDecodeNewlines)
+				value: decodeAttr(value, shouldDecodeNewlines) // 编码解析 todo
 			}
 		}
 		

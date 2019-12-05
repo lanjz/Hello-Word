@@ -48,18 +48,18 @@ export function getAndRemoveAttr (
 ) {
 	let val
 	if ((val = el.attrsMap[name]) != null) {
-	const list = el.attrsList
-	for (let i = 0, l = list.length; i < l; i++) {
-		if (list[i].name === name) {
-			list.splice(i, 1)
-			break
+		const list = el.attrsList
+		for (let i = 0, l = list.length; i < l; i++) {
+			if (list[i].name === name) {
+				list.splice(i, 1)
+				break
+			}
 		}
 	}
-}
-if (removeFromMap) {
-	delete el.attrsMap[name]
-}
-return val
+	if (removeFromMap) {
+		delete el.attrsMap[name]
+	}
+	return val
 }
 
 export function extend (to, _from) {
@@ -198,4 +198,14 @@ export function cached(fn) {
 
 export function baseWarn (msg, range) {
 	console.error(`[Vue compiler]: ${msg}`)
+}
+export function getTagNamespace (tag) {
+	if (isSVG(tag)) {
+		return 'svg'
+	}
+	// basic support for MathML
+	// note it doesn't support other MathML elements being component roots
+	if (tag === 'math') {
+		return 'math'
+	}
 }
