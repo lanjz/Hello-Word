@@ -9,12 +9,12 @@ const dynamicArgAttribute = /^\s*((?:v-[\w-]+:|@|:|#)\[[^=]+\][^\s"'<>\/=]*)(?:\
 const ncname = `[a-zA-Z_][\\-\\.0-9_a-zA-Z${unicodeRegExp.source}]*`
 const qnameCapture = `((?:${ncname}\\:)?${ncname})`
 const startTagOpen = new RegExp(`^<${qnameCapture}`) // 匹配开始标签如<div、<p
-const startTagClose = /^\s*(\/?)>/ // 匹配>
-const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`)
-const doctype = /^<!DOCTYPE [^>]+>/i
+const startTagClose = /^\s*(\/?)>/ // 匹配标签的结束符尖括号>
+const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`) // 匹配结束标签
+const doctype = /^<!DOCTYPE [^>]+>/i // 匹配DOCTYPE说明
 // #7298: escape - to avoid being pased as HTML comment when inlined in page
-const comment = /^<!\--/
-const conditionalComment = /^<!\[/
+const comment = /^<!\--/ // 匹配注释
+const conditionalComment = /^<!\[/ // 匹配文档类型的节点
 
 // Special Elements (can contain anything)
 const reCache = {}
