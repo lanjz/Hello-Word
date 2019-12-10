@@ -29,8 +29,10 @@
     </div>
 </body>
 <script type="module">
-    import { parse }  from './compiler/parser/index.js'
-    import { generate } from './compiler/codegen/index.js'
+    import { compileToFunctions } from './compiler/index.js'
+    import { createElement } from './core/vdom/create-element.js'
+    import { installRenderHelpers } from './core/render-helpers/index.js'
+    import { patch } from './patch/index.js'
 /*    import { Mvue } from './core/instance/index.js'
 	/!*const vm = new Mvue({
 		el: "#app",
@@ -52,11 +54,21 @@
 		}
 	});
 	console.log('vm', vm)*/
-	var html = '<div class="root"><div v-for="(item, index) in list" @click="getItem(item)">{{item}}</div><div class="abc" :clsss="{abc: ab}" v-if="isShow" name ="lanjz"><input v-modal="inp"/></div></div></div>'
-    // var html = '<div :class="root">ABC<div v-for="(item, index) in list">{{item}}</div></div>'
-	var getParse = parse(html, {})
-    console.log(getParse)
-    console.log(generate(getParse))
+	// var html = '<div class="root"><div v-for="(item, index) in list" @click="getItem(item)">{{item}}</div><div class="abc" :clsss="{abc: ab}" v-if="isShow" name ="lanjz"><input v-modal="inp"/></div></div></div>'
+    var html = '<div class="page">{{name}}的列表:<span v-for="(item, index) in list" :key="index">{{item}}</span></div>'
+	var compileToFunctionsResult = compileToFunctions(html, {})
+    console.log(compileToFunctionsResult)
 
+
+    const data = {
+    	name: 'lanjz',
+        list: ['A', 'B'],
+        _c: (a, b, c, d) => createElement(data, a, b, c, d, false),
+		$el: document.body
+    }
+	installRenderHelpers(data)
+	let vnode = compileToFunctionsResult.render.call(data)
+    console.log('vnode', vnode)
+    console.log(patch(data.$el, vnode))
 </script>
 </html>

@@ -109,3 +109,51 @@ export function getTagNamespace (tag) {
 export const isReservedTag = (tag) => {
 	return isHTMLTag(tag) || isSVG(tag)
 }
+
+export function warn(data) {
+	console.log('warn', data)
+}
+export function isFalse (v) {
+	return v === false
+}
+// explicitness and function inlining.
+export function isUndef (v) {
+	return v === undefined || v === null
+}
+
+export function extend (to, _from) {
+	for (const key in _from) {
+		to[key] = _from[key]
+	}
+	return to
+}
+const _toString = Object.prototype.toString
+
+export function isObject (obj) {
+	return obj !== null && typeof obj === 'object'
+}
+
+export const hasSymbol =
+	typeof Symbol !== 'undefined' && isNative(Symbol) &&
+	typeof Reflect !== 'undefined' && isNative(Reflect.ownKeys)
+
+export function isNative (Ctor) {
+	return typeof Ctor === 'function' && /native code/.test(Ctor.toString())
+}
+
+export function toString (val) {
+	return val == null
+		? ''
+		: Array.isArray(val) || (isPlainObject(val) && val.toString === _toString)
+			? JSON.stringify(val, null, 2)
+			: String(val)
+}
+
+export function isPlainObject (obj) {
+	return _toString.call(obj) === '[object Object]'
+}
+
+export function isTrue (v) {
+	return v === true
+}
+

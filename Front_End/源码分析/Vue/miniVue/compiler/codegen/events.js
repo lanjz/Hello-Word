@@ -74,24 +74,6 @@ export function genHandlers (
   }
 }
 
-// Generate handler code with binding params on Weex
-/* istanbul ignore next */
-function genWeexHandler (params: Array<any>, handlerCode: string) {
-  let innerHandlerCode = handlerCode
-  const exps = params.filter(exp => simplePathRE.test(exp) && exp !== '$event')
-  const bindings = exps.map(exp => ({ '@binding': exp }))
-  const args = exps.map((exp, i) => {
-    const key = `$_${i + 1}`
-    innerHandlerCode = innerHandlerCode.replace(exp, key)
-    return key
-  })
-  args.push('$event')
-  return '{\n' +
-    `handler:function(${args.join(',')}){${innerHandlerCode}},\n` +
-    `params:${JSON.stringify(bindings)}\n` +
-    '}'
-}
-
 function genHandler (handler) {
   if (!handler) {
     return 'function(){}'

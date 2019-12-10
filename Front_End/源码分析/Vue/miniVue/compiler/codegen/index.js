@@ -1,4 +1,4 @@
-import { isReservedTag } from '../utils/index.js'
+import { isReservedTag } from '../../utils/index.js'
 import { genHandlers } from './events.js'
 
 function dataGenFns (el) {
