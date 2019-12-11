@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #app{
+            text-align: center;
+        }
+        input{
+            height: 25px;
+            width: 400px;
+            padding: 0 10px;
+            margin-top: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <p>ADFDF
+        <p>ADFDF
+
+        <div class="1">
+            <div class="1-1">AAAA</div>
+        </div>
+        <input v-model ="name" class="2"/>
+        <h1 class="name">{{name}}</h1>
+        <p/>
+    </div>
+</body>
+<script type="module">
+    import { compileToFunctions } from './compiler/index.js'
+    import { createElement } from './core/vdom/create-element.js'
+    import { installRenderHelpers } from './core/render-helpers/index.js'
+    import { patch } from './patch/index.js'
+/*    import { Mvue } from './core/instance/index.js'
+	/!*const vm = new Mvue({
+		el: "#app",
+		data: {
+			name: "我是MT"
+		}
+	});*!/
+	const vm = new Mvue({
+		el: "#app",
+		render: function (createElement) {
+			return createElement('div', {
+				attrs: {
+					id: 'app'
+				},
+			}, this.name)
+		},
+		data: {
+			name: "我是MT"
+		}
+	});
+	console.log('vm', vm)*/
+	// var html = '<div class="root"><div v-for="(item, index) in list" @click="getItem(item)">{{item}}</div><div class="abc" :clsss="{abc: ab}" v-if="isShow" name ="lanjz"><input v-modal="inp"/></div></div></div>'
+    var html = '<div class="page">{{name}}的列表:<span v-for="(item, index) in list" :key="index">{{item}}</span></div>'
+	var compileToFunctionsResult = compileToFunctions(html, {})
+    console.log(compileToFunctionsResult)
+
+
+    const data = {
+    	name: 'lanjz',
+        list: ['A', 'B'],
+        _c: (a, b, c, d) => createElement(data, a, b, c, d, false),
+		$el: document.body
+    }
+	installRenderHelpers(data)
+	let vnode = compileToFunctionsResult.render.call(data)
+    console.log('vnode', vnode)
+    console.log(patch(data.$el, vnode))
+
+    console.log('------------------------')
+    setTimeout(() => {
+		data.list = ['C','B', 'A']
+		let vnode2 = compileToFunctionsResult.render.call(data)
+		patch(vnode, vnode2)
+		console.log('vnode2', vnode2)
+		console.log('patch', patch)
+    }, 5000)
+
+
+
+</script>
+</html>

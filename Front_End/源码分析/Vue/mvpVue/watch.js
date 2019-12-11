@@ -1,12 +1,10 @@
-import Dep from './dep.js'
-
-export default class Watcher {
-	constructor(vm, expOrFn, cb) {
+class Watcher {
+	constructor(vm, prop, callback) {
 		this.vm = vm
-		this.getter = expOrFn
+		this.getter = callback
 		this.newDeps = null
 		this.oldDep = null
-		// this.prop = prop
+		this.prop = prop
 		this.value = this.get()
 	}
 	

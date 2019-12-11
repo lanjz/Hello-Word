@@ -1,4 +1,4 @@
-import { isDef, isTrue, makeMap, isUndef, isPrimitive } from '../utils/index.js'
+import { isDef, isTrue, makeMap, isUndef } from '../utils/index.js'
 import VNode from '../core/vdom/vnode.js'
 export const emptyNode = new VNode('', {}, [])
 
