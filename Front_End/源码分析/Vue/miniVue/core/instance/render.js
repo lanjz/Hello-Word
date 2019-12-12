@@ -15,7 +15,6 @@ export function renderMixin(Vue) {
 		vm.$vnode = _parentVnode
 		let vnode
 		try {
-			console.log('vm._renderProxy', vm._renderProxy)
 			vnode = render.call(vm._renderProxy, vm.$createElement)
 		} catch (e) {
 			console.error(e)

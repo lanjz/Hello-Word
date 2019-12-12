@@ -1,16 +1,14 @@
-
+import { noop, isObject, hasOwn, isPlainObject } from '../../utils/index.js'
+import VNode from '../vdom/vnode.js'
+import { Observer } from '../observer/dep.js'
 export function initState (vm) {
 	vm._watchers = []
 	const opts = vm.$options
-	if (opts.data) {
-		initData(vm)
-	} else {
-		observe(vm._data = {}, true/)
-	}
+	initData(vm)
 }
 
 
-function initData (vm) {
+export function initData (vm) {
 	let data = vm.$options.data
 	data = vm._data = data || {}
 	// proxy data on instance
@@ -21,7 +19,7 @@ function initData (vm) {
 		proxy(vm, `_data`, key)
 	}
 	// observe data
-	observe(data, true)
+	observe(data, true, vm)
 }
 
 const sharedPropertyDefinition = {
@@ -31,6 +29,7 @@ const sharedPropertyDefinition = {
 	set: noop
 }
 
+// 把 target[sourceKey][key] 的读写变成了对 target[key] 的读写
 export function proxy (target, sourceKey, key) {
 	sharedPropertyDefinition.get = function proxyGetter () {
 		return this[sourceKey][key]
@@ -39,4 +38,14 @@ export function proxy (target, sourceKey, key) {
 		this[sourceKey][key] = val
 	}
 	Object.defineProperty(target, key, sharedPropertyDefinition)
+}
+
+
+export function observe (value, asRootData, vm) {
+	if (!isObject(value) || value instanceof VNode) {
+		return
+	}
+	let ob
+	ob = new Observer(value)
+	return ob
 }

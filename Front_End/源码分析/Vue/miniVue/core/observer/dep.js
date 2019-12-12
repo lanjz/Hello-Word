@@ -1,50 +1,41 @@
 let uid = 0
 function defineReactive(obj, key, val) {
 	const dep = new Dep()
-	console.log('dep', dep)
+	val = obj[key]
 	Object.defineProperty(obj, key, {
 		enumerable: true,
 		configurable: true,
 		get: function () {
+			console.log('触发get')
+			const value = val
 			if(Dep.target) {
 				dep.depend()
 			}
-			return val
+			return value
 		},
 		set: function (newVal) {
+			console.log('触发set', newVal)
 			if(newVal === val) {
 				return
 			}
-			val = newVal;
+			val = newVal
 			dep.notify()
 		}
 	})
 	
 }
 
-class Observer {
+export class Observer {
 	constructor(value) {
 		this.walk(value)
 	}
 	walk(obj) {
 		const keys = Object.keys(obj)
 		for (let i = 0; i < keys.length; i++) {
-			defineReactive(obj, keys[i], obj[keys])
+			defineReactive(obj, keys[i])
 		}
 	}
 }
-
-/*
-function observer(data) {
-	if (!data || typeof data !== "object") {
-		return;
-	}
-	Object.keys(data).forEach(key => {
-		defineReactive(data, key, data[key]);
-	});
-}
-*/
-
 
 export default class Dep {
 	constructor() {
