@@ -1,4 +1,4 @@
-import { makeMap } from '../../../utils/index.js'
+import { makeMap, isUnaryTag } from '../../../utils/index.js'
 import { no } from './helper/index.js'
 import { shouldDecodeNewlines, shouldDecodeNewlinesForHref, decodeAttr } from './helper/compat.js'
 export const isPlainTextElement = makeMap('script,style,textarea', true)
@@ -28,7 +28,6 @@ export function parserHTML(html, options = {}) {
 	options.shouldDecodeNewlines = shouldDecodeNewlines
 	const stack = []
 	const expectHTML = options.expectHTML //todo 啥作用
-	const isUnaryTag = options.isUnaryTag || no
 	const canBeLeftOpenTag = options.canBeLeftOpenTag || no
 	let index = 0
 	let last, lastTag
@@ -175,6 +174,7 @@ export function parserHTML(html, options = {}) {
 		const tagName = match.tagName
 		const unarySlash = match.unarySlash
 		
+		// todo
 		if (expectHTML) {
 			if (lastTag === 'p' && isNonPhrasingTag(tagName)) {
 				parseEndTag(lastTag)
