@@ -1,5 +1,6 @@
-import { isReservedTag } from '../../../utils/index.js'
+import { isReservedTag } from '../../utils/index.js'
 import { genHandlers } from './events.js'
+import directives from '../parser/directives/index.js'
 
 function dataGenFns (el) {
 	let data = ''
@@ -19,7 +20,7 @@ export class CodegenState {
 		this.transforms = []
 		// this.transforms = pluckModuleFunction(options.modules, 'transformCode')
 		this.dataGenFns = [dataGenFns]
-		this.directives = {}
+		this.directives = directives
 		// const isReservedTag = isReservedTag
 		this.maybeComponent = (el) => !!el.component || !isReservedTag(el.tag)
 		this.onceId = 0
@@ -30,6 +31,9 @@ export class CodegenState {
 
 
 export function generate(ast, options = {}) {
+	options.warn = function () {
+	
+	}
 	const state = new CodegenState()
 	const code = ast ? genElement(ast, state) : '_c("div")'
 	return {
@@ -123,6 +127,9 @@ export function genChildren (
 }
 export function genData (el, state) {
 	let data = '{'
+	// 处理指定比如v-model
+	const dirs = genDirectives(el, state)
+	if (dirs) data += dirs + ','
 	// key
 	if (el.key) {
 		data += `key:${el.key},`
@@ -203,6 +210,37 @@ export function genData (el, state) {
 		data = el.wrapListeners(data)
 	}
 	return data
+}
+
+function genDirectives (el, state) {
+	const dirs = el.directives
+	if (!dirs) return
+	let res = 'directives:['
+	let hasRuntime = false
+	let i, l, dir, needRuntime
+	for (i = 0, l = dirs.length; i < l; i++) {
+		dir = dirs[i]
+		needRuntime = true
+		const gen = state.directives[dir.name]
+		if (gen) {
+			// compile-time directive that manipulates AST.
+			// returns true if it also needs a runtime counterpart.
+			needRuntime = !!gen(el, dir, state.warn)
+		}
+		if (needRuntime) {
+			hasRuntime = true
+			res += `{name:"${dir.name}",rawName:"${dir.rawName}"${
+				dir.value ? `,value:(${dir.value}),expression:${JSON.stringify(dir.value)}` : ''
+				}${
+				dir.arg ? `,arg:${dir.isDynamicArg ? dir.arg : `"${dir.arg}"`}` : ''
+				}${
+				dir.modifiers ? `,modifiers:${JSON.stringify(dir.modifiers)}` : ''
+				}},`
+		}
+	}
+	if (hasRuntime) {
+		return res.slice(0, -1) + ']'
+	}
 }
 
 export function genFor (

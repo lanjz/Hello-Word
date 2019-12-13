@@ -1,4 +1,4 @@
-import { isDef, isPrimitive, isTrue, isFalse, isUndef } from '../../utils/index.js'
+import { isDef, isPrimitive, isTrue, isFalse, isUndef } from '../utils/index.js'
 import VNode, { createEmptyVNode, createTextVNode } from '../vdom/vnode.js'
 
 const SIMPLE_NORMALIZE = 1

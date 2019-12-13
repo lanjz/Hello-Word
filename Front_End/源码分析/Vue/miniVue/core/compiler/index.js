@@ -7,7 +7,7 @@
 options.render = render
 options.staticRenderFns = staticRenderFns*/
 
-// import baseOptions from './options/index.js'
+// src/compiler/index.js
 import { createCompileToFunctionFn } from './to-function.js'
 import { parse } from './parser/index.js'
 import { generate } from './codegen/index.js'
@@ -17,12 +17,9 @@ function baseCompile(
 	options
 ) {
 	const ast = parse(template.trim(), options)
-	if (options.optimize !== false) {
-		// optimize(ast, options) // 对AST做进一步优化,这里我们就略过了
-	}
 	console.log('ast', ast)
 	const code = generate(ast, options)
-	console.log('code', code)
+	console.log('render字符串', code)
 	return {
 		ast,
 		render: code.render,

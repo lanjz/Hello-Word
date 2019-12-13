@@ -1,4 +1,4 @@
-import { noop, isObject, hasOwn, isPlainObject } from '../../utils/index.js'
+import { noop, isObject, hasOwn, isPlainObject } from '../utils/index.js'
 import VNode from '../vdom/vnode.js'
 import { Observer } from '../observer/dep.js'
 export function initState (vm) {

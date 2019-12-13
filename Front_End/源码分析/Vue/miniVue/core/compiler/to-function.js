@@ -1,8 +1,5 @@
-/* @flow */
-
-import { warn as baseWarn, noop, extend } from '../../utils/index.js'
-import { generateCodeFrame } from './codeframe.js'
-
+import { warn as baseWarn, noop, extend } from '../utils/index.js'
+import parseModules from './parser/modules/index.js'
 function createFunction (code, errors) {
   try {
     return new Function(code)
@@ -19,7 +16,9 @@ export function createCompileToFunctionFn (compile) {
     options,
     vm
   ) {
-    options = extend({}, options)
+    options = extend({}, {
+    	modules: parseModules
+	})
     const warn = baseWarn
     const key = options.delimiters
       ? String(options.delimiters) + template

@@ -1,6 +1,4 @@
-/* @flow */
 
-import { parseText } from '../text-parser.js'
 import {
   getAndRemoveAttr,
   getBindingAttr,

@@ -1,24 +1,9 @@
-/* @flow */
-
-import { parseText } from 'compiler/parser/text-parser'
-import { parseStyleText } from 'web/util/style'
-function transformNode (el: ASTElement, options: CompilerOptions) {
-  const warn = options.warn || baseWarn
+import { parseStyleText } from '../../../patch/helpers/style.js'
+import { getBindingAttr, getAndRemoveAttr } from '../../parser/helper/index.js'
+function transformNode (el, options) {
+  const warn = options.warn || function () {}
   const staticStyle = getAndRemoveAttr(el, 'style')
   if (staticStyle) {
-    /* istanbul ignore if */
-    if (process.env.NODE_ENV !== 'production') {
-      const res = parseText(staticStyle, options.delimiters)
-      if (res) {
-        warn(
-          `style="${staticStyle}": ` +
-          'Interpolation inside attributes has been removed. ' +
-          'Use v-bind or the colon shorthand instead. For example, ' +
-          'instead of <div style="{{ val }}">, use <div :style="val">.',
-          el.rawAttrsMap['style']
-        )
-      }
-    }
     el.staticStyle = JSON.stringify(parseStyleText(staticStyle))
   }
 
@@ -28,7 +13,7 @@ function transformNode (el: ASTElement, options: CompilerOptions) {
   }
 }
 
-function genData (el: ASTElement): string {
+function genData (el) {
   let data = ''
   if (el.staticStyle) {
     data += `staticStyle:${el.staticStyle},`

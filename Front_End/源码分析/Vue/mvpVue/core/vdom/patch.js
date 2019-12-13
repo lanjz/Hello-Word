@@ -74,7 +74,7 @@ export function createPatchFunction(backend) {
 		ownerArray,
 		index
 	) {
-		if(isDef(vnode.elm) && isDef(ownerArray){
+		if(isDef(vnode.elm) && isDef(ownerArray)){
 			vnode = ownerArray[index] = cloneVnode(vnode)
 		}
 		vnode.isRootInsert = !nested
@@ -100,9 +100,6 @@ export function createPatchFunction(backend) {
 		} else {
 			vnode.elm = nodeOps.createTextNode(vnode.text)
 			insert(parentElm, vnode.elm, refElm)
-		}
-		createComponent(){
-			return false
 		}
 	}
 	function insert (parent, elm, ref) {

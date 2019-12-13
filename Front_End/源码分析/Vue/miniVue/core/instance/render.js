@@ -1,5 +1,5 @@
 import { createElement } from '../vdom/create-element.js'
-import { patch } from '../../patch/index.js'
+import { patch } from '../patch/index.js'
 export function initRender(vm) {
 	const options = vm.$options
 	vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)

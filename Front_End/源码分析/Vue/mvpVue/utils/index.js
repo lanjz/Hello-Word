@@ -10,7 +10,34 @@ export function isPromise (val){
 		typeof val.catch === 'function'
 	)
 }
-
+const hyphenateRE = /\B([A-Z])/g
+export const hyphenate = cached((str) => {
+	return str.replace(hyphenateRE, '-$1').toLowerCase()
+})
+export function toObject (arr) {
+	const res = {}
+	for (let i = 0; i < arr.length; i++) {
+		if (arr[i]) {
+			extend(res, arr[i])
+		}
+	}
+	return res
+}
+export function toNumber (val){
+	const n = parseFloat(val)
+	return isNaN(n) ? val : n
+}
+export function cached (fn) {
+	const cache = Object.create(null)
+	return (function cachedFn (str) {
+		const hit = cache[str]
+		return hit || (cache[str] = fn(str))
+	})
+}
+const camelizeRE = /-(\w)/g
+export const camelize = cached((str) => {
+	return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
+})
 export function noop() {}
 export const emptyObject = Object.freeze({})
 
@@ -157,3 +184,13 @@ export function isTrue (v) {
 	return v === true
 }
 
+const hasOwnProperty = Object.prototype.hasOwnProperty
+export function hasOwn (obj, key) {
+	return hasOwnProperty.call(obj, key)
+}
+
+
+export const isUnaryTag = makeMap(
+	'embed,img,image,input,link,meta',
+	true
+)

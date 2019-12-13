@@ -1,5 +1,5 @@
 import Watcher from '../observer/watch.js'
-import { noop } from '../../utils/index.js'
+import { noop } from '../utils/index.js'
 // mountComponent 核心就是先实例化一个渲染Watcher，在它的回调函数中会调用 updateComponent 方法，
 // 在此方法中调用 vm._render 方法先生成虚拟 VNode，最终调用 vm._update 更新 DOM
 export function mountComponent(vm, el) {

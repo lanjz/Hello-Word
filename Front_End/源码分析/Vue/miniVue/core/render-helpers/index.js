@@ -1,6 +1,6 @@
 /* @flow */
 
-import { toString } from '../../utils/index.js'
+import { toString } from '../utils/index.js'
 import { createTextVNode } from '../vdom/vnode.js'
 import { renderList } from './render-list.js'
 

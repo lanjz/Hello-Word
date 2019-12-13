@@ -1,6 +1,6 @@
 /* @flow */
 
-import { isObject, isDef, hasSymbol } from '../../utils/index.js'
+import { isObject, isDef, hasSymbol } from '../utils/index.js'
 
 /**
  * Runtime helper for rendering v-for lists.

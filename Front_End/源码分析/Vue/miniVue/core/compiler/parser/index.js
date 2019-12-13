@@ -1,11 +1,10 @@
 import { parserHTML } from './html-parser.js'
 import { parseText } from './text-parser.js'
 import { parseFilters } from './filter-parser.js'
-import { preTransformNode } from './modules/model.js'
-import { transformNode } from './modules/class.js'
 import { getAndRemoveAttr, extend, getBindingAttr, addDirective, getRawBindingAttr, addHandler, addProp, no, getTagNamespace } from './helper/index.js'
+import { pluckModuleFunction } from '../../utils/index.js'
 export const onRE = /^@|^v-on:/
-import { isIE } from './helper/env.js'
+import { isIE } from '../../utils/env.js'
 const stripParensRE = /^\(|\)$/g
 export const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
 export const dirRE = /^v-|^@|^:/
@@ -175,10 +174,10 @@ export function processElement (
 		!element.attrsList.length
 	)
 	
-	processRef(element)
-	processSlotContent(element)
-	processSlotOutlet(element)
-	processComponent(element)
+	// processRef(element)
+	// processSlotContent(element)
+	// processSlotOutlet(element)
+	// processComponent(element)
 	for (let i = 0; i < transforms.length; i++) {
 		element = transforms[i](element, options) || element
 	}
@@ -484,8 +483,8 @@ export function parse(template, options) {
 	const isReservedTag = options.isReservedTag || no
 	maybeComponent = (el) => !!el.component || !isReservedTag(el.tag)
 	
-	transforms = [transformNode]
-	preTransforms = [preTransformNode]
+	transforms = pluckModuleFunction(options.modules, 'transformNode')
+	preTransforms = pluckModuleFunction(options.modules, 'preTransformNode')
 	postTransforms = []
 	
 	delimiters = options.delimiters
@@ -625,6 +624,7 @@ export function parse(template, options) {
 				processFor(element)
 				processIf(element)
 				processOnce(element)
+				processElement(element, options)
 			}
 			
 			if (!root) {

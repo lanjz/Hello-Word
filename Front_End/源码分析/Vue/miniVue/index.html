@@ -17,8 +17,8 @@
 </head>
 <body>
     <div id="app">
-        <input v-model ="name" class="abc"/>
-        <h1 class="name">姓名是：{{name}}<span v-for="(item, index) in list" :key="index">{{item}}</span></h1>
+        <input v-model ="name" class="abc" test="test" :class="name"/>
+        <h1 class="name">姓名是：{{name}}<span v-for="(item, index) in list" :key="index" >{{item}}</span></h1>
     </div>
 </body>
 <script type="module">
