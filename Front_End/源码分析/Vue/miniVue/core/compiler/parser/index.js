@@ -606,7 +606,6 @@ export function parse(template, options) {
 				processFor(element)
 				processIf(element)
 				processOnce(element)
-				processElement(element, options)
 			}
 			
 			if (!root) {

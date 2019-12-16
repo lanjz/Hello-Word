@@ -17,7 +17,7 @@
 </head>
 <body>
     <div id="app">
-        <input v-model ="name" class="abc" test="test" :class="name"/>
+        <input v-model ="name" class="abc" test="test"/>
         <h1 class="name">姓名是：{{name}}<span v-for="(item, index) in list" :key="index" >{{item}}</span></h1>
     </div>
 </body>
@@ -33,4 +33,10 @@
 	});
 	console.log('vm', vm)
 </script>
+<!--<script type="module">
+	const template = '<div id="ABC"></div>'
+	import { parse } from './core/compiler/parser/index.js'
+	const ast = parse(template.trim(), {})
+	console.log('ast', ast)
+</script>-->
 </html>
