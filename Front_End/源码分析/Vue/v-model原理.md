@@ -89,3 +89,7 @@ with(this){
 			on:{"input":function($event){if($event.target.composing)return;name=$event.target.value}}})
 	])}
 ```
+
+# 总结
+
+原来`v-model`就是自动帮我们添加赋值属性和绑定事件
