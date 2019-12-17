@@ -2,9 +2,9 @@
 
 平时我们会把Vue中数据响应，发生视图变化的过程理解为双向绑定，原来这样理解并不是完全正常的。所谓双向绑定，从字面上它的意思应该是
 当视图上发生变化数据也会变化、反之数据发生变化视图也能跟着变化，这是一个相互影响的过程，在Vue中，我们知道可以通过数据的改变去驱动 DOM 视图的变化，
-但是真实做到改变视图驱动数据变化我们需要通过`v-model`来实现
+但是真实做到改变视图驱动数据变化我们需要通过特定指令来实现比如`v-model`
 
-之前已经分析过模板如何渲染成真实DOM，接下来分析一下当模板中带有`v-model`时，解析过程是如何处理`v-model`的，
+之前已经分析过模板如何渲染成真实DOM，接下来分析一下当模板中带有`v-model`时，解析过程是如何处理的，
 假设模板为`<div id="app"><input v-model ="name" :class="name" /></div>`
 
 ## 模板到AST阶段
@@ -63,4 +63,29 @@
 
 - 添加`value`属性：给`input`添加属性`value="name"`
 
+转换成模板如下：
 
+```javascript
+<input
+  v-bind:value="name"
+  v-on:input="name=$event.target.value">
+```
+
+其实就是动态绑定了`input`的`value`指向了`name`变量，并且在触发`input`事件的时候去动态把`name`设置为目标值，
+这样实际上就完成了数据双向绑定了，所以说`v-model`实际上就是语法糖
+
+对于我们例子而言，最终生成的`render`代码如下：
+
+```javascript
+with(this){
+	return _c('div',
+	{attrs:{"id":"app"}},
+	[
+		_c('input',
+		{
+			directives:[{name:"model",rawName:"v-model",value:(name),expression:"name"}],
+			class:name,
+			attrs:{"test":"test"},domProps:{"value":(name)},
+			on:{"input":function($event){if($event.target.composing)return;name=$event.target.value}}})
+	])}
+```
