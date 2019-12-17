@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+	const sharedPropertyDefinition = {
+		enumerable: true,
+		configurable: true,
+		get: function () {
+
+		},
+		set: function () {
+
+		}
+	}
+	function proxy (target, sourceKey, key) {
+		sharedPropertyDefinition.get = function proxyGetter () {
+			return sourceKey[key]
+		}
+		sharedPropertyDefinition.set = function proxySetter (val) {
+			sourceKey[key] = val
+		}
+		Object.defineProperty(target, key, sharedPropertyDefinition)
+	}
+	const data = { name: 'lanjz', level: 10 }
+	const d = {}
+	Object.keys(data).forEach((ind) => proxy(d, data, ind))
+    console.log(d.name) // lanjz
+    d.level = 999
+    console.log(data.level) // 999
+</script>
+</body>
+</html>

@@ -17,19 +17,23 @@
 </head>
 <body>
     <div id="app">
-        <input v-model ="name" class="abc" test="test" :class="name"/>
-        <h1 class="name">姓名是：{{name}}<span v-for="(item, index) in list" :key="index" >{{item}}</span></h1>
+        <div class="1">
+            <div class="1-1">AAA</div>
+        </div>
+        <input v-model ="name" class="2"/>
+        <h1 class="name">{{name}}</h1>
     </div>
 </body>
-<script type="module">
-    import Mvue from './core/instance/index.js'
+<script src="dep.js"></script>
+<script src="watch.js"></script>
+<script src="compile.js"></script>
+<script src="Mvue.js"></script>
+<script>
 	const vm = new Mvue({
 		el: "#app",
 		data: {
-			name: "我是MT",
-			// name2: "我是MT",
-            list: [1,3,4],
-		},
+			name: "我是MT"
+		}
 	});
 	console.log('vm', vm)
 </script>
