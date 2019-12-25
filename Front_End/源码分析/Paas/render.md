@@ -3,7 +3,7 @@
 
 vue中使用`<component v-bind:is="currentView"></component>`创建动态组件
 
-结合paas机制，现在的问题就变成了如何动态生成组件`currentView`
+结合paas机制，现在的问题就变成了如何动态生成组件
 
 先看下paas在这块的实现方式
 
@@ -48,9 +48,9 @@ Vue.component('my-component', {
 
 其次，Vue允许自定义`render`方法，并且当存在`render`方法时就直接使用定义的`render`方法
 
-这就是paas组件可以直接返回`render`的原因了
+这就是paas组件可以直接返回`render`做为组件的原因了
 
-# render
+## render
 
 > [render Api](https://cn.vuejs.org/v2/api/#render)
 > [render说明](http://doc.vue-js.com/v2/guide/render-function.html)
@@ -141,6 +141,18 @@ Vue.component('my-component', {
 
 - children：{String | Array} 表示子节点
 
+这里着重了解一下`createComponent`第一个参数`tag`，`tag`可有的类型以及对应的内部处理大致如下
+
+- 如果是`String`类型
+
+  - 选判断如果是内置的一些节点，则直接创建一个普通`VNode`
+
+  - 如果是为已注册的组件名，则通过`createComponent`创建一个组件类型的`VNode`
+
+-  如果是`tag`一个 Component 类型，则直接调用`createComponent`创建一个组件类型的`VNode`节点
+
+- 其它类型先略过
+
 例子：
 
 ```html
@@ -164,5 +176,46 @@ render: function (createElement) {
 上文的`render`方法，表示创建一个`id=app`的`div`，这个`div`内部有一个节点`this.message`, `this.message`
 在这里表示是一个文本节点
 
+给合render方法我们模拟实现异步语法元数据，并动态渲染组件的例子：
 
+```javascript
+  import PageIndex from './page/index.vue'
+  export default {
+    name: 'App',
+    data() {
+      return {
+        meta: '是谁'
+      }
+    },
+    components: {
+      // 'Page': PageIndex
+    },
+    computed: {
+      view() {
+        console.log('this.meta', this.meta)
+        const vm = this
+        return {
+          render(createElement) {
+            return createElement('Page', {
+              props: {
+                meta: vm.meta
+              }
+            })
+          }
+        }
+      }
+    },
+    mounted() {
+      setTimeout(() => {
+        this.meta = 'lanjz'
+      }, 2000)
+    }
+  }
+</script>
+```
 
+例子中`createElement`方法第一个参数`Page`是个我们已经注册好的全局组件
+
+到这里我们就已经明白Paas元数据是怎么注入到组件中
+
+## Paas的组件是什么时候注册为全局组件的
