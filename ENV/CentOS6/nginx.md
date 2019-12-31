@@ -51,4 +51,4 @@ https://www.w3cschool.cn/nginx/nginx-d1aw28wa.html
 
 `/usr/share/nginx/html`
 
-https://segmentfault.com/a/1190000007116797
+https://segmentfault.com/a/1190000007116797 
