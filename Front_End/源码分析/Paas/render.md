@@ -5,9 +5,7 @@
 Vue提供的`render`方法的作用就是**生成VUE组件**
 
 浏览器打开PAAS应用时（https://webapp.mypaas.com.cn/b2c/yk_qmyx/test/?tenant_code=yajuleadmin_test），
-先是发出`meta`请求获取到元数据，这个元数据包含了应用中一些配置信息，然后根据元数据生成应用，本文就是绥下请求到元素到页面生成之间发生了
-什么事情
-
+先是发出`meta`请求获取到元数据，这个元数据包含了当前应用的一些配置信息，然后根据元数据生成应用，本文就是了解下请求到元素到页面生成之间发生了什么事情
 
 先简单看下PAAS引擎中针对这块的实现代码
 
@@ -21,9 +19,8 @@ const $instance = new Vue({
     },
     created() {
     	store.dispatch(appTypes.GET_APP_META, { tenant, role }).then(roleMeta => {
-                        store.commit(appTypes.SET_APP_META, roleMeta)
-                    }).catch(() => {
-                    })
+              store.commit(appTypes.SET_APP_META, roleMeta) }).catch(() => { }
+)
     	// do something
     },
     methods: {
