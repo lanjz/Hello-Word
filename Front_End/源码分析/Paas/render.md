@@ -180,7 +180,7 @@ export default {
 
 ```javascript
 // node_modules/webapp/src/emulator/src/utils/renderView.js
-export function renderView(h, view, appMeta, options = {}) {
+export function renderView(h, view, appMeta) {
     let isTabView = false;
     let tabIndex = 0;
     if (appMeta.tabs && appMeta.tabs.items) {
@@ -192,15 +192,15 @@ export function renderView(h, view, appMeta, options = {}) {
     const globalHeader = get(appMeta, 'common.body.header', {});
     const header = get(view, 'body.header', {});
     const footer = get(view, 'body.footer', {});
-    const showHeader = isShowHeader(globalHeader, header, options.client);
+    const showHeader = isShowHeader(globalHeader, header);
 
     return h(
-        formattedComponentName('Page'),
+        'Page',
         {
             props: {
                 showHeader,
                 title: get(header, 'title', ''),
-                showHeaderBack: false,
+                showHeaderBack: !isTabView,
                 showFooter: !footer.hide,
                 pageStyle: view.style,
                 headerStyle: header.style,
@@ -208,9 +208,8 @@ export function renderView(h, view, appMeta, options = {}) {
             }
         },
         [
-            showHeader ? renderViewHeader(h, header) : null,
-            renderViewContent(h, view, appMeta, options),
-            renderViewArea(h, view, appMeta, options, renderAreaList),
+            renderViewHeader(h, header, showHeader),
+            renderViewArea(h, view, appMeta, renderAreaList),
             isTabView ? renderTabFooter(h, appMeta, tabIndex) : null
         ]
     )
@@ -232,7 +231,7 @@ export function renderView(h, view, appMeta, options = {}) {
 
 `h`方法是Vue内部创建VNode的方法，这里解释一下它接收的参数：
 
-- tag: {String | Object | Function}表示一个 HTML 标签名、组件选项对象，或者
+- tag: {String | Object | Function}表示一个 HTML 标签名、组件、选项对象，或者
 
 - data: 可选参数，表示VNode的数据，完整的数据对象如下
 
@@ -296,30 +295,38 @@ export function renderView(h, view, appMeta, options = {}) {
 回到PAAS的代码中
 
 ```javascript
-    return h(
-        formattedComponentName('Page'),
-        {
-            props: {
-                showHeader,
-                title: get(header, 'title', ''),
-                showHeaderBack: false,
-                showFooter: !footer.hide,
-                pageStyle: view.style,
-                headerStyle: header.style,
-                footerStyle: footer.style
-            }
-        },
-        [
-            showHeader ? renderViewHeader(h, header) : null,
-            renderViewContent(h, view, appMeta, options),
-            renderViewArea(h, view, appMeta, options, renderAreaList),
-            isTabView ? renderTabFooter(h, appMeta, tabIndex) : null
-        ]
-    )
+return h(
+    'Page',
+    {
+        props: {
+            showHeader,
+            title: get(header, 'title', ''),
+            showHeaderBack: !isTabView,
+            showFooter: !footer.hide,
+            pageStyle: view.style,
+            headerStyle: header.style,
+            footerStyle: footer.style
+        }
+    },
+    [
+        renderViewHeader(h, header, showHeader),
+        renderViewArea(h, view, appMeta, renderAreaList),
+        isTabView ? renderTabFooter(h, appMeta, tabIndex) : null
+    ]
+)
 ```
 
-结合`h`方法的作用，可以知道上面这段代码是通过`formattedComponentName('Page')`生成一个VNode，并且给这个VNode节点
-添加了一个属性`props`,第三个参数表示这个VNode节点包含的子VNode节点
+执行`h`方法的第一个参数'page'，结合上文的`h`方法的介绍，可以知道`page`应该是个已经注册的了组件名，第二参数是给这个`page`组件传入的`props`属性，
+第三个参数表示这个`page`组件中包含哪些子组件,这些子组件分别使用`renderViewHeader(h, header, showHeader)`、
+` renderViewArea(h, view, appMeta, renderAreaList)`、`renderTabFooter(h, appMeta, tabIndex)`生成
+
+![avatar](https://raw.githubusercontent.com/lanjz/Hello-Word/master/_static/images/1578314228749_1578314178.jpg)
+
+
+这里不细讲这些函数的具体实现了，因为它们内部也是调用`h`方法生成的。这里唯一会让人感到困惑的是我们的组件是什么时候注册为Vue的全局组件的，
+因为
+
+
 
 
 
