@@ -1,5 +1,7 @@
 
-# Paas中是如何结合元数据动态创建组件
+# PAAS如何生成页面
+
+PAAS如何生成页面也就是如果生成Vue组件
 
 vue中使用`<component v-bind:is="currentView"></component>`创建动态组件
 
