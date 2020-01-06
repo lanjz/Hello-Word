@@ -1,8 +1,8 @@
 
 # PAAS动态创建应用机制
 
-> PAAS动态创建应用主要使用了VUE的`render`方法，所以在往下看前建议先对`render`方法有些了解，如果真的暂时不想去了解，那么至少也知道
-`render`的作用就是**生成VUE组件**
+> PAAS动态创建应用主要使用了VUE的`render`方法，所以在往下看之前建议先对`render`方法有些了解，如果真的暂时不想去了解，那么至少请记住
+Vue提供的`render`方法的作用就是**生成VUE组件**
 
 浏览器打开PAAS应用时（https://webapp.mypaas.com.cn/b2c/yk_qmyx/test/?tenant_code=yajuleadmin_test），
 先是发出`meta`请求获取到元数据，这个元数据包含了应用中一些配置信息，然后根据元数据生成应用，本文就是绥下请求到元素到页面生成之间发生了
