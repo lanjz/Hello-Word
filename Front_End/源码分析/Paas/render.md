@@ -1,13 +1,330 @@
 
-# PAAS如何生成页面
+# PAAS动态创建应用机制
 
-PAAS如何生成页面也就是如果生成Vue组件
+> PAAS动态创建应用主要使用了VUE的`render`方法，所以在往下看前建议先对`render`方法有些了解，如果真的暂时不想去了解，那么至少也知道
+`render`的作用就是**生成VUE组件**
+
+浏览器打开PAAS应用时（https://webapp.mypaas.com.cn/b2c/yk_qmyx/test/?tenant_code=yajuleadmin_test），
+先是发出`meta`请求获取到元数据，这个元数据包含了应用中一些配置信息，然后根据元数据生成应用，本文就是绥下请求到元素到页面生成之间发生了
+什么事情
+
+
+先简单看下PAAS引擎中针对这块的实现代码
+
+```javascript
+// node_modules/webapp/src/engine/src/main.js
+const $instance = new Vue({
+    router,
+    store,
+    render: h => {
+        return h(App)
+    },
+    created() {
+    	store.dispatch(appTypes.GET_APP_META, { tenant, role }).then(roleMeta => {
+                        store.commit(appTypes.SET_APP_META, roleMeta)
+                    }).catch(() => {
+                    })
+    	// do something
+    },
+    methods: {
+    	// 定义一些方法
+    }
+});
+
+$instance.$mount('#app');
+
+```
+
+上面代码是先实例化一个`$instance`实例，然后再调用`$mount`方法，把`$instance`挂载到`#app`元素中，至于`$instance`的内容就是通过`render`方法
+加载的，这个`$instance`实例创建时会执行`store.dispatch(appTypes.GET_APP_META)`方法请求元数据，至于处理元数据的操作是在`APP`组件中做的
+
+`APP`是`import`进来的`vue组件`，下面是`APP.vue`简化后的代码
+
+```javascript
+<template>
+    <div id="app">
+        <keep-alive :exclude="exclude"
+                    :include="include">
+            <router-view class="router-view"></router-view>
+        </keep-alive>
+    </div>
+</template>
+export default {
+    name: 'App',
+        watch: {
+            appMeta: {
+                immediate: true,
+                handler(meta = {}, oldMeta = {}) {
+                    const self = this;
+                    // 注册元数据所有的视图路由
+                    const routes = [];
+                    if (meta.views) {
+                    	// 遍历配置的路由信息，生成一条Vue路由信息
+                        meta.views.forEach(view => {
+                            const { name, path, alias } = view;
+                            // 获取路由额外配置属性：页面标题、是否子路由、是否需要登录、别名、当前角色 
+                            const routeMeta = getRouteMeta(self.isDynamicTitle, self.role, view);
+                            const routeView = {
+                                name,
+                                path,
+                                meta: routeMeta,
+                                props() {
+                                    return {
+                                        view: self.cache[name]
+                                    }
+                                },
+                                component: {
+                                    name: `router-view-${name}`,
+                                    beforeRouteLeave,
+                                    props: ['view'],
+                                    render(h) {
+                                        console.log('this1', this)
+                                        return renderView(h, this.view, self.appMeta)
+                                    }
+                                }
+                            };
+                            // 如果已经包含这个路由，则不添加到routes中
+                            if (!self.cache[name]) {
+                                routes.push(routeView)
+                            }
+                            self.cache[name] = view;
+                            // 如果存在children，则遍历并获取子路由，内容跟上面差不多
+                            (view.children || []).forEach(child => {
+                                const childRouteView = {
+                                    name: child.name,
+                                    path: child.path,
+                                    meta: getRouteMeta(self.isDynamicTitle, self.role, child, routeMeta),
+                                    props() {
+                                        return {
+                                            view: self.cache[child.name]
+                                        }
+                                    },
+                                    component: {
+                                        name: `router-view-${child.name}`,
+                                        beforeRouteLeave,
+                                        props: ['view'],
+                                        render(h) {
+                                            return renderView(h, this.view, self.appMeta)
+                                        }
+                                    }
+                                };
+                                if (!self.cache[child.name]) {
+                                    routes.push(childRouteView)
+                                }
+                                self.cache[child.name] = child
+                            })
+                        })
+                    }
+    
+                    // 最后动态生成路由
+                    if (routes && routes.length > 0) {
+                        routes.push({ path: '*', redirect: { name: 'home' } });
+                        self.$router.addRoutes(routes)
+                    }
+                }
+            }
+        },
+}
+```
+
+`APP.vue`跟元数据相关的核心部分就是上面`watch`中的`appMeta`，因为`appMeta`带有`immediate`属性，所以组件加载时`handler`中的
+方法会先执行一次，`handler`函数中代码不长也没有特别复杂的代码，主要功能就是遍历元数据中的页面信息，动态生成Vue路由，这里就不一一解释了，
+重点需要注意的是以下几点
+
+先定义了一下变量` const routes = [];`用来存放Vue路由信息
+
+- 元数据中一条路由信息的结构信息如下
+
+  ```javascript
+{
+	name:39f228fd-66cb-0b40-bffd-e1d1829f4aab, // 路由名称
+    path:/39f228fd-66cb-0b40-bffd-e1d1829f4aab， // 路由路径
+    body:{
+		header:{}, // 当前页面的头部信息。如：页面标题，是否显示页面标题等
+		content: {
+			item: [ // 当前页面包含的哪些组件
+				{
+					type: 'b2c-search', // 组件名称
+					_key: 'b453edb8-439b-498f-ba8b-bc5c9165b01c', // 唯一标识
+					props: { // 组件配置信息，通过props传入当前组件中
+						
+					}
+					routeAlias: '/alias', // 路由别名
+				}
+			] , 
+		}，
+		isLogin: false, // 进入页面前是否必须先登录
+	    alias: [], // 别名
+	    children: []	
+    }
+
+}
+  ```
+
+- 一个路由信息要加载的组件`component`也是通过`render`方法创建的
+
+  ```javascript
+    component: {
+            name: `router-view-${child.name}`,
+            beforeRouteLeave,
+            props: ['view'],
+            render(h) {
+                return renderView(h, this.view, self.appMeta)
+            }
+        }
+  ```
+  
+- 上面代码中的`render`方法内部并不是直接执行了的函数参数`h`方法，而是执行PAAS额外封装的`renderView`方法，接下来我们来分析下`renderView`方法
+
+## renderView方法
+
+```javascript
+// node_modules/webapp/src/emulator/src/utils/renderView.js
+export function renderView(h, view, appMeta, options = {}) {
+    let isTabView = false;
+    let tabIndex = 0;
+    if (appMeta.tabs && appMeta.tabs.items) {
+        tabIndex = appMeta.tabs.items.findIndex(tabItem => tabItem.href && tabItem.href.name === view.name);
+        if (tabIndex > -1) {
+            isTabView = true
+        }
+    }
+    const globalHeader = get(appMeta, 'common.body.header', {});
+    const header = get(view, 'body.header', {});
+    const footer = get(view, 'body.footer', {});
+    const showHeader = isShowHeader(globalHeader, header, options.client);
+
+    return h(
+        formattedComponentName('Page'),
+        {
+            props: {
+                showHeader,
+                title: get(header, 'title', ''),
+                showHeaderBack: false,
+                showFooter: !footer.hide,
+                pageStyle: view.style,
+                headerStyle: header.style,
+                footerStyle: footer.style
+            }
+        },
+        [
+            showHeader ? renderViewHeader(h, header) : null,
+            renderViewContent(h, view, appMeta, options),
+            renderViewArea(h, view, appMeta, options, renderAreaList),
+            isTabView ? renderTabFooter(h, appMeta, tabIndex) : null
+        ]
+    )
+}
+
+```
+
+`renderView`方法接收的参数：
+
+- h: `render`的参数方法，创建VNode使用
+
+- view: 路由信息
+
+- appMeta: 元数据
+
+- options：额外配置
+
+`renderView`首页是从元数据获取一些配置信息，最后返回并执行`h()`
+
+`h`方法是Vue内部创建VNode的方法，这里解释一下它接收的参数：
+
+- tag: {String | Object | Function}表示一个 HTML 标签名、组件选项对象，或者
+
+- data: 可选参数，表示VNode的数据，完整的数据对象如下
+
+  ```
+    {
+      // 和`v-bind:class`一样的 API
+      'class': {
+        foo: true,
+        bar: false
+      },
+      // 和`v-bind:style`一样的 API
+      style: {
+        color: 'red',
+        fontSize: '14px'
+      },
+      // 正常的 HTML 特性
+      attrs: {
+        id: 'foo'
+      },
+      // 组件 props
+      props: {
+        myProp: 'bar'
+      },
+      // DOM 属性
+      domProps: {
+        innerHTML: 'baz'
+      },
+      // 事件监听器基于 "on"
+      // 所以不再支持如 v-on:keyup.enter 修饰器
+      // 需要手动匹配 keyCode。
+      on: {
+        click: this.clickHandler
+      },
+      // 仅对于组件，用于监听原生事件，而不是组件使用 vm.$emit 触发的事件。
+      nativeOn: {
+        click: this.nativeClickHandler
+      },
+      // 自定义指令. 注意事项：不能对绑定的旧值设值
+      // Vue 会为您持续追踨
+      directives: [
+        {
+          name: 'my-custom-directive',
+          value: '2'
+          expression: '1 + 1',
+          arg: 'foo',
+          modifiers: {
+            bar: true
+          }
+        }
+      ],
+      // 如果子组件有定义 slot 的名称
+      slot: 'name-of-slot'
+      // 其他特殊顶层属性
+      key: 'myKey',
+      ref: 'myRef'
+    }
+  ```
+
+- children：{String | Array} 表示子节点
+
+回到PAAS的代码中
+
+```javascript
+    return h(
+        formattedComponentName('Page'),
+        {
+            props: {
+                showHeader,
+                title: get(header, 'title', ''),
+                showHeaderBack: false,
+                showFooter: !footer.hide,
+                pageStyle: view.style,
+                headerStyle: header.style,
+                footerStyle: footer.style
+            }
+        },
+        [
+            showHeader ? renderViewHeader(h, header) : null,
+            renderViewContent(h, view, appMeta, options),
+            renderViewArea(h, view, appMeta, options, renderAreaList),
+            isTabView ? renderTabFooter(h, appMeta, tabIndex) : null
+        ]
+    )
+```
+
+结合`h`方法的作用，可以知道上面这段代码是通过`formattedComponentName('Page')`生成一个VNode，并且给这个VNode节点
+添加了一个属性`props`,第三个参数表示这个VNode节点包含的子VNode节点
+
+
 
 vue中使用`<component v-bind:is="currentView"></component>`创建动态组件
 
-结合paas机制，现在的问题就变成了如何动态生成组件
-
-先看下paas在这块的实现方式
 
 ```html
  <component :is="view"></component>
