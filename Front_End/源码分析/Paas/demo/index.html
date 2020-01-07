@@ -12,11 +12,21 @@
 </head>
 <body>
 <div id="app">
-    <com-2></com-2>
+    <components-2></components-2>
 </div>
 </body>
 
-<script type="module">
+<script>
+	Vue.component('components-1', { template: '<h1>components-1</h1>'})
+	Vue.component('components-2', {
+		render: function (createElement) {
+			return createElement(
+				'h1',
+				{},
+				['components-1']
+			)
+		}
+	})
 	Vue.component('com-2', {
 		render: function (createElement) {
 			return createElement(
@@ -49,7 +59,7 @@
 		},
 	})
 	var app = new Vue({
-		el: '#app',
+		template: '<div>134</div>',
 		data: {}
 	})
 </script>

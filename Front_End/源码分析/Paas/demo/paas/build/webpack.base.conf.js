@@ -29,8 +29,16 @@ module.exports = {
       '@': resolve('src'),
     }
   },
+  resolveLoader: {
+    modules: ['node_modules', path.join(__dirname, './loader')]
+  },
   module: {
     rules: [
+      {
+        test: /register\.js$/,
+        include: resolve('src/biz'),
+        loader: 'biz-loader'
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader',

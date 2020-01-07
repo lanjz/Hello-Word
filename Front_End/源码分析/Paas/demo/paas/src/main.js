@@ -3,10 +3,11 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import PageIndex from './page/index'
+// import PageIndex from './page/index'
+import register from './biz/register'
 Vue.config.productionTip = false
-
-Vue.component('Page', PageIndex)
+register()
+// Vue.component('Page', PageIndex)
 
 /* eslint-disable no-new */
 new Vue({

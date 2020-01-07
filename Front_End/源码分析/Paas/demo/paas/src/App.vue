@@ -24,7 +24,7 @@
         const vm = this
         return {
           render(createElement) {
-            return createElement('Page', {
+            return createElement('page1', {
               props: {
                 meta: vm.meta
               }
