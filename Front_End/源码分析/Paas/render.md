@@ -316,12 +316,436 @@ return h(
 
 ![avatar](https://raw.githubusercontent.com/lanjz/Hello-Word/master/_static/images/1578314228749_1578314178.jpg)
 
+从上图可以看到平时paas组做的组件是通过`renderViewArea(h, view, appMeta, renderAreaList)`渲染的
 
-这里不细讲这些函数的具体实现了，因为它们内部也是调用`h`方法生成的。这里唯一会让人感到困惑的是我们的组件是什么时候注册为Vue的全局组件的，
-因为
+这里不细讲这些函数的具体实现了，因为它们内部也是调用`h`方法生成的。这里唯一让人困惑的是`h`方法的第一参数是要已经定义，比如引擎中`h`方法
+的第一个参数是组件名的话，那这些组件在什么时候注册的呢？
+
+# 注册全局组件
+
+paas中的全局组件在这里分为两类，一类是内置的基础组件，一类是我们开发的业务组件
+
+## 注册基础组件
+
+内置的基础组件在入口文件`node_modules/webapp/src/engine/src/main.js`中注册的，我们要下具体代码
+
+```javascript
+import InnerComponents from '@engine/components'
+import BaseComponents from '@components'
+Vue.use(InnerComponents);
+Vue.use(BaseComponents);
+```
+
+`BaseComponents`在`node_modules/webapp/src/engine/src/components/index.js`目录下
+
+```javascript
+/**
+ * 全局注册内置组件
+ */
+import Page from './Page'
+import TabMenu from './TabMenu'
+
+const components = [
+    Page,
+    TabMenu,
+];
+
+export default {
+    install(Vue) {
+        components.forEach(component => Vue.component(component.name, component))
+    },
+    components
+};
+
+export {
+    Page,
+    TabMenu
+}
+
+```
+
+这个文件是把所有内置组件导入并使用`Vue.component`方法注册成全局组件，可以也看到了上文中我们看到`page`组件
+
+`InnerComponents`也是同理，它定义在`node_modules/webapp/src/component/packages/index.js`目录下
+
+```javascript
+/**
+ * 全局注册内置组件
+ */
+import Banner from './banner'
+import MenuGrid from './menu-grid'
+// 就不一一列举了
+
+const components = [
+    Banner,
+    MenuGrid,
+    // 就不一一列举了
+];
+
+export default {
+    install(Vue) {
+        components.forEach(component => Vue.component(component.name, component))
+    },
+    components
+};
+
+export {
+    Banner,
+    MenuGrid,
+    // 就不一一列举了
+}
+
+```
+
+也是使用的`Vue.component(component.name, component)`注册的全局组件
+
+## 注册业务组件
+
+我们业务组件在引擎的`src`目录下并没有直接找到引用的地方，因为它们是通过`webpack`处理
+
+我们查看`webpack`配置文件`module`部分有定义一个`rules`
+
+```javascript
+// node_modules/webapp/build/webpack.base.conf.js
+ rules: [
+            {
+                test: /register\.js$/, // node_modules/webapp/src/biz/register.js
+                include: [resolveUtils.resolve('src/biz')],
+                loader: 'biz-loader'
+            },
+            ....
+        ]
+```
+这个配置会使用自定义`loader` `biz-loader`处理`node_modules/webapp/src/biz/register.js`
+
+首先`register.js`的内容
+
+```javascript
+import Vue from 'vue'
+import router from '@platform/router'
+import store from '@platform/store'
+import { BODY_PARSER_PROPS as bodyProps } from '@utils/variable'
+import { error } from '@platform/log'
+
+export const modules = [];
+
+/**
+ * 根据 VueJS 组件特殊属性判断
+ * @param options
+ * @returns {boolean}
+ */
+function isVueOptions(options) {
+    if (!options) {
+        return false
+    }
+    return typeof options.template === 'string' || typeof options.render === 'function'
+}
+
+function getOptionItems(options = {}) {
+    return Array.isArray(options) ? options : (options.items || [])
+}
+
+function registerBody(id, { body, component, name }) {
+    const routeBody = body || component;
+    if (routeBody) {
+        if (typeof routeBody === 'function') {
+            // 异步组件
+            Vue.component(['parsed', id, name].join('-'), routeBody)
+        } else {
+            bodyProps.forEach(prop => {
+                getOptionItems(routeBody[prop]).forEach((item, index) => {
+                    // 增加 parsed 前缀，方便识别
+                    Vue.component(['parsed', id, name, prop, index].join('-'), item)
+                })
+            });
+            if (isVueOptions(routeBody)) {
+                Vue.component(['parsed', id, name].join('-'), routeBody)
+            }
+        }
+    }
+}
+
+/* eslint-disable */
+function registerPlugin(id, module) {
+    if (module && module.install) {
+        modules.push(module)
+    } else {
+        error(`钩子组件${id ? `(${id})` : ''}不符合规范`)
+    }
+}
+
+/* eslint-disable */
+function registerComponent(id, { component, routes, storeModule }) {
+    if (id && component) {
+        Vue.component(id, component);
+        if (routes) {
+            routes.forEach(route => {
+                const { body, component } = route;
+                if (body || typeof component === 'function' || bodyProps.some(prop => component && !!component[prop])) {
+                    registerBody(id, route)
+                } else {
+                    router.addRoutes([route])
+                }
+            })
+        }
+        const hasDefined = storeModule && store && store._modules
+        if (hasDefined && store._modules.get && !store._modules.get([id])) {
+            store.registerModule(id, storeModule)
+        }
+    }
+}
+
+```
+
+这个文件只是定义了一些函数
+
+在根据`webpack`配置查看自定义`loader`的配置位置
+
+```javascript
+  resolveLoader: {
+        modules: ['node_modules', path.join(__dirname, './loader')]
+    },
+```
+
+看下里面重点代码
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+const argv = require('../argv').argv;
+const loadJSON = require('../helper').loadJSON;
+const parseComponents = require('../parseComponents');
+const pluginIds = typeof argv.pluginIds === 'string' ? argv.pluginIds.split(',') : [];
+const clients = typeof argv.clients === 'string' ? argv.clients.toLowerCase().split(',') : [];
+const withMp = clients.indexOf('miniprogram') > -1
+
+//开发者业务组件列表
+let componentList = [];
+const devComponentMap = {};
+
+// 业务组件开发模式
+console.log('argv', argv)
+if (argv.devmode) {
+    parseComponents(function (data) {
+        const parsedDir = data.dir.replace(/\\/g, '/');
+        componentList.push(parsedDir);
+        devComponentMap[parsedDir] = data
+    })
+} else {
+    componentList = require('../../src/biz/list')
+}
+
+function getComponentId(component) {
+    return argv.devmode ? loadJSON(`${component}/package.json`).name : component
+}
+
+if (componentList.length) {
+    console.log(
+        '[Biz components include list]\n>',
+        componentList.map(function (component) {
+            return component + (pluginIds.indexOf(getComponentId(component)) > -1 ? '[hook]' : '')
+        }).join('\n> ')
+    );
+}
+
+function exists(dir) {
+    return argv.devmode ?
+        fs.existsSync(dir) && fs.existsSync(path.join(dir, 'index.js')) :
+        fs.existsSync(path.join(__dirname, '../../node_modules', dir)) && fs.existsSync(path.join(__dirname, '../../node_modules', dir, 'index.js'))
+}
+
+function tryBlock(code, component) {
+    return argv.devmode ? code : `
+try {
+    ${code}
+} catch (e) {
+    error(e, {tags: { component: '${ component }' }})
+}`
+}
+
+function getPluginCode(component, componentId) {
+    return exists(component) ? tryBlock(
+        `registerPlugin('${ componentId }', require('${ component}').default || {})`,
+        componentId
+    ) : ''
+}
+
+function getComponentCode(component, componentId) {
+    return exists(component + '/src') ? tryBlock(
+        `registerComponent('${ componentId }', require('${ component}/src').default || {})`,
+        componentId
+    ) : ''
+}
+
+function genRegisterComponentCodes() {
+    console.log('componentList',componentList)
+    return componentList.map(function (component) {
+        const componentId = getComponentId(component);
+        // 非业务组件、钩子组件，忽略
+        if (argv.devmode && devComponentMap[component] && !devComponentMap[component].isComponent) {
+            return ''
+        }
+        return pluginIds.indexOf(componentId) === -1 ?
+            getComponentCode(component, componentId) :
+            getPluginCode(component, componentId)
+    }).join('\n')
+}
+
+function getWxmlCodes() {
+    const target = path.resolve(__dirname, '../MiniProgram/wxml').replace(/\\/g, '/')
+    console.log('__dirname', __dirname)
+    console.log('target', target)
+    // 非最终构建，即引用组件或清除引擎缓存之后的构建
+    const emulatorUse = argv.devmode === 'biz'
+        || /buildDesigner\.js$/.test(argv['$0'])
+        || /buildBiz\.js$/.test(argv['$0'])
+    return (emulatorUse || withMp) ? `\
+const MpComponents = require('${target}').default;
+Vue.use(MpComponents);\n
+` : ''
+}
+
+module.exports = function (source) {
+    console.log('source', source)
+    return source + ';\n' + getWxmlCodes() + genRegisterComponentCodes()
+};
 
 
+```
 
+首先定义了一个`componentList`存放我们的业务组件，在开发环境下`componentList`通过`parseComponents`方法进行填充，下面是`parseComponents`的代码内容
+
+```javascript
+function parseComponents(callback) {
+    if (config.isUnderNodeModules) {
+        utils.parseComponents(path.join(__dirname, '../../..'), callback)
+    } else {
+        utils.parseComponents(path.join(__dirname, '..', 'example'), callback, true)
+    }
+}
+```
+
+
+开发环境下执行`utils.parseComponents(path.join(__dirname, '../../..'), callback)`，`path.join(__dirname, '../../..')`则定位到的是项目根目录路径，
+将根路径传给`utils.parseComponents`函数：
+
+```javascript
+const deepDirs = ['packages', 'workspace', 'modules'];
+function parseComponents(rootDir, cb, isNotDeep, checkFiles, filter, parent) {
+    if (rootDir && fs.existsSync(rootDir)) {
+        const dirList = fs.readdirSync(rootDir);
+        dirList.forEach(biz => {
+            const currentPath = path.join(rootDir, biz);
+            if (isComponentDir(currentPath, checkFiles)) {
+                if (filter.test(biz)) {
+                    cb(parseComponent(currentPath, parent))
+                }
+            } else if (!isNotDeep && deepDirs.indexOf(biz) > -1) {
+                parseComponents(currentPath, cb, isNotDeep, checkFiles, filter, biz)
+            }
+        });
+    }
+}
+```
+
+`parseComponents`函数中先是根据路径获取该路径下的所有文件并遍历他们，通过`isComponentDir(currentPath, checkFiles)`方法判断是否
+是业务组件（通过文件下是否包含`index.js`或者`package.json`），如果符合的话执行`cb(parseComponent(currentPath, parent))`方法，
+如果还是文件夹且名字是`['packages', 'workspace', 'modules']`中的一个则继续执行自身函数获取文件，接下来我们看下`parseComponent()`方法
+
+
+```javascript
+function parseComponent(dir, parent) {
+    const packagePath = path.join(dir, 'package.json');
+    const packageInfo = loadJSON(packagePath);
+    const id = packageInfo.name || dir.replace(/\\/g, '/').split('/').pop();
+
+    return Object.assign(
+        {
+            title: packageInfo.description || id
+        },
+        packageInfo.componentConfig,
+        {
+            dir: dir,
+            id: id,
+            type: 'biz',
+            visible: pluginIds.indexOf(id) > -1 ? 0 : 1,
+            isComponent: parent !== 'modules' || pluginIds.indexOf(id) > -1
+        }
+    )
+}
+
+```
+
+`parseComponent`方法则是通过读取`package.json`文件获取`id`信息，然后返回当前目录的一些基本信息`dir`（目录路径）、`id`、`isComponent`（是否是业务组件）等
+
+回到`biz-loader`，这些组件信息就存入`componentList`中
+
+最后看下loader的导出结果
+
+```javascript
+module.exports = function (source) {
+    console.log('source', source)
+    return source + ';\n' + getWxmlCodes() + genRegisterComponentCodes()
+};
+```
+
+直接返回`register.js`内容加上两个函数`getWxmlCodes()`、`genRegisterComponentCodes()`的返回结果,这里我们关注一下`genRegisterComponentCodes()`方法
+
+```javascript
+function genRegisterComponentCodes() {
+    console.log('componentList',componentList)
+    return componentList.map(function (component) {
+        const componentId = getComponentId(component);
+        // 非业务组件、钩子组件，忽略
+        if (argv.devmode && devComponentMap[component] && !devComponentMap[component].isComponent) {
+            return ''
+        }
+        return pluginIds.indexOf(componentId) === -1 ?
+            getComponentCode(component, componentId) :
+            getPluginCode(component, componentId)
+    }).join('\n')
+}
+
+```
+
+`genRegisterComponentCodes()`方法中遍历`componentList`，即上文收集到所以组件信息，`pluginIds`指的是钩子组件如`b2c-jssdk`、`broker-common`，这些
+不算业务组件
+对于业务组件执行`getComponentCode(component, componentId)`
+
+```javascript
+function getComponentCode(component, componentId) {
+    return exists(component + '/src') ? tryBlock(
+        `registerComponent('${ componentId }', require('${ component}/src').default || {})`,
+        componentId
+    ) : ''
+}
+```
+
+然后会执行`registerComponent`方法，`registerComponent`函数定义在`register.js`中
+
+```javascript
+function registerComponent(id, { component, routes, storeModule }) {
+    if (id && component) {
+        Vue.component(id, component);
+        if (routes) {
+            routes.forEach(route => {
+                const { body, component } = route;
+                if (body || typeof component === 'function' || bodyProps.some(prop => component && !!component[prop])) {
+                    registerBody(id, route)
+                } else {
+                    router.addRoutes([route])
+                }
+            })
+        }
+        const hasDefined = storeModule && store && store._modules
+        if (hasDefined && store._modules.get && !store._modules.get([id])) {
+            store.registerModule(id, storeModule)
+        }
+    }
+}
+```
+
+在这里终于找到了`Vue.component(id, component)`，在这里注册我们编写的业务组件同时处理组件中的路由和`store`等
 
 
 vue中使用`<component v-bind:is="currentView"></component>`创建动态组件
