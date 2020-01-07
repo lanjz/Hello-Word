@@ -1,13 +1,11 @@
 
 # PAAS动态创建应用机制
 
-> PAAS动态创建应用主要使用了VUE的`render`方法，所以在往下看前建议先对`render`方法有些了解，如果真的暂时不想去了解，那么至少也知道
-`render`的作用就是**生成VUE组件**
+> PAAS动态创建应用主要使用了VUE的`render`方法，所以在往下看之前建议先对`render`方法有些了解，如果真的暂时不想去了解，那么至少请记住
+Vue提供的`render`方法的作用就是**生成VUE组件**（这个说法其实不是很准确，这里只是为了帮助理解）
 
 浏览器打开PAAS应用时（https://webapp.mypaas.com.cn/b2c/yk_qmyx/test/?tenant_code=yajuleadmin_test），
-先是发出`meta`请求获取到元数据，这个元数据包含了应用中一些配置信息，然后根据元数据生成应用，本文就是绥下请求到元素到页面生成之间发生了
-什么事情
-
+先是发出`meta`请求获取到元数据，这个元数据包含了当前应用的一些配置信息，然后根据元数据生成应用，本文就是了解下请求到元素到页面生成之间发生了什么事情
 
 先简单看下PAAS引擎中针对这块的实现代码
 
@@ -21,9 +19,8 @@ const $instance = new Vue({
     },
     created() {
     	store.dispatch(appTypes.GET_APP_META, { tenant, role }).then(roleMeta => {
-                        store.commit(appTypes.SET_APP_META, roleMeta)
-                    }).catch(() => {
-                    })
+              store.commit(appTypes.SET_APP_META, roleMeta) }).catch(() => { }
+)
     	// do something
     },
     methods: {
@@ -35,8 +32,7 @@ $instance.$mount('#app');
 
 ```
 
-上面代码是先实例化一个`$instance`实例，然后再调用`$mount`方法，把`$instance`挂载到`#app`元素中，至于`$instance`的内容就是通过`render`方法
-加载的，这个`$instance`实例创建时会执行`store.dispatch(appTypes.GET_APP_META)`方法请求元数据，至于处理元数据的操作是在`APP`组件中做的
+上面代码先是实例化了一个`$instance`实例，然后再调用`$mount`方法，把`$instance`挂载到`#app`元素中，至于`$instance`的内容就是通过`render`方法创建的，这个`$instance`实例创建时会执行`store.dispatch(appTypes.GET_APP_META)`方法请求元数据，至于处理元数据的操作是在`APP`组件中做的
 
 `APP`是`import`进来的`vue组件`，下面是`APP.vue`简化后的代码
 
@@ -127,16 +123,14 @@ export default {
 }
 ```
 
-`APP.vue`跟元数据相关的核心部分就是上面`watch`中的`appMeta`，因为`appMeta`带有`immediate`属性，所以组件加载时`handler`中的
+`APP.vue`跟元数据相关的核心部分就是上面`watch`中的`appMeta`监听函数部分，因为`appMeta`带有`immediate`属性，所以组件加载时`handler`中的
 方法会先执行一次，`handler`函数中代码不长也没有特别复杂的代码，主要功能就是遍历元数据中的页面信息，动态生成Vue路由，这里就不一一解释了，
 重点需要注意的是以下几点
-
-先定义了一下变量` const routes = [];`用来存放Vue路由信息
 
 - 元数据中一条路由信息的结构信息如下
 
   ```javascript
-{
+  {
 	name:39f228fd-66cb-0b40-bffd-e1d1829f4aab, // 路由名称
     path:/39f228fd-66cb-0b40-bffd-e1d1829f4aab， // 路由路径
     body:{
@@ -158,7 +152,7 @@ export default {
 	    children: []	
     }
 
-}
+  }
   ```
 
 - 一个路由信息要加载的组件`component`也是通过`render`方法创建的
@@ -174,7 +168,7 @@ export default {
         }
   ```
   
-- 上面代码中的`render`方法内部并不是直接执行了的函数参数`h`方法，而是执行PAAS额外封装的`renderView`方法，接下来我们来分析下`renderView`方法
+- 上面代码中的`render`方法内部并不是直接执行的函数参数`h`方法，而是执行PAAS额外封装的`renderView`方法，接下来我们来分析下`renderView`方法
 
 ## renderView方法
 
@@ -227,9 +221,9 @@ export function renderView(h, view, appMeta) {
 
 - options：额外配置
 
-`renderView`首页是从元数据获取一些配置信息，最后返回并执行`h()`
+`renderView`首先是从元数据获取一些配置信息，最后返回并执行`h()`
 
-`h`方法是Vue内部创建VNode的方法，这里解释一下它接收的参数：
+`h`方法是Vue内部创建VNode的方法，这里先简单解释一下它接收的参数：
 
 - tag: {String | Object | Function}表示一个 HTML 标签名、组件、选项对象，或者
 
