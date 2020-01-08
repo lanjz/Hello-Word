@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>前端错误处理</h1>
+</body>
+<script>
+	/*window.addEventListener('error',function (e) {
+		console.log(e.error)
+	})*/
+	window.onerror = function (e) {
+		console.log( e.stack)
+		console.log('生成了错误')
+	}
+	throw new Error('try里抛出错误')
+</script>
+</html>
