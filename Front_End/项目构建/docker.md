@@ -35,27 +35,32 @@ Docker 镜像是一个特殊的文件系统，除了提供容器运行时所需�
 
 一个 `Docker Registry` 中可以包含多个仓库（Repository）；每个仓库可以包含多个标签（Tag）；每个标签对应一个镜像。
 
-仓库名经常以 两段式路径 形式出现`<username>/<Image>`，比如 `lanjz/koa-demo`，前者往往表示着 `Docker Registry` 的用户名，后者表示软件名。
+仓库名经常以两段式路径形式出现`<username>/<Image>`，如 `lanjz/koa-demo`，前者往往表示着 `Docker Registry` 的用户名，后者表示Image名。
 
 
 # 镜像操作
 
-从Docker镜像获取镜像的命令是`docker pull`. 其格式为：
+获取镜像，其格式为：
 
 `docker pull [选项] [Docker Registry 地址[:端口号]/]仓库名[:标签]`
 
-- Docker 镜像仓库地址：地址的格式一般是 <域名/IP>[:端口号]。默认地址是 `Docker Hub`。
+- 镜像仓库地址：格式一般是 `<域名/IP>[:端口号`]。默认地址是 `Docker Hub`。
 
-- 仓库名：如之前所说，这里的仓库名是两段式名称，即 `<用户名>/<镜像名>`。对于 Docker Hub，如果不给出用户名，则默认为 `library`，也就是官方镜像。
+- 仓库名：如之前所说的两段式名称，即 `<用户名>/<镜像名>`。对于 Docker Hub，如果不给出用户名，则默认为 `library`，也就是官方镜像。
 
-比如
+比如：
 
 ```
 docker image pull library/hello-world
 ```
 
-上文的命令表示从Docker Hub下载名为`hello-world`的Image,`library`是这个Image所在的组，因为`library`是官方默认组，可以
-省略，所以使用命令`docker image pull hello-world`也是一样的
+因为`library`是官方默认组，所以上面的命令等于：
+
+```
+docker image pull hello-world
+```
+
+上文的命令表示从Docker Hub下载名为`hello-world`的Image
 
 `hello-world`后面没有带标签，则表示获取`last`标签
 
@@ -70,39 +75,6 @@ docker.io/library/hello-world:latest
 ```
 
 抓取成功以后，就可以通过命令`docker image ls`  查看本机Docker里的 Image 文件了。
-
-现在，运行这个 image 文件。
-
-`docker container run [image]`命令会从 image 文件，生成一个正在运行的容器实例。
-
-```
-$ docker container run hello-world
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
-
-... ...
-```
-
-输出这段提示以后，`hello world`就会停止运行，容器自动终止。
-
-有些容器不会自动终止，因为提供的是服务。比如，安装运行Node服务。 
-
-## docker commit
-
-> [利用 commit 理解镜像构成](https://yeasy.gitbooks.io/docker_practice/image/commit.html)
-
-正常我们的容器是通过Image生成的，但有时候我们希望直接修改容器内容，并保存为Image时就需要用到`docker commit`，
-
-格式： `docker commit [选项] <容器ID或容器名> [<仓库名>[:<标签>]]`
-
-```
-$ docker commit \
-    --author "Tao Wang <twang2218@gmail.com>" \
-    --message "修改了默认网页" \
-    webserver \
-    nginx:v2
-sha256:07e33465974800ce65751acc279adc6ed2dc5ed4e0838f8b86f0c87aa1795214
-```
 
 - `--author` 是指定修改的作者
 
