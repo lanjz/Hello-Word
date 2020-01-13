@@ -101,4 +101,4 @@ This message shows that your installation appears to be working correctly.
 
 输出这段提示以后，`hello world`就会停止运行，容器自动终止。
 
-有些容器不会自动终止，因为提供的是服务。比如，安装运行Node服务。
+有些容器不会自动终止，因为提供的是服务。比如，安装运行Node服务。 
