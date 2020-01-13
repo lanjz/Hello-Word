@@ -76,17 +76,122 @@ docker.io/library/hello-world:latest
 
 抓取成功以后，就可以通过命令`docker image ls`  查看本机Docker里的 Image 文件了。
 
+# Docker
+
+> [Docker —— 从入门到实践](https://yeasy.gitbooks.io/docker_practice/basic_concept/image.html)
+ 
+Docker是指容器化技术，用于支持创建和使用Linux容器，Docker 属于 Linux 容器的一种封装，提供简单易用的容器使用接口。
+
+借助Docker,你可将容器当做轻巧，模块化的虚拟机使用。同时，你还将获得高度的灵活性，从而实现对容器的高效创建，部署及复制，并能将其从一个环境顺利迁移至另一个环境
+
+# 基本概念
+
+Docker 包括三个基本概念
+
+- 镜像（Image）
+
+- 容器（Container）
+
+- 仓库（Repository）
+
+## 镜像（Image）
+
+Docker 镜像是一个特殊的文件系统，除了提供容器运行时所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数（如匿名卷、环境变量、用户等）。
+镜像不包含任何动态数据，其内容在构建之后也不会被改变
+
+## 容器（Container）
+
+镜像（Image）和容器（Container）的关系，就像是面向对象程序设计中的 类 和 实例 一样，镜像是静态的定义，容器是镜像运行时的实体。
+
+容器的实质是进程，但与直接在宿主执行的进程不同，容器进程运行于属于自己的独立的 命名空间。因此容器可以拥有自己的 root 文件系统、自己的网络配置、自己的进程空间，甚至自己的用户 ID 空间。
+
+容器内的进程是运行在一个隔离的环境里，使用起来，就好像是在一个独立于宿主的系统下操作一样。
+
+## 仓库（Registry）
+
+简单来说就是一个云存储平台，可以存储Docker Image，我们可以让传自己的Image，也可以下载别人Image
+
+一个 `Docker Registry` 中可以包含多个仓库（Repository）；每个仓库可以包含多个标签（Tag）；每个标签对应一个镜像。
+
+仓库名经常以 两段式路径 形式出现`<username>/<Image>`，比如 `lanjz/koa-demo`，前者往往表示着 `Docker Registry` 的用户名，后者表示软件名。
+
+
+# 镜像操作
+
+从Docker镜像获取镜像的命令是`docker pull`. 其格式为：
+
+`docker pull [选项] [Docker Registry 地址[:端口号]/]仓库名[:标签]`
+
+- Docker 镜像仓库地址：地址的格式一般是 <域名/IP>[:端口号]。默认地址是 `Docker Hub`。
+
+- 仓库名：如之前所说，这里的仓库名是两段式名称，即 `<用户名>/<镜像名>`。对于 Docker Hub，如果不给出用户名，则默认为 `library`，也就是官方镜像。
+
+比如
+
+```
+docker image pull library/hello-world
+```
+
+上文的命令表示从Docker Hub下载名为`hello-world`的Image,`library`是这个Image所在的组，因为`library`是官方默认组，可以
+省略，所以使用命令`docker image pull hello-world`也是一样的
+
+`hello-world`后面没有带标签，则表示获取`last`标签
+
+执行命令后将在终端出现以下信息
+
+```
+Using default tag: latest
+latest: Pulling from library/hello-world
+Digest: sha256:d1668a9a1f5b42ed3f46b70b9cb7c88fd8bdc8a2d73509bb0041cf436018fbf5
+Status: Image is up to date for hello-world:latest
+docker.io/library/hello-world:latest
+```
+
+抓取成功以后，就可以通过命令`docker image ls`  查看本机Docker里的 Image 文件了。
+
+现在，运行这个 image 文件。
+
+`docker container run [image]`命令会从 image 文件，生成一个正在运行的容器实例。
+
+```
+$ docker container run hello-world
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+... ...
+```
+
+输出这段提示以后，`hello world`就会停止运行，容器自动终止。
+
+有些容器不会自动终止，因为提供的是服务。比如，安装运行Node服务。 
+
+## docker commit
+
+> [利用 commit 理解镜像构成](https://yeasy.gitbooks.io/docker_practice/image/commit.html)
+
+`docker commit`让我们可以直接修改容器内容，并保存为新的Image，
+
+格式： `docker commit [选项] <容器ID或容器名> [<仓库名>[:<标签>]]`
+
+```
+$ docker commit \
+    --author "Tao Wang <twang2218@gmail.com>" \
+    --message "修改了默认网页" \
+    webserver \
+    nginx:v2
+sha256:07e33465974800ce65751acc279adc6ed2dc5ed4e0838f8b86f0c87aa1795214
+```
 - `--author` 是指定修改的作者
 
 - `--message` 则是记录本次修改的内容
 
 ### 慎用`docker commit`
 
-使用 docker commit 意味着所有对镜像的操作都是黑箱操作，生成的镜像也被称为 黑箱镜像，换句话说，就是除了制作镜像的人知道执行过什么命令、怎么生成的镜像，别人根本无从得知。
+使用 `docker commit` 意味着所有对镜像的操作都是黑箱操作，生成的镜像也被称为黑箱镜像，换句话说，就是除了制作镜像的人知道执行过什么命令、怎么生成的镜像，别人根本无从得知。
 而且，即使是这个制作镜像的人，过一段时间后也无法记清具体的操作。这种黑箱镜像的维护工作是非常痛苦的。
 
 而且，回顾之前提及的镜像所使用的分层存储的概念，除当前层外，之前的每一层都是不会发生改变的，换句话说，任何修改的结果仅仅是在当前层进行标记、添加、修改，而不会改动上一层。
-如果使用 docker commit 制作镜像，以及后期修改的话，每一次修改都会让镜像更加臃肿一次，所删除的上一层的东西并不会丢失，会一直如影随形的跟着这个镜像，即使根本无法访问到。这会让镜像更加臃肿。
+如果使用 `docker commit` 制作镜像，以及后期修改的话，每一次修改都会让镜像更加臃肿一次，所删除的上一层的东西并不会丢失，会一直如影随形的跟着这个镜像，即使根本无法访问到。这会让镜像更加臃肿。
 
 ## 使用 Dockerfile 定制镜像
 
