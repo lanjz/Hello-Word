@@ -339,6 +339,103 @@ image设置的`username`与你登录的Docker账号不一致，改成一致就�
 
 # Docker常用命令
 
+## 显示Image相关命令
+
+- `docker image ls`
+
+  列出已经Docker已经有的镜像
+  
+- `docker image ls -a`
+
+  显示包括中间层镜像在内的所有镜像
+  
+  > 为了加速镜像构建、重复利用资源，Docker 会利用 中间层镜像。所以在使用一段时间后，可能会看到一些依赖的中间层镜像。
+  > 默认的 `docker image ls` 列表中只会显示顶层镜像
+
+- `docker image ls <仓库名>`
+
+  根据仓库名列出镜像
+  
+- `docker image ls <仓库名>：<标签>`
+
+  列出特定的某个镜像，也就是说指定仓库名和标签
+  
+- `docker image ls --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"`
+
+  自定义Image显示的表格列
+  
+  ```
+  $ docker image ls --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"
+  IMAGE ID            REPOSITORY          TAG
+  5f515359c7f8        redis               latest
+  05a60462f8ba        nginx               latest
+  ```
+
+- `docker image ls -f dangling=true`
+
+  列出虚悬镜像(dangling image)
+  
+  ```
+  REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+  <none>              <none>              00285df0df87        5 days ago          342 MB
+  ```
+  
+   >  虚悬镜像: 假设原本下载了一个镜像`mongo:3.2`，随着官方镜像维护，发布了新版本后，
+   重新 `docker pull mongo:3.2` 时，`mongo:3.2` 这个镜像名被转移到了新下载的镜像身上，而旧的镜像上的这个名称则被取消，
+   从而成为了 `<none>`。除了 `docker pull` 可能导致这种情况，`docker build` 也同样可以导致这种现象。
+   由于新旧镜像同名，旧镜像名称被取消，从而出现仓库名、标签均为 `<none>` 的镜像。
+   这类无标签镜像也被称为 虚悬镜像(dangling image)，一般来说，虚悬镜像已经失去了存在的价值，是可以随意删除的。使用`docker image prune`命令删除
+   虚悬镜像
+   
+## 删除镜像
+
+格式：`docker image rm [选项] <镜像1> [<镜像2> ...]`
+
+- ` docker image rm 501`
+
+  根据ID删除镜像
+  
+- ` docker image rm Hello-World`
+
+  根据镜像名删除镜像
+  
+  ```
+  $ docker image rm centos
+  Untagged: centos:latest
+  Untagged: centos@sha256:b2f9d1c0ff5f87a4743104d099a3d561002ac500db1b9bfa02a783a46e0d366c
+  Deleted: sha256:0584b3d2cf6d235ee310cf14b54667d889887b838d3f3d3033acd70fc3c48b8a
+  Deleted: sha256:97ca462ad9eeae25941546209454496e1d66749d53dfa2ee32bf1faabd239d38
+  ```
+   
+- `docker image prune`
+
+  删除虚悬镜像(dangling image)
+  
+## Untagged 和 Deleted
+
+查看上文删除的输出信息，会发送每条删除信息前都有一个标识：`Untagged`和`Deleted`, 这是因为一个镜像可以有多个标签。
+
+因此当我们使用上面命令删除镜像的时候，实际上是在要求删除某个标签的镜像。所以首先需要做的是将满足我们要求的所有镜像标签都取消，
+这就是我们看到的 `Untagged` 的信息。因为一个镜像可以对应多个标签，因此当我们删除了所指定的标签后，可能还有别的标签指向了这个镜像，
+如果是这种情况，那么`Delete`行为就不会发生。所以并非所有的 `docker image rm` 都会产生删除镜像的行为，有可能仅仅是取消了某个标签而已。
+
+当该镜像所有的标签都被取消了，该镜像很可能会失去了存在的意义，因此会触发删除行为。
+
+## 为什么会有这么多的删除信息
+
+镜像是多层存储结构，因此在删除的时候也是从上层向基础层方向依次进行判断删除。
+镜像的多层结构让镜像复用变得非常容易，因此很有可能某个其它镜像正依赖于当前镜像的某一层。这种情况，依旧不会触发删除该层的行为。
+直到没有任何层依赖当前层时，才会真实的删除当前层。这就是为什么，有时候会奇怪，为什么明明没有别的标签指向这个镜像
+，但是它还是存在的原因，也是为什么有时候会发现所删除的层数和自己 `docker pull` 看到的层数不一样的原因。
+
+除了镜像依赖以外，还需要注意的是容器对镜像的依赖。如果有用这个镜像启动的容器存在（即使容器没有运行），
+那么同样不可以删除这个镜像。之前讲过，容器是以镜像为基础，再加一层容器存储层，组成这样的多层存储结构去运行的。因此该镜像如果被这个容器所依赖的，
+那么删除必然会导致故障。如果这些容器是不需要的，应该先将它们删除，然后再来删除镜像。
+
+- `docker image rm $(docker image ls -q redis)`
+
+  删除所有仓库名为` redis `的镜像：
+
 - `docker image rmi [ IMAGE ID ||  REPOSITORY]`
 
   删除image，如果`rmi`后面使用的是`IMAGE ID`，且这个`IMAGE ID`被一个以上的`REPOSITORY`引用，则删除失败并会提示
