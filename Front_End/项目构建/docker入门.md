@@ -594,5 +594,130 @@ docker run -d -v mydata:/data xxxx
 
 简单的说，容器是独立运行的一个或一组应用，以及它们的运行态环境。对应的，虚拟机可以理解为模拟运行的一整套操作系统（提供了运行态环境和其他系统环境）和跑在上面的应用。
 
+## 启动容器常用操作
 
+- `docker run `: 创建容器
 
+  命令可以跟上参数
+
+    - `-t`: 让Docker分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上
+    
+    - `-i`: 容器的标准输入保持打开
+    
+    - `-d`: 需要让 Docker 在后台运行而不是直接把执行命令的结果输出在当前宿主机下，使用这个参数启动后会返回一个唯一的 `i`
+      如果想到查看输出结果可以使用命令`docker logs`查看
+  
+  下面的命令则启动一个 bash 终端，允许用户进行交互
+
+    ```
+    docker run -t -i ubuntu:18.04 /bin/bash
+    root@af8bae53bdd3:/#
+    ```
+
+  当利用 `docker run`来创建容器时，Docker 在后台运行的标准操作包括
+
+  - 检查本地是否存在指定的镜像，不存在就从公有仓库下载
+
+  - 利用镜像创建并启动一个容器
+
+  - 分配一个文件系统，并在只读的镜像层外面挂载一层可读写层
+
+  - 从宿主主机配置的网桥接口中桥接一个虚拟接口到容器中去
+
+  - 从地址池配置一个 ip 地址给容器
+
+  - 执行用户指定的应用程序
+
+  - 执行完毕后容器被终止
+
+- `docker container start <id>`: 启动已终止容器
+
+- `docker container stop <id>`: 终止容器
+
+- `docker container rm`：删除容器
+
+  ```
+  $ docker container rm  trusting_newton
+  trusting_newton
+  ```
+  
+  如果要删除一个运行中的容器，可以添加 `-f` 参数。Docker 会发送 SIGKILL 信号给容器。
+  
+- `docker container prune`: 清理所有处于终止状态的容器
+
+## 进入容器
+
+在使用 `-d` 参数时，容器启动后会进入后台。
+
+某些时候需要进入容器进行操作，包括使用 `docker attach` 命令或 `docker exec 命令`，他们的区别如下：
+
+- `attach`: 如`docker attach 243c`,如果在窗口内`exit`,会导致容器的停止
+
+- `exec`:如`docker exec -i 69d1 bash`,如果在窗口内`exit`,不会导致容器的停止
+
+因此推荐大家使用 `docker exec`
+
+## 导入和导出
+
+可以使用`docker export`命令导出容器快照到本地文件
+
+```
+$ docker container ls -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                    PORTS               NAMES
+7691a814370e        ubuntu:18.04        "/bin/bash"         36 hours ago        Exited (0) 21 hours ago                       test
+$ docker export 7691a814370e > ubuntu.tar
+```
+
+可以使用 `docker import` 从容器快照文件中再导入为镜像
+
+```
+$ cat ubuntu.tar | docker import - test/ubuntu:v1.0
+$ docker image ls
+REPOSITORY          TAG                 IMAGE ID            CREATED              VIRTUAL SIZE
+test/ubuntu         v1.0                9d37a6082e97        About a minute ago   171.3 MB
+```
+
+此外，也可以通过指定 URL 或者某个目录来导入，例如
+
+```
+docker import http://example.com/exampleimage.tgz example/imagerepo
+```
+
+> 用户既可以使用 docker load 来导入镜像存储文件到本地镜像库，也可以使用 docker import 来导入一个容器快照到本地镜像库。
+这两者的区别在于容器快照文件将丢弃所有的历史记录和元数据信息（即仅保存容器当时的快照状态），而镜像存储文件将保存完整记录，体积也要大。
+此外，从容器快照文件导入时可以重新指定标签等元数据信息。
+
+# 推送自己的镜像
+
+使用`docker login`登录自己的账号
+
+通过 `docker push` 命令来将自己的镜像推送到 Docker Hub
+
+```
+docker tag ubuntu:18.04 username/ubuntu:18.04
+```
+
+通过`docker search <username>`查找官方仓库中的镜像
+
+## 自动构建
+
+自动构建（Automated Builds）功能对于需要经常升级镜像内程序来说，十分方便。
+
+有时候，用户构建了镜像，安装了某个软件，当软件发布新版本则需要手动更新镜像。
+
+而自动构建允许用户通过 Docker Hub 指定跟踪一个目标网站（支持 GitHub 或 BitBucket）上的项目，一旦项目发生新的提交 （commit）或者创建了新的标签（tag），
+Docker Hub 会自动构建镜像并推送到 Docker Hub 中。
+
+要配置自动构建，包括如下的步骤：
+
+- 登录 Docker Hub；
+
+- 在 Docker Hub 点击右上角头像，在账号设置（Account Settings）中关联（Linked Accounts）目标网站；
+
+- 在 Docker Hub 中新建或选择已有的仓库，在 Builds 选项卡中选择 Configure Automated Builds
+
+- 选取一个目标网站中的项目（需要含 Dockerfile）和分支
+
+- 指定 Dockerfile 的位置，并保存
+
+之后，可以在 Docker Hub 的仓库页面的 Timeline 选项卡中查看每次构建的状态
