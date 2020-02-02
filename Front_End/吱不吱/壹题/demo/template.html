@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    function abc(a) {
+      this.abc = a
+    }
+    const bcd = new abc(10)
+    console.log('bcd', bcd)
+
+    function _new(fn, ...arg) {
+      const newFn = Object.create(fn.prototype)
+      const result = fn.apply(newFn, arg)
+      return result
+    }
+    const bcd2 = _new(abc, 55)
+    console.log(bcd2)
+</script>
+</body>
+</html>
