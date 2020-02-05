@@ -91,7 +91,7 @@
 
 ```
 scripts: {  
-  start: './node_modules/someTool/someTool.js build'
+  start: './node_modules/bin/someTool.js build'
 }
 
 // 简写为

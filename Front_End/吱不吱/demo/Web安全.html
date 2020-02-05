@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="abc"></div>
+</body>
+<script>
+  if(location.href.indexOf('default=') > -1) {
+    let getDefault = decodeURI(location.href.substring(location.href.indexOf('default=') + 8))
+    console.log(getDefault)
+    getDefault = escape(getDefault)
+    console.log(getDefault)
+    document.write(getDefault);
+  }
+</script>
+</html>
