@@ -79,6 +79,10 @@ XSS 的原理是恶意攻击者往 Web 页面里插入恶意可执行网页脚�
 
 御防方案：
 
+- 将cookie设置为HttpOnly
+  CRSF攻击很大程度上是利用了浏览器的cookie，为了防止站内的XSS漏洞盗取cookie,需要在cookie中设置“HttpOnly”属性，
+  这样通过程序（如JavaScript脚本、Applet等）就无法读取到cookie信息，避免了攻击者伪造cookie的情况出现
+
 - 后端在入库前应该选择不相信任何前端数据，将所有的字段统一进行转义处理
 
 - 获者后端在输出给前端数据统一进行转义处理
@@ -144,26 +148,82 @@ CSRF 原理：
 
 3. 用户在没有退出A网站登录态的情况下，访问危险网站B
 
-4. B要求访问A网站，请示发出一个请求
-
-5. 网站A根据网站B的要求推带cookie发出请求
+4. 网站B请求网站A的接口，此时请求将会携带网站A的cookie
 
 CSRF 攻击必须要有三个条件 :
 
 - 用户已经登录了站点 A，并在本地记录了 cookie
 
-- 用户没有登出站点 A 的情况下（也就是 cookie 生效的情况下），访问了恶意攻击者提供的引诱危险站点 B (B 站点要求访问站点A)。
+- 用户没有登出站点 A 的情况下（也就是 cookie 生效的情况下），访问了恶意攻击者提供的引诱危险站点 B。
 
 - 站点 A 没有做任何 CSRF 防御
 
 CSRF 预防方案
 
-- 在非 GET 请求中增加 token
+- 在非 GET 请求中增加 token，不要完全使用cookie做为认证
 
-- 为每个用户生成一个唯一的 cookie token，所有表单都包含同一个伪随机值，这种方案最简单，因为攻击者不能获得第三方的 cookie(理论上)，所以表单中的数据也就构造失败，但是由于用户的 cookie 很容易由于网站的 XSS 漏洞而被盗取，所以这个方案必须要在没有 XSS 的情况下才安全。
- 
-- 渲染表单的时候，为每一个表单包含一个 csrfToken，提交表单的时候，带上 csrfToken，然后在后端做 csrfToken 验证。
+- 将cookie设置为HttpOnly
+
+- 通过`Referer`识别
+
+  在HTTP头中有一个字段叫`Referer`，它记录了该HTTP请求的来源地址,
+  但有些场景不适合将来源URL暴露给服务器，所以可以设置不用上传，
+  并且referer属性是可以修改的，所以在服务器端校验referer属性并没有那么可靠
   
+- 通过`origin`属性
+
+  通过`XMLHttpRequest`、`Fetch`发起的跨站请求或者`Post`方法发送请求时，都会带上`origin`,
+  所以服务器可以优先判断`Origin`属性，再根据实际情况判断是否使用`referer`判断。
+
+- 渲染表单的时候，为每一个表单包含一个 `csrfToken`，提交表单的时候，带上 `csrfToken`，然后在后端做 `csrfToken` 验证。
+
+### CSRF攻击实现
+
+1.（可略）CSRF具体攻击实现一：后端设置允许跨域携带cookie
+
+- 后端设置允许跨域携带cookie:`ctx.set("Access-Control-Allow-Credentials", true)`
+
+- 恶意网站B请求时设置`credentials`，如下
+
+  ```
+  fetch('http://localhost:3001/api/users', {
+    credentials: 'include'
+  }).then(response => response.json())
+    .then(data => console.log('fetch success', data))
+    .catch((e => console.log('fetch error', e)))
+  ```
+  
+以上这种实现方式条件局限性比较高：
+
+- 正常网站不会允许跨域携带cookie
+
+- 后端即使设置了`"Access-Control-Allow-Credentials", true`，也是需要设置具体的允许跨域的域名，
+  所以也不会碰巧将未知的其它域名添加到跨域配置中
+  
+2. CSRF具体攻击实现二：：使用`img`，`script`等标签，这些不受同源策略的影响
+
+假如恶意网站中有一个`img`标签，其`src`为网站A的接口地址，使用发送请求时可以发现是携带了cookie过去的
+
+这种方式就不受跨域的影响，但是种方式只能用于`get`请求
+
+3. 使用form表单提交
+
+form表单可以跨域一个历史原因是要保持兼容性，因为form表单会刷新页面不会把结果返回给js，所以认为是安全的
+
+```
+<form id="aaa" action="http://localhost:3001/api/csrf" method="POST" display="none">
+    <input type="text" name="accountNum" value="10001"/>
+    <input type="text" name="money" value="10000"/>
+</form>
+<script>
+  var form = document.getElementById('aaa');
+  form.submit();
+</script>
+```
+
+当打个页面的时将会成功提交一个`post`请求
+
+
 ## SQL 注入
 
  SQL 注入的攻击方式：因为程序没有有效的转义过滤用户的输入，使攻击者成功的向服务器提交恶意的 SQL 查询代码，
