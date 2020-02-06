@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    function add(x, y,z,v) {
+      return x+y+z+v
+    }
+
+    function currying(fn, ...args) {
+      if (args.length >= fn.length) {
+        return fn(...args)
+      }
+      return function (...args2) {
+        return currying(fn, ...args, ...args2)
+      }
+    }
+    const base = currying(add, 1,2,3)
+    console.log(base(1))
+    console.log(base(2))
+    console.log('add', currying(add, 1)(2, 1,2))
+</script>
+</body>
+</html>
