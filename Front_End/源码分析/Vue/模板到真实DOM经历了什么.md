@@ -11,7 +11,7 @@
 
 模板解析就是通过正则手段对模板字符串进行解析，生成AST抽象语法树，我们例子解析完成得到以下AST：
   
- ```javascript
+```javascript
 {
 	type:1,
 	tag:"div",
@@ -66,14 +66,18 @@
 	
 	],
 }
-````
+```
 
 ## 将AST转换成函数字符串
 
 Vue中模块最终都会转换成`render`函数，这个`render`函数的作用是用于生成`VNode`。`VNode`就是`Virsual DOM`，简单理解它就是`DOM`的对象表示，
 可能有人会疑惑这跟上文的`ast`有什么区别，这个下文会解释
 
-上文AST首先会转换成函数字符串`"with(this){return _c('div',{staticClass:"page"},[_v(_s(name)+"的列表:"),_l((list),function(item,index){return _c('span',{key:index},[_v(_s(item))])})],2)}"`
+上文AST首先会转换成函数字符串
+
+```
+"with(this){return _c('div',{staticClass:"page"},[_v(_s(name)+"的列表:"),_l((list),function(item,index){return _c('span',{key:index},[_v(_s(item))])})],2)}"
+```
 
 通过`new Function`方法将函数字符串转换成可执行函数，生成`render`方法
 
@@ -102,7 +106,7 @@ Vue中模块最终都会转换成`render`函数，这个`render`函数的作用�
     }
   ```
   
-  `v-for`则使用`_l`方法进行渲染,`_s`表示使用列表渲染，它将循环生成`VNode`，从上文的转换结果可以看`_s`第一个参数就是渲染源数据`list`，
+  `v-for`则使用`_l`方法进行渲染,`_l`表示使用列表渲染，它将循环生成`VNode`，从上文的转换结果可以看`_l`的第一个参数就是渲染源数据`list`，
   每二个参数则是一个具体渲染子`VNode`的方法
   
 除了`_c`、`_l`Vue中还内置其它的生成`VNode`方法，如`_v`对应`createTextVNode`创建文本`VNode`、`_s`是生成字符串方法等等等等等等等，这里就不一一列表了，

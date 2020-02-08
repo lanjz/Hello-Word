@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    const data = [11,3,124,105,36,54,55,66,7,15,34]
+    // 快速排序
+
+    let count = 0
+    function quick(data = []) {
+      if(data.length < 2) return data
+      const mark = data.shift()
+      const left = []
+      const right = []
+      data.forEach(item => {
+        ++count
+        if(item < mark) {
+          left.push(item)
+        } else {
+          right.push(item)
+        }
+      })
+      return [...quick(left, count), mark, ...quick(right, count)]
+    }
+    console.log('快速排序:', quick([...data], count), count)
+    // 选择排序
+    count = 0
+    function choose(data = []) {
+      for(let i = 0; i < data.length; i++) {
+        let mark = true
+        for(let j=i; j < data.length; j++) {
+          ++count
+          if(data[i] > data[j]){
+            mark = false
+            let tem = data[j]
+            data[j] = data[i]
+            data[i] = tem
+          }
+        }
+        if(mark) {
+          // break
+        }
+      }
+      return data
+    }
+    console.log('选择排序:', choose([...data]), count)
+</script>
+</html>
