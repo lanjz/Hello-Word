@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    var orignalSetItem = localStorage.setItem;
+    localStorage.setItem = function(key,newValue){
+        var setItemEvent = new Event("setItemEvent");
+        setItemEvent.newValue = newValue;
+        window.dispatchEvent(setItemEvent);
+        orignalSetItem.apply(this,arguments);
+    }
+    window.addEventListener("setItemEvent", function (e) {
+        alert(e.newValue);
+    });
+    localStorage.setItem("name","wang");
+    console.log(window.localStorage)
+
+</script>
+</body>
+</html>

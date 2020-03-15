@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>WebSocket</h1>
+<button>关闭websocke</button>
+<div></div>
+</body>
+<script>
+    let ws = new WebSocket("ws://localhost:3001");
+    ws.onopen = function() {
+        console.log("client：打开连接");
+        ws.send("client：hello，服务端");
+    };
+    ws.onmessage = function(e) {
+        console.log("client：接收到服务端的消息 " + e.data);
+        document.querySelector('div').innerText = e.data
+    };
+    ws.onclose = function(params) {
+        document.querySelector('div').innerText = 'client：关闭连接'
+    };
+    document.querySelector('button').onclick = function () {
+        ws.close()
+    }
+</script>
+</html>

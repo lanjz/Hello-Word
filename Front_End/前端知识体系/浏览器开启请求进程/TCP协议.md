@@ -117,3 +117,26 @@ TCP 的连接，实际上是一种纯软件层面的概念，在物理层面并�
 TCP KeepAlive 的基本原理是，隔一段时间给连接对端发送一个探测包，如果收到对方回应的 ACK，则认为连接还是存活的，在超过一定重试次数之后还是没有收到对方的回应，则丢弃该 TCP 连接。
 
 TCP-Keepalive-HOWTO 有对 TCP KeepAlive 特性的详细介绍，有兴趣的同学可以参考。这里主要说一下，TCP KeepAlive 的局限。首先 TCP KeepAlive 监测的方式是发送一个 probe 包，会给网络带来额外的流量，另外 TCP KeepAlive 只能在内核层级监测连接的存活与否，而连接的存活不一定代表服务的可用。例如当一个服务器 CPU 进程服务器占用达到 100%，已经卡死不能响应请求了，此时 TCP KeepAlive 依然会认为连接是存活的。因此 TCP KeepAlive 对于应用层程序的价值是相对较小的。需要做连接保活的应用层程序，例如 QQ，往往会在应用层实现自己的心跳功能。
+
+# 关于`ack = x+1`
+
+需要注意的是， 上图中出现的 ACK = x +1 的写法很容易让人误以为数据包中的 ACK 域的数据值被填成了 y+1 。 ACK = x+1 的实际含义是：
+
+- TCP 包的 ACK 标志位（1 bit） 被置成了 1
+
+- TCP 包的确认号（acknowledgement number ） 的值为 x+1
+
+类似的， TCP 数据包中的 SYN 标志位， 也容易与序号（sequence number） 混淆， 这点需要读者注意
+
+![](https://img-blog.csdn.net/2018091917061915?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xlbmd4aWFvMTk5Mw==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+# 为什么需要三次握手，而非两次
+
+三次握手即通信双方相互告知初始序号， 并确认对方已收到己方的初始序号
+
+三次握手（A three way handshake）是必须的， 因为 sequence numbers（序列号）没有绑定到整个网络的全局时钟（全部统一使用一个时钟，
+就可以确定这个包是不是延迟到的）以及 TCPs 可能有不同的机制来选择 ISN（初始序列号）。
+接收方接收到第一个 SYN 时，没有办法知道这个 SYN 是是否延迟了很久了，除非他有办法记住在这条连接中，
+最后接收到的那个sequence numbers（然而这不总是可行的）。
+这句话的意思是：一个 seq 过来了，跟现在记住的 seq 不一样，我怎么知道他是上条延迟的，还是上上条延迟的呢？
+所以，接收方一定需要跟发送方确认 SYN。
