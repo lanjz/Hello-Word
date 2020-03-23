@@ -121,3 +121,6 @@ Webpack接入Babel必须依赖的模块：
 根据我们的需求选择不同的Plugins或Presets
 
 `npm i -D babel-preset-env`
+
+
+> [史上最清晰易懂的babel配置解析](https://segmentfault.com/a/1190000018721165)
