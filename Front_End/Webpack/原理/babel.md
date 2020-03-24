@@ -242,16 +242,17 @@ function component() {
 document.body.appendChild(component());
 ```
 
-`package.josn`添加启动命令
+`package.json`添加启动命令
 
 ```
  "scripts": {
     "build": "webpack --progress --colors "
   }
 ```
-来个例子：
 
-安装需要用到的模块：`babel-loadr`和 Babel的核心模块`@babel/core`, `yarn add @babel/core babel-loader -D`
+安装需要用到的模块：`babel-loadr`和 Babel的核心模块`@babel/core`
+
+```yarn add @babel/core babel-loader -D```
 
 执行命令`yarn build`,在打包文中查找相关代码
 
@@ -259,7 +260,7 @@ document.body.appendChild(component());
 const abc = () => {  console.log('箭头函数');};
 ```
 
-可以看到并没做任务的转换，原因上文也说过我们并没有使用任何的转换插件，所以在转换阶段就原样输出了
+可以看到并没做任何的转换，原因上文也说过我们并没有使用任何的转换插件，所以在转换阶段就原样输出了
 
 接下来我们在项目目录创建`.babelrc`文件并写以下配置：
 
@@ -298,7 +299,7 @@ new Promise(()=> {})
 console.log(Array.includes)
 ```
 
-可以看到 `Promise`、`inclides`并没有转换成功，在IE浏览器中打开页面，并引用打包出来的JS文件，控制报错了
+打包后看下结果可以看到箭头函数和解构都成功转换了，但是 `Promise`、`inclides`并没有转换成功，在IE浏览器中打开页面，控制台也报错了
 
 ```
 SCRIPT5009: “Promise”未定义
@@ -343,23 +344,6 @@ document.body.appendChild(component());
 
 重新打包后发现能在IE下运行了，控制也能出`Array.includes true`
 
-
-```
-
-{
-  "presets": [
-    [
-      "@babel/preset-env",
-      {
-        "useBuiltIns": "entry"
-      }
-    ]
-  ]
-}
-
-
-```
-
 但同时也会发现打包出来的文件大了非常多，不用`@babel/polyfill`之前才 5.1KB 使用之后变成了 442KB，所以直接使用`@babel/polyfill`会存在
 一些问题：
 
@@ -370,24 +354,7 @@ document.body.appendChild(component());
 
 针对第一个问题好在`@babel/preset-env`提供了一些配置项，帮助我们处理 polyfill
 
-```
-
-{
-  "presets": [
-    [
-      "@babel/preset-env",
-      {
-        "useBuiltIns": "entry",
-        "corejs": 2
-      }
-    ]
-  ]
-}
-
-```
-
-`useBuiltIns`属性可以设置值有`false`,`entry`和`usage`，默认值是`false`,当值是`entry`或`usage`时，需要指定`core-js`模块的版本,
-但仅仅用上面这个配置
+`useBuiltIns`属性可以设置值有：`false`,`entry`和`usage`，默认值是`false`,当值是`entry`或`usage`时，需要指定`core-js`模块的版本
 
 - `entry`: 根据`target`配置的的浏览器列表，引入浏览器不兼容的 polyfill。需要在入口文件手动添加 `import '@babel/polyfill'`
   ```
@@ -440,7 +407,8 @@ document.body.appendChild(component());
 ## transform-runtime和babel-runtime
 
 `babel-plugin-transform-runtime`插件依赖`babel-runtime`，`babel-runtime`是真正提供`runtime`环境的包；
-也就是说`transform-runtime`插件是把js代码中使用到的新原生对象和静态方法转换成对runtime实现包的引用，举个例子如下：
+也就是说`transform-runtime`插件是把js代码中使用到的新原生对象和静态方法转换成对runtime实现包的引用，下面是一个使用`transform-runtime`
+插件后的打包的例子：
 
 ```
 // 输入的ES6代码
@@ -452,7 +420,7 @@ var sym = (0, _symbol.default)();
 
 从上面代码可以看到，当我们要使用`Symbol`时，这个方法是从`babel-runtime/core-js/symbol`导出的，这样既有了 Symbol 的功能，同时又没有像polyfill那样污染全局环境
 
-另外，这里我们也可以隐约发现，babel-runtime其实也不是真正的实现代码所在，真正的代码实现是在core-js中，后面我们再说
+另外，这里我们也可以隐约发现，`babel-runtime`其实也不是真正的实现代码所在，真正的代码实现是在`core-js`中，后面我们再说
 
 总结来说`babel-plugin-transform-runtime`插件的功能有以下几点：
 
@@ -463,7 +431,7 @@ var sym = (0, _symbol.default)();
 - 把Babel生成的辅助函数改为用`babel-runtime/helpers`导出的函数来替代（babel默认会在每个文件顶部放置所需要的辅助函数，如果文件多的话，这些辅助函数就在每个文件中都重复了，
   通过引用`babel-runtime/helpers`就可以统一起来，减少代码体积）
   
-- 它可以为你的代码创建一个sandboxed environment（沙箱环境），这在你编写一些类库等公共代码的时候尤其重要。
+- 它可以为你的代码创建一个`sandboxed environment`（沙箱环境），这在你编写一些类库等公共代码的时候尤其重要。
   
 建议不要直接使用`babel-runtime`，因为`transform-runtime`依赖`babel-runtime`，大部分情况下都可以用`transform-runtime`达成目的
 
@@ -532,72 +500,6 @@ core-js有三种使用方式
   // 对比下polyfill的实现 
   // Array(10).fill(0).map((a, b) => b * b).findIndex(it => it && !(it % 8));
   ```
-
-# .babelrc配置
-
-那么我们现在想要把剪头函数转换为es5函数只需要提供一个箭头函数插件就可以了：
-
-```
-/* .babelrc */
-{
-  "plugins": ["@babel/plugin-transform-arrow-functions"]    
-}
-```
-
-那我想使用es6的解构语法怎么办？很简单，添加解构插件就行了：
-
-```
-/* .babelrc */
-{
-  "plugins": [
-    "@babel/plugin-transform-arrow-functions",
-    "@babel/plugin-transform-destructuring"
-  ]    
-}
-```
-
-问题是有那么多的语法需要转换，一个个的添加插件也太麻烦了，幸好babel提供了presets，他可以理解为插件的集合，省去了我们一个个引入插件的麻烦，官方提供了很多presets，比如preset-env（处理es6+规范语法的插件集合）、preset-stage（处理尚处在提案语法的插件集合）、preset-react（处理react语法的插件集合）等，这里我们主要介绍下preset-env：
-
-```
-/* .babelrc */
-{
-  "presets": ["@babel/preset-env"]    
-}
-```
-
-以上是babel官网对preset-env的介绍，大致意思是说preset-env可以让你使用es6的语法去写代码，并且只转换需要转换的代码。默认情况下preset-env什么都不需要配置，此时他转换所有es6+的代码，然而我们可以提供一个targets配置项指定运行环境：
-
-```
-/* .babelrc */
-{
-  "presets": [
-    ["@babel/preset-env", {
-      "targets": "ie >= 8"
-    }]
-  ]    
-}
-```
-
-但是像 `Promise`这样的api 使用上面的方法却不能正常转换，只能使用`@babel/polyfill`
-
-但是还存在一个问题：@babel/polyfill这个包的体积太大了，我们只需要Promise就够了，假如能够按需polyfill就好了。真巧，preset-env刚好提供了这个功能：
-
-```
-/* .babelrc */
-{
-  "presets": [
-    ["@babel/preset-env", {
-      "modules": false,
-      "useBuiltIns": "entry",
-      "targets": "ie >= 8"
-    }]
-  ]    
-}
-```
-
-我们只需给preset-env添加一个useBuiltIns配置项即可，值可以是entry和usage，假如是entry，会在入口处把所有ie8以上浏览器不支持api的polyfill引入进来，如下：
-
-
 
 [史上最清晰易懂的babel配置解析](https://segmentfault.com/a/1190000018721165)
 [webpack4编译代码如何完美适配IE内核](http://louiszhai.github.io/2019/12/02/webpack4.ie/#%E4%BB%A3%E7%A0%81%E5%9C%A8IE9%E4%B8%8B%E8%BF%90%E8%A1%8C)
