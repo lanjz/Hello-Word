@@ -5,10 +5,11 @@
   "license": "MIT",
   "scripts": {
     "start": "webpack-dev-server --progress --colors --open",
-    "devbuild": "webpack",
+    "test": "webpack --config webpack.test.config.js --progress --colors ",
     "build": "webpack --config webpack.prod.js --env.NODE_ENV=local"
   },
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.0",
     "@babel/plugin-transform-arrow-functions": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.9.0",
@@ -32,6 +33,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "core-js": "2",
     "lodash": "^4.17.15"
   }
 }

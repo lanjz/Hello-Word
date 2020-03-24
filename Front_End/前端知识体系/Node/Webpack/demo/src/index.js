@@ -7,7 +7,7 @@ function component() {
         console.log('箭头函数')
     }
     new Promise(() => {})
-    var b = [1, 2, 3].includes(1);
+	console.log('Array.includes',[1, 2, 3].includes(1))
     return element;
 }
 
