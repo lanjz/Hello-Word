@@ -36,10 +36,15 @@ const config = {
                 ]
             },
             {
-                test: /\.js/,
+                test: /\.js$/,
                 use: [
-                    'babel-loader'
-                ]
+					{
+						loader: 'babel-loader',
+						options: {
+							cacheDirectory: true
+						}
+					}
+				]
             }
 
         ]

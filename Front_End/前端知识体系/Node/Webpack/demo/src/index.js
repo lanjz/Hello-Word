@@ -1,5 +1,6 @@
 import { sayHello } from "./main";
 // import '@babel/polyfill'
+import './assets/app.css'
 function component() {
     var element = document.createElement('div');
     element.innerHTML = 'Hello';
