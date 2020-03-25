@@ -209,7 +209,7 @@ ResolveLoader用于配置Webpack如何寻找Loader，它在默认情况下只会
 ```
  module.exports = {
     resolveLoader: {
-      // 去哪些目录下寻找Loader，有先后顺序之后
+      // 去哪些目录下寻找Loader，有先后顺序之分
       modules: ['node_modules', './loaders']
     }
   }
