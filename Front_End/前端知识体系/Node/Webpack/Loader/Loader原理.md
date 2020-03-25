@@ -1,10 +1,10 @@
-Loader就像一个翻译员，能将源文件经过转换办出新的结果，并且一个文件还可以链式地经过多个翻译员翻译
+Loader就像一个翻译员，能将源文件经过转换成新的结果，并且一个文件还可以链式地经过多个翻译员翻译
 
 以处理SCSS文件为例：
 
 - 先将SCSS源码交给sass-loader处理，转换成CSS
 
-- 先sass-loader转换的css结果再交给css-loader处理，找出CSS中依赖的资源，压缩CSS等
+- sass-loader转换的css结果再交给css-loader处理，找出CSS中依赖的资源，压缩CSS等
 
 - 将css-loader输出的CSS提交给style-loader处理，转换成通过脚本加载的JavaScript代码
 
@@ -41,7 +41,8 @@ Loader就像一个翻译员，能将源文件经过转换办出新的结果，�
 
 ## Loader基础
 
-Webpack是运行在Node.js上的，所以一个Loader其实就是一个Node模块，这个模块需要导出一个函数，这个导出的函数的工作就是获得处理前的内容，对原内容执行处理后，返回处理后的内容。
+Webpack是运行在Node.js上的，所以一个Loader其实就是一个Node模块，这个模块需要导出一个函数，这个导出的函数的工作就是获得处理前的内容，
+对原内容执行处理后，返回处理后的内容。
 
 一个最简单的Loader的源码如下：
 
@@ -104,7 +105,7 @@ const loaderUtils = require('loader-utils')
   )
 ```
 
-Source Map的生成很耗时，通常在开发环境下才会生成Source Map，在其它环境下不用生成，以回事构建。因此，Webpack为Loader提供了`this.sourceMap`API去告诉Loader在当前构建环境下用户是否需要Source Map
+Source Map的生成很耗时，通常在开发环境下才会生成Source Map，在其它环境下不用生成，以加快构建。因此，Webpack为Loader提供了`this.sourceMap`API去告诉Loader在当前构建环境下用户是否需要Source Map
 
 ## 同步与异步
 
