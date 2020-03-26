@@ -1,7 +1,11 @@
 import { sayHello } from "./main";
 // import '@babel/polyfill'
-import './assets/app.css'
+import './imgs/app.css'
+import bg from './assets/助力首页新版-活动未开始.png'
 function component() {
+	const img = new Image()
+	img.src= bg
+	document.body.appendChild(img);
     var element = document.createElement('div');
     element.innerHTML = 'Hello';
     const abc = () => {
@@ -9,6 +13,7 @@ function component() {
     }
     new Promise(() => {})
 	console.log('Array.includes',[1, 2, 3].includes(1))
+	
     return element;
 }
 

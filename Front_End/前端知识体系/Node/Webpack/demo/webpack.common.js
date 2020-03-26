@@ -6,13 +6,13 @@ const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
 const smp = new SpeedMeasurePlugin()
 const config = {
     entry: {
-        // polyfill: '@babel/polyfill',
         index: './src/index.js',
     },
     output: {
         filename: '[name].js',
         chunkFilename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist'),
+		publicPath: '/out/',
     },
     module: {
         rules: [
@@ -26,7 +26,15 @@ const config = {
             {
                 test: /\.(png|svg|jpg|gif)$/,
                 use: [
-                    'file-loader'
+					{
+						loader: 'url-loader',
+						options: {
+							name: '[name].[ext]',
+							outputPath: 'images/',
+							// publicPath: '/assets/',
+							limit: 1
+						}
+					}
                 ]
             },
             {
@@ -74,8 +82,7 @@ const config = {
         }),
         new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production'),
-            'process.env.NODE_ENV2': JSON.stringify('production2'),
+            'process.env.NODE_ENV': JSON.stringify('production')
         })
     ]
 }
