@@ -1,10 +1,12 @@
-html{
+/*html{
     color: red;
     font-size: 12px;
-}
-img{
+    transition: .6s;
+}*/
+img {
     width: 100px;
 }
-body{
+body {
+    transition: .6s;
     background: url("../imgs/助力首页新版-活动未开始.png");
 }

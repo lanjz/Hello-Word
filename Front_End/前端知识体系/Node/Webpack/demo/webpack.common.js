@@ -12,16 +12,25 @@ const config = {
         filename: '[name].js',
         chunkFilename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist'),
-		publicPath: '/out/',
     },
     module: {
         rules: [
             {
                 test: /\.css$/,
                 use: [
-                    'style-loader',
-                    'css-loader'
+                    {
+                        loader: 'style-loader',
+                        options: {
+                            // sourceMap: true
+                        }
+                    },
+                    'css-loader',
+                    'postcss-loader'
                 ]
+            },
+            {
+                test: /\.txt$/,
+                use: 'raw-loader'
             },
             {
                 test: /\.(png|svg|jpg|gif)$/,
@@ -32,7 +41,6 @@ const config = {
 							name: '[name].[ext]',
 							outputPath: 'images/',
 							// publicPath: '/assets/',
-							limit: 1
 						}
 					}
                 ]

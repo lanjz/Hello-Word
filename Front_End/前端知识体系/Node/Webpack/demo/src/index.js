@@ -1,4 +1,6 @@
 import { sayHello } from "./main";
+import txt from './assets/t.txt'
+console.log('txt', txt)
 // import '@babel/polyfill'
 import './imgs/app.css'
 import bg from './assets/助力首页新版-活动未开始.png'
