@@ -16,7 +16,7 @@ const config = {
     module: {
         rules: [
             {
-                test: /\.css$/,
+                test: /\.(css|less)$/,
                 use: [
                     {
                         loader: 'style-loader',
@@ -25,7 +25,15 @@ const config = {
                         }
                     },
                     'css-loader',
-                    'postcss-loader'
+                    'postcss-loader',
+                    {
+                        loader: 'px2rem-loader',
+                        options: {
+                            remUnit: 75,
+                            remPrecision: 8
+                        }
+                    },
+                    'less-loader',
                 ]
             },
             {

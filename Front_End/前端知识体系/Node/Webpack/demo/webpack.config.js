@@ -3,8 +3,8 @@ const webpack = require('webpack')
 const common = require('./webpack.common.js');
 const Dashboard = require('webpack-dashboard');
 const DashboardPlugin = require('webpack-dashboard/plugin');
-const dashboard = new Dashboard();
-const Jarvis = require("webpack-jarvis")
+// const dashboard = new Dashboard();
+// const Jarvis = require("webpack-jarvis")
 const config = merge(common, {
     mode: 'development',
     devtool: 'inline-source-map',
