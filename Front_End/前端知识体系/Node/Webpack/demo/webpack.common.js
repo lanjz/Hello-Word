@@ -13,6 +13,9 @@ const config = {
         chunkFilename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist'),
     },
+    resolveLoader: {
+        modules: ['./node_modules', './my_loader'] // 配置loader的查找目录
+    },
     module: {
         rules: [
             {

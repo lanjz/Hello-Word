@@ -94,7 +94,7 @@ Babel 官方帮我们做了一些预设的插件集，称之为 `Preset`，这�
 
 将先执行 `transform-decorators-legacy` 再执行 `transform-class-properties`
 
-但 preset 是反射的
+但 preset 是反向的
 
 ```
 {

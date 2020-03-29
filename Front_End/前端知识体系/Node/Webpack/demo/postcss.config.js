@@ -1,6 +1,6 @@
 module.exports = ({ file, options, env }) => {
     return ({
-        parser: file.extname === '.sss' ? 'sugarss' : false,
+        // parser: file.extname === '.less' ? 'sugarss' : false,
         plugins: {
             'postcss-cssnext': { // 这个插件包含了autoprefixer 不包含 browsers属性则没办法自动添加兼容前缀
                 browsers: ['last 15 versions']
@@ -13,7 +13,7 @@ module.exports = ({ file, options, env }) => {
 }
 /*
 - autoprefixer：自动补全css前缀，使用于要配置 browsers 属性，要不然没办法自动添加兼容前缀
-- postcss-cssnext：这个插件包含了autoprefixer的功能， 使用于要配置 browsers 属性，要不然没办法自动添加兼容前缀
+- postcss-cssnext：扩展css语法如自定义函数扩展等，这个插件包含了autoprefixer的功能， 使用于要配置 browsers 属性，要不然没办法自动添加兼容前缀
 - cssnano：
     删除空格和最后一个分号
     删除注释
