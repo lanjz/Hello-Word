@@ -3,7 +3,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const webpack = require('webpack');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const smp = new SpeedMeasurePlugin()
+const devMode = process.env.NODE_ENV !== 'production'
+
 const config = {
     entry: {
         index: './src/index.js',
@@ -22,10 +25,16 @@ const config = {
                 test: /\.(css|less)$/,
                 use: [
                     {
-                        loader: 'style-loader',
+                        loader: MiniCssExtractPlugin.loader,
                         options: {
-                            // sourceMap: true
-                        }
+                            // 这里可以指定一个 publicPath
+                            // 默认使用 webpackOptions.output中的publicPath
+                            // publicPath的配置，和plugins中设置的filename和chunkFilename的名字有关
+                            // 如果打包后，background属性中的图片显示不出来，请检查publicPath的配置是否有误
+                            publicPath: './',
+                            // publicPath: devMode ? './' : '../',   // 根据不同环境指定不同的publicPath
+                            hmr: devMode, // 仅dev环境启用HMR功能
+                        },
                     },
                     'css-loader',
                     'postcss-loader',
@@ -102,6 +111,10 @@ const config = {
         new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify('production')
+        }),
+        new MiniCssExtractPlugin({
+            filename: devMode ? '[name].css' : '[name].[hash].css',
+            chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
         })
     ]
 }
