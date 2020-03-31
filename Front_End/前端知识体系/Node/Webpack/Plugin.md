@@ -263,3 +263,38 @@ const UglifyJSPlugin = require('terser-webpack-plugin');
         ]
 ```
 
+## mini-css-extract-plugin
+
+分离样式文件，CSS 提取为独立文件，支持按需加载 (替代`extract-text-webpack-plugin`)
+
+```
+ rules: [
+            {
+                test: /\.(css|less)$/,
+                use: [
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            // 这里可以指定一个 publicPath
+                            // 默认使用 webpackOptions.output中的publicPath
+                            // publicPath的配置，和plugins中设置的filename和chunkFilename的名字有关
+                            // 如果打包后，background属性中的图片显示不出来，请检查publicPath的配置是否有误
+                            publicPath: './',
+                            // publicPath: devMode ? './' : '../',   // 根据不同环境指定不同的publicPath
+                            hmr: devMode, // 仅dev环境启用HMR功能
+                        },
+                    },
+                    'css-loader',
+                    'postcss-loader',
+                    {
+                        loader: 'px2rem-loader',
+                        options: {
+                            remUnit: 75,
+                            remPrecision: 8
+                        }
+                    },
+                    'less-loader',
+                ]
+            },
+]
+```
