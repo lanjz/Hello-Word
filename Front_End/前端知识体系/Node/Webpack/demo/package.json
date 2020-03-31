@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "webpack-dev-server --colors",
+    "start": "webpack-dev-server --colors --env.bool --env.moke=1",
     "test": "webpack --config webpack.test.config.js --progress --colors ",
     "build": "webpack --config webpack.prod.js --env.NODE_ENV=local"
   },

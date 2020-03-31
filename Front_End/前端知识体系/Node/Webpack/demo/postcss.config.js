@@ -1,6 +1,6 @@
 module.exports = ({ file, options, env }) => {
     return ({
-        // parser: file.extname === '.less' ? 'sugarss' : false,
+        parser: file.extname === '.ess' ? 'sugarss' : false,
         plugins: {
             'postcss-cssnext': { // 这个插件包含了autoprefixer 不包含 browsers属性则没办法自动添加兼容前缀
                 browsers: ['last 15 versions']

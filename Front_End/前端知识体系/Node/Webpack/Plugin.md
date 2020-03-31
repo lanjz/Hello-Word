@@ -109,7 +109,6 @@ module.exports = smp.wrap(config)
 
   `"analyz": "NODE_ENV=production npm_config_report=true npm run build"`
 
-
 ## webpack-merge
 
 提取公共配置，减少重复配置代码
@@ -182,5 +181,85 @@ module.exports = {
   ]
 }
 
+```
+
+## webpack.DefinePlugin
+
+`DefinePlugin`允许我们编译时为项目注入全局变量
+
+```
+ plugins: [
+    new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+        'NODE_ENV': JSON.stringify(env),
+    }),
+]
+```
+
+打包出来的项目就可以使用`process.env.NODE_ENV`和`NODE_ENV`访问到我们设置的值的了
+
+这个插件一般会配合我们设置的环境变量使用， Webpack 中配置环境变量也很简单，直接在 `package.json`中的
+`script`命令行中添加`--env`属性，然后在 Webpack 使用函数的形式来返回我们配置，这个函数的参数`env`就包含了我们的设置的所有值
+
+```
+// package.json
+"start": "webpack-dev-server --colors --env.bool --env.moke=1",
+```
+
+- `--env.bool`: 定义了一个`bool`变量，但没赋值，此时这个变量的值为`true`
+
+- `--env.moke=1`: 设置了一个值为`1`的变量`moke`
+
+```
+// webpack.config.s
+module.exports = env => {
+  // Use env.<YOUR VARIABLE> here:
+  console.log('NODE_ENV: ', env.NODE_ENV); // 'local'
+  console.log('Production: ', env.production); // true
+
+  return {
+    entry: './src/index.js',
+    output: {
+      filename: 'bundle.js',
+      path: path.resolve(__dirname, 'dist')
+    }
+  };
+};
+```
+
+## HtmlWebpackPlugin
+
+`HtmlWebpackPlugin`简化了HTML文件的创建，这个插件可以自动为你生成一个HTML文件，并引入打包后的`bundle`文件
+
+```
+plugin: [
+    new HtmlWebpackPlugin({
+        title: 'Output Management'
+    }),
+]
+```
+
+## clean-webpack-plugin
+
+目录清理
+
+```
+plugins: [
+ new CleanWebpackPlugin()
+]
+```
+
+## terser-webpack-plugin
+
+功能与`uglifyjs-webpack-plugin`类似，进行代码压缩
+
+```
+const UglifyJSPlugin = require('terser-webpack-plugin'); 
+ plugins: [
+            new UglifyJSPlugin({
+                sourceMap: true
+            }),
+
+        ]
 ```
 
