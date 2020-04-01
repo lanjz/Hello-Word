@@ -1,11 +1,12 @@
 const path = require('path')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const config = {
 	mode: 'development',
 	entry: {
-		index: './src/index.js',
+		index: './src/index2.js',
 	},
 	output: {
-		filename: '[name].js',
+		filename: '[chunkhash].js',
 		path: path.resolve(__dirname, 'dist'),
 	},
 	module: {
@@ -18,6 +19,9 @@ const config = {
 			}
 		
 		]
-	}
+	},
+	plugins: [
+		new CleanWebpackPlugin(),
+	]
 }
 module.exports = config

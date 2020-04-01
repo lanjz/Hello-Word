@@ -9,7 +9,7 @@ const config = (env) => {
     console.log('env', env)
     return merge(common(env), {
         mode: 'development',
-        devtool: 'inline-source-map',
+        // devtool: 'inline-source-map',
         devServer: {
             contentBase: './dist',
             hot: true,

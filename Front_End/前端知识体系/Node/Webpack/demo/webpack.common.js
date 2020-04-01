@@ -5,17 +5,19 @@ const webpack = require('webpack');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const smp = new SpeedMeasurePlugin()
-const devMode = process.env.NODE_ENV !== 'production'
-
+const HappyPack = require('happypack')
+const happyThreadPool = HappyPack.ThreadPool({size: 5})
 
 const config = (env) => {
+    const devMode = process.env.NODE_ENV !== 'production'
+    console.log('devMode', process.env.NODE_ENV)
     console.log('NODE_ENV:2 ', env);
     return {
         entry: {
             index: './src/index.js',
         },
         output: {
-            filename: '[name][chunkhash].js',
+            filename: '[name].[chunkhash].js',
             chunkFilename: '[name].[chunkhash].js',
             path: path.resolve(__dirname, 'dist'),
         },
@@ -48,8 +50,8 @@ const config = (env) => {
                                 remPrecision: 8
                             }
                         },
-                        'less-loader',
-                    ]
+                        'less-loader'
+                    ],
                 },
                 {
                     test: /\.txt$/,
@@ -76,16 +78,8 @@ const config = (env) => {
                 },
                 {
                     test: /\.js$/,
-                    use: [
-                        {
-                            loader: 'babel-loader',
-                            options: {
-                                cacheDirectory: true
-                            }
-                        }
-                    ]
+                    use: ['happypack/loader?id=babel'],
                 }
-
             ]
         },
         optimization: { // 作用同于 new webpack.optimize.CommonsChunkPlugin(
@@ -106,7 +100,7 @@ const config = (env) => {
                 }
             }
         },
-        devtool: 'inline-source-map',
+        devtool: 'sourcemap',
         plugins: [
             new HtmlWebpackPlugin({
                 title: 'Output Management'
@@ -117,9 +111,17 @@ const config = (env) => {
                 'NODE_ENV': JSON.stringify(env),
             }),
             new MiniCssExtractPlugin({
-                filename: devMode ? '[name].css' : '[name].[hash].css',
-                chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
-            })
+                filename: devMode ? '[name].css' : '[name].[contenthash].css',
+                chunkFilename: devMode ? '[id].css' : '[id].[contenthash].css',
+            }),
+            new HappyPack({
+                // 定义唯一标识符id
+                id: 'babel',
+                // 定义这个HappyPack使用哪个loader，用法和Loader配置一样
+                loaders: ['babel-loader?cacheDirectory'],
+                // 使用共享进程池中的子进程去处理任务
+                threadPool: happyThreadPool
+            }),
         ]
     }
 }

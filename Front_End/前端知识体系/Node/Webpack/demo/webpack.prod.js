@@ -9,10 +9,12 @@ module.exports = (env) => {
 	return smp.wrap(
 		merge(common(env), {
 				mode: 'production',
-				devtool: 'source-map',
+				// devtool: 'source-map',
 				plugins: [
 					new UglifyJSPlugin({
-						sourceMap: true
+						sourceMap: true,
+						// cache: 'path/to/cache',
+						parallel: true
 					}),
 				
 				]

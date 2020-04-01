@@ -6,7 +6,7 @@ Uglify：/'ʌɡlɪfaɪ/
 
 Plugin：/'plʌgin/
 
-在使用Webapck时，我们常用到UglifyPlugin对代码进行压缩以达到减小文件体积的目的。但是在压缩JavaScript时，需要先将代码解析成用Object抽象表示AST语法树，再应用各种规则去解析和处理AST，所以导致这个过程计算量大，耗时非常多。
+在使用Webpack时，我们常用到UglifyPlugin对代码进行压缩以达到减小文件体积的目的。但是在压缩JavaScript时，需要先将代码解析成用Object抽象表示AST语法树，再应用各种规则去解析和处理AST，所以导致这个过程计算量大，耗时非常多。
 
 像之前提到的HappyPack，它将任务分到子进程去执行，子进程完成后再将结果发送给主线程。以此达到提高文件解析的效率。这里讲的ParallelUglifyPlugin的作用也是同理，ParallelUglifyPlugin会开启多个子进程，将对文件的压缩工作分配到多个子进程去完成，每个子进程通过UglifyJS去压缩去代码。并行压缩，所以能更快地完成对多个文件的压缩工作。
 
