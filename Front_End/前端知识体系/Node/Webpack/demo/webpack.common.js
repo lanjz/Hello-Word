@@ -15,8 +15,8 @@ const config = (env) => {
             index: './src/index.js',
         },
         output: {
-            filename: '[name].js',
-            chunkFilename: '[name].bundle.js',
+            filename: '[name][chunkhash].js',
+            chunkFilename: '[name].[chunkhash].js',
             path: path.resolve(__dirname, 'dist'),
         },
         resolveLoader: {
