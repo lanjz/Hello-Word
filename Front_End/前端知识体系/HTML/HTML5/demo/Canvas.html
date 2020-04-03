@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        canvas{
+            /*border: solid 1px #000;*/
+        }
+    </style>
+</head>
+<body>
+
+</body>
+<script>
+    (function () {
+        const tree = [
+            {
+                name: '1',
+                children: [
+                    {
+                        name: '1-1',
+                        children: [
+                            {
+                                name: '1-1-1',
+                            },
+                            {
+                                name: '1-1-2'
+                            }
+                        ]
+                    },
+                    {
+                        name: '1-2',
+                        children: [
+                            {
+                                name: '1-2-1',
+                            },
+                            {
+                                name: '1-2-2'
+                            }
+                        ]
+                    },
+                    {
+                        name: '1-3'
+                    }
+                ]
+            }
+        ]
+        function createCanvas(width = 700, height = 500) {
+            const el = document.createElement('canvas')
+            el.width = width
+            el.height = height
+            return el
+        }
+        const canvas = createCanvas()
+        const ctx = canvas.getContext('2d')
+        drawGrid('red', 10, 10)
+        function readNode(node) {
+            drawText(node.name)
+            if(node.children) {
+                readTree(node.children)
+            }
+        }
+        function readTree(tree) {
+            for(let i in tree) {
+                readNode(tree[i])
+            }
+        }
+        readTree(tree)
+        function drawGrid(color, stepX, stepy) {
+            ctx.save()
+            // 背景
+            ctx.strokeStyle = color
+            ctx.fillStyle = '#fff';
+            ctx.lineWidth = 0.5;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // 画竖线
+            for(let i = stepX; i < canvas.width; i += stepX) {
+                ctx.beginPath()
+                ctx.moveTo(i, 0)
+                ctx.lineTo(i, canvas.height)
+                ctx.stroke()
+            }
+            // 画竖线
+            for(let i = stepX; i < canvas.height; i += stepy) {
+                ctx.beginPath()
+                ctx.moveTo(0, i)
+                ctx.lineTo(canvas.width, i)
+                ctx.stroke()
+            }
+            ctx.restore();
+        }
+        //画文本
+        function drawText(text) {
+            ctx.font = '50px Helvetica';
+            ctx.textBaseline = 'middle'; //设置文本的垂直对齐方式
+            ctx.textAlign = 'center';//设置文本的水平对齐方式
+            ctx.fillStyle = 'orange';
+            ctx.strokeStyle = 'cornflowerblue';
+            ctx.fillText(text, canvas.width / 2,
+                canvas.height / 2);
+            ctx.strokeText(text, canvas.width / 2,
+                canvas.height / 2);
+            ctx.translate(0, 40)
+        }
+        // canvas.width=300
+        document.body.appendChild(canvas)
+    })()
+</script>
+</html>
