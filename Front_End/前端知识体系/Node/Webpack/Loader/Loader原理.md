@@ -1,3 +1,11 @@
+# Loader
+
+Loader 本质就是一个函数，在该函数中对接收到的内容进行转换，返回转换后的结果。 因为 Webpack 只认识 JavaScript，所以 Loader 就成了翻译官，
+对其他类型的资源进行转译的预处理工作。
+
+Loader 在 `module.rules` 中配置，作为模块的解析规则，类型为数组。每一项都是一个 `Object`，
+内部包含了 `test`(类型文件)、`loader`、`options` (参数)等属性。
+
 Loader就像一个翻译员，能将源文件经过转换成新的结果，
 
 以处理SCSS文件为例：
@@ -89,7 +97,7 @@ const loaderUtils = require('loader-utils')
   }
 ```
 
-其中的`this.csllback`是Webpack向Loader注入的API，以方便Loader和Webapck之间通信。`this.callback`的详细使用方法如下：
+其中的`this.csllback`是Webpack向Loader注入的API，以方便Loader和Webpack之间通信。`this.callback`的详细使用方法如下：
 
 ```
  this.callback(
@@ -158,7 +166,7 @@ Loader也有同步与异步之分，上面介绍的Loader都是同步的Loader�
 
 ## 其他Loader API
 
-除了以上提到的在Loader中能调用的Webapck API，还存在以下常用的API。
+除了以上提到的在Loader中能调用的Webpack API，还存在以下常用的API。
 
 - this.context：当前处理的文件所在目录，假如当前Loader处理的文件`/src/main.js`，则`this.context`等于`/src`
 
@@ -168,17 +176,17 @@ Loader也有同步与异步之分，上面介绍的Loader都是同步的Loader�
 
 - this.resourcePath：当前处理的文件的querystring
 
-- this.tartge：等于Webpack配置中的Tartget
+- this.target：等于Webpack配置中的Target
 
-- tihs.loadModule：当Loader在处理一个文件时，如果依赖其他文件的处理结果才能得到当前文件的结果，就可以通过`this.loadModule(request: string, callback:function(err,source, sourceMap, module))`去获取require对应的文件的处理结果 
+- this.loadModule：当Loader在处理一个文件时，如果依赖其他文件的处理结果才能得到当前文件的结果，就可以通过`this.loadModule(request: string, callback:function(err,source, sourceMap, module))`去获取require对应的文件的处理结果 
 
-- this.resovle：像require语句一样获得指定文件的完整路径，使用方法为`resolve(context:string, request:string,callback:function(err, result:string))`
+- this.resolve：像require语句一样获得指定文件的完整路径，使用方法为`resolve(context:string, request:string,callback:function(err, result:string))`
 
 - this.addDependency：为当前处理的文件添加其依赖的文件，以便其依赖的文件发生变化 时，重新调用Loader处理该文件。使用方法为`addDependency(file: string)`
 
 - this.addContextDependency：和addDependency类似，但addContextDependency是将整个目录加入当前正在处理的文件的依赖中。使用方法为`addContextDependency(directory: string)`
 
-- this.clearDepentdencies：清除当前正在处理文件的所有依赖，使用方法为`clearDepentdencies()`
+- this.clearDependencies：清除当前正在处理文件的所有依赖，使用方法为`clearDepentdencies()`
 
 - this.emitFile：输出一个文件，使用方法为`emitFile(name: string, content: Buffer|string, sourceMap:{})`
 

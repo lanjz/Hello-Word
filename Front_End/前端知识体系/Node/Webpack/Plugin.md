@@ -1,5 +1,10 @@
 # 自定义插件
 
+就是插件，基于事件流框架 `Tapable`，插件可以扩展 Webpack 的功能，在 Webpack 运行的生命周期中会广
+播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
+
+Plugin 在 `plugins` 中单独配置，类型为数组，每一项是一个 `Plugin` 的实例，参数都通过构造函数传入。
+
 简单的DEMO
 
 ```
@@ -21,10 +26,9 @@ module.exports = BasicPlugin;
 
 1. 在 webpack 启动后，它会去执行我们配置的 `new BasicPlugin(options)` 初始化一个插件实例
 
-2. 在初始化 `compiler` 对象之后，会调用 `basicPlugin .apply(compiler)` 方法将 `compiler` 传入
+2. 在初始化 `compiler` 对象之后，会调用 `basicPlugin.apply(compiler)` 方法将 `compiler` 传入
 
 3. 插件获得 `compiler` 对象后，就可以通过 `compiler.plugin('事件名', 回调函数)` 的方式进行监听 webpack 广播出来的事件了
-
 
 ```
 class HelloWorldPlugin {
@@ -137,52 +141,6 @@ const DashboardPlugin = require('webpack-dashboard/plugin');
 
 这个插件暂时没试出效果～
 
-## mini-css-extract-plugin插
-
-webpack 4.0以前，我们通过`extract-text-webpack-plugin`插件
-
-webpack 4.0以后，官方推荐使用`mini-css-extract-plugin`插件来打包css文件。
-
-```
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const devMode = process.env.NODE_ENV !== 'production'
-
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.(sa|sc|c)ss$/,  // 可以打包后缀为sass/scss/css的文件
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              // 这里可以指定一个 publicPath
-              // 默认使用 webpackOptions.output中的publicPath
-              // publicPath的配置，和plugins中设置的filename和chunkFilename的名字有关
-              // 如果打包后，background属性中的图片显示不出来，请检查publicPath的配置是否有误
-              publicPath: './',  
-              // publicPath: devMode ? './' : '../',   // 根据不同环境指定不同的publicPath
-              hmr: devMode, // 仅dev环境启用HMR功能
-            },
-          },
-          'css-loader',
-          'sass-loader'
-        ],
-      },
-    ]
-  },
-  plugins: [
-    new MiniCssExtractPlugin({
-      // 这里的配置和webpackOptions.output中的配置相似
-      // 即可以通过在名字前加路径，来决定打包后的文件存在的路径
-      filename: devMode ? 'css/[name].css' : 'css/[name].[hash].css',
-      chunkFilename: devMode ? 'css/[id].css' : 'css/[id].[hash].css',
-    })
-  ]
-}
-
-```
-
 ## webpack.DefinePlugin
 
 `DefinePlugin`允许我们编译时为项目注入全局变量
@@ -239,6 +197,10 @@ plugin: [
 ]
 ```
 
+## web-webpack-plugin
+
+[文档](https://github.com/gwuhaolin/web-webpack-plugin/blob/master/readme_zh.md)
+
 ## clean-webpack-plugin
 
 目录清理
@@ -265,36 +227,46 @@ const UglifyJSPlugin = require('terser-webpack-plugin');
 
 ## mini-css-extract-plugin
 
-分离样式文件，CSS 提取为独立文件，支持按需加载 (替代`extract-text-webpack-plugin`)
+webpack 4.0以前，我们通过`extract-text-webpack-plugin`插件
+
+webpack 4.0以后，官方推荐使用`mini-css-extract-plugin`插件来打包css文件，支持按需加载 
 
 ```
- rules: [
-            {
-                test: /\.(css|less)$/,
-                use: [
-                    {
-                        loader: MiniCssExtractPlugin.loader,
-                        options: {
-                            // 这里可以指定一个 publicPath
-                            // 默认使用 webpackOptions.output中的publicPath
-                            // publicPath的配置，和plugins中设置的filename和chunkFilename的名字有关
-                            // 如果打包后，background属性中的图片显示不出来，请检查publicPath的配置是否有误
-                            publicPath: './',
-                            // publicPath: devMode ? './' : '../',   // 根据不同环境指定不同的publicPath
-                            hmr: devMode, // 仅dev环境启用HMR功能
-                        },
-                    },
-                    'css-loader',
-                    'postcss-loader',
-                    {
-                        loader: 'px2rem-loader',
-                        options: {
-                            remUnit: 75,
-                            remPrecision: 8
-                        }
-                    },
-                    'less-loader',
-                ]
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const devMode = process.env.NODE_ENV !== 'production'
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(sa|sc|c)ss$/,  // 可以打包后缀为sass/scss/css的文件
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // 这里可以指定一个 publicPath
+              // 默认使用 webpackOptions.output中的publicPath
+              // publicPath的配置，和plugins中设置的filename和chunkFilename的名字有关
+              // 如果打包后，background属性中的图片显示不出来，请检查publicPath的配置是否有误
+              publicPath: './',  
+              // publicPath: devMode ? './' : '../',   // 根据不同环境指定不同的publicPath
+              hmr: devMode, // 仅dev环境启用HMR功能
             },
-]
+          },
+          'css-loader',
+          'sass-loader'
+        ],
+      },
+    ]
+  },
+  plugins: [
+    new MiniCssExtractPlugin({
+      // 这里的配置和webpackOptions.output中的配置相似
+      // 即可以通过在名字前加路径，来决定打包后的文件存在的路径
+      filename: devMode ? 'css/[name].css' : 'css/[name].[hash].css',
+      chunkFilename: devMode ? 'css/[id].css' : 'css/[id].[hash].css',
+    })
+  ]
+}
+
 ```

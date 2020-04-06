@@ -15,12 +15,11 @@ XSS 的原理是恶意攻击者往 Web 页面里插入恶意可执行网页脚�
 假设页面中有如下代码
 
 ```
-<script>
-    if(location.href.indexOf('default=') > -1) {
+if(location.href.indexOf('default=') > -1) {
       let getDefault = decodeURI(location.href.substring(location.href.indexOf('default=') + 8))
       console.log(getDefault)
       document.write(getDefault);
-    }
+}
 ```
 
 现在我们URL的参数为： `?default=<script>alert(document.cookie)</script>`
@@ -57,7 +56,7 @@ XSS 的原理是恶意攻击者往 Web 页面里插入恶意可执行网页脚�
 
 刷新页面，发现`alert`没有弹出
 
-## 非持久型XSS
+## 持久型XSS
 
 持久型 XSS 漏洞，也被称为存储型 XSS 漏洞，一般存在于 Form 表单提交等交互功能，如发帖留言，提交文本信息等，
 黑客利用的 XSS 漏洞，将可执行的JS代码通过表单的形式提交到后端，并存储到数据库中，当前端页面从后端获取到含攻击代码的数据，并渲染到
