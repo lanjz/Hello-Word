@@ -6,18 +6,17 @@ const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const smp = new SpeedMeasurePlugin()
 const HappyPack = require('happypack')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const happyThreadPool = HappyPack.ThreadPool({size: 5})
 
 const config = (env) => {
     const devMode = process.env.NODE_ENV !== 'production'
-    console.log('devMode', process.env.NODE_ENV)
-    console.log('NODE_ENV:2 ', env);
     return {
         entry: {
             index: './src/index.js',
         },
         output: {
-            filename: '[name].[chunkhash].js',
+            filename: '[name].[hash].js',
             chunkFilename: '[name].[chunkhash].js',
             path: path.resolve(__dirname, 'dist'),
         },
@@ -26,6 +25,13 @@ const config = (env) => {
         },
         module: {
             rules: [
+                {
+                    test: /\.vue$/,
+                    exclude: /node_modules/,
+                    use:[
+                        "vue-loader"
+                    ]
+                },
                 {
                     test: /\.(css|less)$/,
                     use: [
@@ -103,7 +109,8 @@ const config = (env) => {
         devtool: 'sourcemap',
         plugins: [
             new HtmlWebpackPlugin({
-                title: 'Output Management'
+                title: 'Output Management',
+                template: './index.html'
             }),
             new CleanWebpackPlugin(),
             new webpack.DefinePlugin({
@@ -122,6 +129,7 @@ const config = (env) => {
                 // 使用共享进程池中的子进程去处理任务
                 threadPool: happyThreadPool
             }),
+            new VueLoaderPlugin()
         ]
     }
 }
