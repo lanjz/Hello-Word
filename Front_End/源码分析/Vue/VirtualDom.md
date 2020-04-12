@@ -327,4 +327,8 @@ updateChildren (parentElm, oldCh, newCh) {
 框架给你的保证是，你在不需要手动优化的情况下，我依然可以给你提供过得去的性能
 
 
+# vue和react中虚拟dom的区别
+  
+vue会跟踪每一个组件的依赖关系,不需要重新渲染整个组件树。
 
+而对于React而言，每当应用的状态被改变时，全部组件都会重新渲染，所以react中会需要shouldComponentUpdate这个生命周期函数方法来进行控制
