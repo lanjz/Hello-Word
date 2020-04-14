@@ -1,23 +1,35 @@
 <template>
     <div>
+        <h1>{{title}}</h1>
         <h1 @click="toggle()">SHOW/IF</h1>
         <div v-if="show">v-if</div>
         <div v-show="show">v-show</div>
-        <div>{{arr}}</div>
-        <com1 :arr="arr"></com1>
+        <div>{{provideData}}</div>
+        <comA :arr="arr" ref="comA" abc="13" :ttt="arr" @abc="toggle" :title.sync="title"></comA>
     </div>
 </template>
 <script>
-    import com1 from './components/temp1.vue'
+    import comA from './components/tempA.vue'
+    import { EventBus } from './utils/index.js'
     export default {
+        provide () {
+            return {
+                provideData: this.provideData,
+
+            }
+        },
         data:function () {
             return {
+                title: 'title',
                 show: false,
-                arr: [1,2,3]
+                arr: [1,2,3],
+                provideData: {
+                    name: 'lanjz'
+                }
             }
         },
         components: {
-            com1
+            comA
         },
         watch: {
             arr: function (val) {
@@ -27,7 +39,14 @@
         methods: {
             toggle() {
                 this.show = !this.show
+                console.log(this.$children[0].name = 12)
+                console.log('this', this)
             }
+        },
+        mounted() {
+            EventBus.$on('abc', function () {
+
+            })
         }
     }
 </script>
