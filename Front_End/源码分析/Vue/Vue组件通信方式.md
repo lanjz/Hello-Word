@@ -150,5 +150,3 @@ EventBus.$off()
 这里会包含所有父作用域的绑定 (class 和 style 除外)，并且可以通过 v-bind="$attrs" 传入内部组件——在创建高级别的组件时非常有
 
 
-## `update:myPropName`
-
