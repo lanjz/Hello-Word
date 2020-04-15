@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    function pro() {
+        return new Promise((resolve, reject) => {
+            reject(1)
+        })
+    }
+    async function doPro() {
+        await pro()
+            .catch(err => {
+                console.log('errr', err)
+            })
+    }
+    doPro()
+    Function.prototype._bind = function (obj) {
+        return (...arg) => {
+            return this.apply(obj, arg)
+        }
+    }
+    var a = '1'
+    function abc(arg) {
+        console.log(this.a, arg)
+        return 1
+    }
+    var o = {
+        a: '2'
+    }
+    console.log(abc._bind(o)(13))
+</script>
+</body>
+</html>
