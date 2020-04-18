@@ -16,7 +16,7 @@
   
 - 合并请求
 
-## 预加载
+## Preload 预加载
 
 使用 `link` 标签创建
 
@@ -72,3 +72,5 @@ document.body.appendChild(preloadedScript);
 ## 小图片使用base64
 
 ## 图片合并
+
+## 样式表放顶，脚本放在底部

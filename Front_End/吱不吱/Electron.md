@@ -4,6 +4,8 @@ Electron 是一个用 `HTML`，`CSS` 和 `JavaScript` 来构建跨平台桌面�
 
 ## 核心概念
 
+Electron 结合了 Chromium、Node.js 和用于调用操作系统本地功能的 API（如打开文件窗口、通知、图标等）
+
 Electron 的核心理念是:保持 Electron 的体积小和可持续性开发。
 如:为了保持 Electron 的小巧 (文件体积) 和可持续性开发 (以防依赖库和 API 的泛滥) ， Electron 限制了所使用的核心项目的数量。
 比如 Electron 只用了 Chromium 的渲染库而不是其全部组件。这使得升级 Chromium 更加容易，但也意味着 Electron 缺少了 Google Chrome 里的一些浏览器相关的特性。 添加到 Electron 的新功能应该主要是原生 API。 如果可以的话，一个功能应该尽可能的成 为一个 Node.js 模块。
@@ -41,6 +43,15 @@ button.addEventListener('click',function(e){
 
 ```
 
+## electron 更新
+
+- 使用`electron-build`打包
+
+- 在`package.json`文件中的`public`的配置远程远程放置新包的地址
+
+- 服务器放置新的包和`latest-mac.yml`文件（说明版本内容）
+
+- 在主进程中使用`electron-update`进行检查更新的操作
 
 [Electron](https://www.jianshu.com/p/2244653515a7)
 
