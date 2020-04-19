@@ -74,3 +74,20 @@ document.body.appendChild(preloadedScript);
 ## 图片合并
 
 ## 样式表放顶，脚本放在底部
+
+## 传输内容压缩
+
+开启压缩：
+
+客户端设置：浏览器发送一个请求头，告诉服务器接受压缩版本的文件（`GZIP` 和 `Deflate` 是两种压缩算法）`Accept-Encoding: GZIP, Deflate`
+
+服务端开启:
+
+```
+const express = require('express');
+const app = express();
+ 
+//express框架，前边肯定都是必要的，也就是只需安装compression组件，然后添加一下两句代码就好
+const compression = require('compression');
+app.use(compression());
+```
