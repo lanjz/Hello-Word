@@ -10,23 +10,30 @@
             height: 100%;
             width: 100%;
         }
-        div{
-            width: 100px;
-            height: 100px;
-            /*background: red;*/
-            border-bottom: solid 1px red;
+        .left{
+            width: 200px;
+            float: left;
+            height: 100%;
+            background: aquamarine;
         }
-        .div1{
-            margin: 20px;
+        .right{
+            margin-left: 200px;
+            margin-right: 200px;
+            height: 100%;
+            background: #f7be78;
         }
-        .div2{
-            margin: 40px;
+        .left-right{            width: 200px;
+            float: right;
+            height: 100%;
+            background: aquamarine;
         }
     </style>
 </head>
 <body>
-   <div class="div1"></div>
-   <div class="div2"></div>
-
+   <div class="left">
+       Left
+   </div>
+   <div class="right"></div>
+   <div class="left-right"></div>
 </body>
 </html>
