@@ -36,4 +36,22 @@
    <div class="right"></div>
    <div class="left-right"></div>
 </body>
+<script>
+    const a = {
+        abc: 1,
+        fn: () => {
+            console.log(this)
+            console.log(this.abc)
+        },
+        fn2: function () {
+            console.log(this.abc)
+        }
+    }
+    a.fn()
+    a.fn2()
+    const f = a.fn
+    const f2 = a.fn2
+    f()
+    f2()
+</script>
 </html>
