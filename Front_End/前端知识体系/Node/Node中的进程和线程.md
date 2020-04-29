@@ -128,9 +128,62 @@ Node中使用`child_process`模块来实现多进程的支持
 - `child_process.spawn(command[, args][,callback])`：适用于返回大量数据，例如图像处理，二进制数据处理
 - `child_process.fork(modulePath[, args][,callback])`： 衍生新的进程，进程之间是相互独立的，每个进程都有自己的 V8 实例、内存，系统资源是有限的，不建议衍生太多的子进程出来，通长根据系统** CPU 核心数**设置。
 
+  我们使用`child_process.fork`优化一下之前的服务
 
+  ```
+  const http = require('http');
+  const fork = require('child_process').fork;
+  const server = http.createServer();
+  server.on('request', (req, res) => {
+    if (req.url === '/compute') {
+      const compute = fork('./fork_compute.js');
+      compute.send('开启一个新的子进程');
+      // 当一个子进程使用 process.send() 发送消息时会触发 'message' 事件
+      compute.on('message', sum => {
+          res.end(`Sum is ${sum}`);
+          compute.kill();
+      });
+      // 子进程监听到一些错误消息退出
+      compute.on('close', (code, signal) => {
+          console.log(`收到close事件，子进程收到信号 ${signal} 而终止，退出码 ${code}`);
+          compute.kill();
+      })
 
-> CPU 核心数这里特别说明下，fork 确实可以开启多个进程，但是并不建议衍生出来太多的进程，cpu核心数的获取方式const cpus = require('os').cpus();,这里 cpus 返回一个对象数组，包含所安装的每个 CPU/内核的信息，二者总和的数组哦。假设主机装有两个cpu，每个cpu有4个核，那么总核数就是8
+    } else {
+      res.end('Ok')
+    }
+  });
+
+  server.listen(3000)
+  ```
+
+  ```
+  // chchild_processild.js
+  const computation = () => {
+      let sum = 0;
+      console.info('计算开始');
+      console.time('计算耗时');
+
+      for (let i = 0; i < 1e10; i++) {
+          sum += i
+      };
+
+      console.info('计算结束');
+      console.timeEnd('计算耗时');
+      return sum;
+  };
+
+  process.on('message', msg => {
+      console.log(msg, 'process.pid', process.pid); // 子进程id
+      const sum = computation();
+
+      // 如果Node.js进程是通过进程间通信产生的，那么，process.send()方法可以用来给父进程发送消息
+      process.send(sum);
+  })
+
+  ```
+
+`fork` 确实可以开启多个进程，但是并不建议衍生出来太多的进程，cpu核心数的获取方式`const cpus = require('os').cpus()`;这里 `cpus` 返回一个对象数组，包含所安装的每个 CPU/内核的信息，二者总和的数组哦。假设主机装有两个cpu，每个cpu有4个核，那么总核数就是`8`
 
 ### child_process.exec(command[, options][, callback])
 

@@ -1,33 +1,24 @@
 const http = require('http');
-const mod = require('./mod.js')
-console.log('mod', mod)
-const longComputation = () => {
-    return new Promise(resolve => {
-        let sum = 0;
-        for (let i = 0; i < 1e10; i++) {
-            sum += i;
-        };
-        resolve(sum)
-    })
-};
+const fork = require('child_process').fork;
 const server = http.createServer();
-server.on('request', async (req, res) => {
-    if (req.url === '/compute') {
-        console.info('计算开始',new Date());
-        longComputation()
-            .then(sum => {
-                console.info('计算结束',new Date());
-                res.end(`Sum is ${sum}`);
-            })
-        // return res.end(`Sum is ${sum}`);
-    } else {
-        console.info('计算开始2',new Date());
-        longComputation()
-            .then(sum => {
-                console.info('计算结束2',new Date());
-                res.end(`Sum is ${sum}`);
-            })
-    }
+server.on('request', (req, res) => {
+  if (req.url === '/compute') {
+    const compute = fork('./fork_compute.js');
+    compute.send('开启一个新的子进程');
+    // 当一个子进程使用 process.send() 发送消息时会触发 'message' 事件
+    compute.on('message', sum => {
+        res.end(`Sum is ${sum}`);
+        compute.kill();
+    });
+    // 子进程监听到一些错误消息退出
+    compute.on('close', (code, signal) => {
+        console.log(`收到close事件，子进程收到信号 ${signal} 而终止，退出码 ${code}`);
+        compute.kill();
+    })
+
+  } else {
+    res.end('Ok')
+  }
 });
 
-server.listen(3003);
+server.listen(3000)
