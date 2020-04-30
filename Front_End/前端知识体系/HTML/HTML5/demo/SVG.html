@@ -27,7 +27,9 @@
 
     const cSvg = {
         svgDom: null,
+        svgGroup: null,
         textPadding: 5,
+        maxVertical: 0,
         virtualSvg: {
             root: {
                 children: []
@@ -36,8 +38,8 @@
         // 创建SVG根元素
         cSvgDom: function () {
             const svgDom = document.createElementNS('http://www.w3.org/2000/svg','svg');
-            svgDom.setAttribute('width','200');
-            svgDom.setAttribute('height','200');
+            svgDom.setAttribute('width','2000');
+            svgDom.setAttribute('height','2000');
             svgDom.setAttribute('version','full');
             svgDom.setAttribute('baseProfile','baseProfile');
             svgDom.setAttribute('xmlns','http://www.w3.org/2000/svg');
@@ -73,7 +75,7 @@
         /**
          * @params {String} text: 文字
          * */
-        cReact: function (text, parent) {
+        cReact: function (text, parent, ind, len) {
             const g = this.cG()
             this.svgDom.appendChild(g)
             let sText = this.cText(text,{
@@ -90,7 +92,11 @@
                 rx: 5,
                 ry: 5
             })
-            // g.setAttribute('transform', `translate(0, 50)`);
+            const middleInd = (len-1)/2
+            const offsetVertical = len > 1 ? (ind - middleInd) * 100 : 0
+            const offsetHorizontalDis = parent.horizontalDis || 0
+            this.maxVertical = Math.min(offsetVertical, this.maxVertical)
+            g.setAttribute('transform', `translate(${offsetHorizontalDis}, ${offsetVertical})`);
             g.prepend(sEllipse)
             return g
         },
@@ -99,17 +105,21 @@
         },
         init: function (tree) {
             this.svgDom = this.cSvgDom()
+            this.svgGroup = this.cG()
+            this.svgDom.appendChild(this.svgGroup)
             document.body.appendChild(this.svgDom)
             this.walk(tree)
+            this.svgGroup.setAttribute('transform', `translate(0, ${Math.abs(this.maxVertical)})`)
         },
         walk: function (tree, parent = {}) {
-            tree.forEach((item) => {
-                const svgEl = this.createVirtualSvg(item, parent)
+            tree.forEach((item, index) => {
+                const svgEl = this.createVirtualSvg(item, parent, index, tree.length)
                 const curEl = {
                     ...item,
                     svgNode: svgEl,
                     parent,
-                    children: []
+                    children: [],
+                    horizontalDis: parent.horizontalDis ? parent.horizontalDis+100: 100
                 }
                 if(!this.virtualSvg[parent.name || 'root']) {
                     this.virtualSvg[parent.name || 'root'] = {
@@ -120,11 +130,10 @@
                 if(item.children && item.children.length) {
                     this.walk(item.children, curEl)
                 }
-
             })
         },
-        createVirtualSvg: function (item, parent) {
-            const svgNode = this.cReact(item.name, parent)
+        createVirtualSvg: function (item, parent, index, len) {
+            const svgNode = this.cReact(item.name, parent, index, len)
             return svgNode
         }
 
