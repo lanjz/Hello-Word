@@ -75,11 +75,10 @@
         /**
          * @params {String} text: 文字
          * */
-        cReact: function (text, parent, ind, len) {
+        cReact: function (text, parent, offsetVertical) {
             const g = this.cG()
-            this.svgDom.appendChild(g)
-            let sText = this.cText(text,{
-            })
+            this.svgGroup.appendChild(g)
+            let sText = this.cText(text,{})
             g.appendChild(sText)
             const {x: tX, y: tY, width, height} = sText.getBBox()
             // 默认情况文本向偏上，不能垂直居中，所以纠正一下
@@ -92,8 +91,6 @@
                 rx: 5,
                 ry: 5
             })
-            const middleInd = (len-1)/2
-            const offsetVertical = len > 1 ? (ind - middleInd) * 100 : 0
             const offsetHorizontalDis = parent.horizontalDis || 0
             this.maxVertical = Math.min(offsetVertical, this.maxVertical)
             g.setAttribute('transform', `translate(${offsetHorizontalDis}, ${offsetVertical})`);
@@ -113,14 +110,26 @@
         },
         walk: function (tree, parent = {}) {
             tree.forEach((item, index) => {
-                const svgEl = this.createVirtualSvg(item, parent, index, tree.length)
+                const middleInd = (tree.length-1)/2
+                const offsetVertical = tree.length > 1 ? (index - middleInd) * 100 : 0
+                const svgEl = this.createVirtualSvg(item, parent, offsetVertical)
+
                 const curEl = {
                     ...item,
                     svgNode: svgEl,
                     parent,
                     children: [],
-                    horizontalDis: parent.horizontalDis ? parent.horizontalDis+100: 100
+                    horizontalDis: parent.horizontalDis ? parent.horizontalDis+100: 100,
+                    offsetVertical
                 }
+                const svgLing = this.cEl('line',{
+                    x1: parent.horizontalDis || 0,
+                    y1: parent.offsetVertical,
+                    x2: curEl.horizontalDis,
+                    x2: curEl.offsetVertical,
+                })
+                // todo 线条没出来
+                this.svgGroup.appendChild(svgLing)
                 if(!this.virtualSvg[parent.name || 'root']) {
                     this.virtualSvg[parent.name || 'root'] = {
                         children: []
@@ -132,8 +141,8 @@
                 }
             })
         },
-        createVirtualSvg: function (item, parent, index, len) {
-            const svgNode = this.cReact(item.name, parent, index, len)
+        createVirtualSvg: function (item, parent, offsetVertical) {
+            const svgNode = this.cReact(item.name, parent, offsetVertical)
             return svgNode
         }
 
