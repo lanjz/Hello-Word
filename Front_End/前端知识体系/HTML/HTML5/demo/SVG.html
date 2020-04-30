@@ -23,6 +23,9 @@
 </body>
 <script>
     (function () {
+        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("width", "800");
+        svg.setAttribute("height", "500");
         const tree = [
             {
                 name: '1',
@@ -55,9 +58,20 @@
                 ]
             }
         ]
-        function walk(tree) {
-            tree.forEach((item) => {
+        function createVirtualSvg(item, parent) {
+            const nodeType = item.type === 'dir' ? 'ellipse': 'text'
+            console.log(svg.createElement)
+            const textNode = svg.createTextNode(item.name)
+            console.log('textNode', textNode.getBoundingClientRect())
+            return {
 
+            }
+
+        }
+        const vSvg = []
+        function walk(tree, parent) {
+            tree.forEach((item) => {
+                const vs = createVirtualSvg(item, parent)
             })
         }
         walk(tree)
