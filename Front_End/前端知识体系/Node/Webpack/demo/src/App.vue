@@ -1,5 +1,7 @@
 <template>
     <div>
+        <div class="div1"></div>
+        <div class="div2"></div>
         <h1>{{title}}</h1>
         <h1 @click="toggle()">SHOW/IF</h1>
         <div v-if="show">v-if</div>
