@@ -33,7 +33,44 @@ DOM 上进行更新，而是先在 `Virtual Dom` 上进行相应的更新操作�
 
 仅在同级的`vnode`间做`diff`，递归地进行同级`vnode`的`diff`，最终实现整个DOM树的更新。因为跨层级的操作是非常少的，忽略不计，这样时间复杂度就从`O(n3)`变成`O(n)`。
 
+## diff 算法有两个比较显著的特点
+
+- 比较只会在同层级进行, 不会跨层级比较
+
+- 在 diff 比较的过程中，循环从两边向中间收拢
+
 ## diff 算法过程
+
+diff 的实现主要通过两个方法，`patchVnode` 与 `updateChildren`
+
+`patchVnode`主要有两个参数:旧节点`oldVnode`和新节点`vnode`，主要分五种情况
+
+- `if (oldVnode === vnode)`，他们的引用一致，可以认为没有变化
+
+- `if(oldVnode.text !== null && vnode.text !== null && oldVnode.text !== vnode.text)`，文本节点的比较，需要修改，则会调用`el.textContent = vnode.text`
+
+- `if( oldCh && ch && oldCh !== ch ),` 两个节点都有子节点，而且它们不一样，这样我们会调用 updateChildren 函数比较子节点，这是diff的核心，后边会讲到
+
+- `if (ch)`，只有新的节点有子节点，调用`createEle(vnode)`，`vnode.el`已经引用了老的dom节点，`createEle`函数会在老dom节点上添加子节点
+
+- `if (oldCh)`，新节点没有子节点，老节点有子节点，直接删除老节点
+
+`updateChildren` 是关键，这个过程可以概括如下:
+
+`oldCh` 和 `newCh` 各有两个头尾的变量 `StartIdx` 和 `EndIdx` ，它们的2个变量相互比较，一共有4种比较方式
+
+- `oldCh`的头部与`newCh`的头部比较
+
+- `oldCh`的尾部与`newCh`的尾部比较
+
+- `oldCh`的头部与`newCh`的尾部比较
+
+- `oldCh`的尾部与`newCh`的头部比较
+
+如果 4 种比较都没匹配，如果设置了`key`，就会用`key`进行比较，在比较的过程中，变量会往中间靠，
+一旦 `StartIdx > EndIdx` 表明 `oldCh` 和 `newCh` 至少有一个已经遍历完了，就会结束比较。
+
+
 
 **新旧节点不同**
 

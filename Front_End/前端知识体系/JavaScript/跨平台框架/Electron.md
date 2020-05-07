@@ -4,7 +4,7 @@ Electron 是一个用 `HTML`，`CSS` 和 `JavaScript` 来构建跨平台桌面�
 
 ## 核心概念
 
-Electron 结合了 Chromium、Node.js 和用于调用操作系统本地功能的 API（如打开文件窗口、通知、图标等）
+Electron 结合了 `Chromium`、`Node.js` 和用于调用操作系统本地功能的 API（如打开文件窗口、通知、图标等）
 
 Electron 的核心理念是:保持 Electron 的体积小和可持续性开发。
 如:为了保持 Electron 的小巧 (文件体积) 和可持续性开发 (以防依赖库和 API 的泛滥) ， Electron 限制了所使用的核心项目的数量。
@@ -22,11 +22,11 @@ Electron 的核心理念是:保持 Electron 的体积小和可持续性开发。
 
 - 由于 Electron 使用了 Chromium(谷歌浏览器)来展示 web 页面，所以 Chromium 的 多进程架构也被使用到。 每个 Electron 中的 web 页面运行在它自己的渲染进程中
 
-- 主进程使用 BrowserWindow 实例创建页面。每个 BrowserWindow 实例都在自己的渲 染进程里运行页面。 当一个 BrowserWindow实例被销毁后，相应的渲染进程也会被终止
+- 主进程使用 BrowserWindow 实例创建页面。每个 BrowserWindow 实例都在自己的渲染进程里运行页面。 当一个 BrowserWindow实例被销毁后，相应的渲染进程也会被终止
 
 ## Electron 渲染进程中通过 Nodejs 读取本地文件
 
-在普通的浏览器中，web页面通常在一个沙盒环境中运行，不被允许去接触原生的资源。 然而 Electron 的用户在 Node.js 的 API支持下可以在页面中和操作系统进行一些底层交 互。
+在普通的浏览器中，web页面通常在一个沙盒环境中运行，不被允许去接触原生的资源。 然而 Electron 的用户在 Node.js 的 API支持下可以在页面中和操作系统进行一些底层交互。
 Nodejs 在主进程和渲染进程中都可以使用。渲染进程因为安全限制，不能直接操作生 GUI。虽然如此，因为集成了 Nodejs，渲染进程也有了操作系统底层 API的能力，Nodejs 中常用的 Path、fs、Crypto 等模块在 Electron 可以直接使用，方便我们处理链接、路径、 文件 MD5 等，同时 npm 还有成千上万的模块供我们选择。
 
 ```
@@ -47,7 +47,7 @@ button.addEventListener('click',function(e){
 
 - 使用`electron-build`打包
 
-- 在`package.json`文件中的`public`的配置远程远程放置新包的地址
+- 在`package.json`文件中的`public`的配置放置新包的远程地址
 
 - 服务器放置新的包和`latest-mac.yml`文件（说明版本内容）
 
@@ -55,3 +55,24 @@ button.addEventListener('click',function(e){
 
 [Electron](https://www.jianshu.com/p/2244653515a7)
 
+## electron跨域
+
+1. electron 跨域方案之禁用 `webSecurity`
+
+  ```
+  mainWindow = new BrowserWindow({
+      //...
+      webPreferences: {
+        webSecurity: false,
+        //...
+      },
+  });
+  ```
+
+  对于webview来说，需要添加的属性是`disablewebsecurity`。范例如下：
+  `<webview src="https://www.github.com/" disablewebsecurity></webview>`
+  
+  但是electron官方却是不建议大家使用`webSecurity`的，因为这会给electron软件带来一系列的安全性问题
+
+
+2. 直接在主进程中进行网络请求
