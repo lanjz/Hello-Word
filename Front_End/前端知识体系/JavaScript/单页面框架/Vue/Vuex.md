@@ -12,7 +12,7 @@ Vuex 和单纯的全局对象有以下两点不同：
 
 # 原理
 
-Vuex同样存在一个`install`方法，`install`的逻辑是使用`Vue.minxin`方法全局混入了一个`beforeCreate`钩子函数，
+Vuex 存在一个`install`方法，`install`的逻辑是使用`Vue.minxin`方法全局混入了一个`beforeCreate`钩子函数，
 把`store`保存在所有组件的`this.$sotre`中，这个`options.store`就是实例化`Store`对象的实例，
 这也是为什么我们在组件中可以通过 `this.$store` 访问到这个实例。一个`options.store`的结构如下：
 
@@ -68,5 +68,6 @@ forEachValue(wrappedGetters, (fn, key) => {
 ```
 
 当我根据 key 访问 `store.getters` 的某一个 `getter` 的时候，实际上就是访问了 `store._vm[key]`，也就是 `computed[key]`，
-在执行 `computed[key]` 对应的函数的时候，会执行 `rawGetter(local.state,...)` 方法，那么就会访问到 `store.state`，进而访问到 `store._vm._data.$$state`，这样就建立了一个依赖关系。当 `store.state` 发生变化的时候，下一次再访问 `store.getters` 的时候会重新计算
+在执行 `computed[key]` 对应的函数的时候，会执行 `rawGetter(local.state,...)` 方法，那么就会访问到 `store.state`，进而访问到 `store._vm._data.$$state`，这样就建立了一个依赖关系。
+当 `store.state` 发生变化的时候，下一次再访问 `store.getters` 的时候会重新计算
 
