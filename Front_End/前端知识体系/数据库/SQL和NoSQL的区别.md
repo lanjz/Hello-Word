@@ -10,11 +10,11 @@
 
 - SQL：存储在特定结构的表中
 
-- NoSQL：存储方式更加灵活，可以是 JSO，哈希等其它形式
+- NoSQL：存储方式更加灵活，可以是 JSON，哈希等其它形式
 
 ## 表/数据集合的数据的关系
 
-- SQ：必须定义好表结构后才能添加数据，例如定义表的主键(primary key)，索引(index),触发器(trigger),存储过程(stored procedure)等
+- SQL：必须定义好表结构后才能添加数据，例如定义表的主键(primary key)，索引(index),触发器(trigger),存储过程(stored procedure)等
 
 - NoSQL:数据可以在任何时候任何地方添加，不需要先定义表
 
