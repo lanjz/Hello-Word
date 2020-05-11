@@ -76,3 +76,6 @@ button.addEventListener('click',function(e){
 
 
 2. 直接在主进程中进行网络请求
+
+> [electron-vue](https://simulatedgreg.gitbooks.io/electron-vue/content/cn/file-tree.html)
+> [Electron 深度实践总结](https://changkun.us/archives/2017/03/217/)

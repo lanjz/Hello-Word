@@ -2,20 +2,10 @@
 import React, { useState, useEffect } from 'react';
 
 export default  function About() {
-    // 声明一个叫 "count" 的 state 变量
-    const [count, setCount] = useState(0);
-    useEffect(function () {
-        // setCount(count + 1)
-        return () => {
-            console.log('unMount')
-        }
-    })
+    console.log('about')
     return (
         <div>
-            <p>You clicked {count} times</p>
-            <button onClick={() => setCount(count + 1)}>
-                Click me
-            </button>
+            <p>About</p>
         </div>
     );
 }

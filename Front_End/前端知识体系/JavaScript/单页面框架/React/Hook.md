@@ -128,6 +128,81 @@ useEffect(() => {
 }, []) // 只在组件渲染时执行一次
 ```
 
+## useMemo
+
+`const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);`
+
+返回一个 `memoized` 值
+
+把“创建”函数和依赖项数组作为参数传入 `useMemo`，它仅会在某个依赖项改变时才重新计算 `memoized` 值。
+这种优化有助于避免在每次渲染时都进行高开销的计算
+
+例子：
+
+```
+function App() {
+    // 声明一个叫 "count" 的 state 变量
+    const [count, setCount] = useState(0);
+    function doSomething() {
+        console.log('doSomething')
+    }
+    const abc = doSomething()
+    return (
+        <div>
+            <p>You clicked {count} times</p>
+            <button onClick={() => setCount(count+1)}>
+                Click me
+            </button>
+        </div>
+    );
+}
+```
+
+上面的例子中，每次点击更新`count`的时候，都会触发组件渲染，然后`doSomething`每次都会执行，如果这个函数有非常耗时的计算，那无疑会影响组件
+性能，接下来我们使用`useMemo`优化
+
+```
+function App() {
+    // 声明一个叫 "count" 的 state 变量
+    const [count, setCount] = useState(0);
+    function doSomething() {
+        console.log('doSomething')
+        return 'abc'
+    }
+    const abc = useMemo(() => doSomething(), [])
+    return (
+        <div>
+            <p>You clicked {count} times {abc}</p>
+            <button onClick={() => setCount(count+1)}>
+                Click me
+            </button>
+        </div>
+    );
+}
+```
+
+使用`useMemo`包装`doSomething`方法，第二参数是一个数组，存放的是当前`doSomething`方法依赖的属性，上面传入的空数组，意味着`doSomething`
+只会在组件首次渲染的时候才会执行。
+
+如果我们改为：`const abc = useMemo(() => doSomething(), [count])`,那么只在`count`改变时，`doSomething`才会执行
+
+## useCallback
+
+```
+const memoizedCallback = useCallback(
+  () => {
+    doSomething(a, b);
+  },
+  [a, b],
+);
+```
+
+返回一个 `memoized` 回调函数。
+
+把内联回调函数及依赖项数组作为参数传入 `useCallback`，它将返回该回调函数的 `memoized` 版本，该回调函数仅在某个依赖项改变时才会更新
+
+
+
 ## 自定义Hook
 
 自定义Hook就是将`useState`和`useEffect`放在一个公共函数中，这个函数就成了一个`Hook`，这样就可以让多个组件使用这个`Hook`
@@ -230,3 +305,4 @@ export default App;
   - 在自定义 Hook 中调用其他 Hook 
 
 
+[什么时候使用 useMemo 和 useCallback](https://jancat.github.io/post/2019/translation-usememo-and-usecallback/)

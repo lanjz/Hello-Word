@@ -4,8 +4,9 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+console.log(1)
 ReactDOM.render(
-  <React.StrictMode>
+  <React.StrictMode> {/*strict mode的通过两次调用constructor和render函数来更好的检测不符合预期的side effects*/}
     <App />
   </React.StrictMode>,
   document.getElementById('root')
