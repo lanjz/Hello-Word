@@ -188,20 +188,176 @@ function App() {
 
 ## useCallback
 
+由于React的更新机制是当组件的`state`更新时，当前组件以及子组件都会重新渲染，即使这些子组件的`props`没有更新也会渲染。`React.memo`
+的作用就是包装子组件，这样只有当依赖的`props`更新的时候才会去重新渲染子组件, 如果`props`包含`useState` 或 `useContext` 的 Hook, 
+当 `context` 发生变化时，它仍会重新渲染
+
 ```
-const memoizedCallback = useCallback(
-  () => {
-    doSomething(a, b);
-  },
-  [a, b],
-);
+const ChildrenComponent = memo(({ cab }) => {
+    console.log('ChildrenComponent rending');
+    return <div>ChildrenComponent</div>;
+});
+function App() {
+    // 声明一个叫 "count" 的 state 变量
+    const [count, setCount] = useState(0);
+    const callBack = () => setCount(100)
+    return (
+        <div>
+            <p>You clicked {count} times</p>
+            <button onClick={() => setCount(count+1)}>
+                Click me
+            </button>
+            <ChildrenComponent cab={callBack}></ChildrenComponent>
+        </div>
+    );
+}
+
 ```
 
-返回一个 `memoized` 回调函数。
+上面例子中`ChildrenComponent`每次都会重新渲染，是`memo`不起作用嘛？并不是，当子组件用`memo`包装之后，这个子组件只有在`props`
+更新之后才会渲染，而上面`const callBack = () => setCount(100)`，在当前组件更新后都会重新赋值一个方法，赋值后地址就变了，那么
+子组件自然会被重新渲染
+
+使用`useCallback`解决这个问题：
+
+```
+const ChildrenComponent = memo(({ cab }) => {
+    console.log('ChildrenComponent rending');
+    return <div>ChildrenComponent</div>;
+});
+function App() {
+    // 声明一个叫 "count" 的 state 变量
+    const [count, setCount] = useState(0);
+    const callBack = useCallback(() => setCount(100), [])
+    return (
+        <div>
+            <p>You clicked {count} times</p>
+            <button onClick={() => setCount(count+1)}>
+                Click me
+            </button>
+            <ChildrenComponent cab={callBack}></ChildrenComponent>
+        </div>
+    );
+}
+```
 
 把内联回调函数及依赖项数组作为参数传入 `useCallback`，它将返回该回调函数的 `memoized` 版本，该回调函数仅在某个依赖项改变时才会更新
 
+## useMemo和useCallback的区别
 
+useMemo和useCallback接收的参数都是一样，都是在其依赖项发生变化后才执行，都是返回缓存的值，区别在于`useMemo`返回的是函数运行的结果，
+`useCallback`返回的是函数
+
+[什么时候使用 useMemo 和 useCallback](https://jancat.github.io/post/2019/translation-usememo-and-usecallback/)
+
+## useRef
+
+`const refContainer = useRef(initialValue);`
+
+`useRef` 返回一个可变的 `ref 对象`，其 `.current` 属性被初始化为传入的参数（initialValue）。**返回的 `ref` 对象在组件的整个生命周期内保持不变**
+
+它的作用总结如下：
+
+### 保存dom
+
+```
+function App() {
+    const inputEl = useRef(null);
+    useEffect(() => {
+        console.log('inputEl', inputEl)
+    })
+    return (
+        <div ref={inputEl}>
+            你个弟弟
+        </div>
+    );
+}
+
+```
+
+### 保存事件程序
+
+```
+function Test() {
+  const t = useRef(null);
+  function handleClick() {
+    t.current = setTimeout(() => l(1), 2000);
+  }
+  function handleClear() {
+    clearTimeout(t.current);
+  }
+
+  return (
+    <>
+      <button onClick={handleClick}>start</button>
+      <button onClick={handleClear}>clear</button>
+    </>
+  );
+}
+```
+
+### 存储以前的值
+
+```
+function Test() {
+  const t = useRef(null);
+  const [name, setName] = useState("ajanuw");
+  useEffect(() => {
+    t.current = name;
+  });
+  const prevName = t.current;
+  return (
+    <div>
+      <input value={name} onChange={e => setName(e.target.value)} />
+      <h2>{name}</h2>
+      <p>{prevName}</p>
+    </div>
+  );
+}
+```
+
+## useLayoutEffect
+
+作用与`useEffect` 相同类似，可以使用它来读取 DOM 布局并同步触发重渲染。
+在浏览器执行绘制之前，`useLayoutEffect` 内部的更新计划将被同步刷新
+
+**`useLayoutEffect`和`useEffect`**的区别
+
+在区分之前，我们先了解React 组件的更新过程:
+
+1. 初始化,变更`state`,`变更props`时会触发组件更新
+
+2. 当前组件就会调用`render`函数
+
+3. React 会执行 `useLayoutEffect`，直到该函数逻辑执行完毕
+
+4. 虚拟`dom元素`真实地更新到屏幕上
+
+5. 执行 `useEffect` 表示更新完毕
+
+可以看到`useEffect`是在Dom完成渲染之后执行，`useLayoutEffect`则在Dom最终渲染前执行
+
+## useImperativeHandle
+
+`useImperativeHandle(ref, createHandle, [deps])`
+
+`useImperativeHandle` 可以让你在使用 `ref` 时自定义暴露给父组件的实例值。在大多数情况下，应当避免使用 `ref` 这样的命令式代码。
+`useImperativeHandle` 应当与 `forwardRef` 一起使用：
+
+```
+function FancyInput(props, ref) {
+  const inputRef = useRef();
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current.focus();
+    }
+  }));
+  return <input ref={inputRef} ... />;
+}
+FancyInput = forwardRef(FancyInput);
+```
+
+在本例中，渲染 `<FancyInput ref={inputRef} />` 的父组件可以调用 `inputRef.current.focus()`
 
 ## 自定义Hook
 

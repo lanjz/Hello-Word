@@ -1,28 +1,63 @@
-import React, { useState, useEffect, useMemo, memo } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo,useContext,  memo, forwardRef, useImperativeHandle, useLayoutEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Inbox from './pages/Inbox'
 
-const ChildrenComponent = memo(({ abc }) => {
+let ChildrenComponent = memo(({ cab }) => {
     console.log('ChildrenComponent rending');
-    return <div>ChildrenComponent: {abc} </div>;
-});
-
+    const theme = useContext(ThemeContext);
+    console.log('theme', theme)
+    return <div>ChildrenComponent</div>;
+})
+const lazy = function () {
+    return new Promise(resolve => {
+        setTimeout(resolve, 2000)
+    })
+}
+const themes = {
+    light: {
+        foreground: "#000000",
+        background: "#eeeeee"
+    },
+    dark: {
+        foreground: "#ffffff",
+        background: "#222222"
+    }
+};
+const ThemeContext = React.createContext(themes.light);
 function App() {
+    const inputEl = useRef(null);
+
     // 声明一个叫 "count" 的 state 变量
     const [count, setCount] = useState(0);
     function doSomething() {
         console.log('doSomething')
         return 'abc'
     }
-    const abc = useMemo(() => doSomething(), [])
+    useEffect(() => {
+        console.log('inputEl', inputEl)
+    })
+    useLayoutEffect(() => {
+        async function deng() {
+            await lazy()
+            console.log('useLayoutEffect')
+        }
+        deng()
+        inputEl.current.style.background = count%2 === 0 ? 'red': 'blue'
+
+    })
+
+    // const abc = useMemo(() => doSomething(), [])
+    const callBack = useCallback(() => setCount(100), [])
     return (
-        <div>
-            <p>You clicked {count} times {abc}</p>
+        <div ref={inputEl}>
+            <p>You clicked {count} times</p>
             <button onClick={() => setCount(count+1)}>
                 Click me
             </button>
-            <ChildrenComponent abc={abc}></ChildrenComponent>
+            <ThemeContext.Provider value={themes.dark}>
+                <ChildrenComponent cab={callBack}></ChildrenComponent>
+            </ThemeContext.Provider>
         </div>
     );
 }
