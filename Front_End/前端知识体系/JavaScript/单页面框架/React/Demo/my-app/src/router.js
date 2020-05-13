@@ -1,6 +1,6 @@
 import React from 'react';
 import HookApp from './pages/hook/HookApp'
-
+import Login from './pages/Inbox'
 function Dashboard() {
     return <h1>Hello, Dashboard</h1>;
 }
@@ -13,18 +13,49 @@ function Inbox() {
 function App() {
     return <h1>App</h1>;
 }
-
-const routerConfig = [
+function ClassApp() {
+    return <h1>ClassApp</h1>;
+}
+function Message() {
+    return <h1>Message</h1>;
+}
+const classRouter = [
     {
-        path: '/',
-        component: App,
+        path: '/class',
+        component: ClassApp,
+        name: 'ClassApp',
+        childRouter:
+            [
+                { path: '/about', component: About, name: 'About' },
+                {
+                    path: 'inbox',
+                    component: Inbox,
+                    name: 'Inbox',
+                    childRoutes: [
+                        { path: '/messages/:id', component: Message },
+                        {
+                            path: 'messages/:id',
+                            onEnter: function (nextState, replaceState) {
+                                replaceState(null, '/messages/' + nextState.params.id)
+                            }
+                        }
+                    ]
+                }
+
+            ]
+    }
+]
+const hookRouter = [
+    {
+        path: '/hook',
+        component: Login,
         name: 'App',
-        indexRoute: { component: Inbox },
+        // indexRoute: { component: Inbox },
         childRouter: [
-            { path: 'about', component: About, name: 'About' },
+            { path: '/about', component: About, name: 'About' },
             { path: 'inbox',
                 component: Inbox,
-                name: 'Inbox'
+                name: 'Inbox',
               /*  childRoutes: [
                     { path: '/messages/:id', component: Message },
                     { path: 'messages/:id',
@@ -37,10 +68,5 @@ const routerConfig = [
 
         ]
     },
-    /*{
-        path: '/hook',
-        component: HookApp,
-        name: 'Hook'
-    }*/
 ]
-export default routerConfig
+export default [...classRouter, ...hookRouter]
