@@ -1,17 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, browserHistory} from 'react-router'
-// import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
-// import App from './Appp';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-import routeConfig from './router'
-
 ReactDOM.render(
   <React.StrictMode> {/*strict mode的通过两次调用constructor和render函数来更好的检测不符合预期的side effects*/}
-      {/*<Router routes={routeConfig}*/}
       <App/>
   </React.StrictMode>,
   document.getElementById('root')
