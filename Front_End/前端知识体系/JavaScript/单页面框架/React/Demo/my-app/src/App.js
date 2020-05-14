@@ -9,6 +9,7 @@ function App() {
             <Nav></Nav>
             <BrowserRouter>
                 {renderRoutes(routeConfig)}
+
             </BrowserRouter>
         </>
     )
