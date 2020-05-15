@@ -1,6 +1,7 @@
 import React from 'react';
 import HookApp from './pages/hook/HookApp'
 import Login from './pages/Inbox'
+import ClassIndex from './pages/class/index'
 import Context from './pages/class/Context'
 function Dashboard() {
     return <h1>Hello, Dashboard</h1>;
@@ -23,7 +24,7 @@ function Message() {
 const classRouter = [
     {
         path: '/class',
-        component: Context,
+        component: ClassIndex,
         name: 'ClassApp',
         // exact: true,
         childRouter:
