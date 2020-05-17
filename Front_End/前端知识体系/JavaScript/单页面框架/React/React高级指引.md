@@ -1,3 +1,60 @@
+# Context
+
+Context 提供了一个无需为每层组件手动添加 `props`，就能在组件树间进行数据传递的方法(跨层级组件传值)
+
+## 设置Context
+
+1. 使用`React.createContext`创建一个对象：`const MyContext = React.createContext(defaultValue);`
+
+2. 使用`MyContext.Provider`包褒我们的组件，并使用`value`属性设置要传给子组的值
+
+  `<MyContext.Provider value={/* 某个值 */}>`
+
+  当 Provider 的 `value` 值发生变化时，它内部的所有消费组件都会重新渲染。
+  `Provider` 及其内部 `consumer` 组件都不受制于 `shouldComponentUpdate` 函数，因此当 `consumer 组件`在其祖先组件退出更新的情况下也能更新
+  
+## 获取Context
+
+1. 使用 `static` 这个类属性来初始化你的 `contextType`
+
+  ```
+  class MyClass extends React.Component {
+    static contextType = MyContext;
+    console.log('this.context', this.context)
+    render() {
+      let value = this.context;
+      /* 基于这个值进行渲染工作 */
+    }
+  }
+  ```
+
+2. 使用`Class.contextType`将Context挂载到 Class的`contextType` 属性上
+
+  ```
+  class MyClass extends React.Component {
+    componentDidMount() {
+      let value = this.context;
+      /* 在组件挂载完成后，使用 MyContext 组件的值来执行一些有副作用的操作 */
+    }
+    componentDidUpdate() {
+      let value = this.context;
+      /* ... */
+    }
+    componentWillUnmount() {
+      let value = this.context;
+      /* ... */
+    }
+    render() {
+      let value = this.context;
+      /* 基于 MyContext 组件的值进行渲染 */
+    }
+  }
+  MyClass.contextType = MyContext;
+
+  ```
+
+[React-Context](https://react.docschina.org/docs/context.html#contextprovider)
+
 # 错误边界（Error Boundaries）
 
 [错误边界](https://zh-hans.reactjs.org/docs/error-boundaries.html)
@@ -67,3 +124,80 @@ class ErrorBoundary extends React.Component {
 - 服务端渲染
 
 - 它自身抛出来的错误（并非它的子组件）
+
+# Refs
+
+[Refs 转发](https://react.docschina.org/docs/forwarding-refs.html)
+
+通过Ref 可以获取DOM节点，使用方式：
+
+1. 我们通过调用 `React.createRef` 创建了一个 `React ref` 
+
+2. 我们通过给DOM指定 `ref` 属性
+
+3. 当 `ref` 挂载完成，`ref.current` 将指向 DOM 节点
+
+```
+// 作用于DOM
+class App extends React.Component {
+    constructor(props) {
+        super(props)
+        this.ref = React.createRef()
+    }
+    componentDidMount() {
+        console.log('ref', this.ref.current.focus())
+    }
+    render() {
+        return (
+            <input ref={this.ref} />
+        );
+    }
+}
+```
+
+获取子组件中的元素的方式：
+
+- 使用`React.forwardRef`方法包装子组件，被`React.forwardRef`包装的组件，除了有`prpos`作为第一个属性外，还有第二个参数`ref`，
+
+- 这个`ref`是挂载组件的时候，通过属性传下来的
+
+```
+const FancyButton = React.forwardRef((props, ref) => (
+    <button ref={ref} className="FancyButton"></button>
+));
+class App extends React.Component {
+    constructor(props) {
+        super(props)
+        this.ref = React.createRef()
+    }
+    componentDidMount() {
+        console.log('ref', this.ref.current)
+    }
+    render() {
+        return (
+            <FancyButton ref={this.ref}/>
+        );
+    }
+}
+```
+
+> 第二个参数 ref 只在使用 React.forwardRef 定义组件时存在。常规函数和 class 组件不接收 ref 参数，且 props 中也不存在 ref。
+> Ref 转发不仅限于 DOM 组件，你也可以转发 refs 到 **class 组件**实例中
+
+# Fragment
+
+[Fragments](https://react.docschina.org/docs/fragments.html)
+
+创建组件的时候，组件只能有一个唯一的根元素，使用`Fragmwnt`可以创建一个空的元素
+
+```
+render() {
+  return (
+    <React.Fragment>
+      <ChildA />
+      <ChildB />
+      <ChildC />
+    </React.Fragment>
+  );
+}
+```

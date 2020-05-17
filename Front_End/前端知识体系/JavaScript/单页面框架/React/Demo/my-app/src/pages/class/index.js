@@ -7,9 +7,10 @@ class ClassIndex extends React.Component{
     render(){
         return (
             <div>
-                {null.map((ele,index) =>{
+                1
+                {/*{null.map((ele,index) =>{
                     return <p key={index}>{ele}</p>
-                })}
+                })}*/}
             </div>
         )
     }
