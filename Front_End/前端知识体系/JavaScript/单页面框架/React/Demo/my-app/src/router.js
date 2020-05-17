@@ -4,6 +4,7 @@ import Login from './pages/Inbox'
 import ClassIndex from './pages/class/index'
 import Context from './pages/class/Context'
 import Refs from './pages/class/Refs'
+import Hoc from './pages/class/Hoc'
 function Dashboard() {
     return <h1>Hello, Dashboard</h1>;
 }
@@ -32,6 +33,7 @@ const classRouter = [
     },
     { path: 'context', component: Context, name: 'Context'},
     { path: 'about', component: About, name: 'about' },
+    { path: '/class/hoc', component: Hoc, name: 'hoc' },
     { path: '/class/refs', component: Refs, name: 'Refs' },
     {
         path: 'inbox',
