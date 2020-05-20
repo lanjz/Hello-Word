@@ -11,3 +11,7 @@ $ cd $home && brew update
 ```
 cd "$(brew --repo)" && git remote set-url origin https://github.com/Homebrew/brew.git
 ```
+
+- 查看安装的应用：`brew list`
+
+- 删除应用：`brew uninstall nginx`
