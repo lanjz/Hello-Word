@@ -1,0 +1,318 @@
+## 虚拟化长列表
+
+如果你的应用渲染了长列表（上百甚至上千的数据），我们推荐使用“虚拟滚动”技术。这项技术会在有限的时间内仅渲染有限的内容，并奇迹般地降低重新渲染组件消耗的时间，以及创建 DOM 节点的数量。
+
+`react-window` 和 `react-virtualized` 是热门的虚拟滚动库。 
+
+## shouldComponentUpdate
+
+当一个组件的 props 或 state 变更，React 会将最新返回的元素与之前渲染的元素进行对比，以此决定是否有必要更新真实的 DOM。当它们不相同时，React 会更新该 DOM
+
+即使 React 只更新改变了的 DOM 节点，重新渲染仍然花费了一些时间。在大部分情况下它并不是问题，不过如果它已经慢到让人注意了，
+你可以通过覆盖生命周期方法 `shouldComponentUpdate` 来进行提速。该方法会在重新渲染前被触发。其默认实现总是返回 `true`，让 React 执行更新：
+
+```
+shouldComponentUpdate(nextProps, nextState) {
+  return true;
+}
+```
+
+如果你知道在什么情况下你的组件不需要更新，你可以在 `shouldComponentUpdate` 中返回 `false` 来跳过整个渲染过程
+
+示例：
+
+如果你的组件只有当 `props.color` 或者 `state.count` 的值改变才需要更新时，你可以使用 `shouldComponentUpdate` 来进行检查
+
+```
+class CounterButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {count: 1};
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.color !== nextProps.color) {
+      return true;
+    }
+    if (this.state.count !== nextState.count) {
+      return true;
+    }
+    return false;
+  }
+
+  render() {
+    return (
+      <button
+        color={this.props.color}
+        onClick={() => this.setState(state => ({count: state.count + 1}))}>
+        Count: {this.state.count}
+      </button>
+    );
+  }
+}
+```
+
+在这段代码中，`shouldComponentUpdate` 仅检查了 `props.color` 或 `state.count` 是否改变。
+如果这些值没有改变，那么这个组件不会更新。如果你的组件更复杂一些，你可以使用类似“浅比较”的模式来检查 `props` 和 `state` 中所有的字段，
+以此来决定是否组件需要更新。React 已经提供了一位好帮手来帮你实现这种常见的模式 - 你只要继承 `React.PureComponent` 就行了。所以这段代码可以改成以下这种更简洁的形式
+
+```
+class CounterButton extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {count: 1};
+  }
+
+  render() {
+    return (
+      <button
+        color={this.props.color}
+        onClick={() => this.setState(state => ({count: state.count + 1}))}>
+        Count: {this.state.count}
+      </button>
+    );
+  }
+}
+
+```
+
+注意`React.PureComponent`只能进行数据浅比较，如果`props`或才`sate`是对象的话就无法监测其中的变化了
+
+## 更新DOM
+
+- 尽可能不要改变DOM节构
+
+- 添加 `key` 属性， 提高diff 算法效率
+
+## 减少组件的重新渲染
+
+对于相同的`props`或`state`更新，可以不做重新渲染处理，提高性能，相关的优化方式有：
+
+- 使用`shouldComponentUpdate`控制更新
+
+- 对于像 `this` 的类组件来说，React 提供了 `PureComponent` 基类。扩展 `React.PureComponent` 类的类组件被视为纯组件。
+
+  - 注意`PureComponent`使用的是浅层比较,如果如果属性包含有对象时，要注意
+
+- 对于函数组件，使用`React.memo`
+
+如果先前的状态和 props 数据与下一个 props 或状态相同，则组件不会重新渲染。
+
+## 懒加载组件
+
+`Suspense`和`React.lazy`
+
+## 按需加载模块
+
+```javascript
+import("./math").then(math => {
+  console.log(math.add(16, 26));
+});
+```
+
+## 使用 React Fragments 避免额外标记
+
+## 不要使用内联函数定义
+
+```
+import React from "react";
+
+export default class InlineFunctionComponent extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Welcome Guest</h1>
+        <input type="button" onClick={(e) => { this.setState({inputValue: e.target.value}) }} value="Click For Inline Function" />
+      </div>
+    )
+  }
+}
+
+```
+
+如果我们使用内联函数，则每次调用`render`函数时都会创建一个新的函数实例。
+
+当 React 进行虚拟 DOM diffing 时，它每次都会找到一个新的函数实例；因此在渲染阶段它会会绑定新函数并将旧实例扔给垃圾回收。
+
+因此直接绑定内联函数就需要额外做垃圾回收和绑定到 DOM 的新函数的工作。
+
+优化后：
+
+```
+import React from "react";
+ 
+export default class InlineFunctionComponent extends React.Component {
+  
+  setNewStateData = (event) => {
+    this.setState({
+      inputValue: e.target.value
+    })
+  }
+  
+  render() {
+    return (
+      <div>
+        <h1>Welcome Guest</h1>
+        <input type="button" onClick={this.setNewStateData} value="Click For Inline Function" />
+      </div>
+    )
+  }
+}
+
+```
+
+## 避免 componentWillMount() 中的异步请求
+
+原因：
+
+- 跟服务器端渲染（同构）有关系，如果在`componentWillMount`里面获取数据，`fetch data`会执行两次，一次在服务器端一次在客户端。在`componentDidMount`中可以解决这个问题
+
+- react16.0以后，`componentWillMount`可能会被执行多次
+
+## 在 Constructor 的早期绑定函数
+
+当我们在 React 中创建函数时，我们需要使用 bind 关键字将函数绑定到当前上下文。
+
+绑定可以在构造函数中完成，也可以在我们将函数绑定到 DOM 元素的位置上完成。
+
+两者之间似乎没有太大差异，但性能表现是不一样的。
+
+```
+import React from "react";
+
+export default class DelayedBinding extends React.Component {
+  constructor() {
+    this.state = {
+      name: "Mayank"
+    }
+  }
+  
+  handleButtonClick() {
+    alert("Button Clicked: " + this.state.name)
+  }
+  
+  render() {
+    return (
+      <>
+        <input type="button" value="Click" onClick={this.handleButtonClick.bind(this)} />
+      </>
+    )
+  }
+}
+
+```
+
+在上面的代码中，我们在 render 函数的绑定期间将函数绑定到按钮上。
+
+上面代码的问题在于，每次调用 render 函数时都会创建并使用绑定到当前上下文的新函数，但在每次渲染时使用已存在的函数效率更高。优化方案如下：
+
+```
+import React from "react";
+
+export default class DelayedBinding extends React.Component {
+  constructor() {
+    this.state = {
+      name: "Mayank"
+    }
+    this.handleButtonClick = this.handleButtonClick.bind(this)
+  }
+  
+  handleButtonClick() {
+    alert("Button Clicked: " + this.state.name)
+  }
+  
+  render() {
+    return (
+      <>
+        <input type="button" value="Click" onClick={this.handleButtonClick} />
+      </>
+    )
+  }
+}
+
+```
+
+## 箭头函数与构造函数中的绑定
+
+处理类时的标准做法就是使用箭头函数。使用箭头函数时会保留执行的上下文。
+
+我们调用它时不需要将函数绑定到上下文
+
+```
+import React from "react";
+
+export default class DelayedBinding extends React.Component {
+  constructor() {
+    this.state = {
+      name: "Mayank"
+    }
+  }
+  
+  handleButtonClick = () => {
+    alert("Button Clicked: " + this.state.name)
+  }
+  
+  render() {
+    return (
+      <>
+        <input type="button" value="Click" onClick={this.handleButtonClick} />
+      </>
+    )
+  }
+}
+
+```
+
+箭头函数好处多多，但也有缺点。
+
+当我们添加箭头函数时，该函数被添加为对象实例，而不是类的原型属性。这意味着如果我们多次复用组件，那么在组件外创建的每个对象中都会有这些函数的多个实例。
+
+每个组件都会有这些函数的一份实例，影响了可复用性。此外因为它是对象属性而不是原型属性，所以这些函数在继承链中不可用。
+
+因此箭头函数确实有其缺点。实现这些函数的最佳方法是在构造函数中绑定函数，如上所述。
+
+## 避免使用内联样式属性
+
+```
+import React from "react";
+
+export default class InlineStyledComponents extends React.Component {
+  render() {
+    return (
+      <>
+        <b style={{"backgroundColor": "blue"}}>Welcome to Sample Page</b>
+      </>
+    )
+  }
+}
+
+```
+
+在上面创建的组件中，我们将内联样式附加到组件。添加的内联样式是 JavaScript 对象而不是样式标记。
+
+样式 backgroundColor 需要转换为等效的 CSS 样式属性，然后才应用样式。这样就需要额外的脚本处理和 JS 执行工作。
+
+更好的办法是将 CSS 文件导入组件
+
+## 为组件创建错误边界
+
+错误边界是一个 React 组件，可以捕获子组件中的 JavaScript 错误。我们可以包含错误、记录错误消息，并为 UI 组件故障提供回退机制
+
+错误边界涉及一个高阶组件，包含以下方法：`static getDerivedStateFromError()` 和 `componentDidCatch()`。
+
+## 使用唯一键迭代
+
+当我们需要渲染项目列表时应该为项目添加一个键
+
+## 事件节流和防抖
+
+这是个通用优化方案了
+
+## 使用 CDN
+
+## 用 CSS 动画代替 JavaScript 动画
+
+## 在 Web 服务器上启用 gzip 压缩
+
+## React 组件的服务端渲染
+
