@@ -11,3 +11,5 @@
 - Vue 内置了很多方便的功能的,如果一些指令`v-model`，`v-if`,`v-for`,`watch`,`computed`等等，而React只能使用JSX语法
 
 - vue中只有依赖的数据发生了变化，才会重新渲染视图，react不管这个数据有没在界面中用到，都会重新渲染视图
+
+- 列表特环 vue 使用指令`v-for`，react 使用`map`
