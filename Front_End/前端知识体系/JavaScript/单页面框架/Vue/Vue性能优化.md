@@ -6,7 +6,7 @@
 
 `v-for`具有比`v-if`更高的优先级，应当先对循环的内容作用`v-if`条件的过滤，减少不必要的循环
 
-## 频繁的切换显示使用`v-if`
+## 频繁的切换显示使用`v-sho`
 
 ## 动态加载查块
 
@@ -48,7 +48,7 @@ import(/* webpackPreload: true */ 'ChartingLibrary');
 
 - `preload chunk` 会在父 `chunk` 加载时，以并行方式开始加载。`prefetch chunk` 会在父 `chunk` 加载结束后开始加载
 
-- `preload chunk` 具有中等优先级，并立即下载。prefetch chunk 在浏览器闲置时下载
+- `prefetch chunk` 在浏览器闲置时下载
 
 [项目性能评测](https://www.googlespeed.cn/?spm=a2c4e.10696291.0.0.6e4919a4XKVOUm&url=www.zhujizhou.com)
 

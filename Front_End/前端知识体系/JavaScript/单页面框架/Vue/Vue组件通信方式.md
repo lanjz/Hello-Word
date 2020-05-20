@@ -28,7 +28,6 @@ this.$emit('update:title', 'newTitle')
 <comA :title.sync="title"></comA>
 ```
 
-
 ## $children / $parent
 
 - `$children`：当前组件包含的子组件实例数组。需要注意 `$children` 并不保证顺序，也不是响应式的。
