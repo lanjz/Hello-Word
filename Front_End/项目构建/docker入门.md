@@ -613,6 +613,7 @@ docker run -d -v mydata:/data xxxx
     docker run -t -i ubuntu:18.04 /bin/bash
     root@af8bae53bdd3:/#
     ```
+    **进入后使用退出方式：`Ctrl-D`或`exit`**
 
   当利用 `docker run`来创建容器时，Docker 在后台运行的标准操作包括
 
@@ -629,12 +630,18 @@ docker run -d -v mydata:/data xxxx
   - 执行用户指定的应用程序
 
   - 执行完毕后容器被终止
+  
+- `docker container ls`: 列出正在运行的容器
+
+- `docker container ls --all`: 列出所有容器，包括终止的容器
 
 - `docker container start <id>`: 启动已终止容器
 
 - `docker container stop <id>`: 终止容器
 
 - `docker container rm`：删除容器
+
+- `docker rm $(docker ps -aq)`: 删除所有容器
 
   ```
   $ docker container rm  trusting_newton
@@ -644,6 +651,20 @@ docker run -d -v mydata:/data xxxx
   如果要删除一个运行中的容器，可以添加 `-f` 参数。Docker 会发送 SIGKILL 信号给容器。
   
 - `docker container prune`: 清理所有处于终止状态的容器
+
+- `docker container logs [containerID]`
+
+  `docker container logs`命令用来查看`docker`容器的输出，即容器里面`Shell`的标准输出。
+如果`docker run`命令运行容器的时候，没有使用`-it`参数，就要用这个命令查看输出。
+
+- `$ docker container exec -it [containerID] /bin/bash` 
+
+  `docker container exec`命令用于进入一个正在运行的`docker`容器。如果`docker run`命令运行容器的时候，
+  没有使用`-it`参数，就要用这个命令进入容器。一旦进入了容器，就可以在容器的 `Shell` 执行命令了。
+
+- `docker container cp [containID]:[/path/to/file] .`
+
+  `docker container cp`命令用于从正在运行的 Docker 容器里面，将文件拷贝到本机。
 
 ## 进入容器
 
@@ -656,6 +677,12 @@ docker run -d -v mydata:/data xxxx
 - `exec`:如`docker exec -i 69d1 bash`,如果在窗口内`exit`,不会导致容器的停止
 
 因此推荐大家使用 `docker exec`
+
+## 复制容器内的文件到本机
+
+`sudo docker cp 484:/etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf`
+
+复制 `id 为484`容器内的`/etc/nginx/conf.d/default.conf`文件到本机的`/etc/nginx/conf.d/default.conf`
 
 ## 导入和导出
 
