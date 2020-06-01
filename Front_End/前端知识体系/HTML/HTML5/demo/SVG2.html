@@ -80,6 +80,7 @@
             let sText = this.cText(text,{})
             g.appendChild(sText)
             const {x: tX, y: tY, width, height} = sText.getBBox()
+            console.log('sText.getBBox()', sText.getBBox())
             // 默认情况文本向偏上，不能垂直居中，所以纠正一下
             sText.setAttribute('transform', `translate(${this.textPadding}, ${Math.abs(tY) + this.textPadding})`);
             const sEllipse = this.cEl('rect', {

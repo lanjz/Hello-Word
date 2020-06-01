@@ -75,10 +75,11 @@
         /**
          * @params {String} text: 文字
          * */
-        cReact: function (text, parent, offsetVertical, g) {
-            parent.g.appendChild(g)
+        cReact: function (text) {
+            const cG = this.cG()
             let sText = this.cText(text,{})
-            g.appendChild(sText)
+            cG.appendChild(sText)
+            console.log('sText.getBBox()', sText.getBBox())
             const {x: tX, y: tY, width, height} = sText.getBBox()
             // 默认情况文本向偏上，不能垂直居中，所以纠正一下
             sText.setAttribute('transform', `translate(${this.textPadding}, ${Math.abs(tY) + this.textPadding})`);
@@ -90,11 +91,8 @@
                 rx: 5,
                 ry: 5
             })
-            const offsetHorizontalDis = parent.horizontalDis || 0
-            this.maxVertical = Math.min(offsetVertical, this.maxVertical)
-            g.setAttribute('transform', `translate(${offsetHorizontalDis}, ${offsetVertical})`);
-            g.prepend(sEllipse)
-            return g
+            cG.prepend(sEllipse)
+            return cG
         },
         cG: function() {
             return document.createElementNS('http://www.w3.org/2000/svg', 'g')
@@ -107,30 +105,31 @@
             const rootEl = {
                 g: this.svgGroup
             }
-            const rootG = this.walk(tree)
+            const rootG = this.initWalk(tree)
             this.svgGroup.setAttribute('transform', `translate(0, ${Math.abs(this.maxVertical)})`)
-        },
-        initWalk: function(tree, parent) {
-            tree.forEach((item, index) => {
-                const svgEl = this.createVirtualSvg(item)
-                if(item.children && this.children.length) {
-                    const childSvgEl  = this.walk(item.children)
-                }
-                const combine = this.combine(svgEl, childSvgEl)
-            })
-
         },
         combine: function(a, b) {
             console.log(a, b)
         },
+        createG: function(svgElArr) {
+            console.log('svgElArr', svgElArr)
+        },
+        // 处理根元素
+        initWalk: function(tree, parent) {
+            const gGroup = this.walk(tree)
+            console.log(gGroup, gGroup)
+        },
         walk: function (tree, parent) {
-
+            const svgElArr = []
             tree.forEach((item, index) => {
-                const svgEl = this.createVirtualSvg(item)
+                let svgEl = this.createVirtualSvg(item) // 返回某个文本G
                 if(item.children && this.children.length) {
                     const childSvgEl  = this.walk(item.children)
+                    svgEl = this.combine(svgEl, childSvgEl)
                 }
+                svgElArr.push(svgEl)
             })
+            return this.createG(svgElArr) // 返回组成G
             const walkChild = tree.map(item => {
                 return this.createVirtualSvg(item)
             })
@@ -167,8 +166,8 @@
                 }
             })
         },
-        createVirtualSvg: function ({ name, parent, offsetVertical, g }) {
-            const svgNode = this.cReact(name, parent, offsetVertical, g)
+        createVirtualSvg: function ({ name = '无' }) {
+            const svgNode = this.cReact(name)
             return svgNode
         }
 
@@ -194,6 +193,14 @@
 </script>
 <script>
 
+    const tree2 = [
+        {
+            name: '1-1-1',
+        },
+        {
+            name: '1-1-2'
+        }
+    ]
     const tree = [
         {
             name: '1',
@@ -247,6 +254,6 @@
             ]
         }
     ]
-    cSvg.init(tree)
+    cSvg.init(tree2)
 </script>
 </html>
