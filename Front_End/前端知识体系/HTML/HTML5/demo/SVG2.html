@@ -107,33 +107,10 @@
             const rootEl = {
                 g: this.svgGroup
             }
-            const rootG = this.walk(tree)
+            this.walk(tree, rootEl)
             this.svgGroup.setAttribute('transform', `translate(0, ${Math.abs(this.maxVertical)})`)
         },
-        initWalk: function(tree, parent) {
-            tree.forEach((item, index) => {
-                const svgEl = this.createVirtualSvg(item)
-                if(item.children && this.children.length) {
-                    const childSvgEl  = this.walk(item.children)
-                }
-                const combine = this.combine(svgEl, childSvgEl)
-            })
-
-        },
-        combine: function(a, b) {
-            console.log(a, b)
-        },
         walk: function (tree, parent) {
-
-            tree.forEach((item, index) => {
-                const svgEl = this.createVirtualSvg(item)
-                if(item.children && this.children.length) {
-                    const childSvgEl  = this.walk(item.children)
-                }
-            })
-            const walkChild = tree.map(item => {
-                return this.createVirtualSvg(item)
-            })
             tree.forEach((item, index) => {
                 const middleInd = (tree.length-1)/2
                 const offsetVertical = tree.length > 1 ? (index - middleInd) * 100 : 0 // 获取纵向偏移量
