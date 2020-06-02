@@ -8,13 +8,22 @@
 
 </body>
 <script>
-    var a = 1, b = 2
+ /*   var a = 1, b = 2
     var foo = function () {
         console.log(a)
     }
     console.log(foo)
     (function () {
         console.log(b)
-    })
+    })*/
+    const el1 = document.createElement('div')
+    el1.innerText = 'DIV'
+    document.body.appendChild(el1)
+
+    setTimeout(() => {
+        const el2 = document.createElement('div')
+        el2.appendChild(el1)
+        // document.body.appendChild(el2)
+    }, 2000)
 </script>
 </html>
