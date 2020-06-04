@@ -125,29 +125,50 @@
             while (lastEl.tagName === 'g'){
                 lastEl = lastEl.firstChild
             }
-            console.log('this.getAttribute(b)', firstEl.getAttribute('y'))
-            console.log('lastEl.getAttribute', lastEl.getAttribute('y')*1)
             const result = (lastEl.getAttribute('y') - firstEl.getAttribute('y')*1) / 2 + firstEl.getAttribute('y')*1
-            console.log('tresult', result)
             return result
+        },
+        findPositionElY: function(el){
+            while (el.tagName === 'g'){
+                el = el.firstChild
+            }
+            return {
+                y: el.getAttribute('y'),
+                width: el.getAttribute('width'),
+                height: el.getAttribute('height'),
+            }
         },
         combine: function(a, b) {
             const cG = this.cG()
-            b.setAttribute('width', 100)
             const x = `${this.getRect(a).width+80}`
             // const y = `${(this.getRect(b).height - this.getRect(a).height) / 2}`
 
             const y = this.findMiddlePosition(b)
             this.findMiddlePosition(b)
-            b.setAttribute('transform', `translate(${x}, ${this.getRect(a).y})`)
-            // a.setAttribute('transform', `translate(0, ${y})`)
+            const aY = this.getRect(a).y
+            const aBox = this.getRect(a) // 当前A的偏移量
+            b.setAttribute('transform', `translate(${x}, ${aBox.y})`)
+            a.setAttribute('transform', `translate(0, ${aY})`)
+            a.setAttribute('translateY', aY)
             a.childNodes.forEach(node => {
-                console.log(node.tagName)
                 node.setAttribute('y', y)
             })
+
             cG.appendChild(a)
             cG.appendChild(b)
-            cG.setAttribute('middle-top', y)
+            b.childNodes.forEach(item => {
+                const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
+                const translateY = item.firstChild.getAttribute('translateY')||0 // 注意元素的包含关系
+                const line = this.cEl('line', {
+                    x1: aBox.width,
+                    y1: (aY + y) + aBox.height/2,
+                    x2: x,
+                    y2: Number(positionY) + Number(aBox.y)+Number(translateY)+height/2, // 元素在组内偏移量+组的偏移量+相对右侧居中的偏移量
+                    style: 'stroke:rgb(255,0,0)',
+                    'stroke-width': 2
+                })
+                cG.appendChild(line)
+            })
             return cG
         },
         bindG: function(svgElArr) {
@@ -174,7 +195,7 @@
         },
         walk: function (tree, parent) {
             const svgElArr = []
-            let hei = 0
+            let hei = 0 // 设置每个元素的偏移高度
             tree.forEach((item, index) => {
                 let svgEl = this.cReact(item.name, hei) // 返回某个文本G
                 if(item.children && item.children.length) {
@@ -228,7 +249,35 @@
                             name: 'a-1-3-2'
                         },
                         {
-                            name: 'a-1-3-3'
+                            name: 'a-1-3-3',
+                            children: [
+                                {
+                                    name: 'a-1-3-1',
+                                    children: [
+                                        {
+                                            name: 'a-1-3-1',
+                                        },
+                                        {
+                                            name: 'a-1-3-2'
+                                        },
+                                        {
+                                            name: 'a-1-3-3'
+                                        },
+                                        {
+                                            name: 'a-1-3-4'
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: 'a-1-3-2'
+                                },
+                                {
+                                    name: 'a-1-3-3'
+                                },
+                                {
+                                    name: 'a-1-3-4'
+                                }
+                            ]
                         },
                         {
                             name: 'a-1-3-4'
@@ -240,7 +289,7 @@
                 }
             ]
         },
-       /* {
+        {
             name: '1-1-2',
             children: [
                 {
@@ -257,17 +306,32 @@
                 }
             ]
         },
+
         {
             name: '1-1-3',
             children: [
                 {
-                    name: '1-1-3-1'
+                    name: '1-1-3-1',
+                    children: [
+                        {
+                            name: '1-2-1',
+                        },
+                        {
+                            name: '1-2-2'
+                        },
+                        {
+                            name: '1-2-3'
+                        },
+                        {
+                            name: '1-2-4'
+                        }
+                    ]
                 },
                 {
                     name: '1-1-3-2'
                 }
             ]
-        }*/
+        }
     ]
     const tree = [
         {
