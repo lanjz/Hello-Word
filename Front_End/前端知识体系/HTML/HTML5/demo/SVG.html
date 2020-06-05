@@ -28,12 +28,16 @@
     const cSvg = {
         svgDom: null,
         svgGroup: null,
-        textPadding: 5,
-        maxVertical: 0,
-        virtualSvg: {
-            root: {
-                children: []
-            }
+        reactStyle: { // 文本样式
+            textPadding: 5, // 文字与边框的间距
+            verticalMargin: 10, // 元素上下间距
+            rowMargin: 80, // 元素左右间距
+            minWidth: 50, // 元素最小宽度
+            reactRadius: 5, // 元素圆角
+        },
+        lineStyle: { // 线条样式
+            style: 'stroke:rgb(255,0,0)',
+            'stroke-width': 2
         },
         // 创建SVG根元素
         cSvgDom: function () {
@@ -71,32 +75,30 @@
             })
             return el
         },
-        getRect: function(g){
-            this.svgGroup.appendChild(g)
-            return g.getBBox()
-        },
         // 创建SVG-ellipse元素
         /**
          * @params {String} text: 文字
+         * @params {Number} height: 垂直偏移量
          * */
-        cReact: function (text, hei) {
+        cReact: function (text, hei = 0) {
+            const { textPadding, reactRadius, minWidth } = this.reactStyle
             const cG = this.cG()
             let sText = this.cText(text,{y: hei})
             cG.appendChild(sText)
-            const {x: tX, y: tY, width, height} = this.getRect(cG)
-            // 默认情况文本向偏上，不能垂直居中，所以纠正一下
-            sText.setAttribute('transform', `translate(${this.textPadding}, ${height})`);
+            const {width, height} = this.getRect(cG)
+            sText.setAttribute('transform', `translate(${textPadding}, ${height})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
             const sEllipse = this.cEl('rect', {
                 x: 0,
                 y: hei,
-                width: Math.max((width + this.textPadding * 2), 50),
-                height: height + this.textPadding * 2,
-                rx: 5,
-                ry: 5
+                width: Math.max((width + textPadding * 2), minWidth),
+                height: height + textPadding * 2,
+                rx: reactRadius,
+                ry: reactRadius
             })
             cG.prepend(sEllipse)
             return cG
         },
+        // 创建组
         cG: function(attr = {}) {
             const g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
             Object.keys(attr).forEach(item => {
@@ -104,18 +106,49 @@
             })
             return document.createElementNS('http://www.w3.org/2000/svg', 'g')
         },
-        init: function (tree) {
-            this.svgDom = this.cSvgDom()
-            this.svgGroup = this.cG()
-            this.svgDom.appendChild(this.svgGroup)
-            document.body.appendChild(this.svgDom)
-            const rootEl = {
-                g: this.svgGroup
-            }
-            const rootG = this.initWalk(tree)
-            this.svgDom.appendChild(rootG)
-            this.svgGroup.setAttribute('transform', `translate(0, ${Math.abs(this.maxVertical)})`)
+        /**
+         * 获取元素几何信息，需要在DOM才能得到这些信息，所以先执行appendChild
+         * 要注意appendChild后修改节点位置，所以切勿在插入到正确位置后再执行这个方法
+         * */
+        getRect: function(g){
+            this.svgGroup.appendChild(g)
+            return g.getBBox()
         },
+        /**
+         * @params {svg[g]} a 左侧的g元素
+         * @params {svg[g]} b a对应的子元素
+         * */
+        combine: function(a, b) {
+            const cG = this.cG()
+            const x = `${this.getRect(a).width + this.reactStyle.rowMargin}` // 计算a,b的间距
+            const y = this.findMiddlePosition(b) // 计算a在b垂直方向的中间位置
+            const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
+            b.setAttribute('transform', `translate(${x}, ${aY})`) // b的整体Y偏移要与a元素保持一致
+            a.childNodes.forEach(node => {
+                node.setAttribute('y', y+aY) // （步骤A）相对b的居中位置 + 原本的偏移量
+            })
+
+            cG.appendChild(a)
+            cG.appendChild(b)
+            // 画线
+            b.childNodes.forEach(item => {
+                const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
+                const line = this.cEl('line', {
+                    x1: aWidth,
+                    y1: (aY + y) + aHeight/2, // 这里的aY是上面步骤A之前的值，所以需要（aY + y）才是a真实Y偏移量
+                    x2: x,
+                    y2: Number(positionY) + Number(aY)+height/2, // 元素在组内偏移量+组的偏移量+相对右侧居中的偏移量
+                    ...this.lineStyle
+                })
+                cG.appendChild(line)
+            })
+            return cG
+        },
+        /**
+         *  获取子元素集合中的垂直居中位置
+         *  g元素没有记录几何信息
+         *  通过查找g元素下的非g元素，来获取当前g的垂直偏移量
+         * */
         findMiddlePosition:function(el){
             let firstEl = el.firstChild
             while (firstEl.tagName === 'g'){
@@ -128,6 +161,7 @@
             const result = (lastEl.getAttribute('y') - firstEl.getAttribute('y')*1) / 2 + firstEl.getAttribute('y')*1
             return result
         },
+        // 获取某在元素在当前组内的Y偏移量
         findPositionElY: function(el){
             while (el.tagName === 'g'){
                 el = el.firstChild
@@ -138,81 +172,41 @@
                 height: el.getAttribute('height'),
             }
         },
-        combine: function(a, b) {
-            const cG = this.cG()
-            const x = `${this.getRect(a).width+80}`
-            // const y = `${(this.getRect(b).height - this.getRect(a).height) / 2}`
-
-            const y = this.findMiddlePosition(b)
-            this.findMiddlePosition(b)
-            const aY = this.getRect(a).y
-            const aBox = this.getRect(a) // 当前A的偏移量
-            b.setAttribute('transform', `translate(${x}, ${aBox.y})`)
-            a.setAttribute('transform', `translate(0, ${aY})`)
-            a.setAttribute('translateY', aY)
-            a.childNodes.forEach(node => {
-                node.setAttribute('y', y)
-            })
-
-            cG.appendChild(a)
-            cG.appendChild(b)
-            b.childNodes.forEach(item => {
-                const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
-                const translateY = item.firstChild.getAttribute('translateY')||0 // 注意元素的包含关系
-                const line = this.cEl('line', {
-                    x1: aBox.width,
-                    y1: (aY + y) + aBox.height/2,
-                    x2: x,
-                    y2: Number(positionY) + Number(aBox.y)+Number(translateY)+height/2, // 元素在组内偏移量+组的偏移量+相对右侧居中的偏移量
-                    style: 'stroke:rgb(255,0,0)',
-                    'stroke-width': 2
-                })
-                cG.appendChild(line)
-            })
-            return cG
-        },
+        // 将同父的元素放同一个组中
         bindG: function(svgElArr) {
             const cG = this.cG()
-            console.log('svgElArr', svgElArr)
-            let firstTop = 0
-            let lastTop = 0
             svgElArr.forEach((item, ind) => {
-                if(ind === 0) {
-                    cG.setAttribute('offset-top', item.getAttribute('y'))
-                    firstTop = item.getAttribute('middle-top') || 0
-                } else if(ind === svgElArr.length - 1) {
-                    lastTop = item.getAttribute('middle-top') || 0
-                }
-                // this.svgDom.appendChild(item)
                 cG.appendChild(item)
             })
             return cG
+        },
+        init: function (tree) {
+            this.svgDom = this.cSvgDom()
+            document.body.appendChild(this.svgDom)
+            this.svgGroup = this.cG()
+            this.svgDom.appendChild(this.svgGroup)
+            const rootG = this.initWalk(tree)
+            this.svgGroup.appendChild(rootG)
         },
         // 处理根元素
         initWalk: function(tree) {
             const gGroup = this.walk(tree)
             return gGroup
         },
-        walk: function (tree, parent) {
+        walk: function (tree) {
             const svgElArr = []
             let hei = 0 // 设置每个元素的偏移高度
-            tree.forEach((item, index) => {
+            tree.forEach((item) => {
                 let svgEl = this.cReact(item.name, hei) // 返回某个文本G
-                if(item.children && item.children.length) {
+                if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
                     const childSvgEl  = this.walk(item.children)
-                    childSvgEl.setAttribute('belong', item.name)
                     svgEl = this.combine(svgEl, childSvgEl)
                 }
-                hei += ((this.getRect(svgEl)).height + 10)
+                hei += ((this.getRect(svgEl)).height + this.reactStyle.verticalMargin)
                 svgElArr.push(svgEl)
             })
             return this.bindG(svgElArr) // 返回组成G
         },
-        createVirtualSvg: function ({ name = '无' }) {
-            const svgNode = this.cReact(name)
-            return svgNode
-        }
-
     }
     console.log(cSvg)
 /*    const svgDom = cSvg.cSvgDom()
