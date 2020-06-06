@@ -7,6 +7,9 @@
         canvas{
             /*border: solid 1px #000;*/
         }
+        circle{
+            transition: .5s
+        }
     </style>
 </head>
 <body>
@@ -18,9 +21,328 @@
 </body>
 <script>
     function svgMap(data, options = {}) {
-
+        this.data = JSON.parse(JSON.stringify(data))
+        this.virtualSvg = {}
+        this.reactStyle = { // 文本样式
+            textPadding: 10, // 文字与边框的间距
+            verticalMargin: 20, // 元素上下间距
+            rowMargin: 40, // 元素左右间距
+            minWidth: 50, // 元素最小宽度
+            reactRadius: 5, // 元素圆角
+        }
+        this.lineStyle = { // 线条样式
+            style: 'stroke:#fff',
+            'stroke-width': 1,
+            stroke: '#fff',
+            fill: 'transparent'
+        }
+        this.direction = options.direction|| '' // right->只向右伸展 '' => 左右伸展
+        this.svgDom = this.cSvgDom()
+        this.svgGroup = this.cG()
+        this.svgDom.appendChild(this.svgGroup)
+        document.body.appendChild(this.svgDom)
+        const child = this.data.children || []
+        if(!child.length){
+            console.warn('请确定子元素')
+            return
+        }
+        let childLeft = null
+        if(!this.direction && child.length > 1){
+            const half = Math.floor(child.length/2)
+            const left = child.splice(0, half) // splice会改变原数组，一半存入left中，child只存在其余部分了
+            childLeft = this.initWalk(left, 'left')
+            this.svgGroup.appendChild(childLeft)
+        }
+        const childRight = this.initWalk(child)
+        this.svgGroup.appendChild(childRight)
+        this.addRoot(childRight, childLeft)
+        this.addEvent()
     }
+    svgMap.prototype.addEvent = function(){
+        const _this = this
+        this.svgDom.addEventListener('click', function (e) {
+            if(e.target.tagName === 'circle') {
+                const node = e.target.getAttribute('key')
+                _this.virtualSvg[node].hide = !_this.virtualSvg[node].hide
+                _this.virtualSvg[node].childDom.forEach(item => {
+                    item.style.display = _this.virtualSvg[node].hide ? 'none' : 'block'
+                })
+                e.target.style.opacity = _this.virtualSvg[node].hide ? '.5' : '1'
+            }
 
+            console.log('e', e.target)
+            console.log('e', e.currentTarget)
+        })
+    }
+    svgMap.prototype.cSvgDom = function () {
+        const svgDom = document.createElementNS('http://www.w3.org/2000/svg','svg');
+        svgDom.setAttribute('width','2000');
+        svgDom.setAttribute('height','2000');
+        svgDom.setAttribute('version','full');
+        svgDom.setAttribute('baseProfile','baseProfile');
+        svgDom.setAttribute('style', `background: #272b2d`)
+        svgDom.setAttribute('xmlns','http://www.w3.org/2000/svg');
+        return svgDom
+    }
+    // 创建SVG-文本元素
+    svgMap.prototype.cText = function (txt, attr = {}) {
+        const el = document.createElementNS('http://www.w3.org/2000/svg','text');
+        attr = {
+            dominantBaseline: 'middle',
+            fill: attr.type === 'text' ? '#fff' : '#333',
+            ...attr
+        }
+        Object.keys(attr).forEach(item => {
+            el.setAttribute(item, attr[item]);
+        })
+        el.textContent = txt
+        return el
+    }
+    // 创建SVG-元素
+    svgMap.prototype.cEl = function (tag, attr) {
+        attr = {
+            fill: '#000',
+            ...attr,
+        }
+        const el = document.createElementNS('http://www.w3.org/2000/svg',tag);
+        Object.keys(attr).forEach(item => {
+            el.setAttribute(item, attr[item]);
+        })
+        return el
+    }
+    // 创建SVG-ellipse元素
+    /**
+     * @params {Object} text: 文字相关的配置
+     * @params {Number} height: 垂直偏移量
+     * @params {String} direction: 文字方向
+     * */
+    svgMap.prototype.cReact = function ({text, ...txtOpt}, opt = {}, direction) {
+        const { textPadding, reactRadius, minWidth } = this.reactStyle
+        const cG = this.cG()
+        let sText = this.cText(text,{y: opt.y || 0, x: opt.x || 0, ...txtOpt})
+        cG.appendChild(sText)
+        const {width, height} = this.getRect(cG)
+        sText.setAttribute('transform', `translate(${textPadding}, ${height})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
+        const attr = {
+            x: 0,
+            y: 0,
+            width: Math.max((width + textPadding * 2), minWidth),
+            height: height + textPadding,
+            rx: reactRadius,
+            ry: reactRadius,
+            ...opt
+        }
+        const sEllipse = this.cEl('rect', attr)
+        if(txtOpt.type === 'text') {
+            sText.setAttribute('transform', `translate(${textPadding}, ${height/2})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
+            const underLine = this.cEl('line', {
+                x1: opt.x || 0,
+                y1: (opt.y || 0) + this.getRect(sEllipse).height/2,
+                x2: width + textPadding * 2,
+                y2: (opt.y || 0) + this.getRect(sEllipse).height/2,
+                'stroke-width': 1,
+                stroke: '#fff'
+            })
+            cG.appendChild(underLine)
+        } else if(txtOpt.hasChild){
+            const circle = this.cEl('circle', {
+                cx: direction === 'left' ? (opt.x || 0) - 5:(opt.x || 0) + this.getRect(sEllipse).width+5,
+                cy: (opt.y || 0) + this.getRect(sEllipse).height/2,
+                r: 5,
+                fill: '#fff',
+                'stroke-width': 1,
+                key: text
+            })
+            cG.appendChild(circle)
+        }
+        cG.prepend(sEllipse)
+        if(direction === 'left'){
+            cG.setAttribute('style', `transform: translateX(${Math.max((width + textPadding * 2), minWidth)}px) rotateY(180deg)`)
+        }
+        return cG
+    }
+    // 创建组
+    svgMap.prototype.cG = function(attr = {}) {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+        Object.keys(attr).forEach(item => {
+            g.setAttribute(item, attr[item]);
+        })
+        return document.createElementNS('http://www.w3.org/2000/svg', 'g')
+    }
+    /**
+     * 获取元素几何信息，需要在DOM才能得到这些信息，所以先执行appendChild
+     * 要注意appendChild后修改节点位置，所以切勿在插入到正确位置后再执行这个方法
+     * */
+    svgMap.prototype.getRect = function(g){
+        this.svgGroup.appendChild(g)
+        return g.getBBox()
+    }
+    /**
+     * @params {svg[g]} a 左侧的g元素
+     * @params {svg[g]} b a对应的子元素
+     * */
+    svgMap.prototype.combine = function(a, b, node) {
+        const cG = this.cG()
+        const x = `${this.getRect(a).width + this.reactStyle.rowMargin}` // 计算a,b的间距
+        const y = this.findMiddlePosition(b) // 计算a在b垂直方向的中间位置
+        const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
+        b.setAttribute('transform', `translate(${x}, ${aY})`) // b的整体Y偏移要与a元素保持一致
+        a.childNodes.forEach(node => {
+            if(node.tagName === 'circle') {
+                node.setAttribute('cy', y+aY + aHeight/2) // （步骤A）相对b的居中位置 + 原本的偏移量
+            } else {
+                node.setAttribute('y', y+aY) // （步骤A）相对b的居中位置 + 原本的偏移量
+            }
+        })
+
+        cG.appendChild(a)
+        cG.appendChild(b)
+        if(!this.virtualSvg[node.name]){
+            this.virtualSvg[node.name] = {
+                ...node,
+                childDom: []
+            }
+        }
+        this.virtualSvg[node.name].childDom.push(b)
+        // 画线
+        b.childNodes.forEach(item => {
+            const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
+            const M = `${aWidth} ${(aY + y) + aHeight/2}`
+            const C1 = `${aWidth+20} ${(aY + y) + aHeight/2}`
+            const C2 = `${x-20} ${Number(positionY) + Number(aY)+height/2}`
+            const E = `${x} ${Number(positionY) + Number(aY)+height/2}`
+            /*const line = this.cEl('path', {
+                x1: aWidth,
+                y1: (aY + y) + aHeight/2, // 这里的aY是上面步骤A之前的值，所以需要（aY + y）才是a真实Y偏移量
+                x2: x,
+                y2: Number(positionY) + Number(aY)+height/2, // 元素在组内偏移量+组的偏移量+相对右侧居中的偏移量
+                ...this.lineStyle
+            })*/
+            const line = this.cEl('path', {
+                d: `M${M} C ${C1} ${C2} ${E}`,
+                ...this.lineStyle
+            })
+            this.virtualSvg[node.name].childDom.push(line)
+            cG.appendChild(line)
+        })
+        return cG
+    }
+    /**
+     *  获取子元素集合中的垂直居中位置
+     *  g元素没有记录几何信息
+     *  通过查找g元素下的非g元素，来获取当前g的垂直偏移量
+     * */
+    svgMap.prototype.findMiddlePosition =function(el){
+        const firstEl = el.firstChild
+        const {y: firstElY} = this.findPositionElY(firstEl)
+        const lastEl = el.lastChild
+        const {y: lastElY} = this.findPositionElY(lastEl)
+        const result = (lastElY - firstElY*1) / 2 + firstElY*1
+        return result
+    }
+    // 获取某在元素在的Y偏移量
+    svgMap.prototype.findPositionElY = function(el){
+        while (el.tagName === 'g'){
+            el = el.firstChild
+        }
+        return {
+            y: el.getAttribute('y'),
+            x: el.getAttribute('x'),
+            width: el.getAttribute('width'),
+            height: el.getAttribute('height'),
+        }
+    }
+    // 将同父的元素放同一个组中
+    svgMap.prototype.bindG = function(svgElArr) {
+        const cG = this.cG()
+        svgElArr.forEach((item, ind) => {
+            cG.appendChild(item)
+        })
+        return cG
+    }
+    /**
+     * @params {g} right
+     * @params {g} left 如果没有说明只有一侧
+     * */
+    svgMap.prototype.addRoot = function(right, left){
+        const rightMiddleY = this.findMiddlePosition(right)
+        const leftMiddleY = left ? this.findMiddlePosition(left) : 0
+        // root按的X偏移量：如果有left就放在left右侧
+        const rootX = left ? left.getBBox().width + this.reactStyle.rowMargin : this.reactStyle.rowMargin
+        // 计算高的那个中间值
+        const rootY = Math.max(rightMiddleY, leftMiddleY)
+        const fontStyle = `font-size: 18px;`
+        const rootG = this.cReact({text: '前端知识', style: fontStyle}, {y: rootY, x: rootX, fill: '#eade98', rx: 20, ry: 20})
+        this.svgDom.appendChild(rootG)
+        const rootBox = rootG.getBBox()
+        // 矮的那个也要放在高的垂直居中位置（当存在left时才需要计算）
+        const minEl = left && (leftMiddleY <= rightMiddleY) ? left : right
+        const rightY = left ? rootY - this.findMiddlePosition(minEl) : 0
+        if(minEl === left) {
+            // 水平翻转
+            left.setAttribute('style', `transform: translate(${left.getBBox().width}px, ${rightY}px) rotateY(180deg)`)
+            right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, 0)`)
+        } else {
+            left.setAttribute('style', `transform: translate(${left.getBBox().width}px, 0) rotateY(180deg)`)
+            right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, ${rightY})`)
+        }
+        this.drawLine(rootG, right, left, minEl, rightY)
+    }
+    svgMap.prototype.drawLine = function(root, right, left, minEl, rightY = 0) {
+        const { x: rootX, y: rootY, width: rootW, height: rootH } = root.getBBox()
+        const rootCenterX = Number(rootX) + Number(rootW) / 2
+        const rootCenterY = Number(rootY) + Number(rootH) / 2
+        const M = `${rootCenterX} ${rootCenterY}`
+        if(left) {
+            left.childNodes.forEach(item => {
+                const {y: itemY, height} = this.findPositionElY(item)
+                const targetX = Number(rootX) - this.reactStyle.rowMargin
+                const targetY = Number(itemY) + Number(height) / 2 + ((minEl === left) ? rightY : 0)
+                const Q = `${rootCenterX} ${targetY}`
+                const E = `${targetX} ${targetY}`
+                const line = this.cEl('path', {
+                    d: `M${M} Q ${Q} ${E}`,
+                    ...this.lineStyle
+                })
+                this.svgGroup.appendChild(line)
+            })
+        }
+        right.childNodes.forEach(item => {
+            const {y: itemY, height} = this.findPositionElY(item)
+            const targetX = Number(rootX) +this.reactStyle.rowMargin + rootW
+            const targetY = Number(itemY) + Number(height) / 2 + ((minEl === right) ? rightY : 0)
+            const Q = `${rootCenterX} ${targetY}`
+            const E = `${targetX} ${targetY}`
+            const line = this.cEl('path', {
+                d: `M${M} Q ${Q} ${E}`,
+                ...this.lineStyle
+            })
+            this.svgGroup.appendChild(line)
+        })
+    }
+    // 处理根元素
+    svgMap.prototype.initWalk = function(tree, direction) {
+        const gGroup = this.walk(tree, direction)
+        return gGroup
+    }
+    svgMap.prototype.walk = function (tree, direction) {
+        const svgElArr = []
+        let hei = 0 // 设置每个元素的偏移高度
+        tree.forEach((item) => {
+            let svgEl = this.cReact(
+                {text: item.name, type: item.type || '', hasChild: item.children&&item.children.length},
+                { y: hei, fill: item.type === 'text' ? 'transparent' : '#a3c6c0' },
+                direction
+            ) // 返回某个文本G
+            if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
+                const childSvgEl  = this.walk(item.children, direction)
+                svgEl = this.combine(svgEl, childSvgEl, item)
+            }
+            hei += ((this.getRect(svgEl)).height + this.reactStyle.verticalMargin)
+            svgElArr.push(svgEl)
+        })
+        return this.bindG(svgElArr) // 返回组成G
+    }
     const cSvg = {
         svgDom: null,
         svgGroup: null,
@@ -144,8 +466,9 @@
         /**
          * @params {svg[g]} a 左侧的g元素
          * @params {svg[g]} b a对应的子元素
+         * @params {Object} item 当前所属元素
          * */
-        combine: function(a, b) {
+        combine: function(a, b, item) {
             const cG = this.cG()
             const x = `${this.getRect(a).width + this.reactStyle.rowMargin}` // 计算a,b的间距
             const y = this.findMiddlePosition(b) // 计算a在b垂直方向的中间位置
@@ -161,6 +484,14 @@
 
             cG.appendChild(a)
             cG.appendChild(b)
+            debugger
+            if(!this.virtualSvg[item.name]){
+                this.virtualSvg[item.name] = {
+                    ...item,
+                    childDom: []
+                }
+            }
+            this.virtualSvg[item.name].childDom.push(b)
             // 画线
             b.childNodes.forEach(item => {
                 const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
@@ -168,17 +499,11 @@
                 const C1 = `${aWidth+20} ${(aY + y) + aHeight/2}`
                 const C2 = `${x-20} ${Number(positionY) + Number(aY)+height/2}`
                 const E = `${x} ${Number(positionY) + Number(aY)+height/2}`
-                /*const line = this.cEl('path', {
-                    x1: aWidth,
-                    y1: (aY + y) + aHeight/2, // 这里的aY是上面步骤A之前的值，所以需要（aY + y）才是a真实Y偏移量
-                    x2: x,
-                    y2: Number(positionY) + Number(aY)+height/2, // 元素在组内偏移量+组的偏移量+相对右侧居中的偏移量
-                    ...this.lineStyle
-                })*/
                 const line = this.cEl('path', {
                     d: `M${M} C ${C1} ${C2} ${E}`,
                     ...this.lineStyle
                 })
+                this.virtualSvg[item.name].childDom.push(line)
                 cG.appendChild(line)
             })
             return cG
@@ -321,7 +646,6 @@
             return this.bindG(svgElArr) // 返回组成G
         },
     }
-    console.log(cSvg)
 /*    const svgDom = cSvg.cSvgDom()
 
     const sRect = cSvg.cEl('rect', {
@@ -578,6 +902,7 @@
             }
         ]
     }
-    cSvg.init(root)
+    // cSvg.init(root)
+    console.log(new svgMap(root))
 </script>
 </html>
