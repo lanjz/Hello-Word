@@ -11,27 +11,30 @@
 </head>
 <body>
 <svg width="190px" height="160px" version="1.1" xmlns="http://www.w3.org/2000/svg">
-
+    <line x1="10" y1="110" x2="100"  y2="110" stroke="orange" fill="transparent" stroke-width="5"/>
     <path d="M0 160 C 40 160, 150 0, 190 0" stroke="black" fill="transparent"/>
 
 </svg>
 </body>
 <script>
+    function svgMap(data, options = {}) {
+
+    }
 
     const cSvg = {
         svgDom: null,
         svgGroup: null,
         reactStyle: { // 文本样式
-            textPadding: 5, // 文字与边框的间距
-            verticalMargin: 10, // 元素上下间距
-            rowMargin: 80, // 元素左右间距
+            textPadding: 10, // 文字与边框的间距
+            verticalMargin: 20, // 元素上下间距
+            rowMargin: 40, // 元素左右间距
             minWidth: 50, // 元素最小宽度
             reactRadius: 5, // 元素圆角
         },
         lineStyle: { // 线条样式
-            style: 'stroke:rgb(255,0,0)',
-            'stroke-width': 2,
-            stroke: 'black',
+            style: 'stroke:#fff',
+            'stroke-width': 1,
+            stroke: '#fff',
             fill: 'transparent'
         },
         direction: '', // right->只向右伸展 '' => 左右伸展
@@ -42,7 +45,7 @@
             svgDom.setAttribute('height','2000');
             svgDom.setAttribute('version','full');
             svgDom.setAttribute('baseProfile','baseProfile');
-            svgDom.setAttribute('style', `background: #383f42`)
+            svgDom.setAttribute('style', `background: #272b2d`)
             svgDom.setAttribute('xmlns','http://www.w3.org/2000/svg');
             return svgDom
         },
@@ -51,7 +54,7 @@
             const el = document.createElementNS('http://www.w3.org/2000/svg','text');
             attr = {
                 dominantBaseline: 'middle',
-                fill: 'red',
+                fill: attr.type === 'text' ? '#fff' : '#333',
                 ...attr
             }
             Object.keys(attr).forEach(item => {
@@ -74,14 +77,14 @@
         },
         // 创建SVG-ellipse元素
         /**
-         * @params {String} text: 文字
+         * @params {Object} text: 文字相关的配置
          * @params {Number} height: 垂直偏移量
          * @params {String} direction: 文字方向
          * */
-        cReact: function (text, opt = {}, direction) {
+        cReact: function ({text, ...txtOpt}, opt = {}, direction) {
             const { textPadding, reactRadius, minWidth } = this.reactStyle
             const cG = this.cG()
-            let sText = this.cText(text,{y: opt.y || 0, x: opt.x || 0})
+            let sText = this.cText(text,{y: opt.y || 0, x: opt.x || 0, ...txtOpt})
             cG.appendChild(sText)
             const {width, height} = this.getRect(cG)
             sText.setAttribute('transform', `translate(${textPadding}, ${height})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
@@ -89,12 +92,33 @@
                 x: 0,
                 y: 0,
                 width: Math.max((width + textPadding * 2), minWidth),
-                height: height + textPadding * 2,
+                height: height + textPadding,
                 rx: reactRadius,
                 ry: reactRadius,
                 ...opt
             }
             const sEllipse = this.cEl('rect', attr)
+            if(txtOpt.type === 'text') {
+                sText.setAttribute('transform', `translate(${textPadding}, ${height/2})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
+                const underLine = this.cEl('line', {
+                    x1: opt.x || 0,
+                    y1: (opt.y || 0) + this.getRect(sEllipse).height/2,
+                    x2: width + textPadding * 2,
+                    y2: (opt.y || 0) + this.getRect(sEllipse).height/2,
+                    'stroke-width': 1,
+                    stroke: '#fff'
+                })
+                cG.appendChild(underLine)
+            } else if(txtOpt.hasChild){
+                const circle = this.cEl('circle', {
+                    cx: direction === 'left' ? (opt.x || 0) - 5:(opt.x || 0) + this.getRect(sEllipse).width+5,
+                    cy: (opt.y || 0) + this.getRect(sEllipse).height/2,
+                    r: 5,
+                    fill: '#fff',
+                    'stroke-width': 1,
+                })
+                cG.appendChild(circle)
+            }
             cG.prepend(sEllipse)
             if(direction === 'left'){
                 cG.setAttribute('style', `transform: translateX(${Math.max((width + textPadding * 2), minWidth)}px) rotateY(180deg)`)
@@ -128,7 +152,11 @@
             const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
             b.setAttribute('transform', `translate(${x}, ${aY})`) // b的整体Y偏移要与a元素保持一致
             a.childNodes.forEach(node => {
-                node.setAttribute('y', y+aY) // （步骤A）相对b的居中位置 + 原本的偏移量
+                if(node.tagName === 'circle') {
+                    node.setAttribute('cy', y+aY + aHeight/2) // （步骤A）相对b的居中位置 + 原本的偏移量
+                } else {
+                    node.setAttribute('y', y+aY) // （步骤A）相对b的居中位置 + 原本的偏移量
+                }
             })
 
             cG.appendChild(a)
@@ -137,8 +165,8 @@
             b.childNodes.forEach(item => {
                 const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
                 const M = `${aWidth} ${(aY + y) + aHeight/2}`
-                const C1 = `${aWidth+40} ${(aY + y) + aHeight/2}`
-                const C2 = `${x-40} ${Number(positionY) + Number(aY)+height/2}`
+                const C1 = `${aWidth+20} ${(aY + y) + aHeight/2}`
+                const C2 = `${x-20} ${Number(positionY) + Number(aY)+height/2}`
                 const E = `${x} ${Number(positionY) + Number(aY)+height/2}`
                 /*const line = this.cEl('path', {
                     x1: aWidth,
@@ -220,7 +248,8 @@
             const rootX = left ? left.getBBox().width + this.reactStyle.rowMargin : this.reactStyle.rowMargin
             // 计算高的那个中间值
             const rootY = Math.max(rightMiddleY, leftMiddleY)
-            const rootG = this.cReact('我的前端知识', {y: rootY, x: rootX})
+            const fontStyle = `font-size: 18px;`
+            const rootG = this.cReact({text: '前端知识', style: fontStyle}, {y: rootY, x: rootX, fill: '#eade98', rx: 20, ry: 20})
             this.svgDom.appendChild(rootG)
             const rootBox = rootG.getBBox()
             // 矮的那个也要放在高的垂直居中位置（当存在left时才需要计算）
@@ -277,7 +306,11 @@
             const svgElArr = []
             let hei = 0 // 设置每个元素的偏移高度
             tree.forEach((item) => {
-                let svgEl = this.cReact(item.name, { y: hei }, direction) // 返回某个文本G
+                let svgEl = this.cReact(
+                    {text: item.name, type: item.type || '', hasChild: item.children&&item.children.length},
+                    { y: hei, fill: item.type === 'text' ? 'transparent' : '#a3c6c0' },
+                    direction
+                ) // 返回某个文本G
                 if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
                     const childSvgEl  = this.walk(item.children, direction)
                     svgEl = this.combine(svgEl, childSvgEl)
@@ -322,7 +355,8 @@
                         {
                             name: 'a-1-3-2'
                         },  {
-                            name: 'a-1-3-4'
+                            name: 'a-1-3-4',
+                            type: 'text'
                         }
                     ]
                 },
@@ -336,12 +370,15 @@
             children: [
                 {
                     name: '1-2-1',
+                    type: 'text'
                 },
                 {
-                    name: '1-2-2'
+                    name: '1-2-2',
+                    type: 'text'
                 },
                 {
-                    name: '1-2-3'
+                    name: '1-2-3',
+                    type: 'text'
                 },
                 {
                     name: '1-2-4'
