@@ -10,17 +10,10 @@
     </style>
 </head>
 <body>
-<!--<svg width="660" height="220" style="outline: 1px solid red; font-size: 2em; overflow: visible;"> <text x="240" y="120"> <tspan>SVG</tspan> <tspan>SVG</tspan> </text> </svg>著作权归作者所有。-->
-<svg version="1.1"
-     baseProfile="full"
-     width="300" height="200"
-     xmlns="http://www.w3.org/2000/svg">
+<svg width="190px" height="160px" version="1.1" xmlns="http://www.w3.org/2000/svg">
 
-    <rect width="100" height="100" fill="red"/>
-<!--    <text x="10" y="10" fill="red">Hello World!</text>-->
-    <path d="M50 100 C 100 100, 300 100, 300 50" stroke="black" fill="transparent"/>
-    <text y="0"  text-anchor="start">Hello</text>
-    <!--    <circle cx="10" cy="10" r="2" fill="red"/>-->
+    <path d="M0 160 C 40 160, 150 0, 190 0" stroke="black" fill="transparent"/>
+
 </svg>
 </body>
 <script>
@@ -37,8 +30,11 @@
         },
         lineStyle: { // 线条样式
             style: 'stroke:rgb(255,0,0)',
-            'stroke-width': 2
+            'stroke-width': 2,
+            stroke: 'black',
+            fill: 'transparent'
         },
+        direction: '', // right->只向右伸展 '' => 左右伸展
         // 创建SVG根元素
         cSvgDom: function () {
             const svgDom = document.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -46,6 +42,7 @@
             svgDom.setAttribute('height','2000');
             svgDom.setAttribute('version','full');
             svgDom.setAttribute('baseProfile','baseProfile');
+            svgDom.setAttribute('style', `background: #383f42`)
             svgDom.setAttribute('xmlns','http://www.w3.org/2000/svg');
             return svgDom
         },
@@ -79,23 +76,29 @@
         /**
          * @params {String} text: 文字
          * @params {Number} height: 垂直偏移量
+         * @params {String} direction: 文字方向
          * */
-        cReact: function (text, hei = 0) {
+        cReact: function (text, opt = {}, direction) {
             const { textPadding, reactRadius, minWidth } = this.reactStyle
             const cG = this.cG()
-            let sText = this.cText(text,{y: hei})
+            let sText = this.cText(text,{y: opt.y || 0, x: opt.x || 0})
             cG.appendChild(sText)
             const {width, height} = this.getRect(cG)
             sText.setAttribute('transform', `translate(${textPadding}, ${height})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
-            const sEllipse = this.cEl('rect', {
+            const attr = {
                 x: 0,
-                y: hei,
+                y: 0,
                 width: Math.max((width + textPadding * 2), minWidth),
                 height: height + textPadding * 2,
                 rx: reactRadius,
-                ry: reactRadius
-            })
+                ry: reactRadius,
+                ...opt
+            }
+            const sEllipse = this.cEl('rect', attr)
             cG.prepend(sEllipse)
+            if(direction === 'left'){
+                cG.setAttribute('style', `transform: translateX(${Math.max((width + textPadding * 2), minWidth)}px) rotateY(180deg)`)
+            }
             return cG
         },
         // 创建组
@@ -133,11 +136,19 @@
             // 画线
             b.childNodes.forEach(item => {
                 const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
-                const line = this.cEl('line', {
+                const M = `${aWidth} ${(aY + y) + aHeight/2}`
+                const C1 = `${aWidth+40} ${(aY + y) + aHeight/2}`
+                const C2 = `${x-40} ${Number(positionY) + Number(aY)+height/2}`
+                const E = `${x} ${Number(positionY) + Number(aY)+height/2}`
+                /*const line = this.cEl('path', {
                     x1: aWidth,
                     y1: (aY + y) + aHeight/2, // 这里的aY是上面步骤A之前的值，所以需要（aY + y）才是a真实Y偏移量
                     x2: x,
                     y2: Number(positionY) + Number(aY)+height/2, // 元素在组内偏移量+组的偏移量+相对右侧居中的偏移量
+                    ...this.lineStyle
+                })*/
+                const line = this.cEl('path', {
+                    d: `M${M} C ${C1} ${C2} ${E}`,
                     ...this.lineStyle
                 })
                 cG.appendChild(line)
@@ -150,24 +161,21 @@
          *  通过查找g元素下的非g元素，来获取当前g的垂直偏移量
          * */
         findMiddlePosition:function(el){
-            let firstEl = el.firstChild
-            while (firstEl.tagName === 'g'){
-                firstEl = firstEl.firstChild
-            }
-            let lastEl = el.lastChild
-            while (lastEl.tagName === 'g'){
-                lastEl = lastEl.firstChild
-            }
-            const result = (lastEl.getAttribute('y') - firstEl.getAttribute('y')*1) / 2 + firstEl.getAttribute('y')*1
+            const firstEl = el.firstChild
+            const {y: firstElY} = this.findPositionElY(firstEl)
+            const lastEl = el.lastChild
+            const {y: lastElY} = this.findPositionElY(lastEl)
+            const result = (lastElY - firstElY*1) / 2 + firstElY*1
             return result
         },
-        // 获取某在元素在当前组内的Y偏移量
+        // 获取某在元素在的Y偏移量
         findPositionElY: function(el){
             while (el.tagName === 'g'){
                 el = el.firstChild
             }
             return {
                 y: el.getAttribute('y'),
+                x: el.getAttribute('x'),
                 width: el.getAttribute('width'),
                 height: el.getAttribute('height'),
             }
@@ -183,23 +191,95 @@
         init: function (tree) {
             this.svgDom = this.cSvgDom()
             document.body.appendChild(this.svgDom)
+            const child = tree.children || []
+            if(!child.length){
+                console.warn('请确定子元素')
+                return
+            }
             this.svgGroup = this.cG()
             this.svgDom.appendChild(this.svgGroup)
-            const rootG = this.initWalk(tree)
-            this.svgGroup.appendChild(rootG)
+            let childLeft = null
+            if(!this.direction && child.length > 1){
+                const half = Math.floor(child.length/2)
+                const left = child.splice(0, half) // splice会改变原数组，一半存入left中，child只存在其余部分了
+                childLeft = this.initWalk(left, 'left')
+                this.svgGroup.appendChild(childLeft)
+            }
+            const childRight = this.initWalk(child)
+            this.svgGroup.appendChild(childRight)
+            this.addRoot(childRight, childLeft)
+        },
+        /**
+        * @params {g} right
+        * @params {g} left 如果没有说明只有一侧
+        * */
+        addRoot: function(right, left){
+            const rightMiddleY = this.findMiddlePosition(right)
+            const leftMiddleY = left ? this.findMiddlePosition(left) : 0
+            // root按的X偏移量：如果有left就放在left右侧
+            const rootX = left ? left.getBBox().width + this.reactStyle.rowMargin : this.reactStyle.rowMargin
+            // 计算高的那个中间值
+            const rootY = Math.max(rightMiddleY, leftMiddleY)
+            const rootG = this.cReact('我的前端知识', {y: rootY, x: rootX})
+            this.svgDom.appendChild(rootG)
+            const rootBox = rootG.getBBox()
+            // 矮的那个也要放在高的垂直居中位置（当存在left时才需要计算）
+            const minEl = left && (leftMiddleY <= rightMiddleY) ? left : right
+            const rightY = left ? rootY - this.findMiddlePosition(minEl) : 0
+            if(minEl === left) {
+                // 水平翻转
+                left.setAttribute('style', `transform: translate(${left.getBBox().width}px, ${rightY}px) rotateY(180deg)`)
+                right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, 0)`)
+            } else {
+                left.setAttribute('style', `transform: translate(${left.getBBox().width}px, 0) rotateY(180deg)`)
+                right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, ${rightY})`)
+            }
+            this.drawLine(rootG, right, left, minEl, rightY)
+        },
+        drawLine: function(root, right, left, minEl, rightY = 0) {
+            const { x: rootX, y: rootY, width: rootW, height: rootH } = root.getBBox()
+            const rootCenterX = Number(rootX) + Number(rootW) / 2
+            const rootCenterY = Number(rootY) + Number(rootH) / 2
+            const M = `${rootCenterX} ${rootCenterY}`
+            if(left) {
+                left.childNodes.forEach(item => {
+                    const {y: itemY, height} = this.findPositionElY(item)
+                    const targetX = Number(rootX) - this.reactStyle.rowMargin
+                    const targetY = Number(itemY) + Number(height) / 2 + ((minEl === left) ? rightY : 0)
+                    const Q = `${rootCenterX} ${targetY}`
+                    const E = `${targetX} ${targetY}`
+                    const line = this.cEl('path', {
+                        d: `M${M} Q ${Q} ${E}`,
+                        ...this.lineStyle
+                    })
+                    this.svgGroup.appendChild(line)
+                })
+            }
+            right.childNodes.forEach(item => {
+                const {y: itemY, height} = this.findPositionElY(item)
+                const targetX = Number(rootX) +this.reactStyle.rowMargin + rootW
+                const targetY = Number(itemY) + Number(height) / 2 + ((minEl === right) ? rightY : 0)
+                const Q = `${rootCenterX} ${targetY}`
+                const E = `${targetX} ${targetY}`
+                const line = this.cEl('path', {
+                    d: `M${M} Q ${Q} ${E}`,
+                    ...this.lineStyle
+                })
+                this.svgGroup.appendChild(line)
+            })
         },
         // 处理根元素
-        initWalk: function(tree) {
-            const gGroup = this.walk(tree)
+        initWalk: function(tree, direction) {
+            const gGroup = this.walk(tree, direction)
             return gGroup
         },
-        walk: function (tree) {
+        walk: function (tree, direction) {
             const svgElArr = []
             let hei = 0 // 设置每个元素的偏移高度
             tree.forEach((item) => {
-                let svgEl = this.cReact(item.name, hei) // 返回某个文本G
+                let svgEl = this.cReact(item.name, { y: hei }, direction) // 返回某个文本G
                 if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
-                    const childSvgEl  = this.walk(item.children)
+                    const childSvgEl  = this.walk(item.children, direction)
                     svgEl = this.combine(svgEl, childSvgEl)
                 }
                 hei += ((this.getRect(svgEl)).height + this.reactStyle.verticalMargin)
@@ -241,39 +321,7 @@
                         },
                         {
                             name: 'a-1-3-2'
-                        },
-                        {
-                            name: 'a-1-3-3',
-                            children: [
-                                {
-                                    name: 'a-1-3-1',
-                                    children: [
-                                        {
-                                            name: 'a-1-3-1',
-                                        },
-                                        {
-                                            name: 'a-1-3-2'
-                                        },
-                                        {
-                                            name: 'a-1-3-3'
-                                        },
-                                        {
-                                            name: 'a-1-3-4'
-                                        }
-                                    ]
-                                },
-                                {
-                                    name: 'a-1-3-2'
-                                },
-                                {
-                                    name: 'a-1-3-3'
-                                },
-                                {
-                                    name: 'a-1-3-4'
-                                }
-                            ]
-                        },
-                        {
+                        },  {
                             name: 'a-1-3-4'
                         }
                     ]
@@ -309,6 +357,95 @@
                     children: [
                         {
                             name: '1-2-1',
+
+                        },
+                        {
+                            name: 'a-1-3-3',
+                            children: [
+                                {
+                                    name: 'a-1-3-1',
+                                    children: [
+                                        {
+                                            name: 'a-1-3-1',
+                                        },
+                                        {
+                                            name: 'a-1-3-2'
+                                        },
+                                        {
+                                            name: 'a-1-3-3'
+                                        },
+                                        {
+                                            name: 'a-1-3-4'
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: 'a-1-3-2'
+                                },
+                                {
+                                    name: 'a-1-3-3'
+                                },
+                                {
+                                    name: 'a-1-3-4'
+                                }
+                            ]
+                        },
+                        {
+                            name: '1-2-2'
+                        },
+                        {
+                            name: '1-2-3'
+                        },
+                        {
+                            name: '1-2-4'
+                        }
+                    ]
+                },
+                {
+                    name: '1-1-3-2'
+                }
+            ]
+        },
+        {
+            name: '1-1-4',
+            children: [
+                {
+                    name: '1-1-3-1',
+                    children: [
+                        {
+                            name: '1-2-1',
+
+                        },
+                        {
+                            name: 'a-1-3-3',
+                            children: [
+                                {
+                                    name: 'a-1-3-1',
+                                    children: [
+                                        {
+                                            name: 'a-1-3-1',
+                                        },
+                                        {
+                                            name: 'a-1-3-2'
+                                        },
+                                        {
+                                            name: 'a-1-3-3'
+                                        },
+                                        {
+                                            name: 'a-1-3-4'
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: 'a-1-3-2'
+                                },
+                                {
+                                    name: 'a-1-3-3'
+                                },
+                                {
+                                    name: 'a-1-3-4'
+                                }
+                            ]
                         },
                         {
                             name: '1-2-2'
@@ -380,6 +517,30 @@
             ]
         }
     ]
-    cSvg.init(tree2)
+    const root = {
+        name: '前端知识',
+        children: [...tree2, ...tree]
+    }
+    const min = {
+        name: '3333',
+        children: [
+            {
+                name: 1344,
+                children: [
+                    {
+                        name: 1344,
+
+                    },
+                    {
+                        name: 3455
+                    }
+                ]
+            },
+            {
+                name: 3455
+            }
+        ]
+    }
+    cSvg.init(root)
 </script>
 </html>
