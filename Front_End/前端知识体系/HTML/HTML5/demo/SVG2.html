@@ -255,10 +255,12 @@
            bale: 'name',
            key: 'name',
            callback: function (item) {
-               console.log('item', item)
+               debugger
+               document.body.appendChild(mapSvg(item))
+
            }
        }))
-       document.body.appendChild(mapSvg(min))
+       // document.body.appendChild(mapSvg(min))
    }
 </script>
 </html>

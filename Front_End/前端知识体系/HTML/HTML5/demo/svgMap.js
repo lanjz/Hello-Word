@@ -104,9 +104,9 @@ SvgMap.prototype.walk = function (tree, direction) {
     let hei = 0 // 设置每个元素的偏移高度
     tree.forEach((item) => {
         let svgEl = this.cReact(
-            {text: item[this.lableName], type: item.type || '', hasChild: item.children&&item.children.length, key: item[this.keyName]},
+            { text: item[this.lableName] },
             { y: hei, fill: item.type === 'text' ? 'transparent' : '#a3c6c0' },
-            direction
+            { direction,hasChild: item.children&&item.children.length,key: item[this.keyName], type: item.type || '' }
         ) // 返回某个文本G
         if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
             const childSvgEl  = this.walk(item.children, direction)
@@ -192,7 +192,11 @@ SvgMap.prototype.createRootG = function(right, left){
     // 计算高的那个中间值
     const rootY = Math.max(rightMiddleY, leftMiddleY)
     const fontStyle = `font-size: 18px;`
-    const rootG = this.cReact({text: this.data[this.lableName], style: fontStyle, key: this.data[this.keyName]}, {y: rootY, x: rootX, fill: '#eade98', rx: 20, ry: 20})
+    const rootG = this.cReact(
+        { text: this.data[this.lableName], style: fontStyle },
+        { y: rootY, x: rootX, fill: '#eade98', rx: 20, ry: 20 },
+        { key: this.data[this.keyName] }
+        )
     this.svgDom.appendChild(rootG)
     const rootBox = rootG.getBBox()
     // 矮的那个也要放在高的垂直居中位置（当存在left时才需要计算）
@@ -211,14 +215,16 @@ SvgMap.prototype.createRootG = function(right, left){
 
 /**
  * 创建SVG-ellipse元素
- * @params {Object} text: 文字相关的配置
+ * @params {Object} textOptions: 文字相关的配置
  * @params {Number} height: 垂直偏移量
- * @params {String} direction: 文字方向
+ * @params {Object} config: 其它属性
  * */
-SvgMap.prototype.cReact = function({text, ...txtOpt}, opt = {}, direction) {
+SvgMap.prototype.cReact = function(textOptions, rectOptions = {}, config) {
+    const {text, ...txtOpt} = textOptions
+    const {direction, key, ...conf} = config
     const { textPadding, reactRadius, minWidth } = this.reactStyle
     const cG = createGroup()
-    let sText = cText(text,{y: opt.y || 0, x: opt.x || 0, ...txtOpt})
+    let sText = cText(text,{y: rectOptions.y || 0, x: rectOptions.x || 0, key,  ...txtOpt, ...conf})
     cG.appendChild(sText)
     const {width, height} = this.getRect(cG)
     sText.setAttribute('transform', `translate(${textPadding}, ${height})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
@@ -229,29 +235,30 @@ SvgMap.prototype.cReact = function({text, ...txtOpt}, opt = {}, direction) {
         height: height + textPadding,
         rx: reactRadius,
         ry: reactRadius,
-        key: txtOpt.key,
-        ...opt
+        key,
+        ...rectOptions,
+        ...conf
     }
     const sEllipse = cEl('rect', attr)
-    if(txtOpt.type === 'text') {
+    if(config.type === 'text') {
         sText.setAttribute('transform', `translate(${textPadding}, ${height/2})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
         const underLine = cEl('line', {
-            x1: opt.x || 0,
-            y1: (opt.y || 0) + this.getRect(sEllipse).height/2,
+            x1: rectOptions.x || 0,
+            y1: (rectOptions.y || 0) + this.getRect(sEllipse).height/2,
             x2: width + textPadding * 2,
-            y2: (opt.y || 0) + this.getRect(sEllipse).height/2,
+            y2: (rectOptions.y || 0) + this.getRect(sEllipse).height/2,
             'stroke-width': 1,
             stroke: '#fff'
         })
         cG.appendChild(underLine)
-    } else if(txtOpt.hasChild){
+    } else if(config.hasChild){
         const circle = cEl('circle', {
-            cx: direction === 'left' ? (opt.x || 0) - 5:(opt.x || 0) + this.getRect(sEllipse).width+5,
-            cy: (opt.y || 0) + this.getRect(sEllipse).height/2,
+            cx: direction === 'left' ? (rectOptions.x || 0) - 5:(rectOptions.x || 0) + this.getRect(sEllipse).width+5,
+            cy: (rectOptions.y || 0) + this.getRect(sEllipse).height/2,
             r: 5,
             fill: '#fff',
             'stroke-width': 1,
-            key: txtOpt.key
+            key
         })
         cG.appendChild(circle)
     }
