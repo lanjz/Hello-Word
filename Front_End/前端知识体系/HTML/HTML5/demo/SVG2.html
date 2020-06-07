@@ -10,221 +10,255 @@
     </style>
 </head>
 <body>
-<!--<svg width="660" height="220" style="outline: 1px solid red; font-size: 2em; overflow: visible;"> <text x="240" y="120"> <tspan>SVG</tspan> <tspan>SVG</tspan> </text> </svg>著作权归作者所有。-->
-<svg version="1.1"
-     baseProfile="full"
-     width="300" height="200"
-     xmlns="http://www.w3.org/2000/svg">
-
-    <rect width="100" height="100" fill="red"/>
-<!--    <text x="10" y="10" fill="red">Hello World!</text>-->
-    <path d="M50 100 C 100 100, 300 100, 300 50" stroke="black" fill="transparent"/>
-    <text y="0"  text-anchor="start">Hello</text>
-    <!--    <circle cx="10" cy="10" r="2" fill="red"/>-->
-</svg>
 </body>
+<script src="./svgMap.js"></script>
 <script>
+   window.onload = function () {
+       const tree2 = [
+           {
+               name: '1-1-1',
+               children: [
+                   {
+                       name: '1-1-1-1',
+                       children: [
+                           {
+                               name: 'a-1-3-1',
+                           },
+                           {
+                               name: 'a-1-3-2'
+                           },  {
+                               name: 'a-1-3-4',
+                               type: 'text'
+                           }
+                       ]
+                   },
+                   {
+                       name: '1-1-1-2'
+                   }
+               ]
+           },
+           {
+               name: '1-1-2',
+               children: [
+                   {
+                       name: '1-2-1',
+                       type: 'text'
+                   },
+                   {
+                       name: '1-2-2',
+                       type: 'text'
+                   },
+                   {
+                       name: '1-2-3',
+                       type: 'text'
+                   },
+                   {
+                       name: '1-2-4'
+                   }
+               ]
+           },
 
-    const cSvg = {
-        svgDom: null,
-        svgGroup: null,
-        textPadding: 5,
-        maxVertical: 0,
-        virtualSvg: {
-            root: {
-                children: []
-            }
-        },
-        // 创建SVG根元素
-        cSvgDom: function () {
-            const svgDom = document.createElementNS('http://www.w3.org/2000/svg','svg');
-            svgDom.setAttribute('width','2000');
-            svgDom.setAttribute('height','2000');
-            svgDom.setAttribute('version','full');
-            svgDom.setAttribute('baseProfile','baseProfile');
-            svgDom.setAttribute('xmlns','http://www.w3.org/2000/svg');
-            return svgDom
-        },
-        // 创建SVG-文本元素
-        cText: function (txt, attr = {}) {
-            const el = document.createElementNS('http://www.w3.org/2000/svg','text');
-            attr = {
-                dominantBaseline: 'middle',
-                fill: 'red',
-                ...attr
-            }
-            Object.keys(attr).forEach(item => {
-                el.setAttribute(item, attr[item]);
-            })
-            el.textContent = txt
-            return el
-        },
-        // 创建SVG-元素
-        cEl: function (tag, attr) {
-            attr = {
-                fill: '#000',
-                ...attr,
-            }
-            const el = document.createElementNS('http://www.w3.org/2000/svg',tag);
-            Object.keys(attr).forEach(item => {
-                el.setAttribute(item, attr[item]);
-            })
-            return el
-        },
-        // 创建SVG-ellipse元素
-        /**
-         * @params {String} text: 文字
-         * */
-        cReact: function (text, parent, offsetVertical, g) {
-            parent.g.appendChild(g)
-            let sText = this.cText(text,{})
-            g.appendChild(sText)
-            const {x: tX, y: tY, width, height} = sText.getBBox()
-            console.log('sText.getBBox()', sText.getBBox())
-            // 默认情况文本向偏上，不能垂直居中，所以纠正一下
-            sText.setAttribute('transform', `translate(${this.textPadding}, ${Math.abs(tY) + this.textPadding})`);
-            const sEllipse = this.cEl('rect', {
-                x: 0,
-                y: 0,
-                width: Math.max((width + this.textPadding * 2), 50),
-                height: height + this.textPadding * 2,
-                rx: 5,
-                ry: 5
-            })
-            const offsetHorizontalDis = parent.horizontalDis || 0
-            this.maxVertical = Math.min(offsetVertical, this.maxVertical)
-            g.setAttribute('transform', `translate(${offsetHorizontalDis}, ${offsetVertical})`);
-            g.prepend(sEllipse)
-            return g
-        },
-        cG: function() {
-            return document.createElementNS('http://www.w3.org/2000/svg', 'g')
-        },
-        init: function (tree) {
-            this.svgDom = this.cSvgDom()
-            this.svgGroup = this.cG()
-            this.svgDom.appendChild(this.svgGroup)
-            document.body.appendChild(this.svgDom)
-            const rootEl = {
-                g: this.svgGroup
-            }
-            this.walk(tree, rootEl)
-            this.svgGroup.setAttribute('transform', `translate(0, ${Math.abs(this.maxVertical)})`)
-        },
-        walk: function (tree, parent) {
-            tree.forEach((item, index) => {
-                const middleInd = (tree.length-1)/2
-                const offsetVertical = tree.length > 1 ? (index - middleInd) * 100 : 0 // 获取纵向偏移量
+           {
+               name: '1-1-3',
+               children: [
+                   {
+                       name: '1-1-3-1',
+                       children: [
+                           {
+                               name: '1-2-1',
 
-                const curEl = {
-                    ...item,
-                    g: this.cG(),
-                    parent,
-                    children: [],
-                    horizontalDis: parent.horizontalDis ? parent.horizontalDis+100: 100,
-                    offsetVertical,
-                    index
-                }
-                const svgEl = this.createVirtualSvg(curEl)
-                const svgLing = this.cEl('line',{
-                    x1: parent.horizontalDis || 0,
-                    y1: parent.offsetVertical,
-                    x2: curEl.horizontalDis,
-                    x2: curEl.offsetVertical,
-                })
-                // todo 线条没出来
-                this.svgGroup.appendChild(svgLing)
-                if(!this.virtualSvg[parent.name || 'root']) {
-                    this.virtualSvg[parent.name || 'root'] = {
-                        children: []
-                    }
-                }
-                this.virtualSvg[parent.name || 'root'].children.push(curEl)
-                if(item.children && item.children.length) {
-                    this.walk(item.children, curEl)
-                }
-            })
-        },
-        createVirtualSvg: function ({ name, parent, offsetVertical, g }) {
-            const svgNode = this.cReact(name, parent, offsetVertical, g)
-            return svgNode
-        }
+                           },
+                           {
+                               name: 'a-1-3-3',
+                               children: [
+                                   {
+                                       name: 'a-1-3-1',
+                                       children: [
+                                           {
+                                               name: 'a-1-3-1',
+                                           },
+                                           {
+                                               name: 'a-1-3-2'
+                                           },
+                                           {
+                                               name: 'a-1-3-3'
+                                           },
+                                           {
+                                               name: 'a-1-3-4'
+                                           }
+                                       ]
+                                   },
+                                   {
+                                       name: 'a-1-3-2'
+                                   },
+                                   {
+                                       name: 'a-1-3-3'
+                                   },
+                                   {
+                                       name: 'a-1-3-4'
+                                   }
+                               ]
+                           },
+                           {
+                               name: '1-2-2'
+                           },
+                           {
+                               name: '1-2-3'
+                           },
+                           {
+                               name: '1-2-4'
+                           }
+                       ]
+                   },
+                   {
+                       name: '1-1-3-2'
+                   }
+               ]
+           },
+           {
+               name: '1-1-4',
+               children: [
+                   {
+                       name: '1-1-3-1',
+                       children: [
+                           {
+                               name: '1-2-1',
 
-    }
-    console.log(cSvg)
-/*    const svgDom = cSvg.cSvgDom()
+                           },
+                           {
+                               name: 'a-1-3-3',
+                               children: [
+                                   {
+                                       name: 'a-1-3-1',
+                                       children: [
+                                           {
+                                               name: 'a-1-3-1',
+                                           },
+                                           {
+                                               name: 'a-1-3-2'
+                                           },
+                                           {
+                                               name: 'a-1-3-3'
+                                           },
+                                           {
+                                               name: 'a-1-3-4'
+                                           }
+                                       ]
+                                   },
+                                   {
+                                       name: 'a-1-3-2'
+                                   },
+                                   {
+                                       name: 'a-1-3-3'
+                                   },
+                                   {
+                                       name: 'a-1-3-4'
+                                   }
+                               ]
+                           },
+                           {
+                               name: '1-2-2'
+                           },
+                           {
+                               name: '1-2-3'
+                           },
+                           {
+                               name: '1-2-4'
+                           }
+                       ]
+                   },
+                   {
+                       name: '1-1-3-2'
+                   }
+               ]
+           }
+       ]
+       const tree = [
+           {
+               name: '1',
+               type: 'dir',
+               children: [
+                   {
+                       name: '1-1',
+                       children: [
+                           {
+                               name: '1-1-1',
+                           },
+                           {
+                               name: '1-1-2'
+                           }
+                       ]
+                   },
+                   {
+                       name: '1-2',
+                       children: [
+                           {
+                               name: '1-2-1',
+                           },
+                           {
+                               name: '1-2-2'
+                           },
+                           {
+                               name: '1-2-3'
+                           },
+                           {
+                               name: '1-2-4'
+                           }
+                       ]
+                   },
+                   {
+                       name: '1-3',
+                       children: [
+                           {
+                               name: '1-3-1',
+                           },
+                           {
+                               name: '1-3-2'
+                           },
+                           {
+                               name: '1-3-3'
+                           },
+                           {
+                               name: '1-3-4'
+                           }
+                       ]
+                   }
+               ]
+           }
+       ]
+       const root = {
+           name: '前端知识',
+           children: [...tree2, ...tree]
+       }
+       const min = {
+           name: '3333',
+           children: [
+               {
+                   name: 1344,
+                   children: [
+                       {
+                           name: 1344,
 
-    const sRect = cSvg.cEl('rect', {
-        width: '100',
-        height: '100',
-        fill: 'red',
-    })
-    console.log('sRect', sRect.width)
-    svgDom.appendChild(sRect)
-    const sText  = cText('LAN', {
-        fill: '#000',
-        x: '100',
-        y: '100',
-    })
-    console.log('sText', sText.textLength)
-    svgDom.appendChild(sText)
-    document.body.appendChild(svgDom);*/
-</script>
-<script>
-
-    const tree = [
-        {
-            name: '1',
-            type: 'dir',
-            children: [
-                {
-                    name: '1-1',
-                    children: [
-                        {
-                            name: '1-1-1',
-                        },
-                        {
-                            name: '1-1-2'
-                        }
-                    ]
-                },
-                {
-                    name: '1-2',
-                    children: [
-                        {
-                            name: '1-2-1',
-                        },
-                        {
-                            name: '1-2-2'
-                        },
-                        {
-                            name: '1-2-3'
-                        },
-                        {
-                            name: '1-2-4'
-                        }
-                    ]
-                },
-                {
-                    name: '1-3',
-                    children: [
-                        {
-                            name: '1-3-1',
-                        },
-                        {
-                            name: '1-3-2'
-                        },
-                        {
-                            name: '1-3-3'
-                        },
-                        {
-                            name: '1-3-4'
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-    cSvg.init(tree)
+                       },
+                       {
+                           name: 3455
+                       }
+                   ]
+               },
+               {
+                   name: 3455
+               }
+           ]
+       }
+       // cSvg.init(root)
+       document.body.appendChild(mapSvg(root, {
+           bale: 'name',
+           key: 'name',
+           callback: function (item) {
+               console.log('item', item)
+           }
+       }))
+       document.body.appendChild(mapSvg(min))
+   }
 </script>
 </html>
