@@ -1,5 +1,6 @@
 <template>
     <div>
+        <div>{{obj}}</div>
         <div class="div1"></div>
         <div class="div2"></div>
         <h1>{{title}}</h1>
@@ -20,6 +21,7 @@
     import { EventBus } from './utils/index.js'
     import dyCom1 from './components/dyCom1.vue'
     import dyCom2 from './components/dyCom2.vue'
+    import axios from 'axios'
     export default {
         provide () {
             return {
@@ -35,7 +37,10 @@
                 provideData: {
                     name: 'lanjz'
                 },
-                currentTabComponent: 'dyCom1'
+                currentTabComponent: 'dyCom1',
+              obj: {
+                  a: [{name: 'lanjz'}]
+              }
             }
         },
         components: {
@@ -59,9 +64,17 @@
             }
         },
         mounted() {
+          console.log(this)
             EventBus.$on('abc', function () {
 
             })
+          axios.get('http://www.localhost:10011')
+            .then(function (response) {
+              console.log(response);
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
         }
     }
 </script>
