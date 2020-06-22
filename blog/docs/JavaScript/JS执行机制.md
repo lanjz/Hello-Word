@@ -10,6 +10,147 @@ JS是单线程的但是依靠宿主环境浏览器又可支持异步执行代码
 
 - `this`
 
+## 执行上下文
+
+**执行上下文** 就是一段 JavaScript 代码的执行环境，在一段 JS 脚本执行之前，要先解析代码（所以说 JS 是解释执行的脚本语言），解析的时候会先创建一个执行上下文环境，先把代码中即将执行的变量、函数声明都拿出来。变量先暂时赋值为`undefined`，函数则先声明好可使用。这一步做完了，然后再开始正式执行程序。
+
+有三种类型的代码会创建一新的执行上下文
+
+- 运行代码主体的全局上下文，也就是说它是为那些存在于JavaScript 函数之外的任何代码而创建的。
+
+- 运行函数内代码的局部上下文，每个函数会在执行代码的时候创建自己的执行上下文，即局部上下文
+
+- 使用 `eval()` 函数也会创建一个新的执行上下文
+
+每一个上下文在本质上都是一种作用域层级。每个代码段开始执行的时候都会创建一个新的上下文栈来运行它，并且在代码退出的时候销毁掉
+
+### 执行上下文的生命周期
+
+执行上下文的生命周期包括三个阶段：创建阶段 -> 执行阶段 -> 回收阶段
+
+**创建阶段**
+
+当函数被调用，但未执行任何其内部代码之前，会做以下三件事：
+
+1. 创建变量对象：提升函数声明和变量声明,如果是函数还需要初始化参数`arguments`
+
+2. 创建作用域链（Scope Chain）：在上下文的创建阶段，作用域链是在变量对象之后创建的。作用域链用于解析变量。当被要求解析变量时，JavaScript 始终从代码嵌套的最内层开始，如果最内层没有找到变量，就会跳转到上一层父作用域中查找，直到找到该变量。
+
+3. 确定this指向：包括多种情况，下文会详细说明
+
+**执行阶段**
+
+执行变量赋值、代码执行
+
+**回收阶段**
+
+执行上下文出栈等待虚拟机回收执行上下文
+
+活动的执行上下文在逻辑上组成一个堆栈。堆栈底部永远都是全局上下文(global context)，而顶部就是当前(活动的)执行上下文。堆栈在EC类型进入和退出上下文的时候被修改（推入或弹出）
+
+例如，我们可以定义执行上下文堆栈是一个数组：
+
+```js
+ECStack = []
+```
+
+每次进入`function` (即使`function`被递归调用或作为构造函数) 的时候或者内置的`eval`函数工作的时候，这个堆栈都会被压入
+
+**全局代码**
+
+这种类型的代码是在"程序"级处理的：例如加载外部的js文件或者本地`<script></script>`标签内的代码。全局代码不包括任何`function`体内的代码
+
+在初始化（程序启动）阶段，ECStack是这样的：
+
+```js
+ECStack = [
+  globalContext
+];
+```
+
+**函数代码**
+
+当进入`funtion`函数代码(所有类型的`funtions)`的时候，`ECStack`被压入新元素。需要注意的是，具体的函数代码不包括内部函数(inner functions)代码。如下所示，我们使函数自己调自己的方式递归一次：
+
+```js
+(function  foo(bar) {
+  if (bar) {
+    return;
+  }
+  foo(true);
+})();
+```
+
+那么，`ECStack`以如下方式被改变：
+
+```js
+// 第一次foo的激活调用
+ECStack = [
+  <foo> functionContext
+  globalContext
+];
+ 
+// foo的递归激活调用
+ECStack = [
+  <foo> functionContext – recursively
+  <foo> functionContext
+  globalContext
+];
+```
+
+每次`return`的时候，当前执行上下文也就从`ECStack`弹出,一个抛出的异常如果没被截获的话也有可能从一个或多个执行上下文退出。相关代码执行完以后，`ECStack`只会包含全局上下文(global context)，一直到整个应用程序结束
+
+
+```js
+let outputElem = document.getElementById("output");
+
+let userLanguages = {
+  "Mike": "en",
+  "Teresa": "es"
+};
+
+function greetUser(user) {
+  function localGreeting(user) {
+    let greeting;
+    let language = userLanguages[user];
+    
+    switch(language) {
+      case "es":
+        greeting = `¡Hola, ${user}!`;
+        break;
+      case "en":
+      default:
+        greeting = `Hello, ${user}!`;
+        break;
+    }
+    return greeting;
+  }
+  outputElem.innerHTML += localGreeting(user) + "<br>\r";
+}
+
+greetUser("Mike");
+greetUser("Teresa");
+greetUser("Veronica");
+```
+
+- 程序开始运行时，全局上下文就会被创建好
+
+  - 当执行到 `greetUser("Mike")` 的时候会为 `greetUser()` 函数创建一个它的上下文。这个执行上下文会被推入执行上下文栈中
+
+    - 当 `greetUser()` 调用 `localGreeting()`的时候会为该方法创建一个新的上下文
+
+    - 当`localGreeting()`函数执行完之后就会将它的上下文从执行栈中弹出并销毁。程序会从栈中获取下一个上下文并恢复执行, 也就是从 `greetUser()` 剩下的部分开始执行
+
+  - 当`greetUser()` 执行完毕后，其上下文也从执行栈中弹出并销毁
+
+  - 之后执行`greetUser("Teresa")`和`greetUser("Veronica")`方法的时候，也是同上面的步骤
+
+- 主程序退出，全局执行上下文从执行栈中弹出。此时栈中所有的上下文都已经弹出，程序执行完毕
+
+**递归函数及其上下文**
+
+关于递归函数——即多次调用自身的函数，需要特别注意：每次递归调用自身都会创建一个新的上下文。这使得 JavaScript 运行时能够追踪递归的层级以及从递归中得到的返回值，但这也意味着每次递归都会消耗内存来创建新的上下文
+
 ## 变量对象
 
 变量对象(缩写为VO)是一个与执行上下文相关的特殊对象(抽象概念)，它存储着当前上下文中的以下内容：
@@ -274,7 +415,7 @@ fn()
 
 // ---------------
 function fn(name){
-    console.log(name) // "undefined"
+    console.log(name) // "lanjz"
     var name = 110
 }
 fn('lanjz')
@@ -713,9 +854,121 @@ Scope = catchObject + AO|VO + [[Scope]]
 
 在`catch`语句完成运行之后，作用域链恢复到以前的状态
 
+### 闭包
+
+函数可以作为参数传递给其他函数使用 (在这种情况下，函数被称为“funargs”——“functional arguments”)。接收`funargs`的函数被称之为 高阶函数(`higher-order functions`) 。其他函数的运行时也会返回函数，这些返回的函数被称为 `function valued` 函数 (有 `functional value` 的函数)
+
+**闭包的作用域问题：**
+
+当一个函数从其他函数返回到外部的时候，当函数被激活时，上下文的作用域链表现为激活对象与[[Scope]]属性的组合
+
+```js
+Scope chain = Activation object + [[Scope]]
+作用域链 = 活动对象 + [[Scope]]
+```
+
+EMCAScript使用静态作用域，即作用是在函数创建产生，且不会被改变
+
+```js
+function foo() {
+  var x = 10;
+  return function bar() {
+    console.log(x);
+  };
+}
+ 
+// "foo"返回的也是一个function
+// 并且这个返回的function可以随意使用内部的变量x
+ 
+var returnedFunction = foo();
+ 
+// 全局变量 "x"
+var x = 20;
+ 
+// 支持返回的function
+returnedFunction(); // 结果是10而不是20
+```
+
+```js
+// 全局变量 "x"
+var x = 10;
+ 
+// 全局function
+function foo() {
+  console.log(x);
+}
+ 
+(function (funArg) {
+ 
+  // 局部变量 "x"
+  var x = 20;
+ 
+  // 这不会有歧义
+  // 因为我们使用"foo"函数的[[Scope]]里保存的全局变量"x",
+  // 并不是caller作用域的"x"
+ 
+  funArg(); // 10, 而不是20
+ 
+})(foo); // 将foo作为一个"funarg"传递下去
+```
+
+还有一个很重要的点，几个函数可能含有相同的父级作用域（这是一个很普遍的情况，例如有好几个内部或者全局的函数）。在这种情况下，在`[[Scope]]`中存在的变量是会共享的。一个闭包中变量的变化，也会影响另一个闭包的
+
+```js
+function baz() {
+  var x = 1;
+  return {
+    foo: function foo() { return ++x; },
+    bar: function bar() { return --x; }
+  };
+}
+ 
+var closures = baz();
+ 
+console.log(
+  closures.foo(), // 2
+  closures.bar()  // 1
+);
+```
+
+在某个循环中创建多个函数时，上图会引发一个困惑。如果在创建的函数中使用循环变量(如”k”)，那么所有的函数都使用同样的循环变量，导致一些程序员经常会得不到预期值。现在清楚为什么会产生如此问题了——因为所有函数共享同一个`[[Scope]]`，其中循环变量为最后一次赋值
+
+```js
+var data = [];
+ 
+for (var k = 0; k < 3; k++) {
+  data[k] = function () {
+    alert(k);
+  };
+}
+ 
+data[0](); // 3, but not 0
+data[1](); // 3, but not 1
+data[2](); // 3, but not 2
+```
+
+有一些用以解决这类问题的技术。其中一种技巧是在作用域链中提供一个额外的对象，比如增加一个函数：
+
+```js
+var data = [];
+ 
+for (var k = 0; k < 3; k++) {
+  data[k] = (function (x) {
+    return function () {
+      alert(x);
+    };
+  })(k); // 将k当做参数传递进去
+}
+ 
+// 结果正确
+data[0](); // 0
+data[1](); // 1
+data[2](); // 2
+```
+
 ## this
 
-`this`是执行上下文中的一个属性：
+**`this`是执行上下文中的一个属性而不是某个变量对象的属性**
 
 ```js
 activeExecutionContext = {
@@ -832,147 +1085,6 @@ foo.bar(); //  foo
 
 - 对于箭头函数来说，`this`继承箭头函数外层的函数，如果没有外层函数则指向全局`window`
 
-
-## 执行上下文
-
-**执行上下文** 就是一段 JavaScript 代码的执行环境，在一段 JS 脚本执行之前，要先解析代码（所以说 JS 是解释执行的脚本语言），解析的时候会先创建一个执行上下文环境，先把代码中即将执行的变量、函数声明都拿出来。变量先暂时赋值为`undefined`，函数则先声明好可使用。这一步做完了，然后再开始正式执行程序。
-
-有三种类型的代码会创建一新的执行上下文
-
-- 运行代码主体的全局上下文，也就是说它是为那些存在于JavaScript 函数之外的任何代码而创建的。
-
-- 运行函数内代码的局部上下文，每个函数会在执行代码的时候创建自己的执行上下文，即局部上下文
-
-- 使用 `eval()` 函数也会创建一个新的执行上下文
-
-每一个上下文在本质上都是一种作用域层级。每个代码段开始执行的时候都会创建一个新的上下文栈来运行它，并且在代码退出的时候销毁掉
-
-### 执行上下文的生命周期
-
-执行上下文的生命周期包括三个阶段：创建阶段 -> 执行阶段 -> 回收阶段
-
-**创建阶段**
-
-当函数被调用，但未执行任何其内部代码之前，会做以下三件事：
-
-1. 创建变量对象：提升函数声明和变量声明,如果是函数还需要初始化参数`arguments`
-
-2. 创建作用域链（Scope Chain）：在上下文的创建阶段，作用域链是在变量对象之后创建的。作用域链用于解析变量。当被要求解析变量时，JavaScript 始终从代码嵌套的最内层开始，如果最内层没有找到变量，就会跳转到上一层父作用域中查找，直到找到该变量。
-
-3. 确定this指向：包括多种情况，下文会详细说明
-
-**执行阶段**
-
-执行变量赋值、代码执行
-
-**回收阶段**
-
-执行上下文出栈等待虚拟机回收执行上下文
-
-活动的执行上下文在逻辑上组成一个堆栈。堆栈底部永远都是全局上下文(global context)，而顶部就是当前(活动的)执行上下文。堆栈在EC类型进入和退出上下文的时候被修改（推入或弹出）
-
-例如，我们可以定义执行上下文堆栈是一个数组：
-
-```js
-ECStack = []
-```
-
-每次进入`function` (即使`function`被递归调用或作为构造函数) 的时候或者内置的`eval`函数工作的时候，这个堆栈都会被压入
-
-**全局代码**
-
-这种类型的代码是在"程序"级处理的：例如加载外部的js文件或者本地`<script></script>`标签内的代码。全局代码不包括任何`function`体内的代码
-
-在初始化（程序启动）阶段，ECStack是这样的：
-
-```js
-ECStack = [
-  globalContext
-];
-```
-
-**函数代码**
-
-当进入`funtion`函数代码(所有类型的`funtions)`的时候，`ECStack`被压入新元素。需要注意的是，具体的函数代码不包括内部函数(inner functions)代码。如下所示，我们使函数自己调自己的方式递归一次：
-
-```js
-(function  foo(bar) {
-  if (bar) {
-    return;
-  }
-  foo(true);
-})();
-```
-
-那么，`ECStack`以如下方式被改变：
-
-```js
-// 第一次foo的激活调用
-ECStack = [
-  <foo> functionContext
-  globalContext
-];
- 
-// foo的递归激活调用
-ECStack = [
-  <foo> functionContext – recursively
-  <foo> functionContext
-  globalContext
-];
-```
-
-每次`return`的时候，当前执行上下文也就从`ECStack`弹出,一个抛出的异常如果没被截获的话也有可能从一个或多个执行上下文退出。相关代码执行完以后，`ECStack`只会包含全局上下文(global context)，一直到整个应用程序结束
-
-
-```js
-let outputElem = document.getElementById("output");
-
-let userLanguages = {
-  "Mike": "en",
-  "Teresa": "es"
-};
-
-function greetUser(user) {
-  function localGreeting(user) {
-    let greeting;
-    let language = userLanguages[user];
-    
-    switch(language) {
-      case "es":
-        greeting = `¡Hola, ${user}!`;
-        break;
-      case "en":
-      default:
-        greeting = `Hello, ${user}!`;
-        break;
-    }
-    return greeting;
-  }
-  outputElem.innerHTML += localGreeting(user) + "<br>\r";
-}
-
-greetUser("Mike");
-greetUser("Teresa");
-greetUser("Veronica");
-```
-
-- 程序开始运行时，全局上下文就会被创建好
-
-  - 当执行到 `greetUser("Mike")` 的时候会为 `greetUser()` 函数创建一个它的上下文。这个执行上下文会被推入执行上下文栈中
-
-    - 当 `greetUser()` 调用 `localGreeting()`的时候会为该方法创建一个新的上下文
-
-    - 当`localGreeting()`函数执行完之后就会将它的上下文从执行栈中弹出并销毁。程序会从栈中获取下一个上下文并恢复执行, 也就是从 `greetUser()` 剩下的部分开始执行
-
-  - 当`greetUser()` 执行完毕后，其上下文也从执行栈中弹出并销毁
-
-  - 之后执行`greetUser("Teresa")`和`greetUser("Veronica")`方法的时候，也是同上面的步骤
-
-- 主程序退出，全局执行上下文从执行栈中弹出。此时栈中所有的上下文都已经弹出，程序执行完毕
-
-**递归函数及其上下文**
-
-关于递归函数——即多次调用自身的函数，需要特别注意：每次递归调用自身都会创建一个新的上下文。这使得 JavaScript 运行时能够追踪递归的层级以及从递归中得到的返回值，但这也意味着每次递归都会消耗内存来创建新的上下文
 
 ## 事件循环
 
@@ -1122,7 +1234,7 @@ I am from setTimeout
 
 ## Q&A
 
-** 为什么 `setTimeout`，HTTP请求，事件等是可以异步的**
+**为什么 `setTimeout`，HTTP请求，事件等是可以异步的**
 
 JS是单线程的，但是浏览器是多进程，多线程的，这些异步任务其实是交由给这浏览器其它线程处理的
 

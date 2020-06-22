@@ -38,3 +38,17 @@
 git config --global user.name 'xxx'
 git config --global user.email 'x@xxx'
 ```
+
+# 使用账号密码CLONE项目
+
+格式：`git clone http://邮箱(或用户名):密码@仓库`
+
+如：
+
+- git账号： `lanjz`
+
+- git密码：`123`
+
+- 仓库：`https://git.test.com/abc/demo`
+
+克隆命令：`git clone https://lanjz:123@git.test.com/abc/demo`
