@@ -9,21 +9,25 @@
     
 </body>
 <script>
-var foo = {
-  bar: function () {
-    alert(this);
-  }
+var BaseCalculator = function() {
+    this.decimalDigits = 2;
 };
- 
-// foo.bar(); // Reference, OK => foo
-// (foo.bar)(); // Reference, OK => foo
- 
-console.log((foo.bar = foo.bar))
-// (foo.bar = foo.bar)(); // global?
-// foo.bar = foo.bar
-// foo.bar()
-// (false || foo.bar)(); // global?
-// (foo.bar, foo.bar)(); // global?
 
+BaseCalculator.prototype = {
+    add: function(x, y) {
+        return x + y;
+    },
+    subtract: function(x, y) {
+        return x - y;
+    }
+};
+var Calculator = function () {
+    this.tax= 5;
+};
+
+Calculator.prototype = BaseCalculator.prototype
+var calc = new Calculator();
+alert(calc.add(1, 1));
+alert(calc.decimalDigits);
 </script>
 </html>

@@ -16,7 +16,9 @@ module.exports = {
     '/JavaScript/JS基础',
     '/JavaScript/JS执行机制',
     '/JavaScript/编写高质量JavaScript代码的基本要点',
-    '/JavaScript/揭秘命名函数表达式',
+    '/JavaScript/函数',
+    '/JavaScript/全面解析Module模式',
+    '/JavaScript/闭包',
     '/JavaScript/吱不吱',
     '/JavaScript/README2',
     {
