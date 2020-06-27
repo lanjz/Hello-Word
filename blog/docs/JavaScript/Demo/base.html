@@ -9,25 +9,12 @@
     
 </body>
 <script>
-var BaseCalculator = function() {
-    this.decimalDigits = 2;
-};
-
-BaseCalculator.prototype = {
-    add: function(x, y) {
-        return x + y;
-    },
-    subtract: function(x, y) {
-        return x - y;
-    }
-};
-var Calculator = function () {
-    this.tax= 5;
-};
-
-Calculator.prototype = BaseCalculator.prototype
-var calc = new Calculator();
-alert(calc.add(1, 1));
-alert(calc.decimalDigits);
+var obj = {a:1, c: 3, b:2};
+var arr = [ {a:1, c: 3, b:2},  {a:1, c: 3, b:2}]
+arr.find(item => {
+    item.a = 10000
+    return item 
+})
+console.log('arr', arr)
 </script>
 </html>
