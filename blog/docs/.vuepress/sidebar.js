@@ -24,10 +24,11 @@ module.exports = {
     '/JavaScript/对象创建模式',
     '/JavaScript/吱不吱',
     {
-      title: 'Group 2',
+      title: 'ES6',
       collapsable: false,
       children: [
-        '/JavaScript/guide/'
+        '/JavaScript/guide/',
+        '/JavaScript/ES6/对象',
       ]
     }
    /*  {
