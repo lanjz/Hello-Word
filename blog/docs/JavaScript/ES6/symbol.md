@@ -122,3 +122,90 @@ a[mySymbol] // "Hello!"
 ```
 
 上面代码中，因为点运算符后面总是字符串，所以不会读取 `mySymbol` 作为标识名所指代的那个值，导致a的属性名实际上是一个字符串，而不是一个 Symbol 值
+
+## 遍历 symbol属性
+
+Symbol 作为属性名，遍历对象的时候，该属性不会出现在 `for...in`、`for...of` 循环中，也不会被 `Object.keys()` 、`Object.getOwnPropertyNames()`、`JSON.stringify()` 返回
+
+只能使用 `Object.getOwnPropertySymbols()`可以获取指定对象的所有 Symbol 属性名
+
+```js
+const obj = {};
+let a = Symbol('a');
+let b = Symbol('b');
+
+obj[a] = 'Hello';
+obj[b] = 'World';
+
+const objectSymbols = Object.getOwnPropertySymbols(obj);
+
+objectSymbols
+// [Symbol(a), Symbol(b)]
+```
+
+除了 `Object.getOwnPropertyNames()`, `Reflect.ownKeys()` 方法也可以返回所有类型的键名，包括常规键名和 Symbol 键名以及不可枚举的属性
+
+```js
+let obj = {
+  [Symbol('my_key')]: 1,
+  enum: 2,
+  nonEnum: 3
+};
+
+Reflect.ownKeys(obj)
+//  ["enum", "nonEnum", Symbol(my_key)]
+```
+
+##　Symbol.for()，Symbol.keyFor()
+
+有时，我们希望重新使用同一个 Symbol 值，｀Symbol.for()｀　方法可以做到这一点。它接受一个字符串作为参数，然后搜索有没有以该参数作为名称的 Symbol 值。如果有，就返回这个 Symbol 值，否则就新建一个以该字符串为名称的 Symbol 值，并将其注册到全局
+
+```js
+let s1 = Symbol.for('foo');
+let s2 = Symbol.for('foo');
+
+s1 === s2 // true
+```
+
+`Symbol.for()` 与 `Symbol()` 这两种写法，都会生成新的 Symbol。它们的区别是，前者会被登记在全局环境中供搜索，后者不会。`Symbol.for()` 不会每次调用就返回一个新的 Symbol 类型的值，而是会先检查给定的 `key` 是否已经存在，如果不存在才会新建一个值
+
+```js
+Symbol.for("bar") === Symbol.for("bar")
+// true
+
+Symbol("bar") === Symbol("bar")
+// false
+```
+
+注意，`Symbol.for()为` Symbol 值登记的名字，是全局环境的，不管有没有在全局环境运行
+
+```js
+function foo() {
+  return Symbol.for('bar');
+}
+
+const x = foo();
+const y = Symbol.for('bar');
+console.log(x === y); // true
+```
+
+`Symbol.for()` 的这个全局登记特性，可以用在不同的 `ifram`e 或 `service worker` 中取到同一个值
+
+```js
+iframe = document.createElement('iframe');
+iframe.src = String(window.location);
+document.body.appendChild(iframe);
+
+iframe.contentWindow.Symbol.for('foo') === Symbol.for('foo')
+```
+
+`Symbol.keyFor()` 方法返回一个已登记的 Symbol 类型值的 `key`
+
+```js
+let s1 = Symbol.for("foo");
+Symbol.keyFor(s1) // "foo"
+
+// 变量s2属于未登记的 Symbol 值，所以返回undefined
+let s2 = Symbol("foo");
+Symbol.keyFor(s2) // undefined
+```
