@@ -1,4 +1,4 @@
-# symbol
+# Symbol
 
 `symbol` 是一种基本数据类型, **每个从 `Symbol()` 返回的 `symbol` 值都是唯一的**
 
