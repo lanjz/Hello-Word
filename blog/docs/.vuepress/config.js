@@ -23,8 +23,8 @@ module.exports = {
       {
         text: '框架',
         items: [
-          { text: 'Vue', link: '/Vue/Vue' },
-          { text: 'React', link: '/React/React' },
+          { text: 'Vue', link: '/Vue/' },
+          { text: 'React', link: '/React/' },
         ]
       },
       { text: '工程化', 

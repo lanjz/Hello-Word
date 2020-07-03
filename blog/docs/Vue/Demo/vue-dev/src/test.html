@@ -23,18 +23,20 @@
       message: 'Hello Vue!',
       name: '哈哈'
     },
-    watch: {
+    /* watch: {
       message: function (val) {
         console.log(val)
         this.name = val + this.name
       }
-    },
+    }, */
     mounted(){
       console.log(this)
-      setTimeout(() => {
+      /* setTimeout(() => {
         this.message = 101
         this.name = 10000
-      })
+      }) */
+      // console.log(this.message)
+      // this.message = 101
     },
     updated(){
       console.log('update', this.message, this.name)
