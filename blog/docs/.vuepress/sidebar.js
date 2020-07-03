@@ -29,10 +29,12 @@ module.exports = {
       children: [
         '/JavaScript/guide/',
         '/JavaScript/ES6/Symbol',
+        '/JavaScript/ES6/数组',
         '/JavaScript/ES6/对象',
         '/JavaScript/ES6/Set和WeakSet',
         '/JavaScript/ES6/Map和WeakMap',
         '/JavaScript/ES6/Iterator',
+        '/JavaScript/ES6/Proxy',
       ]
     }
    /*  {
@@ -52,6 +54,10 @@ module.exports = {
   ],
   '/CSS/': [
     '/CSS/样式实现'
+  ],
+  '/Vue/': [
+    '/Vue/组件通信',
+    '/Vue/响应式原理',
   ],
   '/network/': [
     '/network/HTTP及演变',

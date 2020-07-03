@@ -14,6 +14,7 @@
         <keep-alive>
             <component v-bind:is="currentTabComponent"></component>
         </keep-alive>
+        <dyCom1 name="lanjz" class="com" age="18" @click="callback" v-on:event-one="callback" v-on:event-two="callback"></dyCom1>
     </div>
 </template>
 <script>
@@ -61,6 +62,9 @@
             },
             toggle: () => {
                 console.log('this', this)
+            },
+            callback(){
+
             }
         },
         mounted() {

@@ -9,39 +9,42 @@
     
 </body>
 <script>
-function Obj(value) {
-  this.value = value;
-  this.next = null;
-}
-
-Obj.prototype[Symbol.iterator] = function() {
-  var iterator = { next: next };
-
-  var current = this;
-
-  function next() {
-    if (current) {
-      var value = current.value;
-      current = current.next;
-      return { done: false, value: value };
-    } else {
-      return { done: true };
+var obj = {
+  a: 1,
+  b: [2, 4],
+  c: {
+    c1: {
+      c1: 13
     }
   }
-  return iterator;
 }
-
-var one = new Obj(1);
-var two = new Obj(2);
-var three = new Obj(3);
-
-one.next = two;
-two.next = three;
-
-console.log(one)
-for (var i of one){
-  console.log(i); // 1, 2, 3
+var handle = {
+  set: function(a, b, c){
+    console.log(a)
+    console.log(b)
+    console.log(c)
+    a[b] = c
+    return false
+  },
+  has: function(tar, key){
+    console.log(key)
+    return true
+  }
 }
-
+var pro = new Proxy(obj, handle)
+console.log(pro)
+</script>
+<script>
+  function sup(){
+    this.a = []
+    this.b = 1  
+  }
+  sup.prototype.age = []
+  function sub(){
+    // sub.call(this)
+  }
+  sub.prototype = new sup()
+  console.log(new sub())
+  console.log(new sub())
 </script>
 </html>

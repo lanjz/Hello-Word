@@ -20,6 +20,13 @@ module.exports = {
           
         ]
       },
+      {
+        text: '框架',
+        items: [
+          { text: 'Vue', link: '/Vue/Vue' },
+          { text: 'React', link: '/React/React' },
+        ]
+      },
       { text: '工程化', 
       items: [
         { text: '部署', link: '/language/japanese6' },
