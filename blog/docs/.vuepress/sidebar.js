@@ -28,7 +28,7 @@ module.exports = {
       collapsable: false,
       children: [
         '/JavaScript/guide/',
-        '/JavaScript/ES6/Symbol',
+        // '/JavaScript/ES6/Symbol',
         '/JavaScript/ES6/数组',
         '/JavaScript/ES6/对象',
         '/JavaScript/ES6/Set和WeakSet',

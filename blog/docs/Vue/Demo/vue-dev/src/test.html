@@ -8,60 +8,38 @@
   <script src="https://unpkg.com/lodash@4.16.0"></script>
   &lt;!&ndash; Delete ".min" for console warnings in development &ndash;&gt;
   <script src="./core/index.js"></script>-->
+  <script src="../vue.js"></script>
 </head>
 <body>
 
-<div id="editor">
-  <textarea :value="input" @input="update"></textarea>
-  <div v-html="compiledMarkdown"></div>
+<div id="app">
+  {{ message }}
+  {{ name }}
 </div>
 <script>
-  class myPromise{
-    constructor(handle) {
-      this.status = 'PENDING'
-      try{
-        handle(this.resolve.bind(this), this.reject.bind(this))
-      } catch (e){
-        this.reject(e)
+  var app = new Vue({
+    el: '#app',
+    data: {
+      message: 'Hello Vue!',
+      name: '哈哈'
+    },
+    watch: {
+      message: function (val) {
+        console.log(val)
+        this.name = val + this.name
       }
-      this.doResolve = []
-      this.doReject = null
-      this.sonResovle = null
-      this.sonReject = null
-    }
-    resolve(val){
-      if(this.status !== 'PENDING') return
-      this.status === 'FULFILLED'
-      this.doResolve.forEach(itemFn => {
-        itemFn(val)
-        this.sonResovle(val)
+    },
+    mounted(){
+      console.log(this)
+      setTimeout(() => {
+        this.message = 101
+        this.name = 10000
       })
+    },
+    updated(){
+      console.log('update', this.message, this.name)
     }
-    reject(val){
-      if(this.status !== 'PENDING') return
-      this.status === 'REJECTED'
-      this.doReject(val)
-    }
-    then(fn) {
-      this.doResolve.push(fn)
-      const _this = this
-      return new myPromise((resolve, reject) => {
-        _this.sonResovle = resolve
-        _this.sonReject = reject
-      })
-    }
-    catch(fn) {
-      this.doReject = fn
-    }
-  }
-  var pro = new myPromise((resolve, reject) => {
-    setTimeout(() => {resolve('执行成功')}, 2000)
   })
-  pro.then(res => {console.log(res)})
-  pro.then(res => {console.log('then2'+res)})
-    .then(res => console.log('sonThen' + res))
-    .then(res => console.log('sonThen2' + res))
-
 </script>
 
 </body>
