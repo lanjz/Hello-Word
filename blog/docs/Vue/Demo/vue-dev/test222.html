@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+
+    function Dep() {
+      this.sub = []
+    }
+    Dep.prototype.depend = function (val) {
+      this.sub.push(val)
+    }
+    const objjj = {
+      a: 1,
+      b: 2,
+      c: 3
+    }
+  /**
+   * Define a reactive property on an Object.
+   */
+  function defineReactive$$1 (
+    obj,
+    key,
+  ) {
+    var dep = new Dep();
+    Object.defineProperty(obj, key, {
+      enumerable: true,
+      configurable: true,
+      get: function reactiveGetter () {
+        var value = objjj[key]
+        dep.depend(value);
+        return value
+      },
+      set: function reactiveSetter (newVal) {
+        console.log(dep)
+      }
+    });
+  }
+  const obj2 = {}
+    defineReactive$$1(obj2, 'a')
+    defineReactive$$1(obj2, 'b')
+    defineReactive$$1(obj2, 'b')
+    console.log(obj2
+    )
+</script>
+</body>
+</html>
