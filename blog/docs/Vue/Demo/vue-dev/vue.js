@@ -1847,6 +1847,7 @@
       }
       globalHandleError(err, vm, info);
     } finally {
+      debugger
       popTarget();
     }
   }
@@ -4223,6 +4224,7 @@
     if (vm._hasHookEvent) {
       vm.$emit('hook:' + hook);
     }
+    debugger
     popTarget();
   }
 
@@ -4488,6 +4490,7 @@
       if (this.deep) {
         traverse(value);
       }
+      debugger
       popTarget();
       this.cleanupDeps();
     }
@@ -4748,6 +4751,7 @@
       handleError(e, vm, "data()");
       return {}
     } finally {
+      debugger
       popTarget();
     }
   }

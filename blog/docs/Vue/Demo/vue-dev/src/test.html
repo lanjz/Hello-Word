@@ -14,21 +14,27 @@
 
 <div id="app">
   {{ message }}
+  {{ message }}
   {{ name }}
 </div>
 <script>
   var app = new Vue({
     el: '#app',
     data: {
-      message: 'Hello Vue!',
+      message: {
+        name: 'Hello Vue!'
+      },
       name: '哈哈'
     },
-    /* watch: {
-      message: function (val) {
-        console.log(val)
-        this.name = val + this.name
+     watch: {
+      message:{
+        handler:  function (val) {
+          console.log(val)
+        },
+        immediate: true,
+        deep: true
       }
-    }, */
+    },
     mounted(){
       console.log(this)
       /* setTimeout(() => {
