@@ -21,32 +21,26 @@
   var app = new Vue({
     el: '#app',
     data: {
-      message: {
-        name: 'Hello Vue!'
-      },
+      message: 'AA',
       name: '哈哈'
     },
      watch: {
       message:{
         handler:  function (val) {
           console.log(val)
-        },
-        immediate: true,
-        deep: true
+          this.name = val + '_Watch'
+        }
+      },
+      name: {
+        handler:  function (val) {
+          console.log(val)
+        }
       }
     },
     mounted(){
-      console.log(this)
-      /* setTimeout(() => {
-        this.message = 101
-        this.name = 10000
-      }) */
-      // console.log(this.message)
-      // this.message = 101
+      console.log('mounted')
+      this.message = "message_B"
     },
-    updated(){
-      console.log('update', this.message, this.name)
-    }
   })
 </script>
 

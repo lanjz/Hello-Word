@@ -11,6 +11,38 @@
     </div>
     {{ message }}
 </div>
-<!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
+<script>
+    const obj = {
+        name: {
+            name1: 123
+        }
+    }
+    const obj2 = {}
+    console.log(obj)
+
+    def1(obj)
+    function def1(obj){
+        Object.keys(obj).forEach(item => {
+            console.log(typeof obj[item])
+            debugger
+            if(typeof obj[item] === 'object'){
+                def1(obj[item])
+            }
+            def2(obj, item, obj[item])
+        })
+    }
+    function def2(tar, item, value) {
+        Object.defineProperty(tar, item, {
+            get: function(){
+                console.log('get', tar)
+                return value
+            },
+            set: function(val){
+                console.log('set', tar)
+            }
+        })
+    }
+
+</script>
 </body>
 </html>

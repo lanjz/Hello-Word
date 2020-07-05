@@ -1050,6 +1050,7 @@
         return value
       },
       set: function reactiveSetter (newVal) {
+        debugger
         var value = getter ? getter.call(obj) : val;
         /* eslint-disable no-self-compare */
         if (newVal === value || (newVal !== newVal && value !== value)) {
@@ -1847,7 +1848,6 @@
       }
       globalHandleError(err, vm, info);
     } finally {
-      debugger
       popTarget();
     }
   }
@@ -4224,7 +4224,6 @@
     if (vm._hasHookEvent) {
       vm.$emit('hook:' + hook);
     }
-    debugger
     popTarget();
   }
 
@@ -4287,6 +4286,7 @@
    * Flush both queues and run the watchers.
    */
   function flushSchedulerQueue () {
+    debugger
     currentFlushTimestamp = getNow();
     flushing = true;
     var watcher, id;
@@ -4490,7 +4490,6 @@
       if (this.deep) {
         traverse(value);
       }
-      debugger
       popTarget();
       this.cleanupDeps();
     }
@@ -4636,7 +4635,6 @@
   }
 
   function initState (vm) {
-    debugger
     vm._watchers = [];
     var opts = vm.$options;
     if (opts.props) { initProps(vm, opts.props); }
@@ -4751,7 +4749,6 @@
       handleError(e, vm, "data()");
       return {}
     } finally {
-      debugger
       popTarget();
     }
   }

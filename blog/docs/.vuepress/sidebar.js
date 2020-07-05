@@ -58,6 +58,18 @@ module.exports = {
   '/Vue/': [
     '/Vue/组件通信',
     '/Vue/响应式原理',
+    '/Vue/Watch',
+    '/Vue/响应更新',
+    '/Vue/VirtualDom',
+  ],
+  '/React/': [
+    '/React/React16新特性',
+    '/React/Hook',
+    '/React/Diff',
+    '/React/性能优化',
+    '/React/React高级指引',
+    '/React/Redux',
+    '/React/服务端渲染',
   ],
   '/network/': [
     '/network/HTTP及演变',
