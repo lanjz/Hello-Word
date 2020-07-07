@@ -34,7 +34,10 @@ module.exports = {
         '/JavaScript/ES6/Set和WeakSet',
         '/JavaScript/ES6/Map和WeakMap',
         '/JavaScript/ES6/Iterator',
+        '/JavaScript/ES6/Generater',
         '/JavaScript/ES6/Proxy',
+        '/JavaScript/ES6/Class',
+        '/JavaScript/ES6/Class继承',
       ]
     }
    /*  {
