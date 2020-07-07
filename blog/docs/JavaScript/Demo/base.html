@@ -9,42 +9,28 @@
     
 </body>
 <script>
-var obj = {
-  a: 1,
-  b: [2, 4],
-  c: {
-    c1: {
-      c1: 13
-    }
+function fetch(time){
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, time)
+    })
   }
-}
-var handle = {
-  set: function(a, b, c){
-    console.log(a)
-    console.log(b)
-    console.log(c)
-    a[b] = c
-    return false
-  },
-  has: function(tar, key){
-    console.log(key)
-    return true
-  }
-}
-var pro = new Proxy(obj, handle)
-console.log(pro)
-</script>
-<script>
-  function sup(){
-    this.a = []
-    this.b = 1  
-  }
-  sup.prototype.age = []
-  function sub(){
-    // sub.call(this)
-  }
-  sub.prototype = new sup()
-  console.log(new sub())
-  console.log(new sub())
+const p1 = new Promise(function (resolve, reject) {
+  fetch(2000, true)
+  .then(res => {
+    resolve('data1')
+  })
+})
+Promise.resolve('执行成功')
+.then(res => {
+  console.log(res) // 执行成功
+  return 'then'
+})
+.finally(() => {
+  console.log('finally')
+  return 'F'
+})
+.then(res => {
+  console.log(res)
+})
 </script>
 </html>
