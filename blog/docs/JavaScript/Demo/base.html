@@ -9,11 +9,15 @@
     
 </body>
 <script>
-function fetch(time){
+  function fetch(time, sue = true){
     return new Promise((resolve, reject) => {
-      setTimeout(resolve(10), time)
+      let callback = sue ? resolve : reject
+      setTimeout(() => {
+        callback(10)
+      }, time)
     })
   }
+/* 
 
 var gen = function* (){
   var r1 = yield fetch(1000)
@@ -23,7 +27,23 @@ var gen = function* (){
 };
 var g = gen();
 var res = g.next()
-console.log(res)
+console.log(res) */
+
+/* Promise.any([fetch(1000, false), fetch(1000)])
+  .then(res => {
+    console.log(res)
+  })
+  .catch(err => {
+    console.log('err', err) // err, err
+  }) */
+
+const p = Promise.resolve('Hello');
+
+p.then(function (s){
+  console.log(s)
+});
+console.log('aaa')
+// Hello
 
 </script>
 </html>

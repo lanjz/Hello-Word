@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="http://at.alicdn.com/t/font_992689_m4gtgn3rc0o.css">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_992689_cpbfavbilnk.css">
     <style>
         body{
             font-family: '微软雅黑';
             margin: 0;
-            padding: 40px 50px;
+            padding: 30px 50px;
             width: 100%;
             background: #fff;
         }
         .head{
             font-size: 30px;
-            padding-bottom: 40px;
         }
         .app{
             display: flex;
@@ -33,7 +32,7 @@
             padding-left: 15px;
         }
         .title{
-            font-size: 15px;
+            font-size: 16px;
             position: relative;
             border-bottom: dashed 1px #666;
             padding: 8px 0;
@@ -90,6 +89,9 @@
             font-size: 14px;
             color: #666;
         }
+        .text_content span{
+            color: #666;
+        }
         .specialities{
             display: flex;
             justify-content: space-between;
@@ -97,15 +99,15 @@
         .specialities_item{
         }
         .specialities_item .raduis{
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             text-align: center;
             border: solid 1px #666;
             justify-content: center;
         }
         .specialities_item .raduis .iconfont{
-            font-size: 30px;
+            font-size: 25px;
         }
         .specialities_item .specialty_name{
             margin-top: 20px;
@@ -125,18 +127,18 @@
         .skill-line{
             margin-top: 5px;
             height: 2px;
-            background: #999;
+            border-bottom: solid 2px #999;
         }
         .skill-rate{
             width: 56%;
-            height: 2px;
-            background: #000;
+            border-bottom: solid 2px #000;
             position: relative;
         }
         .skill-rate::after{
             content: '';
-            width: 6px;
-            height: 6px;
+            width: 0px;
+            height: 0px;
+            border: solid 3px #000;
             background: #000;
             border-radius: 50%;
             position: absolute;
@@ -151,7 +153,7 @@
         }
         .experience-item{
             display: flex;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
         }
         .experience-item-left{
             margin-right: 4px;
@@ -194,13 +196,20 @@
         .experience-box{
             position: relative;
         }
-        .experience-box::after{
+     /*    .experience-box::after{
             content: '';
             position: absolute;
-            width: 1px;
+            width: 2px;
             background: #333;
             left: 19px;
             height: 100%;
+            top: 0;
+        } */
+        .experience-box .vetical-line{
+            position: absolute;
+            left: 19px;
+            height: 100%;
+            border-left: solid 1px #333333;
             top: 0;
         }
         .experience-box::before{
@@ -217,7 +226,6 @@
             justify-content: space-between;
         }
         .interests-item{
-        
             flex-shrink: 0;
             text-align: center;
             flex-grow: 0;
@@ -227,7 +235,7 @@
             justify-content: center;
         }
         .icon-box .iconfont{
-            font-size: 50px;
+            font-size: 46px;
         }
         .interests-name{
             font-size: 12px;
@@ -241,6 +249,10 @@
             width: 50%;
             flex-shrink: 0;
         }
+        .left>.title, 
+        .right>.title{
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -253,13 +265,13 @@
                 <div>基本信息 / Basic Info</div>
             </div>
             <div class="flex-center text_content contact_item">
-                <i class="iconfont icon-yonghu"></i><span>女 / 26岁(1994.09)</span>
+                <i class="iconfont icon-icon"></i><span>女 / 26岁 ( 1994.10 )</span>
             </div>
             <div class="flex-center text_content contact_item">
                 <i class="iconfont icon-didianPlaces110"></i><span>重庆市 巫山县</span>
             </div>
             <div class="flex-center text_content contact_item">
-                <i class="iconfont icon-xueli"></i><span>福建师范大学 / 协和学院 / 本科(全日制) </span>
+                <i class="iconfont icon-xueli"></i><span>福建师范大学 / 协和学院 </span>
             </div>
             <div class="flex-center text_content contact_item">
                 <i class="iconfont icon-dianhua"></i><span>18649823553</span>
@@ -295,7 +307,7 @@
                 <div class="flex-1">
                     <div class="skill-name">  Word </div>
                     <div class="skill-line">
-                        <div class="skill-rate skill-rate"></div>
+                        <div class="skill-rate skill-rate" style="width: 80%;"></div>
                     </div>
                 </div>
             </div>
@@ -304,7 +316,7 @@
                 <div class="flex-1">
                     <div class="skill-name"> Excel </div>
                     <div class="skill-line">
-                        <div class="skill-rate skill-rate"></div>
+                        <div class="skill-rate skill-rate" style="width: 80%;"></div>
                     </div>
                 </div>
             </div>
@@ -313,7 +325,7 @@
                 <div class="flex-1">
                     <div class="skill-name"> PPT </div>
                     <div class="skill-line">
-                        <div class="skill-rate skill-rate"></div>
+                        <div class="skill-rate skill-rate" style="width: 70%;"></div>
                     </div>
                 </div>
             </div>
@@ -321,7 +333,12 @@
                 <div>关于我 / About Me</div>
             </div>
             <p>
-                日前，安以轩在社交平台上传了自己打开麦当劳外卖包装时被热饮烫伤的视频，热饮被跟其他食物包装在一
+                I. 对数据较为敏感，擅长数据分析，提供相应数据支持。<br/> </p>
+            <p>
+                II. 沟通能力强，充分认可团队协作的重要性，注重执行，具备较强的执行力。<br/>
+            </p>
+            <p>
+                III. 对工作认真负责，具有创新精神，能抗压。适应性强。能够充分利用现有资源搜集信息，能够迅速对信息进行整合和分析。
             </p>
         </div>
         <div class="right">
@@ -329,6 +346,7 @@
                 <div>工作经验 / Work Experience</div>
             </div>
             <div class="experience-box">
+                <div class="vetical-line">|</div>
                 <div class="experience-item">
                     <div class="experience-item-left" style="transform: translateX(-4px)">
                         <i class="iconfont icon-B" ></i>
@@ -365,7 +383,7 @@
                         </div>
                         <div class="flex">
                             <div class="flex-1">
-                                <p> 把控运营采购经营风险将团队工作分成四个板块，各个关口做好把关及时做风险事项预警及报备 </p>
+                                <p> 把控运营采购经营风险，将团队工作分成四个板块，各个关口做好把关及时做风险事项预警及报备 </p>
                                 <div class="p-p">
                                     <p> I. 立项-进钱口：新客户运营风险降低、基准毛利率把控 </p>
                                     <p>II. 采购-出钱口：规避采购风险、宣扬采购意识</p>
@@ -380,9 +398,9 @@
                     <div class="experience-item-left">
                         <i class="iconfont icon-B1"></i>
                     </div>
-                    <div>
+                    <div class="flex-1">
                         <div class="experience-title">
-                            <div class="experience-company">
+                            <div class="experience-company flex-center">
                                 <span>福州牛班网络有限公司</span>
                                 <span>(2017.03 - 2017.08)</span>
                             </div>
@@ -390,16 +408,18 @@
                                 工作岗位：财务（实习）
                             </div>
                         </div>
-                        <p>
-                            1.负责日常收支的管理和核对
-2.办公室基本账务核对
-3.负责开具各项发票
-4.协助主管完成日常事务性工作
+                        <p>I. 负责日常收支的管理和核对
                         </p>
+                        <p>II. 办公室基本账务核对</p>
+                        <p>
+                            III. 负责开具各项发票
+                            
+                        </p>
+                        <p>V. 处理日常事务性工作</p>
                     </div>
                 </div>
             </div>
-            <div class="title">
+            <!-- <div class="title">
                 <div>兴趣爱好 / Interests</div>
             </div>
             <div class="flex-center interests-box">
@@ -443,27 +463,7 @@
                         听音乐
                     </div>
                 </div>
-            </div>
-            <div class="title">
-                <div>作品地址 & 联系方式 /Works & Contack </div>
-            </div>
-            <div class="works-items">
-                <div class="flex-center text_content contact_item">
-                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
-                </div>
-                <div class="flex-center text_content contact_item">
-                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
-                </div>
-                <div class="flex-center text_content contact_item">
-                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
-                </div>
-                <div class="flex-center text_content contact_item">
-                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
-                </div>
-                <div class="flex-center text_content contact_item">
-                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
-                </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </body>
