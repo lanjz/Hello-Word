@@ -3,6 +3,7 @@ module.exports = {
   title: 'Hello VuePress',
   // theme: '@vuepress/blog',
   description: 'Just playing around',  
+  port: 5000,
   themeConfig: {
       sidebarDepth: 2,
       nav: [

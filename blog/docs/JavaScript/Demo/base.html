@@ -11,26 +11,19 @@
 <script>
 function fetch(time){
     return new Promise((resolve, reject) => {
-      setTimeout(resolve, time)
+      setTimeout(resolve(10), time)
     })
   }
-const p1 = new Promise(function (resolve, reject) {
-  fetch(2000, true)
-  .then(res => {
-    resolve('data1')
-  })
-})
-Promise.resolve('执行成功')
-.then(res => {
-  console.log(res) // 执行成功
-  return 'then'
-})
-.finally(() => {
-  console.log('finally')
-  return 'F'
-})
-.then(res => {
-  console.log(res)
-})
+
+var gen = function* (){
+  var r1 = yield fetch(1000)
+  console.log(r1.toString());
+  var r2 = yield fetch(1000)
+  console.log(r2.toString());
+};
+var g = gen();
+var res = g.next()
+console.log(res)
+
 </script>
 </html>

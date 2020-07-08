@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_992689_m4gtgn3rc0o.css">
+    <style>
+        body{
+            font-family: '微软雅黑';
+            margin: 0;
+            padding: 40px 50px;
+            width: 100%;
+            background: #fff;
+        }
+        .head{
+            font-size: 30px;
+            padding-bottom: 40px;
+        }
+        .app{
+            display: flex;
+        }
+        *{
+            box-sizing: border-box;
+            color: #333;
+        }
+        p{
+            margin-bottom: 0;
+            margin-top: 12px;
+        }
+        .p-p p{
+            margin: 6px 0;
+            padding-left: 15px;
+        }
+        .title{
+            font-size: 15px;
+            position: relative;
+            border-bottom: dashed 1px #666;
+            padding: 8px 0;
+            margin-bottom: 25px;
+            margin-top: 40px;
+        }
+        .title_line{
+            position: relative;
+            margin: 6px 0;
+        }
+        .title_line:after{
+            content: "";
+            border-bottom: dashed 1px #333;
+            position: absolute;
+            margin-top: -1px;
+            top: 50%;
+            width: 100%;
+            left: 0;
+            bottom: 2px;
+        }
+        .title_line::before{
+            content: "";
+            width: 6px;
+            height: 6px;
+            display: block;
+            transform: rotate(45deg);
+            background:  #333;
+        }
+        .flex-center{
+            display: flex;
+            align-items: center;
+        }
+        .flex{
+            display: flex;
+        }
+        .flex-1{
+            flex: 1
+        }
+        .left{
+            width: 40%;
+            display: inline-block;
+            padding-right: 40px;
+        }
+        .right{
+            flex: 1
+        }
+        .contact_item{
+            margin: 15px 0;
+        }
+        .contact_item .iconfont{
+            margin-right: 8px;
+        }
+        .text_content{
+            font-size: 14px;
+            color: #666;
+        }
+        .specialities{
+            display: flex;
+            justify-content: space-between;
+        }
+        .specialities_item{
+        }
+        .specialities_item .raduis{
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            text-align: center;
+            border: solid 1px #666;
+            justify-content: center;
+        }
+        .specialities_item .raduis .iconfont{
+            font-size: 30px;
+        }
+        .specialities_item .specialty_name{
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+        }
+        .software-item{
+            margin-bottom: 20px;
+        }
+        .software-item .iconfont{
+            font-size: 26px;
+            margin-right: 8px;
+        }
+        .software-item .skill-name{
+            font-size: 12px;
+        }
+        .skill-line{
+            margin-top: 5px;
+            height: 2px;
+            background: #999;
+        }
+        .skill-rate{
+            width: 56%;
+            height: 2px;
+            background: #000;
+            position: relative;
+        }
+        .skill-rate::after{
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            right: 0;
+            top: -2px;
+        }
+        p{
+            font-size: 12px;
+            color: #666;
+            line-height: 22px;
+            text-align: justify;
+        }
+        .experience-item{
+            display: flex;
+            margin-bottom: 50px;
+        }
+        .experience-item-left{
+            margin-right: 4px;
+            background-color: #fff;
+            align-self: flex-start;
+            padding-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            left: -6px;
+        }
+         .experience-item-left::after{
+             content: '';
+             width: 100%;
+             height: 15px;
+             bottom: 100%;
+             background: #fff;
+             position: absolute;
+             left: 0;
+         }
+        .experience-item-left .iconfont{
+            font-size: 50px;
+        }
+        .experience-title{
+
+        }
+        .experience-title .experience-company{
+            border-bottom: solid 1px #666;
+            padding-bottom: 10px;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .experience-title .experience-company span:last-child{
+            font-size: 13px;
+        }
+        .experience-title .experience-summary{
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .experience-box{
+            position: relative;
+        }
+        .experience-box::after{
+            content: '';
+            position: absolute;
+            width: 1px;
+            background: #333;
+            left: 19px;
+            height: 100%;
+            top: 0;
+        }
+        .experience-box::before{
+            content: '';
+            position: absolute;
+            border-top: solid 10px #333;
+            border-left: solid 6px transparent;
+            border-right: solid 6px transparent;
+            left: 19px;
+            bottom: 0;
+            transform: translate(-5px, 1px);
+        }
+        .interests-box{
+            justify-content: space-between;
+        }
+        .interests-item{
+        
+            flex-shrink: 0;
+            text-align: center;
+            flex-grow: 0;
+        }
+        .interests-item .icon-box{
+            height: 60px;
+            justify-content: center;
+        }
+        .icon-box .iconfont{
+            font-size: 50px;
+        }
+        .interests-name{
+            font-size: 12px;
+            text-align: center;
+        }
+        .works-items{
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .works-items .contact_item{
+            width: 50%;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="head">
+        杨钰琴 | Yu Ki
+    </div>
+    <div class="app">
+        <div class="left">
+            <div class="title">
+                <div>基本信息 / Basic Info</div>
+            </div>
+            <div class="flex-center text_content contact_item">
+                <i class="iconfont icon-yonghu"></i><span>女 / 26岁(1994.09)</span>
+            </div>
+            <div class="flex-center text_content contact_item">
+                <i class="iconfont icon-didianPlaces110"></i><span>重庆市 巫山县</span>
+            </div>
+            <div class="flex-center text_content contact_item">
+                <i class="iconfont icon-xueli"></i><span>福建师范大学 / 协和学院 / 本科(全日制) </span>
+            </div>
+            <div class="flex-center text_content contact_item">
+                <i class="iconfont icon-dianhua"></i><span>18649823553</span>
+            </div>
+            <div class="flex-center text_content contact_item">
+                <i class="iconfont icon-youxiang"></i><span>598930468@qq.com</span>
+            </div>
+            <div class="title">
+                <div>我的标签 / My Label </div>
+                <div style="position: relative;">
+                    <div></div>
+                </div>
+            </div>
+            <div class="specialities">
+                <div class="specialities_item">
+                    <div class="raduis flex-center"> <i class="iconfont icon-jiaoliu1"></i></div>
+                    <div class="specialty_name">沟通</div>
+                </div>
+                <div class="specialities_item">
+                    <div class="raduis flex-center"> <i class="iconfont icon-xiezuo2"></i></div>
+                    <div class="specialty_name">协作</div>
+                </div>
+                <div class="specialities_item">
+                    <div class="raduis flex-center"> <i class="iconfont icon-yangguang"></i></div>
+                    <div class="specialty_name">抗压</div>
+                </div>
+            </div>
+            <div class="title">
+                <div>应用工具 /Software Skills</div>
+            </div>
+            <div class="software-item flex-center">
+                <i class="iconfont icon-word"></i>
+                <div class="flex-1">
+                    <div class="skill-name">  Word </div>
+                    <div class="skill-line">
+                        <div class="skill-rate skill-rate"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="software-item flex-center">
+                <i class="iconfont icon-excel"></i>
+                <div class="flex-1">
+                    <div class="skill-name"> Excel </div>
+                    <div class="skill-line">
+                        <div class="skill-rate skill-rate"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="software-item flex-center">
+                <i class="iconfont icon-ppt"></i>
+                <div class="flex-1">
+                    <div class="skill-name"> PPT </div>
+                    <div class="skill-line">
+                        <div class="skill-rate skill-rate"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="title">
+                <div>关于我 / About Me</div>
+            </div>
+            <p>
+                日前，安以轩在社交平台上传了自己打开麦当劳外卖包装时被热饮烫伤的视频，热饮被跟其他食物包装在一
+            </p>
+        </div>
+        <div class="right">
+            <div class="title">
+                <div>工作经验 / Work Experience</div>
+            </div>
+            <div class="experience-box">
+                <div class="experience-item">
+                    <div class="experience-item-left" style="transform: translateX(-4px)">
+                        <i class="iconfont icon-B" ></i>
+                    </div>
+                    <div>
+                        <div class="experience-title">
+                            <div class="experience-company flex-center">
+                                <span>深圳蓝色光标互动有限公司</span>
+                                <span>(2017.09 - 至今)</span>
+                            </div>
+                            <div class="experience-summary">
+                                工作岗位：运营管理
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <p class="flex-1">负责搭建运营管理全新体系负责深圳运营采购管理的搭建工作，工作拆解纵向变横向，制定相关运营策略和指标，带领团队完成实施计划</p>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-1">
+                                <p>统筹分析经营数据，协助经营决策时效性：负责深圳公司整体的运营数据分析工作，实时更新经营数据，并通过立项进度和指标对比实时同步给各级主管</p>
+                                <div class="p-p">
+                                    <p>
+                                        I. 准确性：经营数据以最终财报数据为导向，保证提供数据的准确性
+                                    </p>
+                                    <p>
+                                        II. 分析：数据底表横纵向更新对比，对各类数据融会贯通，切入要点，能进一步分析出好坏、快慢、优劣，提供经营决策参考
+                                    </p>
+                                    <p>
+                                        III. 特殊数据备忘：负责深圳整体的历史遗留特殊数据备忘，例如历史坏账等有可能产生的利润减少的特殊数据记录并持续跟进处理
+                                    </p>
+                                </div>
+                               
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="flex-1">
+                                <p> 把控运营采购经营风险将团队工作分成四个板块，各个关口做好把关及时做风险事项预警及报备 </p>
+                                <div class="p-p">
+                                    <p> I. 立项-进钱口：新客户运营风险降低、基准毛利率把控 </p>
+                                    <p>II. 采购-出钱口：规避采购风险、宣扬采购意识</p>
+                                    <p>III. 应收-回钱口：实时催收，了解客户系统回款情况，提升回款率、规避坏账风险</p>
+                                    <p>V. 运营-统筹：管理公司红线、统筹规划、保证公司利益</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="experience-item">
+                    <div class="experience-item-left">
+                        <i class="iconfont icon-B1"></i>
+                    </div>
+                    <div>
+                        <div class="experience-title">
+                            <div class="experience-company">
+                                <span>福州牛班网络有限公司</span>
+                                <span>(2017.03 - 2017.08)</span>
+                            </div>
+                            <div class="experience-summary">
+                                工作岗位：财务（实习）
+                            </div>
+                        </div>
+                        <p>
+                            1.负责日常收支的管理和核对
+2.办公室基本账务核对
+3.负责开具各项发票
+4.协助主管完成日常事务性工作
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="title">
+                <div>兴趣爱好 / Interests</div>
+            </div>
+            <div class="flex-center interests-box">
+                <div class="interests-item">
+                    <div class="icon-box flex-center">
+                        <i class="iconfont icon-shuji"></i>
+                    </div>
+                    <div class="interests-name">
+                        阅读
+                    </div>
+                </div>
+                <div class="interests-item">
+                    <div class="icon-box flex-center">
+                        <i class="iconfont icon-youxi"></i>
+                    </div>
+                    <div class="interests-name">
+                        游戏
+                    </div>
+                </div>
+                <div class="interests-item">
+                    <div class="icon-box flex-center">
+                        <i class="iconfont icon-pingpangqiu"></i>
+                    </div>
+                    <div class="interests-name">
+                        乒乓球
+                    </div>
+                </div>
+                <div class="interests-item">
+                    <div class="icon-box flex-center">
+                        <i class="iconfont icon-lvyou"></i>
+                    </div>
+                    <div class="interests-name">
+                        旅游
+                    </div>
+                </div>
+                <div class="interests-item">
+                    <div class="icon-box flex-center">
+                        <i class="iconfont icon-icon07"></i>
+                    </div>
+                    <div class="interests-name">
+                        听音乐
+                    </div>
+                </div>
+            </div>
+            <div class="title">
+                <div>作品地址 & 联系方式 /Works & Contack </div>
+            </div>
+            <div class="works-items">
+                <div class="flex-center text_content contact_item">
+                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
+                </div>
+                <div class="flex-center text_content contact_item">
+                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
+                </div>
+                <div class="flex-center text_content contact_item">
+                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
+                </div>
+                <div class="flex-center text_content contact_item">
+                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
+                </div>
+                <div class="flex-center text_content contact_item">
+                    <i class="iconfont icon-didianPlaces17"></i><span>女/22岁(1999.12)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
