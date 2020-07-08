@@ -505,7 +505,6 @@ function run (generator) {
 
   go(it.next());
 }
-
 run(g);
 
 ```
