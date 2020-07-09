@@ -6,7 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    
+
 </body>
 <script>
   function fetch(time, sue = true){
@@ -17,33 +17,43 @@
       }, time)
     })
   }
-/* 
 
-var gen = function* (){
-  var r1 = yield fetch(1000)
-  console.log(r1.toString());
-  var r2 = yield fetch(1000)
-  console.log(r2.toString());
-};
-var g = gen();
-var res = g.next()
-console.log(res) */
+  var gen = function* (){
+    var r1 = yield fetch(1000)
+    console.log(r1);
+    var r2 = yield fetch(1000)
+    console.log(r2);
+  };
+  function co(fn) {
+    debugger
+    const g = fn()
+    function next() {
+      const gg = g.next()
+      if(gg.done) return gg.value
+      gg.value.then(res => {
+        console.log('res', res)
+        next()
+      })
+    }
+    next()
+  }
+  co(gen)
 
-/* Promise.any([fetch(1000, false), fetch(1000)])
-  .then(res => {
-    console.log(res)
-  })
-  .catch(err => {
-    console.log('err', err) // err, err
-  }) */
+  /* Promise.any([fetch(1000, false), fetch(1000)])
+    .then(res => {
+      console.log(res)
+    })
+    .catch(err => {
+      console.log('err', err) // err, err
+    }) */
 
-const p = Promise.resolve('Hello');
+  const p = Promise.resolve('Hello');
 
-p.then(function (s){
-  console.log(s)
-});
-console.log('aaa')
-// Hello
+  p.then(function (s){
+    console.log(s)
+  });
+  console.log('aaa')
+  // Hello
 
 </script>
 </html>
