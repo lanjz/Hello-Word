@@ -15,7 +15,6 @@ module.exports = {
   '/JavaScript/': [
     '/JavaScript/JS基础',
     '/JavaScript/JS核心',
-    '/JavaScript/ES6',
     '/JavaScript/编写高质量JavaScript代码的基本要点',
     '/JavaScript/函数',
     '/JavaScript/全面解析Module模式',
@@ -28,6 +27,7 @@ module.exports = {
       collapsable: false,
       children: [
         '/JavaScript/guide/',
+        '/JavaScript/函数的扩展/',
         '/JavaScript/ES6/Symbol',
         '/JavaScript/ES6/数组',
         '/JavaScript/ES6/对象',
@@ -36,6 +36,7 @@ module.exports = {
         '/JavaScript/ES6/Promise',
         '/JavaScript/ES6/Iterator',
         '/JavaScript/ES6/Generater',
+        '/JavaScript/ES6/async函数',
         '/JavaScript/ES6/Proxy',
         '/JavaScript/ES6/Class',
         '/JavaScript/ES6/Class继承',

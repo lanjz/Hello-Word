@@ -511,3 +511,150 @@ run(g);
 
 上面代码的 Generator 函数 `g` 之中，有一个异步操作 `getFoo`，它返回的就是一个 Promise 对象。函数`run` 用来处理这个 Promise 对象，并调用下一个 `next` 方法。
 
+## Promise实现
+
+下面是 Promise 的简单实现
+
+```js
+class myPromise{
+    constructor(handle) {
+      this.status = 'PENDING'
+      try{
+        handle(this.resolve.bind(this), this.reject.bind(this))
+      } catch (e){
+        this.reject(e)
+      }
+      this.doResolve = null
+      this.doReject = null
+    }
+    resolve(val){
+      if(this.status !== 'PENDING') return
+      this.status === 'FULFILLED'
+      queueMicrotask(() => {
+        this.doResolve(val)
+      })
+    }
+    reject(val){
+      if(this.status !== 'PENDING') return
+      this.status === 'REJECTED'
+       queueMicrotask(() => {
+        this.doReject(val)
+      })
+    }
+    then(fn) {
+      this.doResolve = fn
+    }
+    catch(fn) {
+      this.doReject = fn
+    }
+  }
+  var pro = new myPromise((resolve, reject) => {
+    setTimeout(() => {resolve('执行成功')}, 2000)
+  })
+  pro.then(res => {console.log(res)})
+```
+
+- 使用 `queueMicrotask` 将 `then` 的执行加入到微任务队列中
+
+- `handle(this.resolve.bind(this), this.reject.bind(this))`，传递自己的 `resolve` 和 `reject` 实例给外面的使用
+
+### 支持多个then
+
+```js
+  class myPromise{
+    constructor(handle) {
+      this.status = 'PENDING'
+      try{
+        handle(this.resolve.bind(this), this.reject.bind(this))
+      } catch (e){
+        this.reject(e)
+      }
+      this.doResolve = []
+      this.doReject = null
+    }
+    resolve(val){
+      if(this.status !== 'PENDING') return
+      this.status === 'FULFILLED'
+      queueMicrotask(() => {
+        this.doResolve.forEach(itemFn => {
+          itemFn(val)
+        })
+      })
+    }
+    reject(val){
+      if(this.status !== 'PENDING') return
+      this.status === 'REJECTED'
+       queueMicrotask(() => {
+        this.doReject(val)
+      })
+    }
+    then(fn) {
+      this.doResolve.push(fn)
+    }
+    catch(fn) {
+      this.doReject = fn
+    }
+  }
+  var pro = new myPromise((resolve, reject) => {
+    setTimeout(() => {resolve('执行成功')}, 2000)
+  })
+  pro.then(res => {console.log(res)})
+  pro.then(res => {console.log('then2'+res)})
+```
+
+### then返回promise
+
+```js
+ class myPromise{
+    constructor(handle) {
+      this.status = 'PENDING'
+      try{
+        handle(this.resolve.bind(this), this.reject.bind(this))
+      } catch (e){
+        this.reject(e)
+      }
+      this.doResolve = []
+      this.doReject = null
+      this.sonResovle = null
+      this.sonReject = null
+    }
+    resolve(val){
+      if(this.status !== 'PENDING') return
+      this.status === 'FULFILLED'
+      queueMicrotask(() => {
+        this.doResolve.forEach(itemFn => {
+          itemFn(val)
+          this.sonResovle(val)
+        })
+      })
+      
+    }
+    reject(val){
+      if(this.status !== 'PENDING') return
+      this.status === 'REJECTED'
+      queueMicrotask(() => {
+       this.doReject(val)
+      })
+      
+    }
+    then(fn) {
+      this.doResolve.push(fn)
+      const _this = this
+      return new myPromise((resolve, reject) => {
+        _this.sonResovle = resolve
+        _this.sonReject = reject
+      })
+    }
+    catch(fn) {
+      this.doReject = fn
+    }
+  }
+  var pro = new myPromise((resolve, reject) => {
+    setTimeout(() => {resolve('执行成功')}, 2000)
+  })
+  pro.then(res => {console.log(res)})
+  pro.then(res => {console.log('then2'+res)})
+    .then(res => console.log('sonThen' + res))
+    .then(res => console.log('sonThen2' + res))
+
+```

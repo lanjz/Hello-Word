@@ -660,7 +660,7 @@ console.log(
 function* main() {
   var result = yield request("http://some.url");
   var resp = JSON.parse(result);
-    console.log(resp.value);
+  console.log(resp.value);
 }
 
 function request(url) {
@@ -688,7 +688,7 @@ function* numbers() {
 }
 ```
 
-###　控制流管理
+### 控制流管理
 
 如果有一个多步操作非常耗时，采用回调函数，可能会写成下面这样
 
@@ -795,4 +795,248 @@ gen.next().value // 'ya'
 gen.next().done  // true
 ```
 
+### Generator 的异步应用
 
+#### Thunk 函数
+
+将参数放到一个临时函数之中，再将这个临时函数传入函数体。这个临时函数就叫做 Thunk 函数
+
+```js
+function f(m) {
+  return m * 2;
+}
+
+f(x + 5);
+
+// 等同于
+
+var thunk = function () {
+  return x + 5;
+};
+
+function f(thunk) {
+  return thunk() * 2;
+}
+
+```
+
+上面代码中，函数 `f` 的参数 `x + 5` 被一个函数替换了。凡是用到原参数的地方，对  Thunk函数求值即可。
+
+这就是 Thunk 函数的定义，它是“传名调用”的一种实现策略，用来替换某个表达式
+
+#### co 模块
+
+co 模块用于 Generator 函数的自动执行
+
+下面是一个 Generator 函数，用于依次读取两个文件
+
+```js
+var gen = function* () {
+  var f1 = yield readFile('/etc/fstab');
+  var f2 = yield readFile('/etc/shells');
+  console.log(f1.toString());
+  console.log(f2.toString());
+};
+
+```
+
+co 模块可以让你不用编写 Generator 函数的执行器。
+
+```js
+var co = require('co');
+co(gen);
+```
+
+上面代码中，Generator 函数只要传入 co 函数，就会自动执行。
+
+co 函数返回一个 `Promise` 对象，因此可以用 `then` 方法添加回调函数
+
+```js
+co(gen).then(function (){
+  console.log('Generator 函数执行完成');
+})
+```
+
+#### co 模块的原理
+
+Generator 就是一个异步操作的容器。它的自动执行需要一种机制，当异步操作有了结果，能够自动交回执行权
+
+两种方法可以做到这一点
+
+1. 回调函数。将异步操作包装成 Thunk 函数，在回调函数里面交回执行权
+
+2. Promise 对象。将异步操作包装成 Promise 对象，用then方法交回执行权
+
+co 模块其实就是将两种自动执行器（Thunk 函数和 Promise 对象），包装成一个模块。使用 co 的前提条件是，Generator 函数的yield命令后面，只能是 Thunk 函数或 Promise 对象.如果数组或对象的成员，全部都是 Promise 对象，也可以使用 co
+
+**基于 Promise 对象的自动执行**
+
+```js
+function fetch(time, sue = true, info){
+    return new Promise((resolve, reject) => {
+      let callback = sue ? resolve : reject
+      setTimeout(() => {
+        callback(info)
+      }, time)
+    })
+  }
+
+  var gen = function* (){
+    var r1 = yield fetch(1000, true, 1)
+    console.log(r1);
+    var r2 = yield fetch(1000, true, 2)
+    console.log(r2);
+    var r3 = yield fetch(1000, true, 3)
+    console.log(r3);
+  };
+  var g = gen();
+
+  g.next().value.then(function(data){
+    g.next(data).value.then(function(data){
+      g.next(data);
+    });
+  });
+```
+
+上面是一个手动执行的例子，手动执行其实就是用 `then` 方法，层层添加回调函数。理解了这一点，就可以写出一个自动执行器
+
+```js
+  var gen = function* (){
+    var r1 = yield fetch(1000)
+    var r2 = yield fetch(1000)
+    var r3 = yield fetch(1000)
+  };
+  function co(fn) {
+    const g = fn()
+    function next() {
+      const gg = g.next()
+      if(gg.done) return gg.value
+      gg.value.then(res => {
+        console.log('res', res)
+        next()
+      })
+    }
+    next()
+  }
+  co(gen)
+```
+
+**co 模块的源码**
+
+首先，co 函数接受 Generator 函数作为参数，返回一个 Promise 对象
+
+```js
+function co(gen) {
+  var ctx = this;
+
+  return new Promise(function(resolve, reject) {
+  });
+}
+```
+
+在返回的 Promise 对象里面，co 先检查参数 `gen` 是否为 Generator 函数。如果是，就执行该函数，得到一个内部指针对象；如果不是就返回，并将 Promise 对象的状态改为 `resolved` 。
+
+```js
+function co(gen) {
+  var ctx = this;
+
+  return new Promise(function(resolve, reject) {
+    if (typeof gen === 'function') gen = gen.call(ctx);
+    if (!gen || typeof gen.next !== 'function') return resolve(gen);
+  });
+}
+
+```
+
+接着，co 将 Generator 函数的内部指针对象的 `next` 方法，包装成 `onFulfilled` 函数。这主要是为了能够捕捉抛出的错误
+
+```js
+function co(gen) {
+  var ctx = this;
+
+  return new Promise(function(resolve, reject) {
+    if (typeof gen === 'function') gen = gen.call(ctx);
+    if (!gen || typeof gen.next !== 'function') return resolve(gen);
+
+    onFulfilled();
+    function onFulfilled(res) {
+      var ret;
+      try {
+        ret = gen.next(res);
+      } catch (e) {
+        return reject(e);
+      }
+      next(ret);
+    }
+  });
+}
+```
+
+最后，就是关键的 `next` 函数，它会反复调用自身
+
+```js
+function next(ret) {
+  if (ret.done) return resolve(ret.value);
+  var value = toPromise.call(ctx, ret.value);
+  if (value && isPromise(value)) return value.then(onFulfilled, onRejected);
+  return onRejected(
+    new TypeError(
+      'You may only yield a function, promise, generator, array, or object, '
+      + 'but the following object was passed: "'
+      + String(ret.value)
+      + '"'
+    )
+  );
+}
+
+```
+
+上面代码中，`next` 函数的内部代码，一共只有四行命令。
+
+第一行，检查当前是否为 Generator 函数的最后一步，如果是就返回。
+
+第二行，确保每一步的返回值，是 Promise 对象。
+
+第三行，使用 `then` 方法，为返回值加上回调函数，然后通过 `onFulfilled` 函数再次调用 `next` 函数。
+
+第四行，在参数不符合要求的情况下（参数非 Thunk 函数和 Promise 对象），将 Promise 对象的状态改为 `rejected`，从而终止执行
+
+**处理并发的异步操作**
+
+co 支持并发的异步操作，即允许某些操作同时进行，等到它们全部完成，才进行下一步。
+
+这时，要把并发的操作都放在数组或对象里面，跟在 `yield` 语句后面
+
+```js
+// 数组的写法
+co(function* () {
+  var res = yield [
+    Promise.resolve(1),
+    Promise.resolve(2)
+  ];
+  console.log(res);
+}).catch(onerror);
+
+// 对象的写法
+co(function* () {
+  var res = yield {
+    1: Promise.resolve(1),
+    2: Promise.resolve(2),
+  };
+  console.log(res);
+}).catch(onerror);
+
+// 下面是另一个例子
+
+co(function* () {
+  var values = [n1, n2, n3];
+  yield values.map(somethingAsync);
+});
+
+function* somethingAsync(x) {
+  // do something async
+  return y
+}
+```
+
+上面的代码允许并发三个 `somethingAsync` 异步操作，等到它们全部完成，才会进行下一步

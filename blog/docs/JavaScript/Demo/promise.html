@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+ class myPromise{
+    constructor(handle) {
+      this.status = 'PENDING'
+      try{
+        handle(this.resolve.bind(this), this.reject.bind(this))
+      } catch (e){
+        this.reject(e)
+      }
+      this.doResolve = []
+      this.doReject = null
+      this.sonResovle = null
+      this.sonReject = null
+    }
+    resolve(val){
+      if(this.status !== 'PENDING') return
+      this.status === 'FULFILLED'
+      queueMicrotask(() => {
+        this.doResolve.forEach(itemFn => {
+          itemFn(val)
+          this.sonResovle(val)
+        })
+      })
+      
+    }
+    reject(val){
+      if(this.status !== 'PENDING') return
+      this.status === 'REJECTED'
+      queueMicrotask(() => {
+       this.doReject(val)
+      })
+      
+    }
+    then(fn) {
+      this.doResolve.push(fn)
+      const _this = this
+      return new myPromise((resolve, reject) => {
+        _this.sonResovle = resolve
+        _this.sonReject = reject
+      })
+    }
+    catch(fn) {
+      this.doReject = fn
+    }
+  }
+  var pro = new myPromise((resolve, reject) => {
+    setTimeout(() => {resolve('执行成功')}, 2000)
+  })
+  pro.then(res => {console.log(res)})
+  pro.then(res => {console.log('then2'+res)})
+    .then(res => console.log('sonThen' + res))
+    .then(res => console.log('sonThen2' + res))
+    </script>
+</body>
+</html>
