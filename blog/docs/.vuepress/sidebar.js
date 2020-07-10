@@ -27,7 +27,7 @@ module.exports = {
       collapsable: false,
       children: [
         '/JavaScript/guide/',
-        '/JavaScript/函数的扩展/',
+        '/JavaScript/ES6/函数的扩展',
         '/JavaScript/ES6/Symbol',
         '/JavaScript/ES6/数组',
         '/JavaScript/ES6/对象',
@@ -40,6 +40,8 @@ module.exports = {
         '/JavaScript/ES6/Proxy',
         '/JavaScript/ES6/Class',
         '/JavaScript/ES6/Class继承',
+        '/JavaScript/ES6/Module',
+        '/JavaScript/ES6/Module的加载实现'
       ]
     }
    /*  {
