@@ -271,3 +271,364 @@ import submodule from 'es-module-package/submodule';
 ```
 
 上面代码中，老版本的 Node.js （不支持 ES6 模块）的入口文件是 `main-legacy.cjs` ，新版本的 Node.js 的入口文件是`main-modern.cjs`
+
+**条件加载**
+
+利用 `.` 这个别名，可以为 ES6 模块和 CommonJS 指定不同的入口。目前，这个功能需要在 Node.js 运行的时候，打开 `--experimental-conditional-exports` 标志
+
+```js
+{
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": "./main.cjs",
+      "default": "./main.js"
+    }
+  }
+}
+```
+
+上面代码中，别名 `.` 的 `require` 条件指定 `require()` 命令的入口文件（即 CommonJS 的入口），`default` 条件指定其他情况的入口（即 ES6 的入口）。
+
+上面的写法可以简写如下
+
+```js
+{
+  "exports": {
+    "require": "./main.cjs",
+    "default": "./main.js"
+  }
+}
+```
+
+注意，如果同时还有其他别名，就不能采用简写，否则或报错
+
+```js
+{
+  // 报错
+  "exports": {
+    "./feature": "./lib/feature.js",
+    "require": "./main.cjs",
+    "default": "./main.js"
+  }
+}
+```
+
+## ES6 模块加载 CommonJS 模块
+
+目前，一个模块同时支持 ES6 和 CommonJS 两种格式的常见方法是，`package.json` 文件的 `main` 字段指定 CommonJS 入口，给 Node.js 使用；`module` 字段指定 ES6 模块入口，给打包工具使用，因为 Node.js 不认识 ``module` 字段。
+
+有了上一节的条件加载以后，Node.js 本身就可以同时处理两种模块
+
+```js
+// ./node_modules/pkg/package.json
+{
+  "type": "module",
+  "main": "./index.cjs",
+  "exports": {
+    "require": "./index.cjs",
+    "default": "./wrapper.mjs"
+  }
+}
+```
+
+上面代码指定了 CommonJS 入口文件 `index.cjs` ，下面是这个文件的代码
+
+```js
+// ./node_modules/pkg/index.cjs
+exports.name = 'value';
+```
+
+然后，ES6 模块可以加载这个文件
+
+```js
+// ./node_modules/pkg/wrapper.mjs
+import cjsModule from './index.cjs';
+export const name = cjsModule.name;
+```
+
+注意，`import` 命令加载 CommonJS 模块，只能整体加载，不能只加载单一的输出项
+
+```js
+// 正确
+import packageMain from 'commonjs-package';
+
+// 报错
+import { method } from 'commonjs-package';
+```
+
+还有一种变通的加载方法，就是使用 Node.js 内置的 `module.createRequire()` 方法。
+
+```js
+// cjs.cjs
+module.exports = 'cjs';
+
+// esm.mjs
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+
+const cjs = require('./cjs.cjs');
+cjs === 'cjs'; // true
+```
+
+上面代码中，ES6 模块通过 `module.createRequire()` 方法可以加载 CommonJS 模块
+
+## CommonJS 模块加载 ES6 模块 
+
+CommonJS 的 `require` 命令不能加载 ES6 模块，会报错，只能使用 `import()` 这个方法加载
+
+```js
+(async () => {
+  await import('./my-app.mjs');
+})();
+```
+
+上面代码可以在 CommonJS 模块中运行
+
+## Node.js 的内置模块
+
+Node.js 的内置模块可以整体加载，也可以加载指定的输出项
+
+```js
+// 整体加载
+import EventEmitter from 'events';
+const e = new EventEmitter();
+
+// 加载指定的输出项
+import { readFile } from 'fs';
+readFile('./foo.txt', (err, source) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(source);
+  }
+});
+```
+
+## 加载路径
+
+ES6 模块的加载路径必须给出脚本的完整路径，不能省略脚本的后缀名。`import` 命令和 `package.json` 文件的 `main` 字段如果省略脚本的后缀名，会报错。
+
+```js
+// ES6 模块中将报错
+import { something } from './index';
+```
+
+为了与浏览器的 `import` 加载规则相同，Node.js 的 `.mjs` 文件支持 URL 路径
+
+```js
+import './foo.mjs?query=1'; // 加载 ./foo 传入参数 ?query=1
+```
+
+上面代码中，脚本路径带有参数 `?query=1` ，Node 会按 URL 规则解读。同一个脚本只要参数不同，就会被加载多次，并且保存成不同的缓存。由于这个原因，只要文件名中含有 `:` 、`%` 、 `#` 、`?` 等特殊字符，最好对这些字符进行转义。
+
+目前，Node.js 的 `import` 命令只支持加载本地模块（`file:`协议）和 `data:` 协议，不支持加载远程模块。另外，脚本路径只支持相对路径，不支持绝对路径（即以 `/` 或 `//` 开头的路径）。
+
+最后，Node 的 `import` 命令是异步加载，这一点与浏览器的处理方法相同
+
+## 内部变量
+
+ES6 模块之中，顶层的 `this` 指向 `undefined`
+
+CommonJS 模块的顶层 `this` 指向当前模块，这是两者的一个重大差异
+
+其次，以下这些顶层变量在 ES6 模块之中都是不存在的
+
+- `arguments`
+
+- `require`
+
+- `module`
+
+- `exports`
+
+- `__filename`
+
+- `__dirname`
+
+
+## CommonJS 模块的加载原理
+
+CommonJS 的一个模块，就是一个脚本文件。`require` 命令第一次加载该脚本，就会执行整个脚本，然后在内存生成一个对象
+
+```js
+{
+  id: '...',
+  exports: { ... },
+  loaded: true,
+  ...
+}
+```
+
+上面代码就是 Node 内部加载模块后生成的一个对象
+
+- `id`: 表示模块名
+
+- `exports`: 模块输出的各个接口
+
+- `loaded`: 一个布尔值，表示该模块的脚本是否执行完毕
+
+以后需要用到这个模块的时候，就会到 `exports` 属性上面取值。即使再次执行 `require` 命令，也不会再次执行该模块，而是到缓存之中取值。也就是说，CommonJS 模块无论加载多少次，都只会在第一次加载时运行一次，以后再加载，就返回第一次运行的结果，除非手动清除系统缓存
+
+## CommonJS 模块的循环加载
+
+CommonJS 模块的重要特性是加载时执行，即脚本代码在 `require` 的时候，就会全部执行。一旦出现某个模块被"循环加载"，就只输出已经执行的部分，还未执行的部分不会输出
+
+```js
+// a.js
+exports.done = false;
+var b = require('./b.js');
+console.log('在 a.js 之中，b.done = %j', b.done);
+exports.done = true;
+console.log('a.js 执行完毕');
+
+// b.js
+exports.done = false;
+var a = require('./a.js');
+console.log('在 b.js 之中，a.done = %j', a.done);
+exports.done = true;
+console.log('b.js 执行完毕');
+```
+
+上面代码之中，`a.js` 脚本先输出一个 `done` 变量，然后加载另一个脚本文件 `b.js` 。注意，此时 `a.js` 代码就停在这里，等待 `b.js` 执行完毕，再往下执行
+
+`b.js` 执行到第二行，就会去加载 `a.js` ，这时，就发生了“循环加载”。系统会去 `a.js` 模块对应对象的 `exports` 属性取值，可是此时 `a.js` 只执行了 `exports.done = false`，所以从 `a.js` 只输入一个变量 `done` ，值为 `false`
+
+然后，`b.js` 接着往下执行，等到全部执行完毕，再把执行权交还给 `a.js` 。于是，`a.js` 接着往下执行，直到执行完毕
+
+## ES6 模块的循环加载
+
+ES6 处理“循环加载”与 CommonJS 有本质的不同。ES6 模块是动态引用，如果使用 `import` 从一个模块加载变量（即 `import foo from 'foo'` ），那些变量不会被缓存，而是成为一个指向被加载模块的引用
+
+```js
+// a.mjs
+import {bar} from './b';
+console.log('a.mjs');
+console.log(bar);
+export let foo = 'foo';
+
+// b.mjs
+import {foo} from './a';
+console.log('b.mjs');
+console.log(foo);
+export let bar = 'bar';
+```
+
+上面代码中，`a.mjs` 加载 `b.mjs` ，`b.mjs` 又加载 `a.mjs`，构成循环加载。执行 `a.mjs` ，结果如下:
+
+```js
+$ node --experimental-modules a.mjs
+b.mjs
+ReferenceError: foo is not defined
+```
+
+首先，执行 `a.mjs` 以后，引擎发现它加载了 `b.mjs` ，因此会优先执行 `b.mjs`
+
+执行 `b.mjs` 的时候，已知它从 `a.mjs` 输入了 `foo` 接口，这时不会去执行 `a.mjs`，而是认为这个接口已经存在了，继续往下执行
+
+执行到第三行 `console.log(foo)` 的时候，才发现这个接口根本没定义，因此报错
+
+解决这个问题的方法，就是让 `b.mjs` 运行的时候，`foo` 已经有定义了。这可以通过将 `foo` 写成函数来解决
+
+```js
+// a.mjs
+import {bar} from './b';
+console.log('a.mjs');
+console.log(bar());
+function foo() { return 'foo' }
+export {foo};
+
+// b.mjs
+import {foo} from './a';
+console.log('b.mjs');
+console.log(foo());
+function bar() { return 'bar' }
+export {bar};
+```
+
+这时再执行 `a.mjs` 就可以得到预期结果
+
+```js
+$ node --experimental-modules a.mjs
+b.mjs
+foo
+a.mjs
+bar
+```
+
+这是因为函数具有提升作用，在执行 `import {bar} from './b'` 时，函数 `foo` 就已经有定义了，所以 `b.mjs` 加载的时候不会报错。这也意味着，如果把函数 `foo` 改写成函数表达式，也会报错
+
+```js
+// a.mjs
+import {bar} from './b';
+console.log('a.mjs');
+console.log(bar());
+const foo = () => 'foo';
+export {foo};
+```
+
+上面代码的第四行，改成了函数表达式，就不具有提升作用，执行就会报错。
+
+我们再来看 ES6 模块加载器 `SystemJS` 给出的一个例子
+
+```js
+// even.js
+import { odd } from './odd'
+export var counter = 0;
+export function even(n) {
+  counter++;
+  return n === 0 || odd(n - 1);
+}
+
+// odd.js
+import { even } from './even';
+export function odd(n) {
+  return n !== 0 && even(n - 1);
+}
+```
+
+上面代码中，`even.js` 里面的函数 `even` 有一个参数 `n`，只要不等于 `0`，就会减去 `1`，传入加载的 `odd()`。`odd.js` 也会做类似操作
+
+```js
+$ babel-node
+> import * as m from './even.js';
+> m.even(10);
+true
+> m.counter
+6
+> m.even(20)
+true
+> m.counter
+17
+```
+
+上面代码中，参数 `n` 从 `10` 变为 `0` 的过程中，`even()` 一共会执行 `6` 次，所以变量 `counter` 等于 `6`。第二次调用 `even()` 时，参数 `n` 从 `20` 变为 `0` ，`even()` 一共会执行 `11` 次，加上前面的 `6` 次，所以变量 `counter` 等于 `17`
+
+这个例子要是改写成 CommonJS，就根本无法执行，会报错
+
+```js
+// even.js
+var odd = require('./odd');
+var counter = 0;
+exports.counter = counter;
+exports.even = function (n) {
+  counter++;
+  return n == 0 || odd(n - 1);
+}
+
+// odd.js
+var even = require('./even').even;
+module.exports = function (n) {
+  return n != 0 && even(n - 1);
+}
+```
+
+上面代码中，`even.js` 加载 `odd.js` ，而 `odd.js` 又去加载 `even.js` ，形成“循环加载”。这时，执行引擎就会输出`even.js` 已经执行的部分（不存在任何结果），所以在 `odd.js` 之中，变量 `even` 等于 `undefined` ，等到后面调用 `even(n - 1)` 就会报错
+
+```js
+$ node
+> var m = require('./even');
+> m.even(10)
+TypeError: even is not a function
+```

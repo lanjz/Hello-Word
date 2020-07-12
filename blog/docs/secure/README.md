@@ -14,7 +14,7 @@ XSS 的原理是恶意攻击者往 Web 页面里插入恶意可执行网页脚�
 
 假设页面中有如下代码
 
-```
+```js
 if(location.href.indexOf('default=') > -1) {
       let getDefault = decodeURI(location.href.substring(location.href.indexOf('default=') + 8))
       console.log(getDefault)
@@ -24,7 +24,7 @@ if(location.href.indexOf('default=') > -1) {
 
 现在我们URL的参数为： `?default=<script>alert(document.cookie)</script>`
 
-刷新页面后，会出现`alert`提示，说明成功执行了攻击代码
+刷新页面后，会出现 `alert` 提示，说明成功执行了攻击代码
 
 非持久XSS漏洞攻击有以下特征：
 
@@ -42,7 +42,7 @@ if(location.href.indexOf('default=') > -1) {
    
 给上例的中代码添加`escape()`
 
-```
+```js
 <script>
   if(location.href.indexOf('default=') > -1) {
     let getDefault = decodeURI(location.href.substring(location.href.indexOf('default=') + 8))
@@ -106,7 +106,7 @@ if(location.href.indexOf('default=') > -1) {
 
 这个字符集为了通过 `7bit` 来表示所有的文字, 除去数字和一部分的符号,其它的部分将都以 `base64` 编码为基础的方式呈现。
 
-```
+```js
 <script>alert("xss")</script>
 可以被解释为：
 +ADw-script+AD4-alert(+ACI-xss+ACI-)+ADw-/script+AD4-
@@ -184,7 +184,7 @@ CSRF 预防方案
 
 - 恶意网站B请求时设置`credentials`，如下
 
-  ```
+  ```js
   fetch('http://localhost:3001/api/users', {
     credentials: 'include'
   }).then(response => response.json())
@@ -209,7 +209,7 @@ CSRF 预防方案
 
 form表单可以跨域一个历史原因是要保持兼容性，因为form表单会刷新页面不会把结果返回给js，所以认为是安全的
 
-```
+```js
 <form id="aaa" action="http://localhost:3001/api/csrf" method="POST" display="none">
     <input type="text" name="accountNum" value="10001"/>
     <input type="text" name="money" value="10000"/>
@@ -265,7 +265,7 @@ form表单可以跨域一个历史原因是要保持兼容性，因为form表单
 
 对于某些远古浏览器来说，并不能支持上面的这种方式，那我们只有通过 JS 的方式来防御点击劫持了
 
-```
+```html
 <head>
   <style id="click-jack">
     html {

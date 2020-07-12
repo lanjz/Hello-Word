@@ -1,9 +1,9 @@
 const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const webpack = require('webpack');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const smp = new SpeedMeasurePlugin()
 const HappyPack = require('happypack')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
@@ -13,11 +13,11 @@ const config = (env) => {
     const devMode = process.env.NODE_ENV !== 'production'
     return {
         entry: {
-            index: './src/index.js',
+            index: './src/index.js'
         },
         output: {
-            filename: '[name].[hash].js',
-            chunkFilename: '[name].[chunkhash].js',
+            filename: '[name].[hash].js', // 输出文件的文件
+            chunkFilename: '[name].[chunkhash].js', // 非入口打包出的文件名称
             path: path.resolve(__dirname, 'dist'),
         },
         resolveLoader: {
@@ -89,8 +89,9 @@ const config = (env) => {
             ]
         },
         optimization: { // 作用同于 new webpack.optimize.CommonsChunkPlugin(
-            minimize: false,
+            // minimize: false,
             splitChunks: {
+                minChunks: 2,
                 cacheGroups: {
                     /*  commons: {
                            name: "commons",

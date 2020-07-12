@@ -6,7 +6,10 @@
   "scripts": {
     "start": "webpack-dev-server --colors --env.bool --env.moke=1",
     "test": "webpack --config webpack.test.config.js --progress --colors ",
-    "build": "webpack --config webpack.prod.js --env.NODE_ENV=local"
+    "build": "webpack --config webpack.prod.js --env.NODE_ENV=local",
+    "start:m": "webpack-dev-server --colors --env.multy --env.moke=1",
+    "build:m": "webpack --config webpack.prod.js --env.NODE_ENV=local --env.multy",
+    "multy": "node dev.multy.server.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -49,8 +52,12 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "@babel/preset-react": "^7.10.4",
     "axios": "^0.19.2",
     "core-js": "2",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "webpack-hot-middleware": "^2.25.0"
   }
 }

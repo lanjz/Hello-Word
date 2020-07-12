@@ -12,6 +12,9 @@ module.exports = {
   '/secure/': [
     '/secure/'
   ],
+  '/利其器/': [
+    '/利其器/Mac'
+  ],
   '/JavaScript/': [
     '/JavaScript/JS基础',
     '/JavaScript/JS核心',
@@ -87,5 +90,13 @@ module.exports = {
     '/network/Cookie',
     '/network/DNS',
     '/network/TCP',
+  ],
+  '/Node/Webpack/': [
+    '/Node/Webpack/配置小记',
+    '/Node/Webpack/构建速度优化',
+    '/Node/Webpack/开发效率优化',
+    '/Node/Webpack/Plugin',
+    '/Node/Webpack/Webpack流程分析',
+    '/Node/Webpack/吱不吱',
   ]
 }

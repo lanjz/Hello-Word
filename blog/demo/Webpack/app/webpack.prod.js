@@ -11,12 +11,12 @@ module.exports = (env) => {
 				mode: 'production',
 				// devtool: 'source-map',
 				plugins: [
-					new UglifyJSPlugin({
+				/* 	new UglifyJSPlugin({
 						sourceMap: true,
 						// cache: 'path/to/cache',
 						parallel: true
 					}),
-				
+				 */
 				]
 			}
 		))
