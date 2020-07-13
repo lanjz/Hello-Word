@@ -45,11 +45,15 @@ app.get('/:viewname?', function(req, res, next) {
         res.end();
     });
 });
+/*app.get('/', function(){
+    console.log('/')
+    console.log('__dirname', __dirname)
+})*/
 app.use(express.static(path.join(__dirname, '../')));
 module.exports = app.listen(8080, function(err) {
     if (err) {
         // do something
         return;
     }
-    console.log('Listening at http://localhost:' + '8000' + '\n')
+    console.log('Listening at http://localhost:' + '8080' + '\n')
 })

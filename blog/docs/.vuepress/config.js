@@ -43,6 +43,7 @@ module.exports = {
           }, */
         ]
       },
+      { text: '算法', link: '/' },
       { 
         text: '工程化', 
         items: [
