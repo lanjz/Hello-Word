@@ -13,7 +13,8 @@ const config = (env) => {
     const devMode = process.env.NODE_ENV !== 'production'
     return {
         entry: {
-            index: './src/index.js'
+            a: './src/views/a/index.js',
+            b: './src/views/b/index.js'
         },
         output: {
             filename: '[name].[hash].js', // 输出文件的文件

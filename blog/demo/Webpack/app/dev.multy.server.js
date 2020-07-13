@@ -26,14 +26,19 @@ var devMiddleware = WebpackDevMiddleware(compiler, {
 app.use(devMiddleware)
 app.use(webpackHotMiddleware(compiler))
 
+app.get('/', function(req, res){
+    res.send(webpackConfig)
+})
+app.get('/favicon.ico', function(req, res){
+    res.send('')
+})
 // 路由
-app.get('/:viewname?', function(req, res, next) {
+app.get('/:viewname', function(req, res, next) {
+    console.log('/:viewname', req.params.viewname)
     var viewname = req.params.viewname 
-        ? req.params.viewname + '.html' 
-        : 'index.html';
-
+    console.log(viewname)
     var filepath = path.join(compiler.outputPath, viewname);
-
+    console.log('filepath', filepath)
     // 使用webpack提供的outputFileSystem
     compiler.outputFileSystem.readFile(filepath, function(err, result) {
         if (err) {
@@ -45,12 +50,12 @@ app.get('/:viewname?', function(req, res, next) {
         res.end();
     });
 });
-/*app.get('/', function(){
-    console.log('/')
-    console.log('__dirname', __dirname)
-})*/
+app.get('/t', function(req, res){
+    res.send('t')
+})
+console.log('path.join(__dirname, \'../\')', path.join(__dirname, '/'))
 app.use(express.static(path.join(__dirname, '../')));
-module.exports = app.listen(8080, function(err) {
+module.exports = app.listen(8060, function(err) {
     if (err) {
         // do something
         return;

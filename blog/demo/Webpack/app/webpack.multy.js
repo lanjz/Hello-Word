@@ -9,9 +9,9 @@ function multyEntry() {
             console.log('filePath', filePath)
             var name = filePath.match(/\/src\/views\/(.+)\/index.js/);
             name = name[1];
-            entry[name] = [filePath, 'webpack-hot-middleware/client?reload=true'];
+            entry[name] = [filePath, 'webpack-hot-middleware/client?reload=true&noInfo=true'];
+            // entry[name] = [filePath]
         });
-    console.log('entry', entry)
     return entry;
 };
 
@@ -21,6 +21,7 @@ function multyHtmlWebpackPlugin(){
         .forEach(function (filePath) {
             var name = filePath.match(/\/src\/views\/(.+)\/index.js/);
             name = name[1];
+            console.log('name', name)
             htmlPlugin.push(
                 new HtmlWebpackPlugin({
                     title: 'Output Management',
