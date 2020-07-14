@@ -13,9 +13,8 @@
 <body>
 
 <div id="app">
-  {{ message }}
-  {{ message }}
-  {{ name }}
+  {{ name }}<br/>
+  {{bind}}
 </div>
 <script>
   var app = new Vue({
@@ -37,7 +36,14 @@
         }
       }
     },
+    computed: {
+      bind: function(){
+        const result = this.message + '__________' + this.name
+        return result
+      }
+    },
     mounted(){
+      debugger
       console.log('mounted')
       this.message = "message_B"
     },

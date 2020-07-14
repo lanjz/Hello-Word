@@ -1050,7 +1050,7 @@
         return value
       },
       set: function reactiveSetter (newVal) {
-        debugger
+        // debugger
         var value = getter ? getter.call(obj) : val;
         /* eslint-disable no-self-compare */
         if (newVal === value || (newVal !== newVal && value !== value)) {
@@ -4286,7 +4286,7 @@
    * Flush both queues and run the watchers.
    */
   function flushSchedulerQueue () {
-    debugger
+    // debugger
     currentFlushTimestamp = getNow();
     flushing = true;
     var watcher, id;
@@ -4756,6 +4756,7 @@
   var computedWatcherOptions = { lazy: true };
 
   function initComputed (vm, computed) {
+    debugger
     // $flow-disable-line
     var watchers = vm._computedWatchers = Object.create(null);
     // computed properties are just getters during SSR
