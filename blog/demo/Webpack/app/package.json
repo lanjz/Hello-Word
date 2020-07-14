@@ -4,12 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "webpack-dev-server --colors --env.bool --env.moke=1",
-    "test": "webpack --config webpack.test.config.js --progress --colors ",
-    "build": "webpack --config webpack.prod.js --env.NODE_ENV=local",
-    "start:m": "webpack-dev-server --colors --env.multy --env.moke=1",
-    "build:m": "webpack --config webpack.prod.js --env.NODE_ENV=local --env.multy",
-    "multy": "node dev.multy.server.js"
+    "test": "webpack --config webpack_config/webpack.test.config.js --progress --colors ",
+    "start": "webpack-dev-server --config webpack_config/webpack.config.js --colors --env.bool --env.moke=1",
+    "build": "webpack --config webpack_config/webpack.prod.js --env.NODE_ENV=local",
+    "start:m": "node webpack_config/dev.multi.server.js --env.multi",
+    "build:m": "webpack --config webpack_config/webpack.prod.js --env.NODE_ENV=local --env.multi"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",

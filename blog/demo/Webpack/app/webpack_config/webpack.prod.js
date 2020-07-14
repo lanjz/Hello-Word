@@ -4,20 +4,23 @@ const UglifyJSPlugin = require('terser-webpack-plugin'); // 使用terser-webpack
 const webpack = require('webpack')
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin")
 const smp = new SpeedMeasurePlugin()
+const multiWebpack = require('./webpack.multi')
 
 module.exports = (env) => {
-	return smp.wrap(
-		merge(common(env), {
-				mode: 'production',
-				// devtool: 'source-map',
-				plugins: [
+	const proConf = merge(common(env), {
+			mode: 'production',
+			// devtool: 'source-map',
+			plugins: [
 				/* 	new UglifyJSPlugin({
 						sourceMap: true,
 						// cache: 'path/to/cache',
 						parallel: true
 					}),
 				 */
-				]
-			}
-		))
+			]
+		}
+	)
+	const conf = env.multi ? multiWebpack(proConf) : proConf
+	return smp.wrap(conf)
+
 }

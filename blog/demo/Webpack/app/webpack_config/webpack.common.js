@@ -11,6 +11,15 @@ const happyThreadPool = HappyPack.ThreadPool({size: 5})
 
 const config = (env) => {
     const devMode = process.env.NODE_ENV !== 'production'
+    const plugins = []
+    if(!env.multi){
+        plugins.push(
+          new HtmlWebpackPlugin({
+              title: 'Output Management',
+              template: './index.html'
+          })
+        )
+    }
     return {
         entry: {
             index: './src/index.js'
@@ -18,7 +27,7 @@ const config = (env) => {
         output: {
             filename: '[name].[hash].js', // 输出文件的文件
             chunkFilename: '[name].[chunkhash].js', // 非入口打包出的文件名称
-            path: path.resolve(__dirname, 'dist'),
+            path: path.resolve(process.cwd(), 'dist'),
         },
         resolveLoader: {
             modules: ['./node_modules', './my_loader'] // 配置loader的查找目录
@@ -88,17 +97,17 @@ const config = (env) => {
                 }
             ]
         },
-        optimization: { // 作用同于 new webpack.optimize.CommonsChunkPlugin(
+/*        optimization: { // 作用同于 new webpack.optimize.CommonsChunkPlugin(
             // minimize: false,
             splitChunks: {
                 minChunks: 2,
                 cacheGroups: {
-                    /*  commons: {
+                    /!*  commons: {
                            name: "commons",
                            chunks: "all",
                           minSize: 1,
                           priority: 0
-                       },*/
+                       },*!/
                     vendor: {
                         name: 'vendor',
                         test: /[\\/]node_modules[\\/]/,
@@ -106,13 +115,10 @@ const config = (env) => {
                     }
                 }
             }
-        },
+        },*/
         devtool: 'sourcemap',
         plugins: [
-            new HtmlWebpackPlugin({
-                title: 'Output Management',
-                template: './index.html'
-            }),
+             ...plugins,
             new CleanWebpackPlugin(),
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': JSON.stringify('production'),
