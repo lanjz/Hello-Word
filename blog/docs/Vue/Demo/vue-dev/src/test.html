@@ -24,21 +24,28 @@
       name: '哈哈'
     },
      watch: {
-      message:{
-        handler:  function (val) {
-          console.log(val)
-          this.name = val + '_Watch'
-        }
-      },
+      // message:{
+        // handler:  function (val) {
+          // console.log(val)
+          // this.name = val + '_Watch'
+        // }
+      // },
       name: {
         handler:  function (val) {
           console.log(val)
+        }
+      },
+      bind: {
+        handler:  function (val) {
+          console.log(val)
+          this.name = 'this.name' + val
         }
       }
     },
     computed: {
       bind: function(){
-        const result = this.message + '__________' + this.name
+        debugger
+        const result = this.message + '__________'
         return result
       }
     },

@@ -358,3 +358,148 @@ this.cleanupDeps();
 
 ## 更新compuntd依赖
 
+按之前 `render Watcher` 和 `watch Watcher` 的更新机制，当依赖的属性更新时，这些 `Watcher` 将被收集到到一个微任务队列中，并且会按 `watcher id` 作为升序排序来触发这些  `Watcher run` 方法
+
+但是 `computed Watcher` 依赖的计算属性更新时并不会将当前的 `conputed Watcher` 添加到微任务队列中，而是在更新 `render Watcher` 时，等访问到 `computed` 属性时，再执行计算函数得到新值。这也就可以理解为什么即使计算依赖的属性没有在渲染中用到也会将 `render Watcher` 添加到 `Dep` 的原因。
+
+如果 `watch` 中有监听 `computed` 属性时，更新机制又是怎样的呢？通过下面这个例子分析一下：
+
+```js
+<div id="app">
+  {{ name }}<br/>
+  {{bind}}
+</div>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      message: 'AA',
+      name: '哈哈'
+    },
+     watch: {
+      // message:{
+        // handler:  function (val) {
+          // console.log(val)
+          // this.name = val + '_Watch'
+        // }
+      // },
+      name: {
+        handler:  function (val) {
+          console.log(val)
+        }
+      },
+      bind: {
+        handler:  function (val) {
+          console.log(val)
+          this.name = 'this.name' + val
+        }
+      }
+    },
+    computed: {
+      bind: function(){
+        debugger
+        const result = this.message + '__________'
+        return result
+      }
+    },
+    mounted(){
+      debugger
+      console.log('mounted')
+      this.message = "message_B"
+    },
+  })
+</script>
+```
+
+首先看下初始化 `watch bind` 的时候做了什么事情：
+
+1. 实现一个 `Watcher` 实例
+
+2. 访问 `this.bind` 属性之前将当前 `watch Watcher` 保存到 `targetStack` 栈中，然后全局属性 `Dep.targe` 指向当前 `watch Watcher` 
+
+3. 因为 `this.bind` 是 `computed` 属性，所以会触发下面代码：
+
+    ```js
+    function createComputedGetter (key) {
+    return function computedGetter () {
+      var watcher = this._computedWatchers && this._computedWatchers[key];
+      if (watcher) {
+        if (watcher.dirty) {
+          watcher.evaluate();
+        }
+        if (Dep.target) {
+          watcher.depend();
+        }
+        return watcher.value
+      }
+    }
+  }
+  ```
+
+  得到当前的 `compunted Watcher`, 然后通过 `watcher.evaluate();` 得到计算结果，在执行 `compunted Watcher` 的 `get` 方法，又将当前 `compunted Watcher` 保存到 `targetStack` 栈中，然后全局属性 `Dep.targe` 指向当前 `compunted Watcher` 。
+  
+4. 注意计算的时候会访问 `this.message` 属性，并且此是的全局  `Dep.target` 为当前 `compunted Watcher`，所以 `compunted Watcher` 会被 `message` 属性收集
+
+5. `compunted Watcher` 收集完之后，当前 `compunted Watcher` 会被 `targetStack` 推出，将 `Dep.target` 指向 `targetStack` 最后一个 `Watcher`，也就是 `watch Watcher` 
+
+6. 执行完 `watcher.evaluate()`，执行 `watcher.depend();`,上文分析过这个方法的作用就是遍历当前 `Watcher` 的 `deps` 属性，收集当前的 `Dep.target` 保存的 `Watcher` 。 也就意味着这里的`watch Watcher` 也会被 `meaaage` 属性收集
+
+当更新 `this.message = "message_B"` 时，执行的步骤如下：
+
+- 遍历 `message` 收集的 `Watcher` ，并执行对应的 `update` 方法，首先执行的是 `watch bind Watcher`, 执行对应的 `run` 方法
+
+```js
+  Watcher.prototype.run = function run () {
+    if (this.active) {
+      var value = this.get();
+      if (
+        value !== this.value ||
+        // Deep watchers and watchers on Object/Arrays should fire even
+        // when the value is the same, because the value may
+        // have mutated.
+        isObject(value) ||
+        this.deep
+      ) {
+        // set new value
+        var oldValue = this.value;
+        this.value = value;
+        if (this.user) {
+          try {
+            this.cb.call(this.vm, value, oldValue);
+          } catch (e) {
+            handleError(e, this.vm, ("callback for watcher \"" + (this.expression) + "\""));
+          }
+        } else {
+          this.cb.call(this.vm, value, oldValue);
+        }
+      }
+    }
+  };
+```
+
+- 先执行 `var value = this.get();` 访问属性 `bind`， 此时会执行对应在的 `computed bind Watcher`
+
+- 上步执行完之后运行到 `this.cb.call(this.vm, value, oldValue)` 执行对应的  `watch Handler`
+
+- 修改 `this.name = 'this.name' + val`，触发对应的 `watch name handle`
+
+- 最后触发 `render Watche` , 此时访问 `this.bind` ，将执行以下语句：
+
+ ```js
+  function createComputedGetter (key) {
+    return function computedGetter () {
+      var watcher = this._computedWatchers && this._computedWatchers[key];
+      if (watcher) {
+        if (watcher.dirty) {
+          watcher.evaluate();
+        }
+        if (Dep.target) {
+          watcher.depend();
+        }
+        return watcher.value
+      }
+    }
+  }
+ ```
+
+ 注意此时 `watcher.dirty` 为 `false`，所以不会重复执行 `computed` 请问，而是直接返回  `watcher.value` 
