@@ -69,6 +69,7 @@ module.exports = {
     '/Vue/组件通信',
     '/Vue/响应式原理',
     '/Vue/Watch',
+    '/Vue/Computed',
     '/Vue/响应更新',
     '/Vue/VirtualDom',
   ],
