@@ -3523,6 +3523,7 @@
     installRenderHelpers(Vue.prototype);
 
     Vue.prototype.$nextTick = function (fn) {
+      debugger
       return nextTick(fn, this)
     };
 
@@ -4757,7 +4758,6 @@
   var computedWatcherOptions = { lazy: true };
 
   function initComputed (vm, computed) {
-    debugger
     // $flow-disable-line
     var watchers = vm._computedWatchers = Object.create(null);
     // computed properties are just getters during SSR

@@ -2,12 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-<!--  <title>Vue.js markdown editor example</title>
-  &lt;!&ndash;<link rel="stylesheet" href="style.css">&ndash;&gt;
-  <script src="https://unpkg.com/marked@0.3.6"></script>
-  <script src="https://unpkg.com/lodash@4.16.0"></script>
-  &lt;!&ndash; Delete ".min" for console warnings in development &ndash;&gt;
-  <script src="./core/index.js"></script>-->
   <script src="../vue.js"></script>
 </head>
 <body>
@@ -23,36 +17,28 @@
       message: 'AA',
       name: '哈哈'
     },
-     watch: {
-      // message:{
-        // handler:  function (val) {
-          // console.log(val)
-          // this.name = val + '_Watch'
-        // }
-      // },
-      name: {
-        handler:  function (val) {
-          console.log(val)
-        }
-      },
-      bind: {
-        handler:  function (val) {
-          console.log(val)
-          this.name = 'this.name' + val
-        }
-      }
-    },
     computed: {
       bind: function(){
-        debugger
         const result = this.message + '__________'
         return result
       }
     },
+    watch: {
+      message: function(val){
+        console.log(val)
+      }
+    },
     mounted(){
       debugger
+      this.$nextTick(() => {
+        console.log('nextTick')
+      })
       console.log('mounted')
       this.message = "message_B"
+      debugger
+      this.$nextTick(() => {
+        console.log('nextTick')
+      })
     },
   })
 </script>
