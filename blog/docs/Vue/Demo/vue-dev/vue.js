@@ -874,6 +874,7 @@
    * Intercept mutating methods and emit events
    */
   methodsToPatch.forEach(function (method) {
+  
     // cache original method
     var original = arrayProto[method];
     def(arrayMethods, method, function mutator () {
