@@ -1,4 +1,109 @@
+[从vue-router看前端路由的两种实现](https://zhuanlan.zhihu.com/p/27588422)
+
 # Vue-Router
+
+## $route/$router属性
+
+每个组件都有一个 `$route/$router` 属性，这个 `$route/$router` 是从哪来的咧？
+
+Vue 在安装 `vue-router` 插件的时候，会调用 `vue-router` 中的 `install` 方法，`install` 中这么两行语句
+
+```js
+ Object.defineProperty(Vue.prototype, '$router', {
+    get: function get () { return this._routerRoot._router }
+  });
+  
+Object.defineProperty(Vue.prototype, '$route', {
+  get: function get () { return this._routerRoot._route }
+});
+```
+
+原来 `$route/$router` 是 `this._routerRoot` 上面的两个属性， `this._routerRoot` 属性也在 `install` 中定义的：
+
+```js
+Vue.mixin({
+  beforeCreate: function beforeCreate () {
+    if (isDef(this.$options.router)) {
+      this._routerRoot = this;
+      this._router = this.$options.router;
+      this._router.init(this);
+      Vue.util.defineReactive(this, '_route', this._router.history.current);
+    } else {
+      this._routerRoot = (this.$parent && this.$parent._routerRoot) || this;
+    }
+    registerInstance(this, this);
+  },
+  destroyed: function destroyed () {
+    registerInstance(this);
+  }
+});
+```
+
+`_routerRoot` 是在利用 `Vue.mixin` 方法在每个组件注入的一个属性，如果有 `this.$options.router` 则指向当前 Vue 实例，否则则取 `$parent` 父组件上的 `_routerRoot`。这里可以得到两个讯息
+
+1. 整个 Vue 项目中所有组件只有一个 `_routerRoot` 
+
+2. 所有  `_routerRoot` 属性来源于根 `Vue` 实例，因为只有根 `Vue` 实例才有 `this.$options.router` 属性。 这个 `router` 属性在入口文件启动项目的时候添加的 
+
+```js
+new Vue({
+    router,
+    render:(h)=> h(App)
+}).$mount(root)
+```
+
+这个 `router` 就是 `vue-router` 的实例
+
+## $router实现响应机制
+
+`$router` 属性的响应机制的添加也是在 `install` 中添加
+
+```js
+if (isDef(this.$options.router)) {
+  this._routerRoot = this;
+  this._router = this.$options.router;
+  this._router.init(this);
+  Vue.util.defineReactive(this, '_route', this._router.history.current);
+}
+```
+
+在根 Vue 实例中使用 `Vue.util.defineReactive(this, '_route', this._router.history.current)`，给 `_route` 属性添加了监听机制，这样 `_route` 属性准备了收集依赖的功能了。在源码中，触发事件的在 
+
+### 依赖收集
+
+上文通过 `Vue.util.defineReactive` 对 `_route` 属性进行的监听，以响应式机制的原理可以知道依赖的收集是在访问 `_route` 属性的时候添加的
+
+```js
+var View = {
+      name: 'RouterView',
+      functional: true,
+      props: {
+        name: {
+          type: String,
+          default: 'default'
+        }
+      },
+      render: function render (_, ref) {
+        // ....
+        var route = parent.$route;
+      }
+}
+```
+
+从上面代码可以知道当渲染 `RouterView` 组件时会访问到 `var route = parent.$route`，此时就会触发 `Object.defineProperty的get` 方法，此时 `Dep.target` 就是 `RouterView` 所在的组件，这一步就完成了对事件的收集
+
+之后当我们在组件调用 `this.$router.push` 方法改变路由时就会更新 `$route` 属性，就会触发依赖的更新方法从而更新视图了（`RouteLInk` 组件渲染时也会做同样的收集）
+
+
+## RouterView/RouterLink
+
+`RouterView/RouterLink` 组件能在所有组件中使用也是因为 `install` 中，对两个组件进行的全局注册
+
+```js
+Vue.component('RouterView', View);
+Vue.component('RouterLink', Link);
+```
+
 
 ## install
 
@@ -206,3 +311,35 @@ function getHash () {
         return _createRoute(null, location)
       }
 ```
+
+## 路由模式
+
+`vue-router` 主要有两种路模式 `hash` 与 `History interface` 两种方式，这两种模式都可以实现 URL 地址更新的同时页面无需重新加载。
+
+`vue-router` 针对两种模式分别封装了两个类：`HTML5History`，`HashHistory`
+
+### HashHistory
+
+**`hash`的使用**
+
+- 监听地址 `hash` 的变化：`window.addEventListener("hashchange", funcRef, false)`
+
+- 主动改变 `hash` ：`window.location.hash='/bar'`,每一次改变 `hash（window.location.hash）`，都会在浏览器的访问历史中增加一个记录
+
+**HashHistory.push()**
+
+源码定义：
+
+```js
+push (location: RawLocation, onComplete?: Function, onAbort?: Function) {
+  this.transitionTo(location, route => {
+    pushHash(route.fullPath)
+    onComplete && onComplete(route)
+  }, onAbort)
+}
+
+function pushHash (path) {
+  window.location.hash = path
+}
+```
+

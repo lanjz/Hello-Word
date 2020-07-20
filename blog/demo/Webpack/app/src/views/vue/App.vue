@@ -1,6 +1,7 @@
 <template>
     <div>
         <h1>APP</h1>
+        <router-link to="/foo">Go to Foo</router-link>
         <span @click="handle">{{title}}</span>
    <!--     <router-link to="/foo">Go to Foo</router-link>
         <router-link to="/bar">Go to Bar</router-link>
