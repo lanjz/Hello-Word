@@ -1,19 +1,16 @@
 <template>
    <div>
-       <H1>BAR</H1>
-       <div @click="push">{{ttttttt}}</div>
-       <router-view>
-           子路由
-       </router-view>
+       <H1>BAR-2</H1>
+       <div @click="push">{{bar2}}</div>
    </div>
 </template>
 
 <script>
   export default {
-    name: "Bar",
+    name: "bar2",
     data: function(){
       return {
-        ttttttt: 'bar'
+        bar2: 'bar2'
       }
     },
     methods: {
@@ -24,7 +21,7 @@
       }
     },
     mounted() {
-      console.log('1', this)
+      console.log('bar1', this)
     }
   }
 </script>

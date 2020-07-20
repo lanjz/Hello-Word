@@ -1,5 +1,7 @@
 import Foo from "./pages/Foo.vue";
 import Bar from "./pages/Bar.vue";
+import Bar1 from "./pages/Bar1.vue";
+import Bar2 from "./pages/Bar2.vue";
 
 
 // 2. 定义路由
@@ -9,6 +11,16 @@ import Bar from "./pages/Bar.vue";
 // 我们晚点再讨论嵌套路由。
 const routes = [
     { path: '/foo', component: Foo },
-    { path: '/bar', component: Bar },
+    {
+        path: '/bar', component: Bar,
+        children: [
+            // 当 /user/:id 匹配成功，
+            // UserHome 会被渲染在 User 的 <router-view> 中
+            { path: '', component: Bar1 },
+            { path: 'bar2', component: Bar2 },
+
+            // ...其他子路由
+        ]
+    },
 ]
 export default routes

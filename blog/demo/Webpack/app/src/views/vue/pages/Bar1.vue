@@ -1,30 +1,27 @@
 <template>
    <div>
-       <H1>BAR</H1>
-       <div @click="push">{{ttttttt}}</div>
-       <router-view>
-           子路由
-       </router-view>
+       <H1>BAR-1</H1>
+       <div @click="push">{{bar1}}</div>
    </div>
 </template>
 
 <script>
   export default {
-    name: "Bar",
+    name: "bar1",
     data: function(){
       return {
-        ttttttt: 'bar'
+        bar1: 'bar1'
       }
     },
     methods: {
       push() {
         debugger
         // this.ttttttt = 'new ttttttt'
-        this.$router.push('/foo')
+        this.$router.push('/bar/bar2')
       }
     },
     mounted() {
-      console.log('1', this)
+      console.log('bar1', this)
     }
   }
 </script>
