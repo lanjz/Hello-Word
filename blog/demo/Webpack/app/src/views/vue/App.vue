@@ -1,78 +1,37 @@
 <template>
     <div>
+        <h1>APP</h1>
+        <span @click="handle">{{title}}</span>
+   <!--     <router-link to="/foo">Go to Foo</router-link>
+        <router-link to="/bar">Go to Bar</router-link>
         <div style="color: red">{{obj}}</div>
-        <div class="div12">1</div>
-        <div class="div2"></div>
-        <h1>{{title}}</h1>
-        <h1 @click="toggle()">SHOW/IF</h1>
-        <div v-if="show">v-if</div>
-        <div v-show="show">v-show</div>
-        <div>{{provideData}}</div>
-        <!-- <comA :arr="arr" ref="comA" abc="13" :ttt="arr" @abc="toggle" :title.sync="title"></comA> -->
-        <h1 @click="currentTabComponent = 'dyCom1'">动态组件1</h1>
-        <h1 @click="currentTabComponent = 'dyCom2'">动态组件2</h1>
-        <keep-alive>
-            <!-- <component v-bind:is="currentTabComponent"></component> -->
-        </keep-alive>
+
+       -->
         <!-- <dyCom1 name="lanjz" class="com" age="18" @click="callback" v-on:event-one="callback" v-on:event-two="callback"></dyCom1> -->
+        <com1></com1>
+
     </div>
 </template>
 <script>
-    import axios from 'axios'
+    import com1 from './pages/car.vue'
     export default {
-        provide () {
-            return {
-                provideData: this.provideData,
-
-            }
-        },
         data:function () {
             return {
                 title: 'title',
-                show: false,
-                arr: [1,2,3],
-                provideData: {
-                    name: 'lanjz'
-                },
-                currentTabComponent: 'dyCom1',
-              obj: {
-                  a: [{name: 'lanjz'}]
-              }
             }
         },
-        components: {
-          
-        },
-        watch: {
-            arr: function (val) {
-                console.log('val', val)
-            }
-        },
-        methods: {
-            toggle() {
-                this.show = !this.show
-                console.log(this.$children[0].name = 12)
-                console.log('this', this)
-            },
-            toggle: () => {
-                console.log('this', this)
-            },
-            callback(){
-
-            }
-        },
+      components: { com1 },
+      methods: {
+        handle() {
+          this.title = 'new title'
+        }
+      },
         mounted() {
           console.log(this)
-          console.log(11)
-    
-        /*   axios.get('http://www.localhost:10011')
-            .then(function (response) {
-              console.log(response);
-            })
-            .catch(function (error) {
-              console.log(error);
-            }); */
-        }
+        },
+      updated() {
+          console.log('up-app')
+      }
     }
 </script>
 <style lang="less">

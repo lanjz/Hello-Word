@@ -1,6 +1,6 @@
-import Dir from './page/dir'
-const Foo = { template: '<div>foo</div>' }
-const Bar = { template: '<div>bar</div>' }
+import Foo from "./pages/Foo.vue";
+import Bar from "./pages/Bar.vue";
+
 
 // 2. 定义路由
 // 每个路由应该映射一个组件。 其中"component" 可以是
@@ -10,5 +10,5 @@ const Bar = { template: '<div>bar</div>' }
 const routes = [
     { path: '/foo', component: Foo },
     { path: '/bar', component: Bar },
-    { path: '/dir', component: Dir }
 ]
+export default routes

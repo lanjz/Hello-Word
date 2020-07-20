@@ -48,6 +48,7 @@
         }
       },
       render: function render (_, ref) {
+        debugger
         var props = ref.props;
         var children = ref.children;
         var parent = ref.parent;
