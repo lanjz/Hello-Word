@@ -1104,6 +1104,7 @@
             if (this$1.replace) {
               router.replace(location, noop);
             } else {
+              debugger
               router.push(location, noop);
             }
           }

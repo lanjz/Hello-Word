@@ -73,6 +73,7 @@ module.exports = {
     '/Vue/响应更新',
     '/Vue/VirtualDom',
     '/Vue/$nextTick',
+    '/Vue/VueRouter',
   ],
   '/React/': [
     '/React/React16新特性',
