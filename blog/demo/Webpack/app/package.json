@@ -58,6 +58,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "vue-router": "^3.3.4",
+    "vuex": "^3.5.1",
     "webpack-hot-middleware": "^2.25.0"
   }
 }
