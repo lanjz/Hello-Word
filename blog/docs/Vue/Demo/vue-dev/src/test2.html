@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="../vue.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>{{arr}}</h1>
+    <h1>{{$$obj}}</h1>
+  </div>
+  
+<script>
+  const obj = {a: 'l'}
+  new Vue({
+    data: {
+      $obj: obj
+    }
+  })
+  var app = new Vue({
+    el: '#app',
+    data: {
+      arr: [0]
+    },
+    obj,
+    beforeCreate(){
+      this.$$obj = this.$options.obj
+    },
+    mounted(){
+      console.log(this)
+    },
+  })
+</script>
+
+</body>
+</html>

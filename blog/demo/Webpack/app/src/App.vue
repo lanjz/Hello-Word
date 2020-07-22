@@ -26,7 +26,6 @@
       },
       mounted() {
           console.log('this', this)
-          console.log('store', store)
         }
     }
 </script>
