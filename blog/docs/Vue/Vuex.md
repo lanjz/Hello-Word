@@ -143,6 +143,12 @@ function resetStoreVM (store, state, hot) {
 ```
 上面代码通过实例化一个新 `Vue` 实例，给 `$$state` 和 `computed` 添加响应机制，看到这里还是不明白这里 `new Vue` 添加的响应跟启动项目的 `new Vue` 有啥关系？
 
+下面通过一个例子理解一下：
+
+```js
+
+```
+
 下面通过一次 `commit` 看下执行过程：
 
 ```js

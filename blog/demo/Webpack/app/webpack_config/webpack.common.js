@@ -10,6 +10,7 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const happyThreadPool = HappyPack.ThreadPool({size: 5})
 
 const config = (env) => {
+    console.log('env.entry', env.entry)
     const devMode = process.env.NODE_ENV !== 'production'
     const plugins = []
     if(!env.multi){
@@ -22,7 +23,7 @@ const config = (env) => {
     }
     return {
         entry: {
-            index: './src/index.js'
+            index: `./${env.entry || 'src'}/index.js`
         },
         output: {
             filename: '[name].[hash].js', // 输出文件的文件
