@@ -68,21 +68,6 @@ Vux 的 `install` 方法执行的就是 `applyMixin` 方法, `applyMixin` 方法
 
 单从这里会有疑问就是只在 `this` 上添加 `$store` 属性是不会有响应功能的，但是实现使用时修改 `state` 是可以触发视图更新，在哪做的了？
 
-## Vuex构造方法
-
-```js
-const store = new Vuex.Store({
-    state: {
-        count: 0
-    },
-    mutations: {
-        increment (state) {
-            state.count++
-        }
-    }
-})
-```
-
 ## Vuex的响应机制
 
 在 `vuex.Store` 的构造方法中有以下代码：
@@ -124,72 +109,40 @@ function resetStoreVM (store, state, hot) {
   });
   Vue.config.silent = silent;
 
-  // enable strict mode for new vm
-  if (store.strict) {
-    enableStrictMode(store);
-  }
-
-  if (oldVm) {
-    if (hot) {
-      // dispatch changes in all subscribed watchers
-      // to force getter re-evaluation for hot reloading.
-      store._withCommit(function () {
-        oldVm._data.$$state = null;
-      });
-    }
-    Vue.nextTick(function () { return oldVm.$destroy(); });
-  }
 }
 ```
 上面代码通过实例化一个新 `Vue` 实例，给 `$$state` 和 `computed` 添加响应机制，看到这里还是不明白这里 `new Vue` 添加的响应跟启动项目的 `new Vue` 有啥关系？
 
 下面通过一个例子理解一下：
 
-```js
-
+```html
+<div id="app">
+    <h1>{{arr}}</h1>
+    <h1>{{$$obj}}</h1>
+</div>
 ```
-
-下面通过一次 `commit` 看下执行过程：
-
 ```js
-this.commit = function boundCommit (type, payload, options) {
-  return commit.call(store, type, payload, options)
-};
-Store.prototype.commit = function commit (_type, _payload, _options) {
-    var this$1 = this;
-
-  // check object-style commit
-  var ref = unifyObjectStyle(_type, _payload, _options);
-    var type = ref.type;
-    var payload = ref.payload;
-    var options = ref.options;
-
-  var mutation = { type: type, payload: payload };
-  var entry = this._mutations[type];
-  if (!entry) {
-    if ((process.env.NODE_ENV !== 'production')) {
-      console.error(("[vuex] unknown mutation type: " + type));
+  const obj = {a: 'l'}
+  new Vue({
+    data: {
+      $obj: obj
     }
-    return
-  }
-  this._withCommit(function () {
-    entry.forEach(function commitIterator (handler) {
-      handler(payload);
-    });
-  });
-
-  this._subscribers
-    .slice() // shallow copy to prevent iterator invalidation if subscriber synchronously calls unsubscribe
-    .forEach(function (sub) { return sub(mutation, this$1.state); });
-
-  if (
-    (process.env.NODE_ENV !== 'production') &&
-    options && options.silent
-  ) {
-    console.warn(
-      "[vuex] mutation type: " + type + ". Silent option has been removed. " +
-      'Use the filter functionality in the vue-devtools'
-    );
-  }
-};
+  })
+  var app = new Vue({
+    el: '#app',
+    data: {
+      arr: [0]
+    },
+    obj,
+    beforeCreate(){
+      this.$$obj = this.$options.obj
+    },
+    mounted(){
+      console.log(this)
+    },
+  })
 ```
+
+上面例子中启动项目的 `Vue` 没有直接在 `data` 中定义 `$$obj` 属性，`$$obj` 属性是在 `beforeCreate` 钩子函数赋值的，取至 `$options` 上属性 `obj`，`$options.obj` 是在 `new Vue` 中传入的，且这个 `obj` 属性也在另一个 `new Vue` 中使用且是使用在 `data.$obj` 属性上，也在就说这个 `$obj` 属性在这个 `Vue` 中是响应式的。也因此在应用中访问`$$obj` 时，全局的 `Watcher` 将会被另一个 Vue 中的 `$obj` 属性收集
+
+不得不说这波操作有点骚～
