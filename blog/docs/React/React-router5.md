@@ -1,3 +1,15 @@
+# React-router使用
+
+## react-router/react-router-dom
+
+`react-router` 实现了路由的核心功能, `react-router-dom` 是基于 `react-router` 的基础上加入了在浏览器运行环境下的一些功能，例如：`Link` 组件，会渲染一个 `a` 标签; `BrowserRouter` 和 `HashRouter` 组件，前者使用 `pushState` 和 `popState` 事件构建路由，后者使用 `window.location.hash` 和 `hashchange` 事件构建路由。
+
+react-router-native: 基于react-router，类似react-router-dom，加入了react-native运行环境下的一些功能
+
+`react-router` 与 `react-router-dom`
+
+
+
 [路径匹配组件](https://www.cnblogs.com/cckui/p/11490372.html)
 
 # 路由组件
