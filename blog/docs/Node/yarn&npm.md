@@ -1,6 +1,4 @@
-# yarn
-
-## npm
+# npm
 
 **查看模块包信息**
 
@@ -131,4 +129,26 @@ npm 设置了一些规则，可用于在 package.json 文件中选择要将软�
 
 当运行 `npm update` 时，`package-lock.json` 文件中的依赖的版本会被更新
 
+## yarn
 
+- `yarn init`: 初始化一个新项目
+
+**安装**
+
+- `yarn or yarn install`: 安装 `package.json` 中的所有依赖
+
+- `yarn add [模块] --dev`: 安装依赖并添加到 `devDependencies`
+
+- `yarn add [模块] --peer`: 安装依赖并添加到 `peerDependencies`
+
+- `yarn add [模块] --optional`: 安装依赖并添加到 `optionalDependencies`
+
+- `yarn upgrade [package | package@tag | package@version | --scope @scope]... [--ignore-engines] [--pattern]`: 此命令更新指定版本的依赖将依赖项更新到 `package.json` 和 `yarn.lock`
+
+- `yarn install --force`: 强制重新下载所有软件包
+
+- `yarn install --production`: 仅安装生产依赖项
+
+**移除**
+
+- `yarn remove <package...>`: 移除模块
