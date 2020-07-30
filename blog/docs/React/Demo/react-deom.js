@@ -24958,6 +24958,7 @@
     return legacyRenderSubtreeIntoContainer(null, element, container, true, callback);
   }
   function render(element, container, callback) {
+    debugger
     if (!isValidContainer(container)) {
       {
         throw Error( "Target container is not a DOM element." );

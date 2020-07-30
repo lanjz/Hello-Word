@@ -9,12 +9,18 @@ const root = document.createElement('div')
 root.id = 'app'
 document.body.appendChild(root)
 
+const App2 = (<h2>Hello World!</h2>)
 
+render(
+  App2
+  , root)
+/*
 render(
   <Router>
     <Route path="/" component={ChildMap}>
-      {/*<Route path="context" component={Context} />*/}
-      {/*<Route path="inbox" component={Inbox} />*/}
+      {/!*<Route path="context" component={Context} />*!/}
+      {/!*<Route path="inbox" component={Inbox} />*!/}
     </Route>
   </Router>
   , root)
+*/

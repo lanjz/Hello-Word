@@ -8,7 +8,6 @@ class LikeButton extends React.Component {
     this.state = { count: 0, liked: 'liked' };
   }
   componentDidMount(){
-    debugger
     this.setState({ count: this.state.count + 1 })
     this.setState({ count: this.state.count + 1 })
   }
@@ -16,7 +15,6 @@ class LikeButton extends React.Component {
 
   }
   render() {
-    debugger
     if (this.state.liked) {
       return 'You liked this.';
     }
