@@ -13,7 +13,8 @@ const config = (env) => {
         devServer: {
             contentBase: './dist',
             hot: true,
-            open: true
+            open: true,
+            port:5001
         },
         plugins: [
             new webpack.NamedModulesPlugin(),

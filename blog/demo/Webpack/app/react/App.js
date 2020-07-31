@@ -6,22 +6,14 @@ class App extends React.Component {
     this.state = { count: 0 , obj: {a: 2}};
   }
   componentDidMount() {
+    debugger
     this.setState({
-      count: this.state.count++
+      count: this.state.count + 1
     })
-    const o = this.state.obj
-    o.a = 3
-    this.setState({
-      obj: o
-    })
-    console.log(this)
   }
 
   render() {
-    return <h1>
-      {this.state.obj.a}
-      <Puc obj={this.state.obj}></Puc>
-    </h1>;
+    return (<h1>{this.state.count}</h1>)
   }
 }
 

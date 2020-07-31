@@ -76,6 +76,7 @@ module.exports = {
     '/Vue/VueRouter',
   ],
   '/React/': [
+    '/React/ReactDOM.render',
     '/React/React16新特性',
     '/React/Hook',
     '/React/Diff',
