@@ -2,13 +2,7 @@
 
 `Virtual Dom` 是一个可以表示 DOM 节点的 JavaScript 对象，一个 `Virtual Dom` 节点包含相应 DOM 节点的 `标签`，`属性`，`子节点`，`事件` 等的属性，它是对真实 DOM 节点的抽象表示。在我们需要更新 DOM 的时候，并不是直接 DOM 上进行更新，而是先在 `Virtual Dom` 上进行相应的更新操作，最后再映射到真实 DOM 中
 
-## Virtual DOM 作用是什么
-
-- 提供与真实 DOM 节点所对应的虚拟节点 `vnode`
-
-- 将虚拟节点 `vnode` 和旧虚拟节点 `oldVnode` 进行对比，然后更新视图
-
-## 为何需要 Virtual DOM
+### Virtual DOM的优点
 
 - 跨平台性
 
@@ -30,6 +24,8 @@
 
 仅在同级的 `vnode` 间做 `diff` ，递归地进行同级 `vnode` 的 `diff` ，最终实现整个 DOM 树的更新。因为跨层级的操作是非常少的，忽略不计，这样时间复杂度就从 `O(n3)` 变成 `O(n)` 。
 
+**总之一句话：使用 `diff` 算法就是为了避免不必要的 DOM 操作**
+
 ### diff 算法的特点
 
 `diff` 算法有两个比较显著的特点
@@ -38,9 +34,9 @@
 
 - 在 `diff` 比较的过程中，循环从两边向中间收拢
 
-## diff 算法过程
+### diff 算法过程
 
-diff 的实现主要通过两个方法，`patchVnode` 与 `updateChildren`
+`diff` 的实现主要通过两个方法，`patchVnode` 与 `updateChildren`
 
 `patchVnode`主要有两个参数:旧节点`oldVnode`和新节点`vnode`，主要分五种情况
 
@@ -68,8 +64,6 @@ diff 的实现主要通过两个方法，`patchVnode` 与 `updateChildren`
 
 如果 4 种比较都没匹配，如果设置了`key`，就会用`key`进行比较，在比较的过程中，变量会往中间靠，
 一旦 `StartIdx > EndIdx` 表明 `oldCh` 和 `newCh` 至少有一个已经遍历完了，就会结束比较。
-
-
 
 **新旧节点不同**
 

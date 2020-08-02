@@ -12,7 +12,7 @@ features:
   details: Node -   流 进程 webpack
 - title: 基础点的复习
   details: 基础点的复习
-- title: 基础点的复习
+- title: 其它
   details: 微信小程序+React
 footer: MIT Licensed | Copyright © 2018-present Evan You
 ---
