@@ -1,6 +1,6 @@
 # ReactDOM.render
 
-`ReactDOM.render` 用于初次渲染将 React 应用挂载在 DOM 元素上
+`ReactDOM.render` 用于初次渲染时将 React 应用挂载在 DOM 元素上
 
 ```js
 const root = document.createElement('div')
@@ -391,7 +391,7 @@ function updateContainer(element, container, parentComponent, callback) {
 
 6. 最后返回过期时间 `expirationTime`
 
-之后回到 `legacyRenderSubtreeIntoContainer` 执行最的 `getPublicRootInstance(fiberRoot)` 方法
+之后回到 `legacyRenderSubtreeIntoContainer()` 函数执行最后的 `getPublicRootInstance(fiberRoot)` 方法
 
    ```js
    // 获取root实例

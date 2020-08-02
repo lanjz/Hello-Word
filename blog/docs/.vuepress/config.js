@@ -19,7 +19,6 @@ module.exports = {
           { text: '算法', link: '/language/japanese4' },
           { text: 'Web安全', link: '/secure/' },
           { text: '浏览器', link: '/language/japanese5' },
-          
         ]
       },
       {
@@ -66,7 +65,6 @@ module.exports = {
         }
       ],
       sidebar      
-
   },
   
 }

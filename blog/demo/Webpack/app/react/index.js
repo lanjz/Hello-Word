@@ -12,7 +12,7 @@ document.body.appendChild(root)
 const App2 = (<h2>Hello World!</h2>)
 
 render(
-  App2
+  App
   , root)
 /*
 render(
