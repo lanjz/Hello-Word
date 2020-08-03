@@ -5,22 +5,19 @@
   <script src="../vue.js"></script>
 </head>
 <body>
-  <div id="app">
-    <h1>{{arr}}</h1>
-    <h1>{{$$obj}}</h1>
-  </div>
-  
+  <div id="app"><h1 key="1" v-if="type">h1</h1><h1 key="2" v-if="type">h2</h1><h1 key="20" v-if="!type" >h1</h1><h1 key="2" v-if="!type" >h2</h1><h1 key="1" v-if="!type">h2</h1><h3 key="11" v-if="!type">h2</h3></div>
 <script>
   const obj = {a: 'l'}
   new Vue({
     data: {
-      $obj: obj
+      $obj: obj,
     }
   })
   var app = new Vue({
     el: '#app',
     data: {
-      arr: [0]
+      arr: [1,2,3,4],
+      type: 1
     },
     obj,
     beforeCreate(){

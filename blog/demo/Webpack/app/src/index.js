@@ -6,7 +6,6 @@ import Dir from './page/dir.vue'
 import storeData from './store'
 import './assets/app.css'
 import loadingLine from './utils/loadingLing'
-debugger
 Vue.use(Vuex)
 const root = document.createElement('div')
 root.id = 'app'
