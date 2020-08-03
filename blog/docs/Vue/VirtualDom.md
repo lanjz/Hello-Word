@@ -121,8 +121,9 @@ Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
   }
   // ...
 }
+
 ```
-`diff` 的过程就是调用 `patch` 函数
+`vm._update` 方法中会调用 `__patch__` 方法， `diff` 的过程就是调用 `patch` 函数
 
 ```js
 function patch (oldVnode, vnode, hydrating, removeOnly) {
@@ -453,10 +454,12 @@ patchVnode (oldVnode, vnode) {
 
 - `else if (oldCh)`，新节点没有子节点，老节点有子节点，直接删除老节点
 
-**updateChildren**
+
+**diff 子元素**
+
+都新旧 vnode 都有子节点且不相同时，则会执行 `updateChildren` 对子元素进行 `diff`
 
 ```js
-
 function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly) {
   var oldStartIdx = 0; // 记录旧节点的开始标记位
   var newStartIdx = 0; // 记录新节点的开始标记位
@@ -512,7 +515,7 @@ function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly
       oldEndVnode = oldCh[--oldEndIdx];
       newStartVnode = newCh[++newStartIdx];
     } else {
-      // oldKeyToIdx 表示当前列表的 [key] map [元素] 的映射，如果没有则执行 createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx) 遍布一次列表生成 oldKeyToIdx
+      // oldKeyToIdx 表示当前列表的 [key] map [元素] 的映射，如果没有则执行 createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx) 遍历一次列表生成 oldKeyToIdx
       if (isUndef(oldKeyToIdx)) { oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx); }
       // 如果当前存在 key 则从oldKeyToIdx 找出旧节点对应的key的元素的索引值
       idxInOld = isDef(newStartVnode.key)
@@ -531,7 +534,7 @@ function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly
           // 更新位置 
           canMove && nodeOps.insertBefore(parentElm, vnodeToMove.elm, oldStartVnode.elm);
         } else {
-          // 同样的关键但不同的元素。作为新元素处理
+          // 同样的key但不同的元素。作为新元素处理
           createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, false, newCh, newStartIdx);
         }
       }
@@ -618,23 +621,29 @@ VNode 旧: A、B、C、D、E、F     新: A、E、C、D、B、F
 第五轮判断
 
 - `if(sameVnode(oldStartVnode, newStartVnode))` 为 `true`,所以移动 `oldStartIdx` 和 `newStartIdx` 的指针: `++oldStartIdx`、`++newStartIdx`
+
                   ↓                       ↓
 VNode 旧: A、B、C、D、E、F     新: A、E、C、D、B、F  
                   ↑                       ↑
+
 对应DOM : A、E、C、D、B、F  
 
 第六轮判断
 
 - `if(sameVnode(oldStartVnode, newStartVnode))` 为 `true`,所以移动 `oldStartIdx` 和 `newStartIdx` 的指针: `++oldStartIdx`、`++newStartIdx`
+
                      ↓                       ↓
 VNode 旧: A、B、C、D、E、F     新: A、E、C、D、B、F  
                   ↑                       ↑
+
 对应DOM : A、E、C、D、B、F  
 
 之会跳出 `while` 循环
 
+### 总结
 
-过程可以概括为：`oldCh`和`newCh`各有两个头尾的变量`StartIdx`和`EndIdx`，在一次遍历中，会使用他们做4种比较方式。
+
+过程可以概括为：`oldCh` 和 `newCh` 各有两个头尾的变量 `StartIdx` 和 `EndIdx` ，在一次遍历中，会使用他们做4种比较方式。
 
 1. 新节点的首部节点与旧节点的首部节点是否相同
 
@@ -644,14 +653,19 @@ VNode 旧: A、B、C、D、E、F     新: A、E、C、D、B、F
 
 4. 新节点的尾部节点与旧节点的着部节点是否相同： 元素内部发生了位置变化，有个元素跑后面去了
 
-如果4种比较都没匹配，如果设置了`key`，就会用`key`进行比较
+5. 如果4种比较都没匹配，则尝试通过 `key` 查找，这里分两种情况
 
-在比较的过程中，变量会往中间靠，一旦`StartIdx>EndIdx`表明`oldCh`和`newCh`至少有一个已经遍历完了，就会结束比较。
+  - 如果新节点有 `key`, 且能匹配到旧节点，则当做添加新节点处理
 
-不设`key`，`newCh`和`oldCh`只会进行头尾两端的相互比较，设`key`后，除了头尾两端的比较外，还会从用`key`生成的对象`oldKeyToIdx`中查找匹配的节点，
-所以为节点设置`key`可以更高效的利用`dom`。
+  - 如果新节点有 `key`, 且能匹配到旧节点，则先通过 `sameVnode` 方法判断这两个新旧节点是否相同，情况也分两种
 
-对于与`sameVnode(oldStartVnode, newStartVnode)`和`sameVnode(oldEndVnode,newEndVnode)`为`true`的情况，不需要对`dom`进行移动。
+    - 如果相同，则 `patchVnode` 继续对新旧节点做 `diff` 处理，并且交换位置
+
+    - 如果不相同，则当做新节点做处理
+
+**所以为节点设置`key`可以更高效的利用`dom`**
+
+在比较的过程中，变量会往中间靠，一旦 `StartIdx>EndIdx` 表明 `oldCh` 和 `newCh` 至少有一个已经遍历完了，就会结束比较。
 
 在结束时，分为两种情况：
 
@@ -660,8 +674,7 @@ VNode 旧: A、B、C、D、E、F     新: A、E、C、D、B、F
 - `newStartIdx > newEndIdx`, 可以认为`newCh`先遍历完。此时`oldStartIdx`和`oldEndIdx`之间的`vnode`在新的子节点里已经不存在了，
 调用`removeVnodes`将它们从dom里删除。
 
-
-# Virtual DOM 比真实 DOM 快嘛
+## Virtual DOM 比真实 DOM 快嘛
 
 `Virtual DOM` 并不是比真实 DOM 快，而是不管数据怎么变化，都可以用最小的代码进行更新 DOM
 
@@ -673,8 +686,8 @@ VNode 旧: A、B、C、D、E、F     新: A、E、C、D、B、F
 框架给你的保证是，你在不需要手动优化的情况下，我依然可以给你提供过得去的性能
 
 
-# vue和react中虚拟dom的区别
+## vue和react中虚拟dom的区别
   
 vue会跟踪每一个组件的依赖关系,不需要重新渲染整个组件树。
 
-而对于React而言，每当应用的状态被改变时，全部组件都会重新渲染，所以react中会需要shouldComponentUpdate这个生命周期函数方法来进行控制
+而对于React而言，每当应用的状态被改变时，全部组件都会重新渲染，所以 react 中会需要 `shouldComponentUpdate` 这个生命周期函数方法来进行控制
