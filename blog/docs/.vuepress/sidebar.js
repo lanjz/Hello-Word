@@ -71,7 +71,7 @@ module.exports = {
     '/Vue/Watch',
     '/Vue/Computed',
     '/Vue/响应更新',
-    '/Vue/VirtualDom',
+    '/Vue/PatchNode',
     '/Vue/$nextTick',
     '/Vue/VueRouter',
   ],
