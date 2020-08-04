@@ -1,9 +1,6 @@
 # 模板到真实DOM经历了什么？
 
-> 文章会尽可能少的赋加源码，如果想到知道这块内容对应的源码内容可以看[Vue.js技术揭秘](https://ustbhuangyi.github.io/vue-analysis/v2/data-driven/render.html)，
-中数据驱动和编译两大章
-
-这里通过一个例子来介绍下VUE中模板到真实DOM需要哪些过程：
+这里通过一个例子来介绍下 VUE 中模板到真实 DOM 需要哪些过程：
 
 `<div class="page">{{name}}的列表:<span v-for="(item, index) in list" :key="index">{{item}}</span></div>`
 
