@@ -1,7 +1,8 @@
 <template>
     <div>
-        <div>{{$store.state}}</div>
-        <div>{{name}}</div>
+        <span ref="abc" v-if="show">{{$store.state}}</span>
+        <div ref="abc">{{$store.state}}</div>
+        <span v-for="(item) in list" ref="abcd">{{item}}</span>
     </div>
 </template>
 <script>
@@ -12,6 +13,8 @@
         data:function () {
             return {
                 title: 'title',
+              list: [1,3],
+              show: false
             }
         },
         watch: {

@@ -652,7 +652,25 @@ beforeRouteLeave (to, from, next) {
 
 12. 用创建好的实例调用 `beforeRouteEnter` 守卫中传给 `next` 的回调函数。
 
+# 总结
 
+- 先实例一个 `router`，这个  `router` 包含了我们平时使用的 `$route` 和 `$router` 两个属性
+
+- 在项目初始化传入这个 `router` 实例 `new Vue({router})`，这样就可以 `this.$options.router` 访问这个 `router` 实例
+
+- 使用 `vue-minxin` 给所有 vue 混入 `beforeCreate` 钩子，`beforeCreate` 钩子中需要做的几件事情：
+
+  - 代理 `$router` 和 `$route` 属性到上面说的 `router` 实例中，这样就可以在组件通过 `this` 访问这两个属性
+
+  - 使用 `Vue.util.defineReactive` 监听当前路由信息（`this._router.history.current`）的变化 
+
+  - 全局注册 `RouterView` 和 `RouterLink`，当渲染这两个组件的时候，就会访问 `$router` 信息，然后收集当前 `render Watcher`
+
+  注意一下 `$router`, `_routerRoot`， `_router` 的关系
+
+  `$router => this._routerRoot._router`
+
+  `this._routerRoot = this` == `$router => this._router`
 
 [从vue-router看前端路由的两种实现](https://zhuanlan.zhihu.com/p/27588422)
 

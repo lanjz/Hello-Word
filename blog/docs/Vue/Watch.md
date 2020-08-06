@@ -118,10 +118,12 @@ Vue.prototype.$watch = function (
     this.depIds = new _Set();
     this.newDepIds = new _Set();
     this.expression = expOrFn.toString();
-    // parse expression for getter
+    // 如果 expOrFn 是函数，render 时这里是函数
     if (typeof expOrFn === 'function') {
       this.getter = expOrFn;
     } else {
+      // watch时 expOrFn 是属性名，所以会走到这里
+      // parsePath 方法就是获取属性名对应值的方法
       this.getter = parsePath(expOrFn);
       if (!this.getter) {
         this.getter = noop;
@@ -133,6 +135,7 @@ Vue.prototype.$watch = function (
         );
       }
     }
+    // this.lazy 为false 所以会执行 this.get()
     this.value = this.lazy
       ? undefined
       : this.get();
@@ -191,7 +194,7 @@ Watcher.prototype.get = function get () {
   var value;
   var vm = this.vm;
   try {
-    value = this.getter.call(vm, vm); // 此时
+    value = this.getter.call(vm, vm); 
   } catch (e) {
     if (this.user) {
       handleError(e, vm, ("getter for watcher \"" + (this.expression) + "\""));
@@ -204,7 +207,6 @@ Watcher.prototype.get = function get () {
     if (this.deep) {
       traverse(value);
     }
-    debugger
     popTarget();
     this.cleanupDeps();
   }
@@ -216,7 +218,7 @@ Watcher.prototype.get = function get () {
 
 1. 执行 `pushTarget(this)`: 将当前的 `Watcher` 实例保存到 `Dep.target` 全局属性中, 方便被属性的 `dep` 容器收集
 
-2. 执行 `value = this.getter.call(vm, vm)` : 此时的 `this.getter` 是上文中 `parsePath(expOrFn)` 的返回值， 这  里执行完之后就是得到属性对应的值 
+2. 执行 `value = this.getter.call(vm, vm)` : 此时的 `this.getter` 是上文中 `parsePath(expOrFn)` 的返回值， 这里执行完之后就是得到属性对应的值 
 
   ```js
   data(){
@@ -232,10 +234,44 @@ Watcher.prototype.get = function get () {
   // value = this.getter.call(vm, vm) 执行之后，value就是 007
   ```
   
-上面的第二点要注意了， `this.getter` 是返回 `message` 对应的值，就是意味着要读取 `data` 上的 `message` 属性， 此时就是会被  `Object.definedProperty()` 的 `get` 方法劫持，然后就是把当前保存在全局属性 `Dep.target` 中的当前的 `Watcher` 实例保存到容器 `dep` 中， 至此就完成当前属性（`message`）对这个 `Watcher` 的收集
-
+以上面这个例子为例， `this.getter` 是获取 `message` 对应的值，就是意味着要读取 `data` 上的 `message` 属性， 此时就是会被  `Object.definedProperty()` 的 `get` 方法劫持，然后就是把当前保存在全局属性 `Dep.target` 中的当前的 `Watcher` 实例保存到容器 `dep` 中， 至此就完成当前属性（`message`）对这个 `Watcher` 的收集
 
 上面就完成了对 `watch` 监听属性机制的分析
+
+## 触发handle
+
+当要监听属性更新时，这会派发收集到的 `Watcher` ，执行 `Watcher.update => Watcher.run => this.cb`
+
+```js
+  Watcher.prototype.run = function run () {
+    if (this.active) {
+      var value = this.get();
+      if (
+        value !== this.value ||
+        // Deep watchers and watchers on Object/Arrays should fire even
+        // when the value is the same, because the value may
+        // have mutated.
+        isObject(value) ||
+        this.deep
+      ) {
+        // set new value
+        var oldValue = this.value;
+        this.value = value;
+        if (this.user) {
+          try {
+            this.cb.call(this.vm, value, oldValue);
+          } catch (e) {
+            handleError(e, this.vm, ("callback for watcher \"" + (this.expression) + "\""));
+          }
+        } else {
+          this.cb.call(this.vm, value, oldValue);
+        }
+      }
+    }
+  };
+```
+
+`this.cb` 就是 `watch handle` 方法
 
 ## deep
 
@@ -304,6 +340,8 @@ function _traverse (val, seen) {
   if ((!isA && !isObject(val)) || Object.isFrozen(val) || val instanceof VNode) {
     return
   }
+
+  // 获取当前 val 所对应 Observer 实例
   if (val.__ob__) {
     var depId = val.__ob__.dep.id;
     if (seen.has(depId)) {
@@ -392,3 +430,10 @@ Vue.prototype.$watch = function (
 ```
 
 如果存在 `options.immediate` 则执行 `cb.call(vm, watcher.value)` , 这个 `cb` 就是对应的 `handler` 方法
+
+# 总结
+
+`watch` 的监听原理其实也是把当前的 `watch handler` 包装在 `watcher` 中，然后这个 `watch Watcher` 被监听的属性所收集，之后当属性被更新时，这会派发收集的 `Watcher`，执行对应的 `handler` 方法
+
+`deep` 的实现本质是因为 Vue 对于对象类型的数据会遍历其子元素，并对这些子元素进行监听劫持，然后当前如果有 `deep` 属性时， `watch Watcher` 中会去遍历监听元素的子元素，注意此时全局 `Dep.target` 仍为当前这个 `watch Watcher`,通过访问这些子属性，让子属性收集 `watch Watcher`
+

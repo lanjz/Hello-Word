@@ -4,7 +4,7 @@
 
 用法：`Vue.nextTick( [callback, context] )`
 
-为什么需要 `$nextTick` 才能准确取后更新后的 DOM 呢？因为 Vue 的视图更新是异步，准备来说是 Vue 的依赖更新是异步的
+为什么需要 `$nextTick` 才能准确取后更新后的 DOM 呢？因为 Vue 的视图更新是异步，准确来说是 Vue 的依赖更新是异步的
 
 ## Vue异步更新队列
 
@@ -167,7 +167,7 @@ console.log(3)
   }
 ```
 
-`flushCallbacks` 方法就是从上文提到的 `callbacks` 数组中取出之前保存任务，然后并一一执行。
+`flushCallbacks` 方法就是从上文提到的 `callbacks` 数组中取出之前保存任务，然后并一一执行，同时 `callbacks` 长置为 `0` 好接收下一批要执行任务。
 
 `nextTick` 方法中除了执行 `timerFunc()`, 同时还有一个 `pending 变量`，`pending` 的作用是一个标记，初始值为 `false`,当启动一个延迟任务之后 `pending` 设为 `true`，在同一时间段内如果 `nextTick` 还有被触发那么这些任务将会被收集在一起。被收集到一起的任务都在下一整件循环中一起执行。当这些一次延迟任务开始执行的时候 `pending` 才会重置为 `false`，之后收集的任务将在一下延迟中执行。
 
@@ -364,3 +364,7 @@ Promise.resolve()
       })
   })
 ```
+
+## 总结
+
+同一时间的任务都会保存到 `callback` 队列中，同时根据环境使用原生的 `Promise.then`、`MutationObserver` 和 `setImmediate`方法，延迟执行 `callback` 中的任务

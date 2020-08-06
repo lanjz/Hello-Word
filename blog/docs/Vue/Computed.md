@@ -47,12 +47,13 @@
 
 ```js
   function initComputed (vm, computed) {
-    // $flow-disable-line
+    // 在当有实例上定义一个_computedWatchers属性,保存 conputed Watcher
     var watchers = vm._computedWatchers = Object.create(null);
     // computed properties are just getters during SSR
     var isSSR = isServerRendering();
-
+    // 遍历computed
     for (var key in computed) {
+      // 获取computed计算方法
       var userDef = computed[key];
       var getter = typeof userDef === 'function' ? userDef : userDef.get;
       if (getter == null) {
@@ -63,12 +64,12 @@
       }
 
       if (!isSSR) {
-        // create internal watcher for the computed property.
+        // 实例化 Watcher
         watchers[key] = new Watcher(
           vm,
           getter || noop,
           noop,
-          computedWatcherOptions
+          computedWatcherOptions // { lazy: true }
         );
       }
 
@@ -76,8 +77,11 @@
       // component prototype. We only need to define computed properties defined
       // at instantiation here.
       if (!(key in vm)) {
+        // 如果当前没有计算属性在 data 属性上，执行 defineComputed 方法
+        // 配置访问这个属性时要执行就是这个计算方法
         defineComputed(vm, key, userDef);
       } else {
+        // 如果当前有计算属性在 data 属性上，就提示错误
         if (key in vm.$data) {
           warn(("The computed property \"" + key + "\" is already defined in data."), vm);
         } else if (vm.$options.props && key in vm.$options.props) {
@@ -103,8 +107,9 @@
 ```js
   var Watcher = function Watcher (
     vm,
-    expOrFn, // 这个参数是 watch 要监听的属性名
-    cb,     // 对应 watch 的 handler
+    expOrFn, // 这个参数是 conputed 对应的计算方法
+    cb,     // 空函数
+    options // { lazy: true }
   ) {
     this.vm = vm;
     if (isRenderWatcher) {
@@ -151,12 +156,11 @@
   };
 ```
 
-与 `渲染 Watcher` 和 `watcher Watcher` 不同的是， 因为实例  `Watcher` 时传的第四个参数 `{ lazy: true }` 所以 `options.lazy = true；this.dirty = true` (后面访问 `computed` 时有用) ， 所以`computed Watcher` 并没有执行最后的 `this.get()` 方法。 
+与 `渲染 Watcher` 和 `watcher Watcher` 不同的是， 此时实例  `Watcher` 时传的第四个参数 `{ lazy: true }` 所以 `options.lazy = true；this.dirty = true` (后面访问 `computed` 时有用) ， 所以`computed Watcher` 并没有执行最后的 `this.get()` 方法。 
 
 执行完之后回到 `initComputed` 中，把当前的 `Watcher` 实例保存到了 `vm._computedWatchers` 中。 之后执行 `defineComputed(vm, key, userDef)` 方法
 
 ```js
-
   function defineComputed (
     target,
     key,
@@ -196,6 +200,7 @@
       var watcher = this._computedWatchers && this._computedWatchers[key];
       if (watcher) {
         if (watcher.dirty) {
+          // 执行计算方法
           watcher.evaluate();
         }
         if (Dep.target) {
@@ -220,7 +225,9 @@
 
 最后通过 `Object.defineProperty` 方法设置属性的访问规则
 
-看到这个原来当我们访问 `computed` 上的属性时，是通过 `computedGetter` 方法返回真正的值的;如果尝试去修改 `computed` 上的属性，将会触发上面的 `set` 中的 `warn` 提示
+看到这个原来当我们访问 `computed` 上的属性时，是通过 `computedGetter` 方法返回真正的值的; 
+
+并且如果尝试去修改 `computed` 上的属性，将会触发上面的 `set` 中的 `warn` 提示
 
 到此 `compuntd` 的初始化就完成了，接下就是看看当访问 `computed` 时做了什么
 
@@ -518,3 +525,7 @@ this.cleanupDeps();
  ```
 
  注意此时 `watcher.dirty` 为 `false`，所以不会重复执行 `computed` 请问，而是直接返回 `watcher.value` ，也就是之前得到的值 
+
+ # 总结
+
+ 通过 `Object.defineProperty(target, key, sharedPropertyDefinition);` 方法，当前访问 `compunted` 上的属性时，将被代理到这个 `compunted` 属性对应的 `Watcher` 上，然后通过 ` watcher.evaluate()` 执行对应原 `compunted` 计算方法求值

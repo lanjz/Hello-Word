@@ -1,6 +1,8 @@
-# 响应更新
+# Watcher更新顺序
 
-数据变化的时候如果派发更新的呢？ 如果我们同一时变化了多个 `data` 属性， 会触发多次的 `Watcher` 吗？以下面例子为例：
+数据变化的时候如果派发更新的呢？ 如果我们同一时变化了多个 `data` 属性，会触发多次的 `Watcher` 吗？以下面例子为例：
+
+## 例子一
 
 ```js
 new Vue({
@@ -431,4 +433,4 @@ function flushCallbacks () {
 
 当数据发生变化时，并不会立马执行做更新操作，所有需要执行的 `Watcher` 都会先放入到 `queue` 中， 并且具有相同 `id` 的 `Watcher` 不会重复添加，在执行下一次微任务时才开始一一执行 `queue` 的 `Watcher` 方法
 
-并且从例子二可以知道一个组件的所有 `Watcher`， `watch Watcher` 总是最先执行的
+并且从例子二可以知道一个组件的所有 `Watcher`， `watch Watcher` 总是会优先于 `render Watcher`  执行
