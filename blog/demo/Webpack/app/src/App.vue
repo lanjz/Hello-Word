@@ -9,6 +9,7 @@
     import comA from './components/tempA.vue'
     import axios from 'axios'
     import store from '../src/store/index'
+    import toast from '../plugins/toast/toast'
     export default {
         data:function () {
             return {
@@ -29,6 +30,9 @@
       },
       mounted() {
           console.log('this', this)
+        toast({
+          title: 'abc'
+        })
         }
     }
 </script>

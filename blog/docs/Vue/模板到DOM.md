@@ -156,6 +156,10 @@ VNode{
 
 这一步就是遍历 `VNode` 转生成真实DOM，并插入到浏览器视图中
 
+# 总结
+
+`template => AST => Render => VNode => DOM`
+
 
   
   

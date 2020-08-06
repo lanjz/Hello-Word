@@ -1,17 +1,48 @@
 # Extend
 
-使用`Vue.extend`方法使用创建一个“子类”。参数是一个包含组件选项的对象
+使用 `Vue.extend` 方法使用创建一个“子类”。参数是一个包含组件选项的对象
 
-平时会使用`Vue.extend`制作Vue公共组件
+`data` 选项是特例，需要注意 - 在 `Vue.extend()` 中它必须是函数
+
+```html
+<div id="mount-point"></div>
+```
+
+```js
+// 创建构造器
+var Profile = Vue.extend({
+  template: '<p>{{firstName}} {{lastName}} aka {{alias}}</p>',
+  data: function () {
+    return {
+      firstName: 'Walter',
+      lastName: 'White',
+      alias: 'Heisenberg'
+    }
+  }
+})
+// 创建 Profile 实例，并挂载到一个元素上。
+new Profile().$mount('#mount-point')
+
+```
+
+结果如下：
+
+```js
+<p>Walter White aka Heisenberg</p>
+```
+
+平时会使用 `Vue.extend` 制作 Vue 公共插件
 
 下面通过两个组件示例来了解一下用法
 
 ## 例子一-Toast组件
 
-首选实现`Toast` 组件部分
+首先实现一个 `Toast` 组件
 
-```
-./Toast.vue
+先实现 Toast 组件部分
+
+```js
+// Toast.vue
 <template>
   <transition name="fade">
     <div class="wrap" v-show="visible">{{title}}</div>
@@ -21,7 +52,7 @@
   export default {
     data(){
       return {
-        title: 'tt',
+        title: '',
         visible: false,
       }
     },
@@ -59,9 +90,10 @@
 
 ```
 
-使用`vue.extend`制作`toast`组件
-```
-// ./toast.js
+使用 `vue.extend` 生成 `toast` 组件实例
+
+```js
+// toast.js
 import vue from 'vue'
 
 // 这里就是我们刚刚创建的那个静态组件
@@ -73,12 +105,14 @@ let instance
 const ToastConstructor = vue.extend(toastComponent)
 
 const initInstance = () => {
+  // 生成 toast 组件实例
   instance = new ToastConstructor({
     el: document.createElement('div')
   })
+  // 获者 instance = new ToastConstructor().$mount(document.createElement('div'))
 }
 
-
+// 通过 vue 实例就可以设置和获取实例中的属性和方法了
 function initToast(options){
   if(!instance) {
     initInstance()
@@ -87,9 +121,12 @@ function initToast(options){
     instance[item] = options[item]
   }
   if(instance) {
+    // 将这个 vue 插入到 DOM 中
     document.body.appendChild(instance.$el)
   }
+  // 显示这个 toast
   instance.visible = true
+  // 过一定时间后隐藏这个组件
   setTimeout(() => {
     instance.visible = false
   }, options.duration)
@@ -108,12 +145,12 @@ function registryToast(options) {
   }
   return initToast({ ...defaultOptions, ...options })
 }
-
 export default registryToast
 ```
 
-// 组装成插件，方法方法保存到`Vue.prototype`中，这样就可以全局使用`toast`方法了
-```
+然后再组装成插件，将方法保存到 `Vue.prototype` 中，这样就可以在作用所有组件中使用这个 `toast` 方法了
+
+```js
 // ./index.js
 import toast from './toast.js'
 
@@ -122,25 +159,31 @@ export default {
     Vue.prototype.$toast = toast
   }
 }
-
 ```
 
-// 安装这个插件
-```
+安装这个插件
+
+```js
 import Vue from 'vue'
 import toast from '../components/toast/index'
 
 Vue.use(toast)
 
+// 在组件中使用这个组件
+this.$toast({
+  title: '成功显示了',
+  duration: 2000
+})
 ```
 
 ## 例子二-Alert
 
-这个组件相比之前的 Toast 它多了一个回调方法
+这个组件相比之前的 Toast 组件它多了一个回调方法
 
 先实现组件
 
-```
+```vue
+// MeaasgeBox.vue
 <template>
   <div class="hello-message-box-bg" v-show="visible">
     <div class="hello-message-box">
@@ -174,8 +217,7 @@ Vue.use(toast)
         this.callback(arg)
       }
     },
-    mounted() {
-    }
+    mounted() { }
   }
 </script>
 
@@ -244,9 +286,9 @@ Vue.use(toast)
 
 ```
 
-使用`vue.extend`动态创建`MeaasgeBox`组件实例
+使用 `vue.extend` 创建 `MeaasgeBox` 组件实例
 
-```
+```js
 import vue from 'vue'
 
 // 这里就是我们刚刚创建的那个静态组件
@@ -264,7 +306,7 @@ const initInstance = () => {
   instance = new MessageBoxConstructor({
     el: document.createElement('div')
   })
-  instance.callback = defaultCallback // 接收组内的方法
+  instance.callback = defaultCallback // 接收组件回调
 }
 
 
@@ -295,13 +337,23 @@ const defaultOptions = {
   cancelText: '取消',
   showCancel: true
 }
+
+// 调用 Alert 后返回一个 Promise, 所以 MessageBox 也需要返回一个 Promise
 function helloAlert(options){
   if( Object.prototype.toString.call(options) !== '[object Object]') {
     options = {}
   }
   return MessageBox({ ...defaultOptions, ...options })
 }
-
 export default helloAlert
 
+```
+
+使用
+
+```js
+helloAlert({title: 'title', content: 'content'})
+  .then(res => {
+    alert(res)
+  })
 ```

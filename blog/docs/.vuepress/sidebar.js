@@ -67,6 +67,7 @@ module.exports = {
   ],
   '/Vue/': [
     '/Vue/组件通信',
+    '/Vue/模板到DOM',
     '/Vue/响应式原理',
     '/Vue/Watcher更新顺序',
     '/Vue/PatchNode',
@@ -78,6 +79,7 @@ module.exports = {
     '/Vue/数据代理',
     '/Vue/VueRouter',
     '/Vue/Vuex',
+    '/Vue/Extend',
   ],
   '/React/': [
     '/React/ReactDOM.render',

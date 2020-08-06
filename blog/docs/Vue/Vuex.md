@@ -152,7 +152,7 @@ function resetStoreVM (store, state, hot) {
 
 `getters`则是借助vue的计算属性`computed`实现数据实时监听
 
-**那么 `getters` 和 `state` 是如何建立依赖逻辑的呢，**我们再看这段代码逻辑：
+**那么 `getters` 和 `state` 是如何建立依赖逻辑的呢，** 我们再看这段代码逻辑：
 
 ```js
 forEachValue(wrappedGetters, (fn, key) => {
