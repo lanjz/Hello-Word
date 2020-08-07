@@ -80,6 +80,8 @@ module.exports = {
     '/Vue/VueRouter',
     '/Vue/Vuex',
     '/Vue/Extend',
+    '/Vue/Paas应用',
+    '/Vue/吱不吱',
   ],
   '/React/': [
     '/React/ReactDOM.render',

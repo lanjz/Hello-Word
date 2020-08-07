@@ -1,2 +1,28 @@
 # Vue
 
+> [Vue.js技术揭秘](https://ustbhuangyi.github.io/vue-analysis/)
+
+![](https://ustbhuangyi.github.io/vue-analysis/assets/mind.png)
+
+# Vue的初始化
+
+```html
+<div id="app">
+  {{ message }}
+</div>
+```
+
+```javascript
+var app = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue!'
+  }
+})
+```
+
+# Vue和React的区别
+
+- Vue 通过 getter/setter 以及一些函数的劫持，能精确知道数据变化，不需要特别的优化就能达到很好的性能
+
+- React 默认是通过比较引用的方式进行的，如果不优化（PureComponent/shouldComponentUpdate）可能导致大量不必要的VDOM的重新渲染
