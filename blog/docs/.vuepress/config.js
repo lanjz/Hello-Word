@@ -5,6 +5,7 @@ module.exports = {
   description: 'Just playing around',
   extraWatchFiles: ['./sidebar.js'],
   port: 5000,
+  sidebar: 'auto',
   themeConfig: {
     sidebarDepth: 2,
     nav: [
@@ -31,6 +32,8 @@ module.exports = {
       {
         text: 'Node',
         items: [
+          { text: '基础', link: '/Node/基础/' },
+          { text: 'yarn&npm', link: '/Node/Package/' },
           { text: 'Webpack', link: '/Node/Webpack/' },
           /*  {
              text: 'Webpack',

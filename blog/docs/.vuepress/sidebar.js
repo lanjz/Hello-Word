@@ -105,6 +105,8 @@ module.exports = {
     '/network/DNS',
     '/network/TCP',
   ],
+  '/Node/基础/': ['/Node/基础/'],
+  '/Node/Package/': ['/Node/Package/'],
   '/Node/Webpack/': [
     '/Node/Webpack/配置小记',
     '/Node/Webpack/构建速度优化',
