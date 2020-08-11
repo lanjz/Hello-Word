@@ -105,7 +105,12 @@ module.exports = {
     '/network/DNS',
     '/network/TCP',
   ],
-  '/Node/基础/': ['/Node/基础/'],
+  '/Node/基础/': [
+    '/Node/基础/README',
+    '/Node/基础/基础使用',
+    '/Node/基础/事件循环',
+    '/Node/基础/守护服务',
+  ],
   '/Node/Package/': ['/Node/Package/'],
   '/Node/Webpack/': [
     '/Node/Webpack/配置小记',
