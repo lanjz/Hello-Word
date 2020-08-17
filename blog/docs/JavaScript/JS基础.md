@@ -143,7 +143,8 @@ var o = {}
 | NaN        | "NaN"       | false | new Number(NaN)       |
 | Infinity   | "Infinity"  | true  | new Number(Infinity)  |
 | -Infinity  | "-Infinity" | true  | new Number(-Infinity) |
-| 1          | "-1"        | true  | new Number(1)         |
+| -1         | "-1"        | true  | new Number(-1)        |
+| 1          | "1"         | true  | new Number(1)         |
 
 | 对象   | 字符串 | 数字  | 布尔值 |
 | ----- | ------| ----- |-----:|
