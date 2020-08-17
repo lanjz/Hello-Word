@@ -6,16 +6,16 @@
 		"col1": []
 	},
 	"userInfo": {
-		"usernumber": "18649823553",
-		"currentID": "18649823553",
 		"nettype": "11",
 		"paytype": "2",
 		"provincecode": "038",
+		"usernumber": "18649823553",
+		"currentID": "18649823553",
+		"citycode": "380",
 		"loginType": "01",
 		"customid": "5017052760227373",
-		"citycode": "380",
 		"packageName": "蚂蚁大宝卡",
-		"expireTime": "1594357608897",
+		"expireTime": "1597648112627",
 		"areaCode": "",
 		"custlvl": "三星忠诚用户",
 		"certnum": "5002****3126",
@@ -28,92 +28,132 @@
 		"productType": "01",
 		"subscrbstat": "开通",
 		"certtype": "11",
-		"is_wo": "2",
 		"nickName": "y*琴",
-		"laststatdate": "",
+		"laststatdate": "20200404152714",
 		"brand_name": "沃4G后付费",
 		"is_20": false,
 		"is_36": false,
+		"is_wo": "2",
 		"group_info": {
 			"con_member_info": [],
 			"main_member_info": [],
 			"group_type": "00",
-			"main_num_flag": "1",
 			"group_id": "9818101105454245",
 			"product_name": "TDML卡专属亲情语音产品（单向免费）",
-			"product_id": "90308943",
-			"main_card_flag": ""
+			"main_num_flag": "1",
+			"main_card_flag": "",
+			"product_id": "90308943"
 		},
-		"natureQueryNumberInfo": {
-			"number_info": [],
-			"rsp_code": "0000",
-			"part_id": "1-5******126",
-			"cert_type": "01",
-			"cert_number": "500******126",
-			"cert_name": "杨******",
-			"rsp_desc": "正常/成功"
-		},
-		"verifyState": "",
-		"encryptCert": "M6/JO6ozQDOFopBXL0fCGc2FHAsN52ojtu+pT16SusGUdYZL1KPnlf3X0ECJwKQHB/0ZPkZa0hZ2iTsacols4hyJ+MjX/4qqQO9qemw2XJN5KWYck/t9mypdyaj7ajTusMaTCZV6gMc7oRu+3pHRPb1f0gSLK2cMWRfHVgeT/tw=",
 		"loginCustid": "5017052760227373",
-		"lastLoginTime": "2020-06-19 14:01:39",
+		"bindCustID": "",
+		"lastLoginTime": "2020-07-10 11:06:48",
 		"defaultFlag": "00",
 		"isINUser": "0000",
 		"mapExtraParam_rls": "01",
 		"custsex": "1",
+		"verifyState": "",
+		"encryptCert": "ktQleb4d/phKWw9xLPDgq1R2opWXg2/IkXxeWvEjT23T+7hFJMfbvDA3nr5nzV1JY0LGh6sAmTFagWJd8fkVM48q6jDPDN6S1fnTIoTRW9r88tEumGmi5uj3bsb8Si7eP6VDPz4I2buFTIHSMp9Aq9NeLRnlyZ7Jw4RM5yDWf4c=",
+		"natureQueryNumberInfo": {
+			"rsp_desc": "正常/成功",
+			"part_id": "1-5******126",
+			"cert_type": "01",
+			"cert_number": "500******126",
+			"cert_name": "杨******",
+			"number_info": [],
+			"rsp_code": "0000"
+		},
 		"status": "开通"
 	},
 	"separateShow": false,
-	"totalMonthData": null,
+	"totalMonthData": [{
+		"fee": "119.00",
+		"cycleid": "201908"
+	}, {
+		"fee": "119.30",
+		"cycleid": "201909"
+	}, {
+		"fee": "37.00",
+		"cycleid": "201910"
+	}, {
+		"fee": "119.10",
+		"cycleid": "201911"
+	}, {
+		"fee": "119.70",
+		"cycleid": "201912"
+	}, {
+		"fee": "119.30",
+		"cycleid": "202001"
+	}, {
+		"fee": "119.10",
+		"cycleid": "202002"
+	}, {
+		"fee": "119.70",
+		"cycleid": "202003"
+	}, {
+		"fee": "119.40",
+		"cycleid": "202004"
+	}, {
+		"fee": "119.30",
+		"cycleid": "202005"
+	}, {
+		"fee": "119.40",
+		"cycleid": "202006"
+	}, {
+		"fee": "119.90",
+		"cycleid": "202007"
+	}],
 	"billList": [{
 		"amount": "119.00",
 		"leve": "",
 		"discnt": "",
-		"integrateItemCode": "1001",
+		"lineSize": 2,
 		"lines": [{
 			"amount": "119.00",
 			"leve": "-",
 			"discnt": "",
-			"integrateItemCode": "21229",
+			"lineSize": 1,
 			"lines": [],
 			"allLineCount": 1,
 			"usedCount": "--",
-			"lineSize": 1,
+			"integrateItemCode": "21229",
 			"childCount": 0,
 			"name": "基本套餐费"
 		}],
 		"allLineCount": 2,
 		"usedCount": "--",
-		"lineSize": 2,
+		"integrateItemCode": "1001",
 		"childCount": 1,
 		"name": "月固定费"
 	}, {
-		"amount": "0.40",
+		"amount": "0.90",
 		"leve": "",
 		"discnt": "",
-		"integrateItemCode": "1002",
+		"lineSize": 2,
 		"lines": [{
-			"amount": "0.40",
+			"amount": "0.90",
 			"leve": "-",
 			"discnt": "",
-			"integrateItemCode": "21247",
+			"lineSize": 1,
 			"lines": [],
 			"allLineCount": 1,
 			"usedCount": "--",
-			"lineSize": 1,
+			"integrateItemCode": "21247",
 			"childCount": 0,
 			"name": "点对点短信"
 		}],
 		"allLineCount": 2,
 		"usedCount": "--",
-		"lineSize": 2,
+		"integrateItemCode": "1002",
 		"childCount": 1,
 		"name": "增值业务费"
 	}],
 	"datList": [{
-		"dat": "202006",
-		"datfmt": "2020年06月",
+		"dat": "202007",
+		"datfmt": "2020年07月",
 		"cls": "on"
+	}, {
+		"dat": "202006",
+		"datfmt": "2020年06月"
 	}, {
 		"dat": "202005",
 		"datfmt": "2020年05月"
@@ -144,13 +184,9 @@
 	}, {
 		"dat": "201908",
 		"datfmt": "2019年08月"
-	}, {
-		"dat": "201907",
-		"datfmt": "2019年07月"
 	}],
 	"isDiscount": "",
 	"result": {
-		"resultMemo": "备注信息",
 		"balance": "0.00",
 		"areaCode": "0591",
 		"scoreInfo": [{
@@ -162,7 +198,53 @@
 			"scoreIdleValue": "0"
 		}],
 		"userId": "3817122330422201",
-		"cycleId": "202006",
+		"cycleId": "202007",
+		"resultMemo": "备注信息",
+		"backFee": "0.00",
+		"actionFeeUsed": "0.00",
+		"derateFee": "0.00",
+		"allFee": "119.90",
+		"adjustFee": "0.00",
+		"acctClass": [{
+			"fee": "119.00",
+			"cycleid": "201908"
+		}, {
+			"fee": "119.30",
+			"cycleid": "201909"
+		}, {
+			"fee": "37.00",
+			"cycleid": "201910"
+		}, {
+			"fee": "119.10",
+			"cycleid": "201911"
+		}, {
+			"fee": "119.70",
+			"cycleid": "201912"
+		}, {
+			"fee": "119.30",
+			"cycleid": "202001"
+		}, {
+			"fee": "119.10",
+			"cycleid": "202002"
+		}, {
+			"fee": "119.70",
+			"cycleid": "202003"
+		}, {
+			"fee": "119.40",
+			"cycleid": "202004"
+		}, {
+			"fee": "119.30",
+			"cycleid": "202005"
+		}, {
+			"fee": "119.40",
+			"cycleid": "202006"
+		}, {
+			"fee": "119.90",
+			"cycleid": "202007"
+		}],
+		"writeOffFee": "119.90",
+		"recvFeeUsed": "119.90",
+		"presentFeeUsed": "0.00",
 		"billInfo": [{
 			"fee": "119.00",
 			"balance": "",
@@ -184,7 +266,7 @@
 			"adjustAfter": "",
 			"adjustBefore": ""
 		}, {
-			"fee": "0.40",
+			"fee": "0.90",
 			"balance": "",
 			"discnt": "",
 			"parentItemCode": "-1",
@@ -194,7 +276,7 @@
 			"adjustAfter": "",
 			"adjustBefore": ""
 		}, {
-			"fee": "0.40",
+			"fee": "0.90",
 			"balance": "",
 			"discnt": "",
 			"parentItemCode": "1002",
@@ -204,17 +286,9 @@
 			"adjustAfter": "",
 			"adjustBefore": ""
 		}],
-		"allFee": "119.40",
-		"writeOffFee": "119.40",
-		"recvFeeUsed": "119.40",
-		"presentFeeUsed": "0.00",
-		"derateFee": "0.00",
-		"adjustFee": "0.00",
-		"backFee": "0.00",
-		"actionFeeUsed": "0.00",
 		"serialNumber": "18649823553",
 		"success": true,
-		"busiOrder": "BUSI012007101106590411261723",
+		"busiOrder": "BUSI012008171438450481811154",
 		"respCode": "0000",
 		"respDesc": "成功"
 	},
@@ -224,18 +298,18 @@
 		"usedScore": 0
 	},
 	"success": true,
-	"curDate": "202006",
-	"queryTime": "查询时间：2020年07月10日 11:07:29",
+	"curDate": "202007",
+	"queryTime": "查询时间：2020年08月17日 14:38:45",
 	"isForTotal": "",
 	"LoginType": "01",
 	"groupInfo": {
 		"con_member_info": [],
 		"main_member_info": [],
 		"group_type": "00",
-		"main_num_flag": "1",
 		"group_id": "9818101105454245",
 		"product_name": "TDML卡专属亲情语音产品（单向免费）",
-		"product_id": "90308943",
-		"main_card_flag": ""
+		"main_num_flag": "1",
+		"main_card_flag": "",
+		"product_id": "90308943"
 	}
 }
