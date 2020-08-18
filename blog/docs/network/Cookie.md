@@ -40,11 +40,11 @@ Cookie 可设置的属性有：
 
   `Set-Cookie: CookieName=CookieValue; SameSite=Strict`
 
-  - `Lax`: Lax规则稍稍放宽，大多数情况也是不发送第三方 Cookie，但是导航到目标网址的 Get 请求除外
+  - `Lax`: `Lax` 规则稍稍放宽，大多数情况也是不发送第三方 Cookie，但是导航到目标网址的 Get 请求除外
 
-  - `None`: hrome 计划将Lax变为默认设置。这时，网站可以选择显式关闭`SameSite`属性，将其设为`None`。不过，前提是必须同时设置`Secure`属性, 否则无效。
+  - `None`: Chrome 计划将 `Lax` 变为默认设置。这时，网站可以选择显式关闭 `SameSite` 属性，将其设为 `None`。不过，前提是必须同时设置 `Secure` 属性, 否则无效。
 
-下图是使用和不使用`SameSite`时常见请求方式下的`cookie`携带发送情况  
+下图是使用和不使用 `SameSite` 时常见请求方式下的 `cookie` 携带发送情况  
 
 ![](./static/cookie_1.png)
 
