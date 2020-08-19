@@ -1,3 +1,7 @@
 import Vue from 'vue'
 export const EventBus = new Vue()
-export var a = [1]
+var obj = 1
+export default obj
+export function add() {
+  obj = obj + 1
+}

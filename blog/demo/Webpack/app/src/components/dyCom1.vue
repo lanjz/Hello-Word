@@ -2,7 +2,8 @@
     <h2>动态组件一{{t}}</h2>
 </template>
 <script>
-  import { a } from '../utils/index'
+  import obj, { add } from '../utils/index'
+  // let {obj, add} = require('../utils/commonJS')
   export default {
     data(){
       return {
@@ -11,7 +12,9 @@
     },
     methods: {
       do(){
-        console.log(a)
+        console.log(obj)
+        add()
+        console.log(obj)
       }
     },
     activated() {

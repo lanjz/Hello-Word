@@ -5,29 +5,28 @@
   <script src="vue.js"></script>
 </head>
 <body>
-  <div id="app"><h1 :abc="type">h1</h1></div>
+  <div id="app">
+    <div v-for="(item, ind) in t" :key="item" :class="'A'+item">{{item}}</div>
+  </div>
 <script>
-  const obj = {a: 'l'}
-  new Vue({
-    data: {
-      $obj: obj,
-    }
-  })
   var app = new Vue({
     el: '#app',
     data: {
-      arr: [1,2,3,4],
-      type: 1
+      t: [1,2,3,4],
     },
-    obj,
     beforeCreate(){
-      this.$$obj = this.$options.obj
     },
     mounted(){
       console.log(this)
     },
   })
 </script>
+<style>
+  div{
+    height: 10px;
+    border: solid 1px red;
+  }
+</style>
 
 </body>
 </html>

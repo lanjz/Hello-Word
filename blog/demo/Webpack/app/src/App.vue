@@ -3,10 +3,7 @@
         <span ref="abc" v-if="show">{{$store.state}}</span>
         <div ref="abc">{{$store.state}}</div>
         <span v-for="(item) in list" ref="abcd">{{item}}</span>
-        <dyCom1>
-
-        </dyCom1>
-        <dyCom2></dyCom2>
+        <router-view></router-view>
     </div>
 </template>
 <script>

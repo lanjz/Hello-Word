@@ -2,6 +2,163 @@
 
 在 ES6 之前，社区制定了一些模块加载方案，最主要的有 CommonJS 和 AMD 两种。前者用于服务器，后者用于浏览器
 
+ES6 模块跟 CommonJS 模块的不同，主要有以下两个方面：
+
+1. ES6 模块输出的是值的引用，输出接口动态绑定，而 CommonJS 输出的是值的拷贝
+
+2. ES6 模块编译时执行，它的对外接口只是一种静态定义，在代码静态解析阶段就会生成而 CommonJS 模块总是在运行时加载
+
+先来一个问题：在 CommonJS 和 ES6 模块两种场景下，两个文件都引入同一个模块，如果一个文件把导出的值改了，那么在另外文件中这个值会被改变嘛？
+
+分别分析在两种模式下的表现：
+
+**CommonJS**
+
+要注意 CommonJS 模块输出的是一个值的拷贝, 而且是个浅铐钡
+
+```js
+// module
+var obj = []
+module.exports = obj
+// page1
+let obj = require('../utils/commonJS')
+console.log(obj) // []
+obj = 'lanjz' 
+console.log(obj) // lanjz
+// page2
+let obj = require('../utils/commonJS')
+console.log(obj) // []
+```
+
+从上面的例子可以觉得一些讯息：
+
+1. 注意 `CommonJS` 的用法： `let obj = ` , 这不就是普通的变量声明嘛，只是这里赋值是从 `require('../utils/commonJS')` 得到的，所以从这里是不是可以很好得理解为什么说 **CommonJS 模块输出的是一个值的拷贝**。所以上面的例子等价于：
+
+```js
+var _obj = []
+let obj = _obj
+console.log(obj)
+obj = 'lanjz' 
+```
+
+因为是直接修改了当前页面的 `obj` 变量，所以对模块中的变量没有造成影响。再看另个例子
+
+```js
+// module
+var obj = []
+module.exports = obj
+// page1
+let obj = require('../utils/commonJS')
+console.log(obj) // []
+obj.push('lanjz') 
+console.log(obj) // ['lanjz']
+// page2
+let obj = require('../utils/commonJS')
+console.log(obj) //  ['lanjz']
+```
+
+因为引用 `CommonJS` 模块时，只是一个铐钡而且还是一个浅铐钡，所以当直接引用的属性时，其实他模块再次取这个模块时，自然也会发生改变
+
+**ES6模块**
+
+ES6 模块输出的是值的引用
+
+```js
+// module
+export var obj = []
+// page1
+import { obj } from '../utils/index'
+console.log(obj) // []
+obj = 'lanjz'  // 将报错 obj is undefined
+```
+
+从上面的例子可以看到使用 `import` 导出的值是不能直接改变的，上文提到过 ES6 模块是以接口的形式输出的， 也就是 `export` 输出的是一个接口，`import` 得到这个接口的引用，而且借用断点调试时，在作用域中也确实没有找到 `obj` 这个变量
+
+虽然不能直接修改这个值，但如果这个值是引用类型的话，会是怎样的呢？
+
+```js
+// module
+export var obj = []
+// page1
+import { obj } from '../utils/index'
+console.log(obj) // []
+obj.push('lanjz')  // 
+// page2
+import { obj } from '../utils/index'
+console.log(obj) //  ['lanjz']
+```
+
+从上面例子可以看到，如果是引用类型还是可以修改，表现跟 `CommonJS` 一致
+
+问题二：上面例子是引用模块的文件做修改，如果是模块内容对变量做修改会是怎样的呢？
+
+**CommonJS 模块**
+
+```js
+// module
+var obj = []
+var number = 1
+function add(){
+  obj.push(1)
+  number = number + 1
+}
+module.exports = {
+  obj,
+  add
+}
+//page1
+let {obj, add, number} = require('../utils/commonJS')
+console.log(number) // 1
+console.log(obj) // []
+add()
+//page2
+let {obj, add, number} = require('../utils/commonJS')
+console.log(obj) // [1]
+console.log(number) //1
+```
+
+从引用 CommonJS 模块其实做是个浅铐钡这个特点，可以理解上面输出结果, 对于引用类型会受到影响，如果是基本类型则不受影响 
+
+**ES6 模块**
+
+```js
+// module
+export var obj = 1
+export function add() {
+  obj = obj + 1
+}
+//page1
+import { add, obj } from '../utils/index'
+console.log(obj) // 1
+add()
+//page2
+import { obj } from '../utils/index'
+console.log(obj) // 2
+```
+
+即使修改的是基本类型，其它页面也会受到影响，因为上文提过 **ES6 模块导出的是一个引用**
+
+但要注意下面这个例子：
+
+```js
+// module
+var obj = 1
+export default obj
+export function add() {
+  obj = obj + 1
+}
+//page1
+import obj, { add } from '../utils/index'
+console.log(obj) // 1
+add()
+//page2
+import obj from '../utils/index'
+console.log(obj) // 1
+```
+
+引用的值并没受到影响，因为模块中 `export default obj` 相当于导出是的 `obj` 的值，此时跟 `obj` 是没关系的
+
+
 ## CommonJS
 
 CommonJS 模块就是对象，输入时必须查找对象属性
