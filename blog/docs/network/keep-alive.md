@@ -4,13 +4,13 @@ HTTP `keep-alive` 也称为 HTTP 长连接, 是一个通用消息头。它通过
 
 在 Http 1.0 中，Keep-Alive是没有官方支持的，但是也有一些 Server 端支持
 
-Http1.1 以后，Keep-Alive已经默认支持并开启
+Http1.1 以后，Keep-Alive 已经默认支持并开启
 
 ## 使用`keep-alive`
 
-客户端（包括但不限于浏览器）发送请求时会在 Header 中增加一个请求头`Connection: Keep-Alive`，当服务器收到附带有`Connection: Keep-Alive`的请求时，也会在响应头中添加 `Keep-Alive`,这样一来，客户端和服务器之间的 HTTP 连接就会被保持，不会断开（断开方式下面介绍），当客户端发送另外一个请求时，就可以复用已建立的连接。
+客户端（包括但不限于浏览器）发送请求时会在 Header 中增加一个请求头 `Connection: Keep-Alive`，当服务器收到附带有 `Connection: Keep-Alive` 的请求时，也会在响应头中添加 `Keep-Alive`, 这样一来，客户端和服务器之间的 HTTP 连接就会被保持，不会断开（断开方式下面介绍），当客户端发送另外一个请求时，就可以复用已建立的连接。
 
-```
+```js
 HTTP/1.1 200 OK
 Connection: Keep-Alive
 Content-Encoding: gzip
@@ -38,7 +38,7 @@ Http 协议规定了两种关闭复用连接的方式：
 
 **通过 Keep-Alive Timeout 标识**
 
-如果服务端 Response Header 设置了`Keep-Alive:timeout={timeout}`，客户端会就会保持此连接 `timeout`（单位秒）时间，超时之后关闭连接。
+如果服务端 Response Header 设置了 `Keep-Alive:timeout={timeout}`，客户端会就会保持此连接 `timeout`（单位秒）时间，超时之后关闭连接。
 
 `Keep-Alive: timeout=5, max=1000`
 
@@ -48,9 +48,9 @@ Http 协议规定了两种关闭复用连接的方式：
 
 ## 服务端开启keep-alive
 
-Httpd守护进程，一般都提供了`keep-alive timeout`时间设置参数,nginx本身仅支持一个`keepalive_timeout`指令
+Httpd 守护进程，一般都提供了 `keep-alive timeout` 时间设置参数, `nginx` 本身仅支持一个` keepalive_timeout` 指令
 
-```
+```js
 location /cqjt/ {   
     alias /url/var/www/html/;   
     keepalive_timeout  75;   
@@ -60,15 +60,15 @@ location /cqjt/ {
 
 ## tcp keep-alive
 
-`tcp keep-alive`与`http keep-alive`，不是同一回事
+`tcp keep-alive` 与 `http keep-alive`，不是同一回事
 
-`tcp keep-alive`是TCP的一种检测TCP[连接]状况的保鲜机制,定时发送一个空的 TCP Segment，来监测连接是否存活
+`tcp keep-alive` 是TCP的一种检测TCP[连接]状况的保鲜机制,定时发送一个空的 TCP Segment，来监测连接是否存活
 
 **如何设置它?**
 
 KeepAlive都支持哪些设置项
 
-- `tcp_keepalive_time: KeepAlive`的空闲时长，或者说每次正常发送心跳的周期，默认值为`7200s（2小时）`
+- `tcp_keepalive_time: KeepAlive` 的空闲时长，或者说每次正常发送心跳的周期，默认值为`7200s（2小时）`
 
 - `tcp_keepalive_intvl`: KeepAlive探测包的发送间隔，默认值为75s
 

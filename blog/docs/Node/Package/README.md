@@ -154,3 +154,27 @@ npm 设置了一些规则，可用于在 package.json 文件中选择要将软�
 **移除**
 
 - `yarn remove <package...>`: 移除模块
+
+## 镜像管理
+
+### 查看一下镜像源
+
+`yarn config get registry`
+
+### 切换为淘宝源
+
+`yarn config set registry https://registry.npm.taobao.org`
+
+### nrm
+
+使用 `nrm` 可以方便我们管理多个镜像源
+
+安装`nrm`：`npm install nrm -g`
+
+- 测试已有的源速度：`nrm test`
+
+- 查看源：`nrm ls`
+
+- 切换源：`nrm use taobao`
+
+- 添加源：`nrm add mypaas https://registry-npm.mypaas.com.cn`

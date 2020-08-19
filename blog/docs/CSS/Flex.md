@@ -116,3 +116,11 @@ Flex 是 `Flexible Box` 的缩写，意为"弹性布局"，用来为盒状模型
 - `align-self`: `align-self`属性允许单个项目有与其他项目不一样的对齐方式，可覆盖`align-items`属性。默认值为`auto`，表示继承父元素的`align-items`属性，如果没有父元素，则等同于`stretch`
 
 该属性可能取6个值，除了`auto`，其他都与`align-items`属性完全一致
+
+## Q&A
+
+**`flex` 项子元素文本使用 `ellipsis` 无效**
+
+原因： 一般情况下 `min-width` 属性默认值是 `0`，但是 Flexbox 容器中的 `flex项` 的 `min-width` 属性默认值是 `auto`
+
+解决方案： 给 `flex项` 设计样式：`min-width：0`

@@ -369,7 +369,7 @@ HTTP2不使用管道化的方式，而是引入了帧、消息和数据流等概
 
 没有。因为HTTP2也是基于TCP的，应用层无法解决传输层的问题
 
-### `Contetn-Encoding`有哪些压缩方法及对应的算法
+### `Content-Encoding`有哪些压缩方法及对应的算法
 
 - `gzip`: 表示采用 `Lempel-Ziv coding` (LZ77) 压缩算法，以及32位CRC校验的编码方式。
 
@@ -405,7 +405,7 @@ HTTP2不使用管道化的方式，而是引入了帧、消息和数据流等概
 
 **node端**
 
-```
+```js
 var compression = require('compression')
 var app = express();
 
@@ -415,7 +415,7 @@ app.use(compression());
 
 **nginx**
 
-```
+```js
 #on为启用，off为关闭
 gzip on;
 
@@ -485,7 +485,7 @@ Hpack的主要思想说明：
 
 假如现在需要请求一个页面`index.html`
 
-```
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -521,7 +521,7 @@ Hpack的主要思想说明：
 
 Nginx 实现
 
-```
+```js
 server {
     listen 443 ssl http2;
     server_name  localhost;
@@ -577,35 +577,31 @@ server {
 
 分块传输例子：
 
-```
+```js
 var http = require("http");
 function generateChunk(index, response) {
-    setTimeout(() => {
-        if (index === 5) {
-            response.write("end");
-            response.write("");
-            // response.end("</body></html>");
-        } else {
-            response.write('</span>&lt;p&gt; chunk <span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>&lt;/p&gt;<span class="pl-pds">');
-        }
-        }, index * 1000)
+  setTimeout(() => {
+      if (index === 5) {
+          response.write("end");
+          response.write("");
+          // response.end("</body></html>");
+      } else {
+          response.write('</span>&lt;p&gt; chunk <span class="pl-s1"><span class="pl-pse">${</span>index<span class="pl-pse">}</span></span>&lt;/p&gt;<span class="pl-pds">');
+      }
+  }, index * 1000)
 }
-
 
 function handlerRequest(_request, response) {
 response.setHeader("Content-Type", "text/html; charset=UTF-8");
 response.setHeader("Transfer-Encoding", "chunked");
 response.write('</span>&lt;!DOCTYPE html&gt;</span> <span class="pl-s"> &lt;html lang="en"&gt;</span> <span class="pl-s"> &lt;head&gt;</span> <span class="pl-s"> &lt;meta charset="utf-8"&gt;</span> <span class="pl-s"> &lt;title&gt;HTTP 分块传输示例&lt;/title&gt;</span> <span class="pl-s"> &lt;/head&gt;</span> <span class="pl-s"> &lt;body&gt;</span> <span class="pl-s"> &lt;h1&gt;HTTP 分块传输示例&lt;/h1&gt;</span> <span class="pl-s"> <span class="pl-pds">');
 
-
 let index = 0;
-while (index <= 5) {
-generateChunk(index, response);
-index++;
+  while (index <= 5) {
+    generateChunk(index, response);
+    index++;
+  }
 }
-}
-
-
 const server = http.createServer(handlerRequest);
 server.listen(3000);
 console.log("server started at http://localhost:3000");
@@ -614,4 +610,16 @@ console.log("server started at http://localhost:3000");
 
 **方案四：web socket**
 
-WebSocket和传统的tcp socket连接相似，也是基于tcp协议，提供双向的数据通道。WebSocket优势在于提供了message的概念，比基于字节流的tcp socket使用更简单，同时又提供了传统的http所缺少的长连接功能。不过WebSocket相对较新，2010年才起草，并不是所有的浏览器都提供了支持。各大浏览器厂商最新的版本都提供了支持
+`WebSocket` 和传统的 `tcp socket` 连接相似，也是基于 `tcp` 协议，提供双向的数据通道。`WebSocket` 优势在于提供了 `message` 的概念，比基于字节流的`tcp socket` 使用更简单，同时又提供了传统的 `http` 所缺少的长连接功能。不过 `WebSocket` 相对较新，2010 年才起草，并不是所有的浏览器都提供了支持。各大浏览器厂商最新的版本都提供了支持
+
+## UDP
+
+UDP 是一个简单的传输层协议。和 TCP 相比，UDP 有以下几个特性：
+
+- UDP 缺乏可靠性。UDP 本身不提供确认，序列号，超时重传等机制。UDP 数据报可能在网络中被复制，被重新排序。即 UDP 不保证数据报会到达其最终目的地，也不保证各个数据报的先后顺序，也不保证每个数据报只到达一次
+
+- UDP 数据报是有长度的。每个 UDP 数据报都有长度，如果一个数据报正确地到达目的地，那么该数据报的长度将随数据一起传递给接收方。而 TCP 是一个字节流协议，没有任何（协议上的）记录边界。
+
+- UDP 是无连接的。UDP 客户和服务器之前不必存在长期的关系。UDP 发送数据报之前也不需要经过握手创建连接的过程。
+
+- UDP 支持多播和广播。
