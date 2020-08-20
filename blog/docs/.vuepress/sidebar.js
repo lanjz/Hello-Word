@@ -113,7 +113,7 @@ module.exports = {
     '/network/DNS',
     '/network/TCP',
     '/network/keep-alive',
-    '/network/webSocket',
+    '/network/WebSocket',
     '/network/网络层的优化',
   ],
   '/Node/基础/': [
