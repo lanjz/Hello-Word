@@ -125,11 +125,11 @@ module.exports = {
   ],
   '/Node/Package/': ['/Node/Package/'],
   '/Node/Webpack/': [
-    '/Node/Webpack/配置小记',
-    '/Node/Webpack/构建速度优化',
-    '/Node/Webpack/开发效率优化',
     '/Node/Webpack/Plugin',
-    '/Node/Webpack/Webpack流程分析',
+    '/Node/Webpack/Babel-Loader',
     '/Node/Webpack/吱不吱',
+    '/Node/Webpack/配置小记',
+    '/Node/Webpack/css-loader&style-loader',
+    '/Node/Webpack/构建优化方案',
   ]
 }
