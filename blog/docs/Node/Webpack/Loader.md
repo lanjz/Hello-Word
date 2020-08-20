@@ -261,3 +261,25 @@ module.exports = {
     return replace(content)
   }
 ```
+
+
+
+# loader执行顺序
+
+正常情况下 loader 的执行顺序是倒序的
+
+但可以通过enforce属性去改变执行顺序：
+
+- `enforce:'pre'` 前置 权重最高
+
+- `enforce:'normal'` 不变 权重第二
+
+- `enforce:'inline'` 行内 权重第三
+
+- `enforce:'post'` 后置 权重第四
+
+
+
+
+
+

@@ -126,9 +126,8 @@ module.exports = {
   '/Node/Package/': ['/Node/Package/'],
   '/Node/Webpack/': [
     '/Node/Webpack/Plugin',
+    '/Node/Webpack/Loader',
     '/Node/Webpack/Babel-Loader',
-    '/Node/Webpack/吱不吱',
-    '/Node/Webpack/配置小记',
     '/Node/Webpack/css-loader&style-loader',
     '/Node/Webpack/构建优化方案',
   ]
