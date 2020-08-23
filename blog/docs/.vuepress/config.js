@@ -15,6 +15,7 @@ module.exports = {
         items: [
           { text: 'JavaScript', link: '/JavaScript/' },
           { text: 'Node', link: '/language/japanese' },
+          { text: 'HTML5', link: '/HTML5/' },
           { text: 'CSS', link: '/CSS/' },
           { text: '网络', link: '/network/' },
           { text: '算法', link: '/language/japanese4' },
@@ -49,7 +50,9 @@ module.exports = {
       {
         text: '工程化',
         items: [
-          { text: '部署', link: '/language/japanese6' },
+          { text: '系统设计', link: '/工程化/系统设计' },
+          { text: '重构', link: '/工程化/重构改善既有代码的设计' },
+          { text: '开发与调试', link: '/工程化/开发与调试技巧' },
         ]
       },
       {

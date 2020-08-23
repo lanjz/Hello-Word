@@ -24,11 +24,11 @@ Web Worker 有以下几个使用注意点：
 
   Worker 线程无法读取本地文件，即不能打开本机的文件系统（file://），它所加载的脚本，必须来自网络
 
-# 基本用法
+## 基本用法
 
 在浏览器原生提供`Worker()`构造函数，用来供主线程生成 Worker 线程。
 
-```
+```js
 var myWorker = new Worker(jsUrl, options)
 ```
 
@@ -36,7 +36,7 @@ var myWorker = new Worker(jsUrl, options)
 
 - `options`: 配置对象，该对象可选。它的一个作用就是指定 Worker 的名称，用来区分多个 Worker 线程
 
-  ```
+  ```js
   // 主线程
   var myWorker = new Worker('worker.js', { name : 'myWorker' });
   
@@ -60,7 +60,7 @@ var myWorker = new Worker(jsUrl, options)
 
 创建一个`worker.js`文件
 
-```
+```js
 onmessage = function(e) {
     console.log('Worker: Message received from main script', e);
     doWorker()
@@ -80,7 +80,7 @@ function doWorker(e) {
 
 上面定义了`onmessage`方法接收客户端传过来的信息，除了直接定义`onmessage`方法，还可以使用`addEventListener`方法监听传过来的信息
 
-```
+```js
 self.addEventListener('message', function (e) {
     console.log('addEventListener: Message received from main script', e);
     doWorker(e)
@@ -97,7 +97,7 @@ self.addEventListener('message', function (e) {
 
 使用`worker.js`
 
-```
+```html
 <body>
 <button id="start">开始让Worker执行一个任务吧</button>
 <div></div>
@@ -130,7 +130,7 @@ self.addEventListener('message', function (e) {
 
 主线程可以监听 Worker 是否发生错误。如果发生错误，Worker 会触发主线程的error事件
 
-```
+```js
 worker.onerror(function (event) {
   console.log([
     'ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
@@ -152,7 +152,7 @@ worker.addEventListener('error', function (event) {
 
 - Worker 线程: `self.close()`
 
-# 传递的数据
+## 传递的数据
 
 前面说过，主线程与 Worker 之间的通信内容，可以是文本，也可以是对象。需要注意的是，这种通信是拷贝关系，即是传值而不是传址，
 Worker 对通信内容的修改，不会影响到主线程。事实上，浏览器内部的运行机制是，先将通信内容串行化，然后把串行化后的字符串发给 Worker，
@@ -160,7 +160,7 @@ Worker 对通信内容的修改，不会影响到主线程。事实上，浏览�
 
 主线程与 Worker 之间也可以交换二进制数据，比如 File、Blob、ArrayBuffer 等类型，也可以在线程之间发送。下面是一个例子。
 
-```
+```js
 // 主线程
 var uInt8Array = new Uint8Array(new ArrayBuffer(10));
 for (var i = 0; i < uInt8Array.length; ++i) {
@@ -182,7 +182,7 @@ self.onmessage = function (e) {
 这是为了防止出现多个线程同时修改数据的麻烦局面。这种转移数据的方法，叫做`Transferable Objects`。
 这使得主线程可以快速把数据交给 Worker，对于影像处理、声音处理、3D 运算等就非常方便了，不会产生性能负担。
 
-```
+```js
 // Transferable Objects 格式
 worker.postMessage(arrayBuffer, [arrayBuffer]);
 
@@ -190,11 +190,11 @@ worker.postMessage(arrayBuffer, [arrayBuffer]);
 var ab = new ArrayBuffer(1);
 worker.postMessage(ab, [ab]);
 ```
-# 同页面的 Web Worker
+## 同页面的 Web Worker
 
 通常情况下，Worker 载入的是一个单独的 JavaScript 脚本文件，但是也可以载入与主线程在同一个网页的代码。
 
-```
+```js
 <script id="worker" type="app/worker">
       addEventListener('message', function () {
         postMessage('some message');
@@ -205,7 +205,7 @@ worker.postMessage(ab, [ab]);
 
 然后，读取这一段嵌入页面的脚本，用 Worker 来处理。
 
-```
+```js
 var blob = new Blob([document.querySelector('#worker').textContent]);
 var url = window.URL.createObjectURL(blob);
 var worker = new Worker(url);
@@ -221,7 +221,7 @@ worker.onmessage = function (e) {
 
 完整例子如下：
 
-```
+```js
 <!DOCTYPE html>
 <html lang="en">
 <head>

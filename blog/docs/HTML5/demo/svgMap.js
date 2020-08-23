@@ -1,7 +1,5 @@
 function cSvgDom() {
     const svgDom = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    // svgDom.setAttribute('width','2000');
-    // svgDom.setAttribute('height','2000');
     svgDom.setAttribute('version','full');
     svgDom.setAttribute('baseProfile','baseProfile');
     svgDom.setAttribute('style', `background: #272b2d`)
