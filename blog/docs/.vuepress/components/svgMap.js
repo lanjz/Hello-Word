@@ -1,3 +1,8 @@
+function cContainer() {
+    const div = document.createElement('div');
+    div.setAttribute('style','width=500px;height:500px;border:solid 1px red;overflow: hidden');
+    return div
+}
 function cSvgDom() {
     const svgDom = document.createElementNS('http://www.w3.org/2000/svg','svg');
     svgDom.setAttribute('version','full');
@@ -64,6 +69,8 @@ SvgMap.prototype.initState = function(data, options = {}) {
         stroke: '#fff',
         fill: 'transparent'
     }
+    this.translateX = 0
+    this.translateY = 0
     this.keyName = options.key || 'key'
     this.lableName = options.name || 'label'
     this.callback = options.callback || null
@@ -91,7 +98,9 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom.setAttribute('width', svgW)
     this.svgDom.setAttribute('height', svgH)
     this.svgDom.remove()
-    return this.svgDom
+    const div = cContainer()
+    div.appendChild(this.svgDom)
+    return div
 }
 // 处理根元素
 SvgMap.prototype.initWalk = function(tree, direction) {
@@ -142,6 +151,20 @@ SvgMap.prototype.addEvent = function(){
             _this.callback && _this.callback(_this.virtualSvg[key])
         }
     })
+    this.svgDom.addEventListener('mousedown', this.mousedown.bind(_this))
+    this.svgDom.addEventListener('mousemove', this.mousemove.bind(_this))
+}
+SvgMap.prototype.mousedown = function(e) {
+    this.mousedownX = e.pageX
+    this.mousedownStart =  true
+    this.mousedownY = e.pageX
+}
+SvgMap.prototype.mousemove = function(e) {
+    return
+    if(!this.mousedownStart) return
+    this.translateX += (e.pageX - this.mousedownX)
+    console.log('this.svgDom', this.svgDom)
+    this.svgDom.setAttribute('style', `transform: translate(${this.translateX}px, ${this.translateY}px)`)
 }
 /**
  * 获取元素几何信息，需要在DOM才能得到这些信息，所以先执行appendChild
