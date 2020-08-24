@@ -227,7 +227,7 @@
            }
        ]
        const root = {
-           name: '前端知识',
+           name: 'Tree',
            children: [...tree2, ...tree]
        }
        const min = {
@@ -255,6 +255,7 @@
            bale: 'name',
            key: 'name',
            callback: function (item) {
+             console.log('item', item)
                document.body.appendChild(mapSvg(item))
 
            }

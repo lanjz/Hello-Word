@@ -64,8 +64,8 @@ SvgMap.prototype.initState = function(data, options = {}) {
         stroke: '#fff',
         fill: 'transparent'
     }
-    this.keyName = options.key || 'name'
-    this.lableName = options.name || 'name'
+    this.keyName = options.key || 'key'
+    this.lableName = options.name || 'label'
     this.callback = options.callback || null
 }
 SvgMap.prototype.init = function (data, options) {
