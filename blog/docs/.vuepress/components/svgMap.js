@@ -78,6 +78,7 @@ SvgMap.prototype.initState = function(data, options = {}) {
 SvgMap.prototype.init = function (data, options) {
     this.initState(data, options)
     this.svgDom = cSvgDom()
+    this.svgDom.that = this
     this.svgGroup = createGroup()
     this.svgDom.appendChild(this.svgGroup)
     document.body.appendChild(this.svgDom)
@@ -99,6 +100,7 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom.setAttribute('height', svgH)
     this.svgDom.remove()
     const div = cContainer()
+    div.setAttribute('style', `background: #272b2d`)
     div.appendChild(this.svgDom)
     return div
 }
@@ -151,20 +153,31 @@ SvgMap.prototype.addEvent = function(){
             _this.callback && _this.callback(_this.virtualSvg[key])
         }
     })
-    this.svgDom.addEventListener('mousedown', this.mousedown.bind(_this))
-    this.svgDom.addEventListener('mousemove', this.mousemove.bind(_this))
+    this.svgDom.addEventListener('mousedown', _this.mousedown)
 }
 SvgMap.prototype.mousedown = function(e) {
-    this.mousedownX = e.pageX
-    this.mousedownStart =  true
-    this.mousedownY = e.pageX
+    let _this = this.that
+    _this.mousedownMoveStartX = e.pageX
+    _this.mousedownMoveStartY = e.pageY
+    _this.svgDom.addEventListener('mousemove', _this.mousemove)
+    _this.svgDom.addEventListener('mouseup', _this.mouseleave)
+    _this.svgDom.addEventListener('mouseleave', _this.mouseleave)
+}
+SvgMap.prototype.mouseleave = function(e) {
+    let _this = this.that
+    _this.translateX = _this.temTranslateX
+    _this.translateY = _this.temTranslateY
+    _this.svgDom.removeEventListener('mousemove', _this.mousemove)
+    _this.svgDom.removeEventListener('mouseleave', _this.mouseleave)
+    _this.svgDom.removeEventListener('mouseleave', _this.mouseleave)
 }
 SvgMap.prototype.mousemove = function(e) {
-    return
-    if(!this.mousedownStart) return
-    this.translateX += (e.pageX - this.mousedownX)
-    console.log('this.svgDom', this.svgDom)
-    this.svgDom.setAttribute('style', `transform: translate(${this.translateX}px, ${this.translateY}px)`)
+    let _this = this.that
+    _this.positionX = (e.pageX - _this.mousedownMoveStartX)
+    _this.positionY = (e.pageY - _this.mousedownMoveStartY)
+    _this.temTranslateX = _this.positionX + _this.translateX
+    _this.temTranslateY = _this.positionY + _this.translateY
+    _this.svgDom.setAttribute('style', `transform: translate(${_this.temTranslateX}px, ${_this.temTranslateY}px)`)
 }
 /**
  * 获取元素几何信息，需要在DOM才能得到这些信息，所以先执行appendChild
