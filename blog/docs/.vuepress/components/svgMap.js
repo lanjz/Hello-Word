@@ -71,6 +71,7 @@ SvgMap.prototype.initState = function(data, options = {}) {
     }
     this.translateX = 0
     this.translateY = 0
+    this.scale = 1
     this.keyName = options.key || 'key'
     this.lableName = options.name || 'label'
     this.callback = options.callback || null
@@ -100,7 +101,7 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom.setAttribute('height', svgH)
     this.svgDom.remove()
     const div = cContainer()
-    div.setAttribute('style', `background: #272b2d`)
+    div.setAttribute('style', `background: #272b2d; overflow:hidden;width: 500px;height:500px`)
     div.appendChild(this.svgDom)
     return div
 }
@@ -154,6 +155,22 @@ SvgMap.prototype.addEvent = function(){
         }
     })
     this.svgDom.addEventListener('mousedown', _this.mousedown)
+    this.svgDom.onmousewheel = this.wheel.bind(this)
+}
+SvgMap.prototype.wheel = function(e){
+    const { wheelDelta } = e
+    console.log(this)
+    const { width, height } = this.svgGroup.getBBox()
+    if(wheelDelta > 0) {
+        this.scale += 0.1
+    } else {
+        this.scale -= 0.1
+    }
+    let _w = (width*this.scale - width)/2
+    let _h = (height*this.scale - height)/2
+    this.translateX += _w
+    this.translateY += _h
+    this.svgDom.setAttribute('style', `transform: translate(${this.translateX }px, ${this.translateY}px) scale(${this.scale})`)
 }
 SvgMap.prototype.mousedown = function(e) {
     let _this = this.that
@@ -177,7 +194,7 @@ SvgMap.prototype.mousemove = function(e) {
     _this.positionY = (e.pageY - _this.mousedownMoveStartY)
     _this.temTranslateX = _this.positionX + _this.translateX
     _this.temTranslateY = _this.positionY + _this.translateY
-    _this.svgDom.setAttribute('style', `transform: translate(${_this.temTranslateX}px, ${_this.temTranslateY}px)`)
+    _this.svgDom.setAttribute('style', `transform: translate(${_this.temTranslateX}px, ${_this.temTranslateY}px) scale(${_this.scale})`)
 }
 /**
  * 获取元素几何信息，需要在DOM才能得到这些信息，所以先执行appendChild
