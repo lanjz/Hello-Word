@@ -27,6 +27,9 @@
       console.log('mounted', this)
       console.log('this.$attrs', this.$attrs)
       console.log('this.$listeners', this.$listeners)
+    },
+    activated() {
+      console.log('activated')
     }
   }
 </script>

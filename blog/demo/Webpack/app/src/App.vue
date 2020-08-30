@@ -1,5 +1,8 @@
 <template>
     <div>
+        <keep-alive>
+            <dyCom1></dyCom1>
+        </keep-alive>
         <span ref="abc" v-if="show">{{$store.state}}</span>
         <div ref="abc">{{$store.state}}</div>
         <span v-for="(item) in list" ref="abcd">{{item}}</span>

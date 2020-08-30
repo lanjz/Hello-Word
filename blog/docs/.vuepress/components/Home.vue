@@ -1,5 +1,7 @@
 <template>
-  <div ref="home"></div>
+  <div class="app">
+    <div ref="home" class="container"></div>
+  </div>
 </template>
 
 <script>
@@ -29,9 +31,8 @@ export default {
       return createData
     },
     initSvgTree(){
-
       const svgTree = this.getItemTree(nav)
-      const svg = mapSvg({ label: 'LAN_JZ', children: svgTree })
+      const svg = mapSvg({ label: 'LAN_JZ', key: 'LAN_JZ', children: svgTree }, { className: 'svg-dom' })
       this.$refs['home'].appendChild(svg)
     }
   },
@@ -41,6 +42,20 @@ export default {
 }
 </script>
 
-<style>
+<style scope>
+.app{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: #272b2d;
+}
+.container{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 
+}
 </style>

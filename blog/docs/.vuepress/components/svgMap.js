@@ -1,6 +1,5 @@
 function cContainer() {
     const div = document.createElement('div');
-    div.setAttribute('style','width=500px;height:500px;border:solid 1px red;overflow: hidden');
     return div
 }
 function cSvgDom() {
@@ -75,6 +74,7 @@ SvgMap.prototype.initState = function(data, options = {}) {
     this.keyName = options.key || 'key'
     this.lableName = options.name || 'label'
     this.callback = options.callback || null
+    this.className = options.className || ''
 }
 SvgMap.prototype.init = function (data, options) {
     this.initState(data, options)
@@ -99,9 +99,19 @@ SvgMap.prototype.init = function (data, options) {
     const { width: svgW, height: svgH } = this.svgGroup.getBBox()
     this.svgDom.setAttribute('width', svgW)
     this.svgDom.setAttribute('height', svgH)
+    const centerSvg = this.virtualSvg[this.data[this.keyName]]
+    if( centerSvg && centerSvg.dom ){
+        const { y: cTop } = centerSvg.dom.getBBox()
+        this.translateY = svgH/2 - cTop
+        this.svgDom.setAttribute('style', `transform: translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`)
+    }
+
     this.svgDom.remove()
     const div = cContainer()
-    div.setAttribute('style', `background: #272b2d; overflow:hidden;width: 500px;height:500px`)
+    div.setAttribute('style', `background: #272b2d`)
+    if(this.className) {
+        div.classList.add(this.className)
+    }
     div.appendChild(this.svgDom)
     return div
 }
@@ -125,11 +135,11 @@ SvgMap.prototype.walk = function (tree, direction) {
         }
         hei += ((this.getRect(svgEl)).height + this.reactStyle.verticalMargin)
         svgElArr.push(svgEl)
-        this.addVirtualSvg(item)
+        this.addVirtualSvg(item, null, svgEl)
     })
     return this.createListGroup(svgElArr) // 返回组成G
 }
-SvgMap.prototype.addVirtualSvg = function(node, childDom) {
+SvgMap.prototype.addVirtualSvg = function(node, childDom, curDom) {
     if(!this.virtualSvg[node[this.keyName]]){
         this.virtualSvg[node[this.keyName]] = {
             ...node,
@@ -138,6 +148,9 @@ SvgMap.prototype.addVirtualSvg = function(node, childDom) {
     }
     if(childDom) {
         this.virtualSvg[node[this.keyName]].childDom.push(childDom)
+    }
+    if(curDom) {
+        this.virtualSvg[node[this.keyName]].dom = curDom
     }
 }
 SvgMap.prototype.addEvent = function(){
@@ -159,7 +172,6 @@ SvgMap.prototype.addEvent = function(){
 }
 SvgMap.prototype.wheel = function(e){
     const { wheelDelta } = e
-    console.log(this)
     const { width, height } = this.svgGroup.getBBox()
     if(wheelDelta > 0) {
         this.scale += 0.1
@@ -173,7 +185,9 @@ SvgMap.prototype.wheel = function(e){
     this.svgDom.setAttribute('style', `transform: translate(${this.translateX }px, ${this.translateY}px) scale(${this.scale})`)
 }
 SvgMap.prototype.mousedown = function(e) {
+    console.log('mounsedown', this)
     let _this = this.that
+    _this.mousedown = true
     _this.mousedownMoveStartX = e.pageX
     _this.mousedownMoveStartY = e.pageY
     _this.svgDom.addEventListener('mousemove', _this.mousemove)
@@ -182,6 +196,7 @@ SvgMap.prototype.mousedown = function(e) {
 }
 SvgMap.prototype.mouseleave = function(e) {
     let _this = this.that
+    _this.mousedown = false
     _this.translateX = _this.temTranslateX
     _this.translateY = _this.temTranslateY
     _this.svgDom.removeEventListener('mousemove', _this.mousemove)
@@ -190,6 +205,8 @@ SvgMap.prototype.mouseleave = function(e) {
 }
 SvgMap.prototype.mousemove = function(e) {
     let _this = this.that
+    console.log('_this.mousedown', _this.mousedown)
+    if(!_this.mousedown) return
     _this.positionX = (e.pageX - _this.mousedownMoveStartX)
     _this.positionY = (e.pageY - _this.mousedownMoveStartY)
     _this.temTranslateX = _this.positionX + _this.translateX
@@ -236,7 +253,6 @@ SvgMap.prototype.findPositionElY = function(el){
  * @params {g} left 如果没有说明只有一侧
  * */
 SvgMap.prototype.createRootG = function(right, left){
-    this.addVirtualSvg(this.data)
     const rightMiddleY = this.findMiddlePosition(right)
     const leftMiddleY = left ? this.findMiddlePosition(left) : 0
     // 中心按钮的X偏移量：如果有left就放在left右侧
@@ -249,6 +265,8 @@ SvgMap.prototype.createRootG = function(right, left){
         { y: rootY, x: rootX, fill: '#eade98', rx: 20, ry: 20 },
         { key: this.data[this.keyName] }
         )
+    this.addVirtualSvg(this.data, right, rootG)
+    this.addVirtualSvg(this.data, left)
     this.svgDom.appendChild(rootG)
     const rootBox = rootG.getBBox()
     // 矮的那个也要放在高的垂直居中位置（当存在left时才需要计算）
@@ -340,7 +358,7 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
 
     cG.appendChild(a)
     cG.appendChild(b)
-    this.addVirtualSvg(node, b)
+    this.addVirtualSvg(node, b, a)
     // 画线
     b.childNodes.forEach(item => {
         const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
