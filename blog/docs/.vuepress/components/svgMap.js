@@ -145,10 +145,12 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom.setAttribute('width', svgW)
     this.svgDom.setAttribute('height', svgH)
     const centerSvg = this.virtualSvg[this.data[this.keyName]]
-    if( centerSvg && centerSvg.dom ){
-        const { y: cTop } = centerSvg.dom.getBBox()
-        this.translateY = svgH/2 - cTop
-        this.svgDom.setAttribute('style', `transform: translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`)
+    if(centerSvg) {
+        const titleSvg = this.svgDom.lastChild
+        console.log(svgH, titleSvg.getBBox(), document.body.clientHeight)
+        const { y: cTop } = titleSvg.getBBox()
+        // this.translateY = svgH/2
+        // this.svgDom.setAttribute('style', `transform: translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`)
     }
 
     this.svgDom.remove()
@@ -163,10 +165,10 @@ SvgMap.prototype.init = function (data, options) {
 }
 // 处理根元素
 SvgMap.prototype.initWalk = function(tree, direction) {
-    const gGroup = this.walk(tree, direction)
+    const gGroup = this.walk(tree, direction, true)
     return gGroup
 }
-SvgMap.prototype.walk = function (tree, direction) {
+SvgMap.prototype.walk = function (tree, direction, root) {
     const svgElArr = []
     let hei = 0 // 设置每个元素的偏移高度
     tree.forEach((item) => {
@@ -178,10 +180,15 @@ SvgMap.prototype.walk = function (tree, direction) {
         if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
             const childSvgEl  = this.walk(item.children, direction)
             svgEl = this.combineGroup(svgEl, childSvgEl, item)
+        } else {
+            this.addVirtualSvg(item, svgEl, null)
         }
         hei += ((this.getRect(svgEl)).height + this.reactStyle.verticalMargin)
         svgElArr.push(svgEl)
-        this.addVirtualSvg(item, svgEl, null)
+        if(root) {
+            this.addVirtualSvg(this.data, this.svgGroup, svgEl)
+        }
+        //
     })
     return this.createListGroup(svgElArr) // 返回组成G
 }
@@ -314,8 +321,8 @@ SvgMap.prototype.createRootG = function(right, left){
         { y: rootY, x: rootX, fill: '#eade98', rx: 20, ry: 20 },
         { key: this.data[this.keyName] }
         )
-    this.addVirtualSvg(this.data, rootG, right)
-    this.addVirtualSvg(this.data, null, left)
+    // this.addVirtualSvg(this.data, rootG, right)
+    // this.addVirtualSvg(this.data, null, left)
     this.svgDom.appendChild(rootG)
 
     if(right) {
