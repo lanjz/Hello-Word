@@ -32,7 +32,7 @@ export default {
     },
     initSvgTree(){
       const svgTree = this.getItemTree(nav)
-      const svg = mapSvg({ label: 'LAN_JZ', key: 'LAN_JZ', children: svgTree }, { className: 'svg-dom' })
+      const svg = mapSvg(svgTree, { title: 'Orchid' })
       this.$refs['home'].appendChild(svg)
     }
   },

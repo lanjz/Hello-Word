@@ -1,3 +1,26 @@
+/**
+ * 判断滚轮方向
+ * @return { boolean } true-向上; false-向下
+ * */
+function wheelDir(e) {
+    e = e || window.event;
+    if (e.wheelDelta) {
+        if (e.wheelDelta>0) {
+           return true
+        }
+        if (e.wheelDelta<0) {
+            return false
+        }
+    } else if (e.detail) {
+        if (e.detail > 0) {
+            return false
+        }
+        if(e.detail<0){
+            return true
+        }
+    }
+}
+
 function cContainer() {
     const div = document.createElement('div');
     return div
@@ -46,13 +69,33 @@ function createGroup(attr = {}) {
 }
 // ----------------- //
 function SvgMap(data, options = {}) {
-    if(!data || !data.children.length){
-        console.warn('请确定子元素')
-        return
+    if(!data && typeof data !== 'object'){
+        console.error('svgMap: data 数据无效')
     }
 }
+/**
+ * @params {Object<keys:label,key,children>} data: 数据源
+ * options：
+ * @property {String} title： 主题
+ * @property {String <right, null>} direction： svg 延展方向, 默认为 null
+ * @property {String} key： label的字段名，默认为 label
+ * @property {String} name： keys 的字段名，默认为 key
+ * @property {String} className： 赋加到 svg 上的类名
+ * @property {Function} callback： 点击项后的回调函数
+ * */
 SvgMap.prototype.initState = function(data, options = {}) {
-    this.data = JSON.parse(JSON.stringify(data))
+    const copyData = JSON.parse(JSON.stringify(data))
+    const type = Object.prototype.toString.call(copyData)
+    if(type === '[object Array]'){
+        this.data = {
+            label: options.title || 'Root',
+            key: 'root',
+            children: copyData
+        }
+    } else {
+        this.data = copyData
+    }
+
     this.direction = options.direction|| '' // right->只向右伸展 '' => 左右伸展
     this.virtualSvg = {}
     this.reactStyle = { // 文本样式
@@ -84,7 +127,7 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom.appendChild(this.svgGroup)
     document.body.appendChild(this.svgDom)
     const child = this.data.children || []
-    let childLeft = null
+    let childLeft, childRight
     if(!this.direction && child.length > 1){
         const half = Math.floor(child.length/2)
         // 一半存入left中，child存放其余部分了
@@ -92,11 +135,13 @@ SvgMap.prototype.init = function (data, options) {
         childLeft = this.initWalk(left, 'left')
         this.svgGroup.appendChild(childLeft)
     }
-    const childRight = this.initWalk(child)
-    this.svgGroup.appendChild(childRight)
+    if(child.length > 1){
+        childRight = this.initWalk(child)
+        this.svgGroup.appendChild(childRight)
+    }
     this.addEvent()
     this.createRootG(childRight, childLeft)
-    const { width: svgW, height: svgH } = this.svgGroup.getBBox()
+    const { width: svgW, height: svgH } = this.svgDom.getBBox()
     this.svgDom.setAttribute('width', svgW)
     this.svgDom.setAttribute('height', svgH)
     const centerSvg = this.virtualSvg[this.data[this.keyName]]
@@ -113,6 +158,7 @@ SvgMap.prototype.init = function (data, options) {
         div.classList.add(this.className)
     }
     div.appendChild(this.svgDom)
+    console.log('_this.mousedown', this.virtualSvg)
     return div
 }
 // 处理根元素
@@ -135,11 +181,17 @@ SvgMap.prototype.walk = function (tree, direction) {
         }
         hei += ((this.getRect(svgEl)).height + this.reactStyle.verticalMargin)
         svgElArr.push(svgEl)
-        this.addVirtualSvg(item, null, svgEl)
+        this.addVirtualSvg(item, svgEl, null)
     })
     return this.createListGroup(svgElArr) // 返回组成G
 }
-SvgMap.prototype.addVirtualSvg = function(node, childDom, curDom) {
+/**
+ * 根据 data 元素生成虚拟节点
+ * @params { Object } node: 当前节点
+ * @params { curDom } node: 当前节点对应的 svg dom
+ * @params { childDom } node: 当前节点对应的子节点 dom
+ * */
+SvgMap.prototype.addVirtualSvg = function(node, curDom, childDom) {
     if(!this.virtualSvg[node[this.keyName]]){
         this.virtualSvg[node[this.keyName]] = {
             ...node,
@@ -171,21 +223,15 @@ SvgMap.prototype.addEvent = function(){
     this.svgDom.onmousewheel = this.wheel.bind(this)
 }
 SvgMap.prototype.wheel = function(e){
-    const { wheelDelta } = e
-    const { width, height } = this.svgGroup.getBBox()
-    if(wheelDelta > 0) {
+    if(wheelDir(e)) {
         this.scale += 0.1
     } else {
         this.scale -= 0.1
     }
-    let _w = (width*this.scale - width)/2
-    let _h = (height*this.scale - height)/2
-    this.translateX += _w
-    this.translateY += _h
-    this.svgDom.setAttribute('style', `transform: translate(${this.translateX }px, ${this.translateY}px) scale(${this.scale})`)
+    this.svgDom.style.setProperty('transform', `translate(${this.translateX }px, ${this.translateY}px) scale(${this.scale})`)
+    e.preventDefault()
 }
 SvgMap.prototype.mousedown = function(e) {
-    console.log('mounsedown', this)
     let _this = this.that
     _this.mousedown = true
     _this.mousedownMoveStartX = e.pageX
@@ -205,7 +251,6 @@ SvgMap.prototype.mouseleave = function(e) {
 }
 SvgMap.prototype.mousemove = function(e) {
     let _this = this.that
-    console.log('_this.mousedown', _this.mousedown)
     if(!_this.mousedown) return
     _this.positionX = (e.pageX - _this.mousedownMoveStartX)
     _this.positionY = (e.pageY - _this.mousedownMoveStartY)
@@ -253,10 +298,14 @@ SvgMap.prototype.findPositionElY = function(el){
  * @params {g} left 如果没有说明只有一侧
  * */
 SvgMap.prototype.createRootG = function(right, left){
-    const rightMiddleY = this.findMiddlePosition(right)
+    // 创建 title 元素
+    const rightMiddleY = right ? this.findMiddlePosition(right) : 0
     const leftMiddleY = left ? this.findMiddlePosition(left) : 0
     // 中心按钮的X偏移量：如果有left就放在left右侧
-    const rootX = left ? left.getBBox().width + this.reactStyle.rowMargin : this.reactStyle.rowMargin
+    let rootX = 0
+    if(left || right){
+        rootX = left ? left.getBBox().width + this.reactStyle.rowMargin : this.reactStyle.rowMargin
+    }
     // 计算高的那个中间值
     const rootY = Math.max(rightMiddleY, leftMiddleY)
     const fontStyle = `font-size: 18px;`
@@ -265,22 +314,25 @@ SvgMap.prototype.createRootG = function(right, left){
         { y: rootY, x: rootX, fill: '#eade98', rx: 20, ry: 20 },
         { key: this.data[this.keyName] }
         )
-    this.addVirtualSvg(this.data, right, rootG)
-    this.addVirtualSvg(this.data, left)
+    this.addVirtualSvg(this.data, rootG, right)
+    this.addVirtualSvg(this.data, null, left)
     this.svgDom.appendChild(rootG)
-    const rootBox = rootG.getBBox()
-    // 矮的那个也要放在高的垂直居中位置（当存在left时才需要计算）
-    const minEl = left && (leftMiddleY <= rightMiddleY) ? left : right
-    const rightY = left ? rootY - this.findMiddlePosition(minEl) : 0
-    if(minEl === left) {
-        // 水平翻转
-        left.setAttribute('style', `transform: translate(${left.getBBox().width}px, ${rightY}px) rotateY(180deg)`)
-        right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, 0)`)
-    } else {
-        left.setAttribute('style', `transform: translate(${left.getBBox().width}px, 0) rotateY(180deg)`)
-        right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, ${rightY})`)
+
+    if(right) {
+        const rootBox = rootG.getBBox()
+        // 矮的那个也要放在高的垂直居中位置（当存在left时才需要计算）
+        const minEl = left && (leftMiddleY <= rightMiddleY) ? left : right
+        const rightY = left ? rootY - this.findMiddlePosition(minEl) : 0
+        if(minEl === left) {
+            // 水平翻转
+            left.setAttribute('style', `transform: translate(${left.getBBox().width}px, ${rightY}px) rotateY(180deg)`)
+            right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, 0)`)
+        } else {
+            left.setAttribute('style', `transform: translate(${left.getBBox().width}px, 0) rotateY(180deg)`)
+            right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, ${rightY})`)
+        }
+        this.drawLine(rootG, right, left, minEl, rightY)
     }
-    this.drawLine(rootG, right, left, minEl, rightY)
 }
 
 /**
@@ -358,7 +410,7 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
 
     cG.appendChild(a)
     cG.appendChild(b)
-    this.addVirtualSvg(node, b, a)
+    this.addVirtualSvg(node,a, b)
     // 画线
     b.childNodes.forEach(item => {
         const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
