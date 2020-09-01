@@ -25,28 +25,6 @@ module.exports = {
     '/JavaScript/设计模式',
     '/JavaScript/对象创建模式',
     '/JavaScript/吱不吱',
-    {
-      title: 'ES6',
-      collapsable: false,
-      children: [
-        '/JavaScript/guide/',
-        '/JavaScript/ES6/函数的扩展',
-        '/JavaScript/ES6/Symbol',
-        '/JavaScript/ES6/数组',
-        '/JavaScript/ES6/对象',
-        '/JavaScript/ES6/Set和WeakSet',
-        '/JavaScript/ES6/Map和WeakMap',
-        '/JavaScript/ES6/Promise',
-        '/JavaScript/ES6/Iterator',
-        '/JavaScript/ES6/Generater',
-        '/JavaScript/ES6/async函数',
-        '/JavaScript/ES6/Proxy',
-        '/JavaScript/ES6/Class',
-        '/JavaScript/ES6/Class继承',
-        '/JavaScript/ES6/Module',
-        '/JavaScript/ES6/Module的加载实现'
-      ]
-    }
    /*  {
       title: 'Group 1',
       collapsable: false,
@@ -62,6 +40,23 @@ module.exports = {
        ]
     }, */
   ],
+  '/ES6/': [
+    '/ES6/函数的扩展',
+    '/ES6/Symbol',
+    '/ES6/数组',
+    '/ES6/对象',
+    '/ES6/Set和WeakSet',
+    '/ES6/Map和WeakMap',
+    '/ES6/Promise',
+    '/ES6/Iterator',
+    '/ES6/Generater',
+    '/ES6/async函数',
+    '/ES6/Proxy',
+    '/ES6/Class',
+    '/ES6/Class继承',
+    '/ES6/Module',
+    '/ES6/Module的加载实现'
+  ],
   '/CSS/': [
     '/CSS/CSS3新特性',
     '/CSS/Flex',
@@ -72,6 +67,10 @@ module.exports = {
     '/CSS/BFC和IFC',
     '/CSS/适配iponeX',
     '/CSS/样式实现',
+  ],
+  '/Browser/': [
+    '/Browser/浏览器中的进程与线程',
+    '/Browser/浏览器的工作原理',
   ],
   '/Vue/': [
     '/Vue/组件通信',

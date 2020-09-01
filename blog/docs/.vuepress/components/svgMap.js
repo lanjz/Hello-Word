@@ -35,8 +35,6 @@ function cSvgDom() {
 }
 // 创建SVG-文本元素
 function cText(txt, attr = {}) {
-    console.log('attr.fillColor', attr.fillColor)
-    console.log('attr.fillColor', attr)
     const el = document.createElementNS('http://www.w3.org/2000/svg','text');
     attr = {
         dominantBaseline: 'middle',
@@ -128,6 +126,7 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom = cSvgDom()
     this.svgDom.that = this
     this.svgGroup = createGroup()
+    this.svgGroup.style.setProperty('transform', `translate(0px, 5px)`)
     this.svgDom.appendChild(this.svgGroup)
     document.body.appendChild(this.svgDom)
     const child = this.data.children || []

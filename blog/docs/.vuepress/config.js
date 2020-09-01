@@ -14,9 +14,10 @@ module.exports = {
         text: '前端基础',
         items: [
           { text: 'JavaScript', link: '/JavaScript/' },
+          { text: 'ES6', link: '/ES6/' },
           { text: 'HTML5', link: '/HTML5/' },
           { text: 'CSS', link: '/CSS/' },
-          { text: '浏览器', link: '/language/japanese5' },
+          { text: 'Browser', link: '/Browser/' },
         ]
       },
       {

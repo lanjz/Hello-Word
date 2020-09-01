@@ -39,6 +39,7 @@ export default {
       const { path } = this.$route
       const svgTree = this.getItemTree(sidebar[path])
       const name = path.substring(1, path.length-1)
+      console.log('svgTree', svgTree)
       const svg = mapSvg(svgTree, { title: name, theme: 'light' })
       this.$refs['home'].appendChild(svg)
     }
