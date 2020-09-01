@@ -10,23 +10,19 @@ import meun from '../config'
 const { nav = [], sidebar = {} } = meun.themeConfig
 export default {
   methods: {
-    getItemTree(data = []){
+    getItemTree(data = [], prefix = ''){
       if(!data.length) return []
-      const createData = data.map(it => {
+      let createData = []
+      data.forEach(it => {
         let item = it
-        if(typeof it === 'string') {
-          item = {
-            text: it.substring(it.lastIndexOf('/') + 1),
-            link: '__' + it,
-          }
-        }
-        let childs = item.items ?  (item.items) : (sidebar[item.link] || [])
-        return {
+        if(item.ignore) return
+        const one = {
           label: item.text,
-          key: `${item.text}_${item.link || ''}`,
+          key: `${prefix}${item.link || ''}`,
           type: (item.items || (item.link && item.link[item.link.length - 1] === '/')) ? 'dir' : 'text',
-          children: this.getItemTree(childs)
+          children: this.getItemTree(item.items, item.link)
         }
+        createData.push(one)
       })
       return createData
     },

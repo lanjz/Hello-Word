@@ -29,16 +29,18 @@ function cSvgDom() {
     const svgDom = document.createElementNS('http://www.w3.org/2000/svg','svg');
     svgDom.setAttribute('version','full');
     svgDom.setAttribute('baseProfile','baseProfile');
-    svgDom.setAttribute('style', `background: #272b2d`)
+    // svgDom.setAttribute('style', `background: #272b2d`)
     svgDom.setAttribute('xmlns','http://www.w3.org/2000/svg');
     return svgDom
 }
 // 创建SVG-文本元素
 function cText(txt, attr = {}) {
+    console.log('attr.fillColor', attr.fillColor)
+    console.log('attr.fillColor', attr)
     const el = document.createElementNS('http://www.w3.org/2000/svg','text');
     attr = {
         dominantBaseline: 'middle',
-        fill: attr.type === 'text' ? '#fff' : '#333',
+        fill: attr.fillColor,
         ...attr
     }
     Object.keys(attr).forEach(item => {
@@ -95,6 +97,8 @@ SvgMap.prototype.initState = function(data, options = {}) {
     } else {
         this.data = copyData
     }
+    this.primaryColor = options.theme === 'light' ? '#272b2d' : '#fff'
+    this.bgColor = options.theme === 'light' ? '#fff' : '#272b2d'
 
     this.direction = options.direction|| '' // right->只向右伸展 '' => 左右伸展
     this.virtualSvg = {}
@@ -106,9 +110,9 @@ SvgMap.prototype.initState = function(data, options = {}) {
         reactRadius: 5, // 元素圆角
     }
     this.lineStyle = { // 线条样式
-        style: 'stroke:#fff',
+        style: `stroke:${this.primaryColor}`,
         'stroke-width': 1,
-        stroke: '#fff',
+        stroke: this.primaryColor,
         fill: 'transparent'
     }
     this.translateX = 0
@@ -144,23 +148,13 @@ SvgMap.prototype.init = function (data, options) {
     const { width: svgW, height: svgH } = this.svgDom.getBBox()
     this.svgDom.setAttribute('width', svgW)
     this.svgDom.setAttribute('height', svgH)
-    const centerSvg = this.virtualSvg[this.data[this.keyName]]
-    if(centerSvg) {
-        const titleSvg = this.svgDom.lastChild
-        console.log(svgH, titleSvg.getBBox(), document.body.clientHeight)
-        const { y: cTop } = titleSvg.getBBox()
-        // this.translateY = svgH/2
-        // this.svgDom.setAttribute('style', `transform: translate(${this.translateX}px, ${this.translateY}px) scale(${this.scale})`)
-    }
-
     this.svgDom.remove()
     const div = cContainer()
-    div.setAttribute('style', `background: #272b2d`)
+    div.setAttribute('style', `background: ${this.bgColor}`)
     if(this.className) {
         div.classList.add(this.className)
     }
     div.appendChild(this.svgDom)
-    console.log('_this.mousedown', this.virtualSvg)
     return div
 }
 // 处理根元素
@@ -353,7 +347,10 @@ SvgMap.prototype.cReact = function(textOptions, rectOptions = {}, config) {
     const {direction, key, ...conf} = config
     const { textPadding, reactRadius, minWidth } = this.reactStyle
     const cG = createGroup()
-    let sText = cText(text,{y: rectOptions.y || 0, x: rectOptions.x || 0, key,  ...txtOpt, ...conf})
+    let sText = cText(
+        text,
+        {y: rectOptions.y || 0, x: rectOptions.x || 0, key,  fillColor: txtOpt.type !== 'text' ? this.primaryColor : this.bgColor ,...txtOpt, ...conf}
+        )
     cG.appendChild(sText)
     const {width, height} = this.getRect(cG)
     sText.setAttribute('transform', `translate(${textPadding}, ${height})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
@@ -377,7 +374,7 @@ SvgMap.prototype.cReact = function(textOptions, rectOptions = {}, config) {
             x2: width + textPadding * 2,
             y2: (rectOptions.y || 0) + this.getRect(sEllipse).height/2,
             'stroke-width': 1,
-            stroke: '#fff'
+            stroke: this.primaryColor
         })
         cG.appendChild(underLine)
     } else if(config.hasChild){
@@ -385,7 +382,7 @@ SvgMap.prototype.cReact = function(textOptions, rectOptions = {}, config) {
             cx: direction === 'left' ? (rectOptions.x || 0) - 5:(rectOptions.x || 0) + this.getRect(sEllipse).width+5,
             cy: (rectOptions.y || 0) + this.getRect(sEllipse).height/2,
             r: 5,
-            fill: '#fff',
+            fill: this.primaryColor,
             'stroke-width': 1,
             key
         })

@@ -9,18 +9,22 @@ module.exports = {
   themeConfig: {
     sidebarDepth: 2,
     nav: [
-      { text: 'Home', link: '/' },
+      { text: 'Home', link: '/', ignore: true },
       {
-        text: '体系',
+        text: '前端基础',
         items: [
           { text: 'JavaScript', link: '/JavaScript/' },
-          { text: 'Node', link: '/language/japanese' },
           { text: 'HTML5', link: '/HTML5/' },
           { text: 'CSS', link: '/CSS/' },
+          { text: '浏览器', link: '/language/japanese5' },
+        ]
+      },
+      {
+        text: '网络&算法',
+        items: [
           { text: '网络', link: '/network/' },
           { text: '算法', link: '/language/japanese4' },
           { text: 'Web安全', link: '/secure/' },
-          { text: '浏览器', link: '/language/japanese5' },
         ]
       },
       {
