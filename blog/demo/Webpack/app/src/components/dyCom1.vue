@@ -1,5 +1,5 @@
 <template>
-    <h2>动态组件一{{t}}</h2>
+    <div class="abc">动态组件一{{t}}</div>
 </template>
 <script>
   import obj, { add } from '../utils/index'
@@ -33,3 +33,8 @@
     }
   }
 </script>
+<style>
+.abc{
+  font-size: 100px;
+}
+</style>
