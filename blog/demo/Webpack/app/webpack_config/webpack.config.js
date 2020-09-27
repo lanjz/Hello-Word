@@ -14,7 +14,8 @@ const config = (env) => {
             contentBase: './dist',
             hot: true,
             open: true,
-            port:5001
+            host: '192.168.31.250',
+            port:5002
         },
         plugins: [
             new webpack.NamedModulesPlugin(),
