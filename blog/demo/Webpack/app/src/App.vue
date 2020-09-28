@@ -1,5 +1,6 @@
 <template>
     <div class="app">
+        <div class="test"></div>
         <!--<keep-alive>
             <dyCom1></dyCom1>
         </keep-alive>
@@ -7,13 +8,13 @@
         <div ref="abc">{{$store.state}}</div>
         <span v-for="(item) in list" ref="abcd">{{item}}</span>
         <router-view></router-view>-->
-        <h1>h1</h1>
+      <!--   <h1>h1</h1>
         <video
           class="m-player"
         >
             <source src="https://www.runoob.com/try/demo_source/movie.mp4" type="video/mp4">
             您的浏览器不支持 video 标签。
-        </video>
+        </video> -->
     </div>
 </template>
 <script>
@@ -65,6 +66,9 @@
         left: 0;
         width: 100%;
         height: 100%;
+        border: solid 1px red;
+    }
+    .test{
         border: solid 1px red;
     }
 </style>
