@@ -1,16 +1,24 @@
 # CSS3新特性
 
-**选择器**
+### 布局
+
+- flex
+
+- 多列布局（column-count）
+
+- box-sizing
+
+### 选择器
 
 CSS3中新添加了很多选择器，解决了很多之前需要用javascript才能解决的布局问题。
 
 - element1~element2: 选择前面有element1元素的每个element2元素。
 
-- [attribute^=value]: 选择某元素attribute属性是以value开头的。
+- `[attribute^=value]`: 选择某元素attribute属性是以value开头的。
 
-- [attribute$=value]: 选择某元素attribute属性是以value结尾的。
+- `[attribute$=value]`: 选择某元素attribute属性是以value结尾的。
 
-- [attribute*=value]: 选择某元素attribute属性包含value字符串的。
+- `[attribute*=value]`: 选择某元素attribute属性包含value字符串的。
 
 - E:first-of-type: 选择属于其父元素的首个E元素的每个E元素。
 
@@ -46,11 +54,15 @@ CSS3中新添加了很多选择器，解决了很多之前需要用javascript才
 
 - E::selection: 选择被用户选取的元素部分。
 
-**Transition,Transform和Animation**
+### 动画
 
-**box-shadow**
+- transition
 
-**文字效果**
+- transform
+
+- Animation
+
+**文字样式**
 
 - word-wrap
 
@@ -60,14 +72,13 @@ CSS3中新添加了很多选择器，解决了很多之前需要用javascript才
 
 - text-decoration
 
-**渐变**
+### 其它
 
-**多列布局**
+- box-shadow
 
-**box-sizing**
+- @font-face
 
-**flex**
+- 渐变
 
-**@font-face**
 
 

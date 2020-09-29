@@ -1,6 +1,6 @@
 <template>
     <div class="app">
-        <div class="test"></div>
+        <div class="test">一地的节操</div>
         <!--<keep-alive>
             <dyCom1></dyCom1>
         </keep-alive>
@@ -15,6 +15,7 @@
             <source src="https://www.runoob.com/try/demo_source/movie.mp4" type="video/mp4">
             您的浏览器不支持 video 标签。
         </video> -->
+      <div class="bottom"></div>
     </div>
 </template>
 <script>
@@ -55,7 +56,14 @@
     }
 </script>
 <style>
+  .bottom {
+    height: constant(safe-area-inset-bottom);
+    height: env(safe-area-inset-bottom);
+    background: black;
+  }
     .app{
+      background: #3eaf7c;
+      height: 2000px;
         font-size: 100px;
     }
     .m-player{
@@ -69,6 +77,12 @@
         border: solid 1px red;
     }
     .test{
-        border: solid 1px red;
+      font-size: 20px;
+      border: solid 1px red;
+      width: 375px;
+      height: 375px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 </style>

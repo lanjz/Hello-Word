@@ -4,7 +4,7 @@ Flex 是 `Flexible Box` 的缩写，意为"弹性布局"，用来为盒状模型
 
 任何一个容器都可以指定为 Flex 布局。
 
-```
+```css
 .box{
   display: flex;
 }
@@ -12,7 +12,7 @@ Flex 是 `Flexible Box` 的缩写，意为"弹性布局"，用来为盒状模型
 
 行内元素也可以使用 Flex 布局。
 
-```
+```css
 .box{
   display: inline-flex;
 }
@@ -119,8 +119,10 @@ Flex 是 `Flexible Box` 的缩写，意为"弹性布局"，用来为盒状模型
 
 ## Q&A
 
-**`flex` 项子元素文本使用 `ellipsis` 无效**
+**`flex` 子项元素使用 `ellipsis` 无效**
 
-原因： 一般情况下 `min-width` 属性默认值是 `0`，但是 Flexbox 容器中的 `flex项` 的 `min-width` 属性默认值是 `auto`
+- 原因： 一般情况下 `min-width` 属性默认值是 `0`，但是 Flexbox 容器中的 `flex项` 的 `min-width` 属性默认值是 `auto`
 
-解决方案： 给 `flex项` 设计样式：`min-width：0`
+- 解决方案： 给 `flex项` 设计样式：`min-width：0`
+
+![阮一峰的网络日志 - Flex 布局教程](http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html)
