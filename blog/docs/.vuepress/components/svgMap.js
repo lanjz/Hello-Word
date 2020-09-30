@@ -138,7 +138,7 @@ SvgMap.prototype.init = function (data, options) {
         childLeft = this.initWalk(left, 'left')
         this.svgGroup.appendChild(childLeft)
     }
-    if(child.length > 1){
+    if(child.length > 0){
         childRight = this.initWalk(child)
         this.svgGroup.appendChild(childRight)
     }

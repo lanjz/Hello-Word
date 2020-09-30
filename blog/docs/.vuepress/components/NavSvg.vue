@@ -1,6 +1,6 @@
 <template>
   <div class="nav-svg">
-    <div ref="home" class="container"></div>
+    <div ref="home" class="in-page"></div>
   </div>
 </template>
 
@@ -39,12 +39,30 @@ export default {
       const { path } = this.$route
       const svgTree = this.getItemTree(sidebar[path])
       const name = path.substring(1, path.length-1)
-      console.log('svgTree', svgTree)
-      const svg = mapSvg(svgTree, { title: name, theme: 'light' })
+      const _this = this
+      const svg = mapSvg(svgTree, {
+        title: name,
+        theme: 'light',
+        callback(tar) {
+          console.log('tar', tar)
+          _this.$router.push({
+            path: `${tar.key}.html`
+          })
+        }
+      })
       this.$refs['home'].appendChild(svg)
+    },
+    initPage(){
+      let navBar = document.querySelector('.navbar')
+      if(navBar) {
+        navBar.getBoundingClientRect().height
+      }
+      const navH = document.querySelector('.navbar').getBoundingClientRect().height
+      console.log()
     }
   },
   mounted() {
+    this.initPage()
     this.initSvgTree()
   }
 }
@@ -56,7 +74,11 @@ export default {
   height: 100%;
   background: #272b2d;
 }
-.container{
-
+.in-page{
+  min-height: 550px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
 }
 </style>
