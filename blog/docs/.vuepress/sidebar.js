@@ -70,7 +70,8 @@ module.exports = {
   ],
   '/Browser/': [
     '/Browser/浏览器中的进程与线程',
-    '/Browser/浏览器的工作原理',
+    '/Browser/浏览器渲染HTML的工作原理',
+    '/Browser/HTML渲染过程',
   ],
   '/Vue/': [
     '/Vue/组件通信',
