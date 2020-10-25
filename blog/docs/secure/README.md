@@ -396,3 +396,5 @@ HTML(signup.html) 内容如下：
 ### Content-Security-Policy-Report-Only
 
 `Content-Security-Policy-Report-Only` 和 `Content-Security-Policy` 用法一样，区别在于在`Content-Security-Policy` 头部中指定的策略有强制性 ，而 `Content-Security-Policy-Report-Only` 中的策略仅产生报告而不具有强制性,意味着违规内容仍能正常加载
+
+[MDN-CSP](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CSP)
