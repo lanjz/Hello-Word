@@ -295,5 +295,104 @@ form表单可以跨域一个历史原因是要保持兼容性，因为form表单
  当然防御中间人攻击其实并不难，只需要增加一个安全通道来传输信息。HTTPS 就可以用来防御中间人攻击，但是并不是说使用了 HTTPS 就可以高枕无忧了，因为如果你没有完全关闭 HTTP 访问的话，攻击方可以通过某些方式将 HTTPS 降级为 HTTP 从而实现中间人攻击。
 
 
+## CSP
 
+CSP（Content-Security-Policy） 即内容安全策略，用于检测和减轻用于 Web 站点的特定类型的攻击，例如 XSS 和数据注入等。
 
+该安全策略的实现基于一个称作 `Content-Security-Policy` 的 HTTP 首部
+
+### 作用
+
+CSP 的主要目标是减少和报告 XSS 攻击，XSS 攻击利用了浏览器对于从服务器所获取的内容的信任。恶意脚本在受害者的浏览器中得以运行，即使有的时候这些脚本并非来自于它本该来的地方
+
+CSP 通过指定有效域——即限制浏览器可加载资源有效来源，防止加载其它资源的脚本和内容
+
+### 使用
+
+方式一：服务器返回  `Content-Security-Policy:[策略规则]`  HTTP 头部
+
+:::tip
+有时候会看到 `X-Content-Security-Policy`的 Header 这是是旧版本写法
+:::
+
+方式二： `<meta>`  元素也可以被用来配置该策略, 如
+
+`<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src https://*; child-src 'none';">`
+
+通过策略规则控制浏览器可以为该页面获取哪些资源，这些资源包括图片，样式，JS脚本等
+
+### 例子
+
+- `Content-Security-Policy: default-src 'self'`: 所有内容均来自站点的同一个源 (不包括其子域名)
+
+- `Content-Security-Policy: default-src 'self' *.trusted.com`: 一个网站管理者允许内容来自信任的域名及其子域名 (域名不必须与CSP设置所在的域名相同)
+
+ - `Content-Security-Policy: default-src 'self'; img-src *; media-src media1.com media2.com; script-src userscripts.example.com`，该策略表示：
+
+   - 图片可以从任何地方加载(注意 "*" 通配符)。
+   
+   - 多媒体文件仅允许从 `media1.com` 和 `media2.com` 加载(不允许从这些站点的子域名)。
+   
+   - 可运行脚本仅允许来自于 `userscripts.example.com`
+
+### 违规报告
+
+在策略中添加 `report-uri`,就可以启用发送违规报告，如下例子：
+
+`Content-Security-Policy: default-src 'self'; report-uri http://reportcollector.example.com/collector.cgi`
+
+#### 违例报告的内容
+
+作为报告的JSON对象报告包含了以下数据：
+
+- `document-uri`: 发生违规的文档的URI
+
+- `referrer`: 违规发生处的文档引用（地址）
+
+- `blocked-uri`: 被 CSP 阻止的资源 URI。如果被阻止的 URI 来自不同的源而非文档 URI ，那么被阻止的资源 URI 会被删减，仅保留协议，主机和端口号
+
+- `violated-directive`: 违反的策略名称
+
+- `original-policy`:  在 `Content-Security-Policy` HTTP 头部中指明的原始策略
+
+#### 违例报告样本
+
+假设当前如下 CSP 策略：
+
+`Content-Security-Policy: default-src 'none'; style-src cdn.example.com; report-uri /_/csp-reports`
+
+HTML(signup.html) 内容如下：
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    ... Content ...
+  </body>
+</html>
+
+```
+
+样式表仅允许加载自 `cdn.example.com`，然而该页面企图从自己的源 ( `http://example.com` )加载。当该文档被访问时，一个兼容 CSP 的浏览器将以 POST 请求的形式发送违规报告到 `http://example.com/_/csp-reports` ，内容如下：
+
+```js
+{
+  "csp-report": {
+    "document-uri": "http://example.com/signup.html",
+    "referrer": "",
+    "blocked-uri": "http://example.com/css/style.css",
+    "violated-directive": "style-src cdn.example.com",
+    "original-policy": "default-src 'none'; style-src cdn.example.com; report-uri /_/csp-reports"
+  }
+}
+```
+
+如你所见，该报告在 `blocked-uri` 字段中包含了违规资源的完整路径 ，但情况并非总是如此。比如，当 `signup.html` 试图从 `http://anothercdn.example.com/stylesheet.css` 加载 CSS 时，浏览器将不会包含完整路径，而只会保留源路径 (`http://anothercdn.example.com`)
+
+### Content-Security-Policy-Report-Only
+
+`Content-Security-Policy-Report-Only` 和 `Content-Security-Policy` 用法一样，区别在于在`Content-Security-Policy` 头部中指定的策略有强制性 ，而 `Content-Security-Policy-Report-Only` 中的策略仅产生报告而不具有强制性,意味着违规内容仍能正常加载
