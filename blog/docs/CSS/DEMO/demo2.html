@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        //div{margin: 0;padding: 0}
         .flex{
             display: flex;
             border: solid 1px black;
-            overflow: hidden;
+        }
+        .flex-1{
+            flex: 1;
         }
         .item-1, .item-2{
             color: #fff;
@@ -20,22 +23,29 @@
             flex-shrink: 0;
         }
         .item-1{
+
             background: red;
-            flex: 1;
+            padding-right: 20px;
         }
         .text-ellipsis{
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
         }
+        .item-1-box{
+            width: 0;
+        }
     </style>
 </head>
 <body>
-    <div class="flex">
+<div class="flex">
+    <div class="flex flex-1 item-1-box">
         <div class="item-1 text-ellipsis">
             啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊
         </div>
         <div class="item-2"></div>
     </div>
+</div>
 </body>
+
 </html>
