@@ -26,6 +26,7 @@ module.exports = {
     '/JavaScript/对象创建模式',
     '/JavaScript/正则',
     '/JavaScript/吱不吱',
+    '/JavaScript/代码实现',
    /*  {
       title: 'Group 1',
       collapsable: false,
