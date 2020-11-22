@@ -6166,6 +6166,7 @@
     }
 
     function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly) {
+      debugger
       var oldStartIdx = 0;
       var newStartIdx = 0;
       var oldEndIdx = oldCh.length - 1;
@@ -6462,7 +6463,6 @@
     }
 
     return function patch (oldVnode, vnode, hydrating, removeOnly) {
-      debugger
       if (isUndef(vnode)) {
         if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
         return

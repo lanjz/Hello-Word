@@ -6,13 +6,24 @@
 </head>
 <body>
   <div id="app">
-    <div v-for="(item, ind) in t" :key="item" :class="'A'+item">{{item}}</div>
+    <div v-for="(item, ind) in t" :key="item.id" :class="'A'+item" @click="doa"><span>{{item.name}}</span></div>
   </div>
 <script>
   var app = new Vue({
     el: '#app',
     data: {
-      t: [1,2,3,4],
+      t: [
+        {id: 1, name: '一'},
+        {id: 2, name: '二'},
+        {id: 3, name: '三'},
+        {id: 4, name: '四'},
+        {id: 5, name: '五'},
+      ],
+    },
+    methods:{
+      doa(){
+        this.t.push(this.t.splice(0,1)[0])
+      }
     },
     beforeCreate(){
     },
@@ -23,7 +34,7 @@
 </script>
 <style>
   div{
-    height: 10px;
+    padding: 10px;
     border: solid 1px red;
   }
 </style>

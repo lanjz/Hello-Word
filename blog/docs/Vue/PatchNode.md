@@ -591,13 +591,36 @@ VNode 旧: A、B、C、(←)D、(→)E、F     新: A、E、C、(←)D、(→)B�
 
 因为使用 `index` 作为 `key`，会导致 diff 时不能找到**正确**的节点做复用。注意这里的**正确**一词
 
-假设有以下列表 `[1, 2, 3, 4]`，并用 `index` 做为 `key`，此时列表对应原 `key` 为 `[0, 1, 2,3]` 之后我们将列表改成 `[1, 3, 4]`,此时对应原 `key` 为 `[0, 1, 2]`
+假设有以下列表 `[1, 2, 3, 4]`，并用 `index` 做为 `key`，此时列表对应原 `key` 为 `[0, 1, 2, 3]` 之后我们将列表改成 `[2, 3, 4, 1]`,此时对应的 `key` 还是 `[0, 1, 2， 3]`
 
-当进行 `diff` 时, 新节点 `1` 与 节点 `1` 是一致的，这没毛病
+回顾下进行 `diff` 时执行的 `updateChildren` 方法：
 
-新节点 `3` 与 节点 `2` 的 `sameNode` 判断时也会认为是一致的，因为 `tag`, `key` 都是相同的，然后会对这两个节点进行子节点的判断，那么如果他们没子节点的情况下，当前节点算是被复用了么？我为是的，只是复用的节点是错。一旦存在子节点时，这些子节点不相同的可能是极大的，这才是导致影响属性的原因
+```js
+ while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+        if (sameVnode(oldStartVnode, newStartVnode)) {
+          patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);
+          oldStartVnode = oldCh[++oldStartIdx];
+          newStartVnode = newCh[++newStartIdx];
+        } else if (sameVnode(oldEndVnode, newEndVnode)) {
+          // todo
+        } else if (sameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
+          patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue, newCh, newEndIdx);
+          canMove && nodeOps.insertBefore(parentElm, oldStartVnode.elm, nodeOps.nextSibling(oldEndVnode.elm));
+          oldStartVnode = oldCh[++oldStartIdx];
+          newEndVnode = newCh[--newEndIdx];
+        } else if (sameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
+          // todo
+        } else {
+          // todo
+        }
+      }
+```
 
-其实一个原因是如果列表是一个组件，包含一些更新逻辑，当前用 `index` 作为 `key` 时，当会识认为这些组件是相同的，那么一些更新的状态可能就不会执行
+假设当前进行对比都是第一个元素，在执行到第一个判断语句 `sameVnode(oldStartVnode, newStartVnode)` 时，此时新旧节点的`tag`, `key` 都是相同的此时就对这两个节点做进一步的 `diff` 判断，之后判断到文本内容是不一样的，就会将新的文本替换旧的文本，这样就导致子节点没办法得到复用了。以此类推，其它的所节点都会有这个问题
+
+但是如果当前使用的是唯一 `id` 作为 `key`，在上面的例子中，在对比第一个元素，将执行第三个判断主句  `sameVnode(oldStartVnode, newEndVnode)` ，实际上他们的子节点也是相同，因此再进一步 `diff` 时也是认为是相同的，之后将执行 `canMove && nodeOps.insertBefore(parentElm, oldStartVnode.elm, nodeOps.nextSibling(oldEndVnode.elm));`语句， 直接以相换位置的方式复用旧节点，以此拿到提高性能的目的
+
+所以如果使用 `index` 作为 `key`将不利于节点的复用
 
 **Virtual DOM 比真实 DOM 快嘛**
 
