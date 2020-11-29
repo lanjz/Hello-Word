@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    body{
+      background: #272b2d;
+    }
+  </style>
+</head>
+<body>
+
+</body>
+<script type="module">
+  import mapSvg from './svgMap2.js'
+  import {min} from './data.js'
+  const rootStyle = {
+    'font-size': '18px',
+    'border-radius': '2',
+    color: 'blue',
+    fill: 'red',
+    padding: '0 5',
+  }
+  const svg = mapSvg([], { title: 'Orchid', rootStyle })
+  document.body.appendChild(svg)
+
+</script>
+</html>
