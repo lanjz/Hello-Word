@@ -218,19 +218,19 @@ export const min = {
   name: '3333',
   children: [
     {
-      name: 1344,
+      label: 1344,
       children: [
         {
-          name: 1344,
+          label: 1344,
           
         },
         {
-          name: 3455
+          label: 3455
         }
       ]
     },
     {
-      name: 3455
+      label: 3455
     }
   ]
 }

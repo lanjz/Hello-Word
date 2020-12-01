@@ -208,8 +208,9 @@ SvgMap.prototype.walk = function (tree, direction, root) {
         } else {
             this.addVirtualSvg(item, svgEl, null)
         }
-        hei += ((this.getRect(svgEl)).height + this.reactStyle.verticalMargin)
+        hei += ((this.getRect(svgEl)).height + this.globalStyle.verticalMargin)
         svgElArr.push(svgEl)
+        console.log('svgElArr', svgElArr)
         if(root) {
             this.addVirtualSvg(this.data, this.svgGroup, svgEl)
         }
