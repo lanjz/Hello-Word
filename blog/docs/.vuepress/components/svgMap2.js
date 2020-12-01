@@ -47,11 +47,11 @@ function cSvgDom() {
 // 创建SVG-文本元素
 /**
  * @params <String> txt : 文本
- * @params <Object> attr: 样式 { fill: '颜色', 'font-size': '文字大小'}
+ * @params <Object> attr: 样式 { fill: '颜色', 'font-size': '文字大小', initY: 偏移高度}
  * */
 function cText(txt, options = {}) {
     const el = document.createElementNS('http://www.w3.org/2000/svg','text');
-    let { padding = 0, ...attr } = options
+    let { padding = 0, initY, ...attr } = options
     let [pt, pl] = getPadding(padding)
     attr = {
         // dominantBaseline: 'bottom',
@@ -64,7 +64,7 @@ function cText(txt, options = {}) {
     el.textContent = txt
     el.rect = this.getRect(el)
     // svg无法知道文字高度，且文字基准线在底部，当文字出现时文字会向上偏移（偏移量为文字高度）
-    el.setAttribute('y', Math.abs(el.rect.y)+(+pt));
+    el.setAttribute('y', Math.abs(el.rect.y)+(+pt)+(initY||0));
     return el
 }
 // 创建SVG-元素
@@ -115,7 +115,12 @@ SvgMap.prototype.initState = function(data, options = {}) {
     } else {
         this.data = copyData
     }
-    this.stackEl = []
+    this.direction = options.direction|| '' // right->只向右伸展 '' => 左右伸展
+    this.keyName = options.key || 'key'
+    this.lableName = options.name || 'label'
+    this.callback = options.callback || null
+    this.virtualSvg = {}
+    // 主按钮样式
     this.rootStyle = {
         'font-size': '18px',
         color: '#fff',
@@ -124,31 +129,35 @@ SvgMap.prototype.initState = function(data, options = {}) {
         'border-radius': '5',
         ...(options.rootStyle||{})
     }
-    this.primaryColor = options.theme === 'light' ? '#272b2d' : '#fff'
-    this.bgColor = options.theme === 'light' ? '#fff' : '#272b2d'
-
-    this.direction = options.direction|| '' // right->只向右伸展 '' => 左右伸展
-    this.virtualSvg = {}
-    this.reactStyle = { // 文本样式
-        textPadding: 10, // 文字与边框的间距
+    // rect样式
+    this.rectStyle = {
+        'font-size': '16px',
+        color: '#fff',
+        fill: '#a3c6c0',
+        padding: 10,
+        'border-radius': '5',
+        ...(options.rectStyle||{})
+    }
+    // 连接线样式
+    this.lineStyle = {
+        color: this.rectStyle.color,
+        width: 1,
+        fill: 'transparent',
+        ...(options.lineStyle||{})
+    }
+    // text样式
+    this.textStyle = {
+        'font-size': '16px',
+        color: '#fff',
+        ...(options.textStyle||{})
+    }
+    // 公共样式
+    this.globalStyle = { // 文本样式
         verticalMargin: 20, // 元素上下间距
         rowMargin: 40, // 元素左右间距
-        minWidth: 50, // 元素最小宽度
-        reactRadius: 5, // 元素圆角
     }
-    this.lineStyle = { // 线条样式
-        style: `stroke:${this.primaryColor}`,
-        'stroke-width': 1,
-        stroke: this.primaryColor,
-        fill: 'transparent'
-    }
-    this.translateX = 0
-    this.translateY = 0
-    this.scale = 1
-    this.keyName = options.key || 'key'
-    this.lableName = options.name || 'label'
-    this.callback = options.callback || null
-    this.className = options.className || ''
+
+
 }
 SvgMap.prototype.init = function (data, options) {
     this.initState(data, options)
@@ -158,7 +167,9 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom.appendChild(this.svgGroup)
     document.body.appendChild(this.svgDom)
     let childRight = this.initWalk(this.data.children)
+    console.log('childRight', childRight)
     this.createRootG() // 创建中点元素
+    this.svgDom.appendChild(childRight)
     this.svgDom.remove()
     return this.svgDom
 }
@@ -171,13 +182,28 @@ SvgMap.prototype.walk = function (tree, direction, root) {
     const svgElArr = []
     let hei = 0 // 设置每个元素的偏移高度
     tree.forEach((item) => {
-        let svgEl = this.cReact(
-            { text: item[this.lableName] },
-            { y: hei, fill: item.type === 'text' ? 'transparent' : '#a3c6c0' },
-            { direction,hasChild: item.children&&item.children.length,key: item[this.keyName], type: item.type || '' }
-        ) // 返回某个文本G
+        let textOpt = {
+            text: item[this.lableName],
+            fill: this.rectStyle.color,
+            'font-size': this.rectStyle['font-size'],
+            initY: hei,
+        }
+        const rectOpt = {
+            fill: this.rectStyle.fill,
+            'rx': this.rectStyle['border-radius'],
+            'ry': this.rectStyle['border-radius'],
+            'padding': this.rectStyle.padding,
+            initY: hei,
+        }
+        const config = {
+            direction,
+            hasChild: item.children&&item.children.length,
+            key: item[this.keyName],
+            type: item.type || ''
+        }
+        let svgEl = this.cReact(textOpt, rectOpt, config) // 返回某个文本G
         if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
-            const childSvgEl  = this.walk(item.children, direction)
+            const childSvgEl = this.walk(item.children, direction)
             svgEl = this.combineGroup(svgEl, childSvgEl, item)
         } else {
             this.addVirtualSvg(item, svgEl, null)
@@ -319,7 +345,7 @@ SvgMap.prototype.createRootG = function(right, left){
         'padding': this.rootStyle.padding,
     }
     let rect = this.cReact(textOptions, rectOptions)
-    this.svgDom.appendChild(rect)
+    this.svgGroup.appendChild(rect)
 }
 SvgMap.prototype.createRootG2 = function(right, left){
     // 创建 title 元素
@@ -452,7 +478,7 @@ SvgMap.prototype.cReact2 = function(textOptions, rectOptions = {}, config) {
  * */
 SvgMap.prototype.combineGroup = function(a, b, node) {
     const cG = createGroup()
-    const x = `${this.getRect(a).width + this.reactStyle.rowMargin}` // 计算a,b的间距
+    const x = `${this.getRect(a).width + this.globalStyle.rowMargin}` // 计算a,b的间距
     const y = this.findMiddlePosition(b) // 计算a在b垂直方向的中间位置
     const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
     b.setAttribute('transform', `translate(${x}, ${aY})`) // b的整体Y偏移要与a元素保持一致
@@ -476,7 +502,10 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
         const E = `${x} ${Number(positionY) + Number(aY)+height/2}`
         const line = cEl('path', {
             d: `M${M} C ${C1} ${C2} ${E}`,
-            ...this.lineStyle
+            style: `stroke:${this.lineStyle.color}`,
+            'stroke-width': this.lineStyle.width,
+            stroke: this.lineStyle.color,
+            fill: 'transparent'
         })
         this.virtualSvg[node[this.keyName]].childDom.push(line)
         cG.appendChild(line)
