@@ -62,15 +62,16 @@ function cText(txt, options = {}) {
         el.setAttribute(item, attr[item]);
     })
     el.textContent = txt
-    el.rect = this.getRect(el)
+    let rect = this.getRect(el)
     // svg无法知道文字高度，且文字基准线在底部，当文字出现时文字会向上偏移（偏移量为文字高度）
-    el.setAttribute('y', Math.abs(el.rect.y)+(+pt)+(initY||0));
+    el.setAttribute('y', Math.abs(rect.y)+(+pt)+(initY||0));
     return el
 }
 // 创建SVG-元素
 function cEl(tag, attr) {
     attr = {
         fill: '#000',
+        y: attr.initY || 0,
         ...attr,
     }
     const el = document.createElementNS('http://www.w3.org/2000/svg',tag);
@@ -202,6 +203,10 @@ SvgMap.prototype.walk = function (tree, direction, root) {
             type: item.type || ''
         }
         let svgEl = this.cReact(textOpt, rectOpt, config) // 返回某个文本G
+        // 如果有子节点,右侧添加小圆圈
+        if(item.children&&item.children.length){
+            this.appendCircle(svgEl)
+        }
         if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
             const childSvgEl = this.walk(item.children, direction)
             svgEl = this.combineGroup(svgEl, childSvgEl, item)
@@ -211,12 +216,23 @@ SvgMap.prototype.walk = function (tree, direction, root) {
         hei += ((this.getRect(svgEl)).height + this.globalStyle.verticalMargin)
         svgElArr.push(svgEl)
         console.log('svgElArr', svgElArr)
+        // todo
         if(root) {
             this.addVirtualSvg(this.data, this.svgGroup, svgEl)
         }
         //
     })
     return this.createListGroup(svgElArr) // 返回组成G
+}
+SvgMap.prototype.appendCircle = function (cG, direction = 'right'){
+    const circle = cEl('circle', {
+        cx: direction === 'left' ? -5: this.getRect(cG).width+5,
+        cy: 0,
+        r: 5,
+        fill: this.rectStyle.color,
+        'stroke-width': 1,
+    })
+    cG.appendChild(circle)
 }
 /**
  * 根据 data 元素生成虚拟节点
@@ -297,10 +313,18 @@ SvgMap.prototype.cText = cText
  * 要注意appendChild后修改节点位置，所以切勿在插入到正确位置后再执行这个方法
  * */
 SvgMap.prototype.getRect = function(g){
-    this.svgGroup.appendChild(g)
-    let rect = g.getBBox()
-    g.remove()
-    return rect
+    if(document.body.contains(g)){
+        let rect = g.getBBox()
+        g.rect = rect
+    } else if(g.rect){
+        return g.rect
+    } else {
+        this.svgGroup.appendChild(g)
+        let rect = g.getBBox()
+        g.rect = rect
+        g.remove()
+    }
+    return g.rect
 }
 
 /**
@@ -398,7 +422,6 @@ SvgMap.prototype.cReact = function(textOptions, rectOptions = {}) {
     let [pt, pl] = getPadding(padding)
     rectOptions = {
         x: 0,
-        y: 0,
         width: sText.rect.width + (2 * pl),
         height: sText.rect.height + (2 * pt),
         ...rectOptions
@@ -479,15 +502,19 @@ SvgMap.prototype.cReact2 = function(textOptions, rectOptions = {}, config) {
  * */
 SvgMap.prototype.combineGroup = function(a, b, node) {
     const cG = createGroup()
-    const x = `${this.getRect(a).width + this.globalStyle.rowMargin}` // 计算a,b的间距
-    const y = this.findMiddlePosition(b) // 计算a在b垂直方向的中间位置
     const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
-    b.setAttribute('transform', `translate(${x}, ${aY})`) // b的整体Y偏移要与a元素保持一致
+    const x = `${aWidth + this.globalStyle.rowMargin}` // 计算a,b的间距
+    const y = this.getRect(b).height/2 - aHeight/2 // 计算a在b垂直方向的中间位置
+    // 1. b与a 水平对齐
+    b.setAttribute('transform', `translate(${x}, ${aY})`)
+    // 2. 上一步对齐的基础上,将 a 放到 b 垂直居中的位置
     a.childNodes.forEach(node => {
+        // console.log('node', node, node.rect)
         if(node.tagName === 'circle') {
             node.setAttribute('cy', y+aY + aHeight/2) // （步骤A）相对b的居中位置 + 原本的偏移量
         } else {
-            node.setAttribute('y', y+aY) // （步骤A）相对b的居中位置 + 原本的偏移量
+            let curY = node.getAttribute('y') * 1
+            node.setAttribute('y', y+curY) // （步骤A）相对b的居中位置 + 原本的偏移量
         }
     })
 
@@ -497,10 +524,10 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
     // 画线
     b.childNodes.forEach(item => {
         const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
-        const M = `${aWidth} ${(aY + y) + aHeight/2}`
-        const C1 = `${aWidth+20} ${(aY + y) + aHeight/2}`
-        const C2 = `${x-20} ${Number(positionY) + Number(aY)+height/2}`
-        const E = `${x} ${Number(positionY) + Number(aY)+height/2}`
+        const M = `${aWidth} ${(aY + y) + aHeight/2}` // rect 右侧垂直居中的位置
+        const C1 = `${aWidth+20} ${(aY + y) + aHeight/2}` // 开始转弯的位置
+        const C2 = `${x-20} ${Number(positionY) + Number(aY)+height/2}` // 结束墨迹的位置
+        const E = `${x} ${Number(positionY) + Number(aY)+height/2}` // 结束的位置
         const line = cEl('path', {
             d: `M${M} C ${C1} ${C2} ${E}`,
             style: `stroke:${this.lineStyle.color}`,

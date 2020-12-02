@@ -230,7 +230,36 @@ export const min = {
       ]
     },
     {
-      label: 3455
+      label: 3455,
+    }
+  ]
+}
+export const min2 = {
+  name: '3333',
+  children: [
+    {
+      label: 1344,
+      children: [
+        {
+          label: 1344,
+
+        },
+        {
+          label: 3455
+        }
+      ]
+    },
+    {
+      label: 3455,
+      children: [
+        {
+          label: 13441,
+
+        },
+        {
+          label: 34552
+        }
+      ]
     }
   ]
 }
