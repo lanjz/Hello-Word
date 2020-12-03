@@ -242,10 +242,12 @@ export const min2 = {
       children: [
         {
           label: 1344,
+          type: 'text'
 
         },
         {
-          label: 3455
+          label: 3455,
+          type: 'text'
         }
       ]
     },

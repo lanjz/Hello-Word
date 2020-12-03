@@ -64,7 +64,8 @@ function cText(txt, options = {}) {
     el.textContent = txt
     let rect = this.getRect(el)
     // svg无法知道文字高度，且文字基准线在底部，当文字出现时文字会向上偏移（偏移量为文字高度）
-    el.setAttribute('y', Math.abs(rect.y)+(+pt)+(initY||0));
+    el.setAttribute('transform', `translate(0, ${-rect.y})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
+    el.setAttribute('y', (+pt)+(initY||0));
     return el
 }
 // 创建SVG-元素
@@ -168,7 +169,6 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom.appendChild(this.svgGroup)
     document.body.appendChild(this.svgDom)
     let childRight = this.initWalk(this.data.children)
-    console.log('childRight', childRight)
     this.createRootG() // 创建中点元素
     this.svgDom.appendChild(childRight)
     this.svgDom.remove()
@@ -202,8 +202,8 @@ SvgMap.prototype.walk = function (tree, direction, root) {
             key: item[this.keyName],
             type: item.type || ''
         }
-        let svgEl = this.cReact(textOpt, rectOpt, config) // 返回某个文本G
-        // 如果有子节点,右侧添加小圆圈
+        let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt, config) : this.cReact(textOpt, rectOpt, config) // 返回某个文本G
+        // 如果有子节点, 给当前 rect 右侧添加小圆圈
         if(item.children&&item.children.length){
             this.appendCircle(svgEl)
         }
@@ -225,9 +225,10 @@ SvgMap.prototype.walk = function (tree, direction, root) {
     return this.createListGroup(svgElArr) // 返回组成G
 }
 SvgMap.prototype.appendCircle = function (cG, direction = 'right'){
+    const { width, height, y } = this.getRect(cG)
     const circle = cEl('circle', {
-        cx: direction === 'left' ? -5: this.getRect(cG).width+5,
-        cy: 0,
+        cx: direction === 'left' ? -5: width + 5,
+        cy: y + height/2, // rect 的垂直偏移量 + rect 中间位置
         r: 5,
         fill: this.rectStyle.color,
         'stroke-width': 1,
@@ -431,69 +432,23 @@ SvgMap.prototype.cReact = function(textOptions, rectOptions = {}) {
     cG.appendChild(sText)
     return cG
 }
-/**
- * 创建SVG-ellipse元素
- * @params {Object} textOptions: 文字相关的配置
- * @params {Number} height: 垂直偏移量
- * @params {Object} config: 其它属性
- * */
-SvgMap.prototype.cReact2 = function(textOptions, rectOptions = {}, config) {
-    const {text, ...txtOpt} = textOptions
-    const {direction, key, ...conf} = config
-    const { textPadding, reactRadius, minWidth } = this.reactStyle
+SvgMap.prototype.cWord = function(textOptions, rectOptions = {}) {
+    const { text, ...txtOpt } = textOptions
+    const { padding } = rectOptions
     const cG = createGroup()
-    let sText = this.cText(
-        text,
-      {
-          y: rectOptions.y || 0,
-          x: rectOptions.x || 0,
-          key,
-          fillColor: txtOpt.type !== 'text' ? this.primaryColor : this.bgColor ,
-          ...txtOpt,
-          ...conf
-      }
-    )
-    cG.appendChild(sText)
-    const {width, height} = this.getRect(cG)
-    sText.setAttribute('transform', `translate(${textPadding}, ${height})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
-    const attr = {
+    let [pt, pl] = getPadding(padding)
+    let sText = this.cText(text, { padding: `0 ${pl}`, ...txtOpt })
+    rectOptions = {
         x: 0,
-        y: 0,
-        width: Math.max((width + textPadding * 2), minWidth),
-        height: height + textPadding,
-        rx: reactRadius,
-        ry: reactRadius,
-        key,
+        width: sText.rect.width + (2 * pl),
+        height: sText.rect.height + (2 * pt),
         ...rectOptions,
-        ...conf
+        fill: 'transparent'
     }
-    const sEllipse = cEl('rect', attr)
-    if(config.type === 'text') {
-        sText.setAttribute('transform', `translate(${textPadding}, ${height/2})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
-        const underLine = cEl('line', {
-            x1: rectOptions.x || 0,
-            y1: (rectOptions.y || 0) + this.getRect(sEllipse).height/2,
-            x2: width + textPadding * 2,
-            y2: (rectOptions.y || 0) + this.getRect(sEllipse).height/2,
-            'stroke-width': 1,
-            stroke: this.primaryColor
-        })
-        cG.appendChild(underLine)
-    } else if(config.hasChild){
-        const circle = cEl('circle', {
-            cx: direction === 'left' ? (rectOptions.x || 0) - 5:(rectOptions.x || 0) + this.getRect(sEllipse).width+5,
-            cy: (rectOptions.y || 0) + this.getRect(sEllipse).height/2,
-            r: 5,
-            fill: this.primaryColor,
-            'stroke-width': 1,
-            key
-        })
-        cG.appendChild(circle)
-    }
-    cG.prepend(sEllipse)
-    if(direction === 'left'){
-        cG.setAttribute('style', `transform: translateX(${Math.max((width + textPadding * 2), minWidth)}px) rotateY(180deg)`)
-    }
+    const rect = cEl('rect', rectOptions)
+    cG.appendChild(rect)
+    cG.appendChild(sText)
+    cG.dataType = 'text'
     return cG
 }
 /**
@@ -511,7 +466,8 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
     a.childNodes.forEach(node => {
         // console.log('node', node, node.rect)
         if(node.tagName === 'circle') {
-            node.setAttribute('cy', y+aY + aHeight/2) // （步骤A）相对b的居中位置 + 原本的偏移量
+            let curY = node.getAttribute('cy') * 1
+            node.setAttribute('cy', y+curY) // （步骤A）相对b的居中位置 + 原本的偏移量
         } else {
             let curY = node.getAttribute('y') * 1
             node.setAttribute('y', y+curY) // （步骤A）相对b的居中位置 + 原本的偏移量
@@ -523,11 +479,21 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
     this.addVirtualSvg(node,a, b)
     // 画线
     b.childNodes.forEach(item => {
+        console.log('item', item)
         const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
         const M = `${aWidth} ${(aY + y) + aHeight/2}` // rect 右侧垂直居中的位置
         const C1 = `${aWidth+20} ${(aY + y) + aHeight/2}` // 开始转弯的位置
-        const C2 = `${x-20} ${Number(positionY) + Number(aY)+height/2}` // 结束墨迹的位置
-        const E = `${x} ${Number(positionY) + Number(aY)+height/2}` // 结束的位置
+        let [pl] = getPadding(this.rectStyle.padding)
+        let pt = 8
+        let C2, E
+        if(item.dataType === 'text'){ // 是文本元素
+            let bY = Number(positionY) + height + Number(pt)
+            C2 = `${x-20} ${bY}` // 结束转弯的位置
+            E = `${x} ${bY} M${x} ${bY} h ${this.getRect(item).width + this.getRect(item).x*2}` // 结束的位置
+        } else {
+            C2 = `${x - 20} ${Number(positionY) + Number(aY)+height/2}` // 结束转弯的位置
+            E = `${x + 20} ${Number(positionY) + Number(aY)+height/2} ` // 结束的位置
+        }
         const line = cEl('path', {
             d: `M${M} C ${C1} ${C2} ${E}`,
             style: `stroke:${this.lineStyle.color}`,
@@ -548,7 +514,6 @@ SvgMap.prototype.createListGroup = function(svgElArr) {
     })
     return cG
 }
-
 SvgMap.prototype.drawLine = function(root, right, left, minEl, rightY = 0) {
     const { x: rootX, y: rootY, width: rootW, height: rootH } = root.getBBox()
     const rootCenterX = Number(rootX) + Number(rootW) / 2
