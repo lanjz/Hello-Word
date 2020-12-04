@@ -8,7 +8,18 @@ function getPadding(val) {
     }
     return [val[0] || 0, val[val.length - 1] || 0]
 }
-
+function getTranslate(val){
+    if(!val) return { x: 0, y: 0 }
+    let reg = /translate\(.*(\d+).*(\d+).*/g
+    let result = reg.exec(val)
+    if(result){
+        return {
+            x: result[1],
+            y: result[2],
+        }
+    }
+    return { x: 0, y: 0 }
+}
 /**
  * 判断滚轮方向
  * @return { boolean } true-向上; false-向下
@@ -158,9 +169,8 @@ SvgMap.prototype.initState = function(data, options = {}) {
         verticalMargin: 20, // 元素上下间距
         rowMargin: 40, // 元素左右间距
     }
-
-
 }
+SvgMap.prototype.cText = cText
 SvgMap.prototype.init = function (data, options) {
     this.initState(data, options)
     this.svgDom = cSvgDom()
@@ -168,7 +178,18 @@ SvgMap.prototype.init = function (data, options) {
     this.svgGroup = createGroup()
     this.svgDom.appendChild(this.svgGroup)
     document.body.appendChild(this.svgDom)
-    let childRight = this.initWalk(this.data.children)
+    const child = this.data.children || []
+    if(!this.direction && child.length > 1){
+        const half = Math.floor(child.length/2)
+        // 一半存入left中，child存放其余部分了
+        const left = child.splice(0, half)
+        let childLeft = this.initWalk(left, 'left')
+        this.svgGroup.appendChild(childLeft)
+    }
+    if(child.length > 0){
+        let childRight = this.initWalk(child)
+        this.svgGroup.appendChild(childRight)
+    }
     this.createRootG() // 创建中点元素
     this.svgDom.appendChild(childRight)
     this.svgDom.remove()
@@ -196,13 +217,7 @@ SvgMap.prototype.walk = function (tree, direction, root) {
             'padding': this.rectStyle.padding,
             initY: hei,
         }
-        const config = {
-            direction,
-            hasChild: item.children&&item.children.length,
-            key: item[this.keyName],
-            type: item.type || ''
-        }
-        let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt, config) : this.cReact(textOpt, rectOpt, config) // 返回某个文本G
+        let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt, direction) : this.cReact(textOpt, rectOpt, direction)
         // 如果有子节点, 给当前 rect 右侧添加小圆圈
         if(item.children&&item.children.length){
             this.appendCircle(svgEl)
@@ -215,7 +230,6 @@ SvgMap.prototype.walk = function (tree, direction, root) {
         }
         hei += ((this.getRect(svgEl)).height + this.globalStyle.verticalMargin)
         svgElArr.push(svgEl)
-        console.log('svgElArr', svgElArr)
         // todo
         if(root) {
             this.addVirtualSvg(this.data, this.svgGroup, svgEl)
@@ -308,7 +322,7 @@ SvgMap.prototype.mousemove = function(e) {
     _this.temTranslateY = _this.positionY + _this.translateY
     _this.svgDom.setAttribute('style', `transform: translate(${_this.temTranslateX}px, ${_this.temTranslateY}px) scale(${_this.scale})`)
 }
-SvgMap.prototype.cText = cText
+
 /**
  * 获取元素几何信息，需要在DOM才能得到这些信息，所以先执行appendChild
  * 要注意appendChild后修改节点位置，所以切勿在插入到正确位置后再执行这个方法
@@ -373,49 +387,12 @@ SvgMap.prototype.createRootG = function(right, left){
     let rect = this.cReact(textOptions, rectOptions)
     this.svgGroup.appendChild(rect)
 }
-SvgMap.prototype.createRootG2 = function(right, left){
-    // 创建 title 元素
-    const rightMiddleY = right ? this.findMiddlePosition(right) : 0
-    const leftMiddleY = left ? this.findMiddlePosition(left) : 0
-    // 中心按钮的X偏移量：如果有left就放在left右侧
-    let rootX = 0
-    if(left || right){
-        rootX = left ? left.getBBox().width + this.reactStyle.rowMargin : this.reactStyle.rowMargin
-    }
-    // 计算高的那个中间值
-    const rootY = Math.max(rightMiddleY, leftMiddleY)
-    const fontStyle = `font-size: 18px;`
-    const rootG = this.cReact(
-      { text: this.data[this.lableName], style: fontStyle },
-      { y: rootY, x: rootX, fill: '#eade98', rx: 20, ry: 20 },
-      { key: this.data[this.keyName] }
-    )
-    // this.addVirtualSvg(this.data, rootG, right)
-    // this.addVirtualSvg(this.data, null, left)
-    this.svgDom.appendChild(rootG)
-    
-    if(right) {
-        const rootBox = rootG.getBBox()
-        // 矮的那个也要放在高的垂直居中位置（当存在left时才需要计算）
-        const minEl = left && (leftMiddleY <= rightMiddleY) ? left : right
-        const rightY = left ? rootY - this.findMiddlePosition(minEl) : 0
-        if(minEl === left) {
-            // 水平翻转
-            left.setAttribute('style', `transform: translate(${left.getBBox().width}px, ${rightY}px) rotateY(180deg)`)
-            right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, 0)`)
-        } else {
-            left.setAttribute('style', `transform: translate(${left.getBBox().width}px, 0) rotateY(180deg)`)
-            right.setAttribute('transform', `translate(${Number(rootBox.x)+Number(rootBox.width)+this.reactStyle.rowMargin}, ${rightY})`)
-        }
-        this.drawLine(rootG, right, left, minEl, rightY)
-    }
-}
 /**
  * 创建SVG-ellipse元素
  * @params {Object} textOptions: 文字相关的配置
  * @params {Object} rectOptions: 矩形相关的配置
  * */
-SvgMap.prototype.cReact = function(textOptions, rectOptions = {}) {
+SvgMap.prototype.cReact = function(textOptions, rectOptions = {}, direction) {
     const { text, ...txtOpt } = textOptions
     const { padding } = rectOptions
     const cG = createGroup()
@@ -430,8 +407,14 @@ SvgMap.prototype.cReact = function(textOptions, rectOptions = {}) {
     const rect = cEl('rect', rectOptions)
     cG.appendChild(rect)
     cG.appendChild(sText)
+    if(direction === 'left'){
+        cG.setAttribute('style', `transform: translateX(${Math.max((width + textPadding * 2), minWidth)}px) rotateY(180deg)`)
+    }
     return cG
 }
+/**
+ * 创建文本类型的 svg 元素
+ * */
 SvgMap.prototype.cWord = function(textOptions, rectOptions = {}) {
     const { text, ...txtOpt } = textOptions
     const { padding } = rectOptions
@@ -448,6 +431,8 @@ SvgMap.prototype.cWord = function(textOptions, rectOptions = {}) {
     const rect = cEl('rect', rectOptions)
     cG.appendChild(rect)
     cG.appendChild(sText)
+    // 为了连线的时候整齐，跟普通rect一样连到中间的点，所以将文本上向偏移到中间位置
+    cG.style.setProperty('transform', `translate(${getTranslate(sText).x}px, ${getTranslate(sText).y-12}px)`)
     cG.dataType = 'text'
     return cG
 }
@@ -458,41 +443,35 @@ SvgMap.prototype.cWord = function(textOptions, rectOptions = {}) {
 SvgMap.prototype.combineGroup = function(a, b, node) {
     const cG = createGroup()
     const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
-    const x = `${aWidth + this.globalStyle.rowMargin}` // 计算a,b的间距
-    const y = this.getRect(b).height/2 - aHeight/2 // 计算a在b垂直方向的中间位置
-    // 1. b与a 水平对齐
-    b.setAttribute('transform', `translate(${x}, ${aY})`)
-    // 2. 上一步对齐的基础上,将 a 放到 b 垂直居中的位置
+    const bX = `${aWidth + this.globalStyle.rowMargin}` // 计算a,b的间距
+    const middleByA = aHeight/2
+    const middleByGroup = this.getRect(b).height/2 // 计算a在b垂直方向的中间位置
+    // 1. 将b放在a的右侧 且与a水平对齐
+    b.setAttribute('transform', `translate(${bX}, ${aY})`) // g 没有 x y属性
+    // 2. 在上一步对齐的基础上,将 a 放到 b 垂直居中的位置
     a.childNodes.forEach(node => {
         // console.log('node', node, node.rect)
         if(node.tagName === 'circle') {
             let curY = node.getAttribute('cy') * 1
-            node.setAttribute('cy', y+curY) // （步骤A）相对b的居中位置 + 原本的偏移量
+            node.setAttribute('cy', middleByGroup+curY-middleByA) // （步骤A）相对b的居中位置 + 原本的偏移量
         } else {
             let curY = node.getAttribute('y') * 1
-            node.setAttribute('y', y+curY) // （步骤A）相对b的居中位置 + 原本的偏移量
+            node.setAttribute('y', middleByGroup+curY-middleByA) // （步骤A）相对b的居中位置 + 原本的偏移量
         }
     })
-
     cG.appendChild(a)
     cG.appendChild(b)
     this.addVirtualSvg(node,a, b)
-    // 画线
+    // 绘制连接线
     b.childNodes.forEach(item => {
-        console.log('item', item)
         const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
-        const M = `${aWidth} ${(aY + y) + aHeight/2}` // rect 右侧垂直居中的位置
-        const C1 = `${aWidth+20} ${(aY + y) + aHeight/2}` // 开始转弯的位置
-        let [pl] = getPadding(this.rectStyle.padding)
-        let pt = 8
-        let C2, E
+        const M = `${aWidth} ${(aY + middleByGroup)}` // 起点 从父级rect 右侧垂直居中的位置
+        const C1 = `${aWidth+20} ${(aY + middleByGroup)}` // 开始转弯的位置
+        let endY = Number(positionY) + Number(aY)+height/2 // 结束时的 Y 位置
+        const C2 = `${bX - 20} ${endY}` // 结束转弯的位置,子元素左侧位置
+        let E = `${bX + 20} ${endY}`
         if(item.dataType === 'text'){ // 是文本元素
-            let bY = Number(positionY) + height + Number(pt)
-            C2 = `${x-20} ${bY}` // 结束转弯的位置
-            E = `${x} ${bY} M${x} ${bY} h ${this.getRect(item).width + this.getRect(item).x*2}` // 结束的位置
-        } else {
-            C2 = `${x - 20} ${Number(positionY) + Number(aY)+height/2}` // 结束转弯的位置
-            E = `${x + 20} ${Number(positionY) + Number(aY)+height/2} ` // 结束的位置
+            E = E+` M${bX + 20} ${endY} h ${this.getRect(item).width}` // 结束的位置
         }
         const line = cEl('path', {
             d: `M${M} C ${C1} ${C2} ${E}`,
