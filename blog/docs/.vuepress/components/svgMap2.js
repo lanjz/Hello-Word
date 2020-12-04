@@ -179,19 +179,33 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom.appendChild(this.svgGroup)
     document.body.appendChild(this.svgDom)
     const child = this.data.children || []
+    let childRight, childLeft
+    // 绘制右侧的元素
     if(!this.direction && child.length > 1){
         const half = Math.floor(child.length/2)
         // 一半存入left中，child存放其余部分了
         const left = child.splice(0, half)
-        let childLeft = this.initWalk(left, 'left')
+        childLeft = this.initWalk(left, 'left')
         this.svgGroup.appendChild(childLeft)
     }
+    // 绘制左侧的元素
     if(child.length > 0){
-        let childRight = this.initWalk(child)
+        childRight = this.initWalk(child)
         this.svgGroup.appendChild(childRight)
     }
-    this.createRootG() // 创建中点元素
-    this.svgDom.appendChild(childRight)
+    // 创建中点元素
+    let RootG = this.createRootG()
+    this.svgGroup.appendChild(RootG)
+    // 连接中心点和右侧元素
+    if(!!childRight){
+        let combine = this.combineGroup(RootG, childRight, this.data)
+        this.svgGroup.appendChild(combine)
+    }
+    if(!!childLeft){
+        // let combine = this.combineGroup(RootG, childRight, this.data)
+        // this.svgGroup.appendChild(combine)
+    }
+    this.svgDom.appendChild(this.svgGroup)
     this.svgDom.remove()
     return this.svgDom
 }
@@ -217,10 +231,14 @@ SvgMap.prototype.walk = function (tree, direction, root) {
             'padding': this.rectStyle.padding,
             initY: hei,
         }
-        let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt, direction) : this.cReact(textOpt, rectOpt, direction)
+        let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt) : this.cReact(textOpt, rectOpt, direction)
         // 如果有子节点, 给当前 rect 右侧添加小圆圈
         if(item.children&&item.children.length){
-            this.appendCircle(svgEl)
+            this.appendCircle(svgEl, direction)
+        }
+        // // 如果左侧的元素水平翻转
+        if(direction === 'left'){
+            svgEl.setAttribute('style', `transform: rotateY(180deg); transform-origin: ${this.getRect(svgEl).width/2}px ${this.getRect(svgEl).height/2}px`)
         }
         if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
             const childSvgEl = this.walk(item.children, direction)
@@ -372,9 +390,9 @@ SvgMap.prototype.findPositionElY = function(el){
  * @params {g} right
  * @params {g} left 如果没有说明只有一侧
  * */
-SvgMap.prototype.createRootG = function(right, left){
+SvgMap.prototype.createRootG = function(){
     const textOptions = {
-        text: this.data.label,
+        text: this.data[this.lableName],
         fill: this.rootStyle.color,
         'font-size': this.rootStyle['font-size']
     }
@@ -385,31 +403,30 @@ SvgMap.prototype.createRootG = function(right, left){
         'padding': this.rootStyle.padding,
     }
     let rect = this.cReact(textOptions, rectOptions)
-    this.svgGroup.appendChild(rect)
+    return rect
 }
 /**
  * 创建SVG-ellipse元素
  * @params {Object} textOptions: 文字相关的配置
  * @params {Object} rectOptions: 矩形相关的配置
  * */
-SvgMap.prototype.cReact = function(textOptions, rectOptions = {}, direction) {
+SvgMap.prototype.cReact = function(textOptions, rectOptions = {}) {
     const { text, ...txtOpt } = textOptions
     const { padding } = rectOptions
     const cG = createGroup()
     let sText = this.cText(text, { padding, ...txtOpt })
     let [pt, pl] = getPadding(padding)
+    let rectWidth = sText.rect.width + (2 * pl)
+    let rectHeight = sText.rect.height + (2 * pt)
     rectOptions = {
         x: 0,
-        width: sText.rect.width + (2 * pl),
-        height: sText.rect.height + (2 * pt),
+        width: rectWidth,
+        height: rectHeight,
         ...rectOptions
     }
     const rect = cEl('rect', rectOptions)
     cG.appendChild(rect)
     cG.appendChild(sText)
-    if(direction === 'left'){
-        cG.setAttribute('style', `transform: translateX(${Math.max((width + textPadding * 2), minWidth)}px) rotateY(180deg)`)
-    }
     return cG
 }
 /**

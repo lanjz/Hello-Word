@@ -215,7 +215,7 @@ const root = {
   children: [...tree2, ...tree]
 }
 export const min = {
-  name: '3333',
+  label: '3333',
   children: [
     {
       label: 1344,
@@ -235,7 +235,7 @@ export const min = {
   ]
 }
 export const min2 = {
-  name: '3333',
+  label: '3333',
   children: [
     {
       label: 1344,
