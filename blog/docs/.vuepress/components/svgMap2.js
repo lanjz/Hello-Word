@@ -196,14 +196,23 @@ SvgMap.prototype.init = function (data, options) {
     // 创建中点元素
     let RootG = this.createRootG()
     this.svgGroup.appendChild(RootG)
+    if(!!childLeft){
+        // let combine = this.combineGroup(createGroup(), childLeft, this.data)
+        // this.svgGroup.appendChild(combine)
+        // 经过上一步后，RootG 的位置往下偏移，所以需要复位
+        /*RootG.childNodes.forEach(node => {
+            node.setAttribute('y', 0) // （步骤A）相对b的居中位置 + 原本的偏移量
+        })*/
+        this.svgGroup.setAttribute('transform', `translate(${this.getRect(childLeft).width}, 0)`) // g 没有 x y属性
+        // combine.setAttribute('style', `transform: rotate(90deg)`)
+        // combine.setAttribute('style', `transform: rotateY(180deg)`)
+        // combine.setAttribute('transform', 'skewY(180)') // g 没有 x y属性
+        
+    }
     // 连接中心点和右侧元素
     if(!!childRight){
         let combine = this.combineGroup(RootG, childRight, this.data)
         this.svgGroup.appendChild(combine)
-    }
-    if(!!childLeft){
-        // let combine = this.combineGroup(RootG, childRight, this.data)
-        // this.svgGroup.appendChild(combine)
     }
     this.svgDom.appendChild(this.svgGroup)
     this.svgDom.remove()

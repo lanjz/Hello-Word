@@ -204,6 +204,9 @@ const tree = [
           },
           {
             name: '1-3-4'
+          },
+          {
+            name: '1-3-5'
           }
         ]
       }
@@ -260,6 +263,9 @@ export const min2 = {
         },
         {
           label: 34552
+        },
+        {
+          label: 11111111
         }
       ]
     }
