@@ -113,23 +113,27 @@ function createGroup(attr = {}) {
     })
     return document.createElementNS('http://www.w3.org/2000/svg', 'g')
 }
-// ----------------- //
 function SvgMap(data, options = {}) {
     if(!data && typeof data !== 'object'){
         console.error('svgMap: 无效的数据源')
     }
 }
+SvgMap.prototype.cText = cText
 /**
- * @params {Object<keys:label,key,children>} data: 数据源
- * options：
- * @property {String} title： 主题
- * @property {String <right, null>} direction： svg 延展方向, 默认为 null
- * @property {String} key： label的字段名，默认为 label
- * @property {String} name： keys 的字段名，默认为 key
- * @property {String} className： 赋加到 svg 上的类名
- * @property {Function} callback： 点击项后的回调函数
+ * @params {Object} data: 数据
+ * @params {Object} options: 配置项
+ * @property {String} options.title： 主题
+ * @property {String <right, null>} options.direction： svg 延展方向, 默认为 null
+ * @property {String} options.name：label 的字段名，默认为 label
+ * @property {String} options.key：key 的字段名，默认为 key
+ * @property {String} options.className：赋加到 svg 上的类名
+ * @property {Function} options.callback：点击元素后的回调函数
+ * @property {Function} options.rootStyle：中心点样式
+ * @property {Function} options.rectStyle：父级元素样式
+ * @property {Function} options.textStyle：子级文字样式
+ * @property {Function} options.lineStyle：连接线样式
  * */
-SvgMap.prototype.initState = function(data, options = {}) {
+SvgMap.prototype.init = function(data, options = {}) {
     const copyData = JSON.parse(JSON.stringify(data))
     const type = Object.prototype.toString.call(copyData)
     if(type === '[object Array]'){
@@ -142,28 +146,35 @@ SvgMap.prototype.initState = function(data, options = {}) {
         this.data = copyData
         this.data.key = 'root'
     }
-    this.direction = options.direction|| '' // right->只向右伸展 '' => 左右伸展
+    // right: 只呈现在右侧， 默认左右呈现
+    this.direction = options.direction|| '' 
     this.keyName = options.key || 'key'
     this.lableName = options.name || 'label'
     this.callback = options.callback || null
     this.virtualSvg = {}
-    // 主按钮样式
+    // 中心点样式
     this.rootStyle = {
         'font-size': '18px',
+        'border-radius': '5',
         color: '#fff',
         fill: 'transparent',
         padding: 0,
-        'border-radius': '5',
         ...(options.rootStyle||{})
     }
     // rect样式
     this.rectStyle = {
         'font-size': '16px',
+        'border-radius': '5',
         color: '#fff',
         fill: '#a3c6c0',
         padding: 10,
-        'border-radius': '5',
         ...(options.rectStyle||{})
+    }
+    // text样式
+    this.textStyle = {
+        'font-size': '16px',
+        color: '#fff',
+        ...(options.textStyle||{})
     }
     // 连接线样式
     this.lineStyle = {
@@ -172,21 +183,14 @@ SvgMap.prototype.initState = function(data, options = {}) {
         fill: 'transparent',
         ...(options.lineStyle||{})
     }
-    // text样式
-    this.textStyle = {
-        'font-size': '16px',
-        color: '#fff',
-        ...(options.textStyle||{})
-    }
-    // 公共样式
-    this.globalStyle = { // 文本样式
+    // 其它布局样式
+    this.globalStyle = { 
         verticalMargin: 20, // 元素上下间距
         rowMargin: 40, // 元素左右间距
     }
+    return this.draw()
 }
-SvgMap.prototype.cText = cText
-SvgMap.prototype.init = function (data, options) {
-    this.initState(data, options)
+SvgMap.prototype.draw = function () {
     this.svgDom = cSvgDom()
     this.svgDom.that = this
     this.svgGroup = createGroup()
@@ -194,37 +198,37 @@ SvgMap.prototype.init = function (data, options) {
     document.body.appendChild(this.svgDom)
     const child = this.data.children || []
     let childRight, childLeft
-    // 绘制右侧的元素
     if(!this.direction && child.length > 1){
         const half = Math.floor(child.length/2)
-        // 一半存入left中，child存放其余部分了
         const left = child.splice(0, half)
+        // 绘制左侧的元素
         childLeft = this.initWalk(left, 'left')
         this.svgGroup.appendChild(childLeft)
     }
-    // 绘制左侧的元素
+    // 绘制右侧的元素
     if(child.length > 0){
         childRight = this.initWalk(child)
         this.svgGroup.appendChild(childRight)
     }
-    let centerY = ''
+    let centerY = '' // 保存中心点的位置
     // 连接中心点和右侧元素
-    let {el: addRootLineRightGroup, enter: rightEnter} = this.drawRootLine(childRight)
+    let {el: drawRightResult, enter: rightEnter} = this.drawRootLine(childRight)
     centerY = rightEnter.y
-    this.svgGroup.appendChild(addRootLineRightGroup)
+    this.svgGroup.appendChild(drawRightResult)
     if(!!childLeft){
-        let {el: addRootLineGroup, enter: leftEnter} = this.drawRootLine(childLeft)
-        this.svgGroup.appendChild(addRootLineGroup)
-        addRootLineGroup.setAttribute('style', `transform: rotateY(180deg)`)
-        // this.svgGroup 向右偏移,用以完整显示左边的元素
-        setTransform(this.svgGroup, 'translateX', `(${this.getRect(addRootLineGroup).width}px)`)
-        // 两边元素垂直居中
+        let {el: drawLeftResult, enter: leftEnter} = this.drawRootLine(childLeft)
+        this.svgGroup.appendChild(drawLeftResult)
+        // 1. 水平翻转，完成左侧绘制
+        drawLeftResult.setAttribute('style', `transform: rotateY(180deg)`)
+        // 2. 为了显示翻转后的图形，将 svgGroup 向右偏移
+        setTransform(this.svgGroup, 'translateX', `(${this.getRect(drawLeftResult).width}px)`)
+        // 3. 设置左右两边图形垂直居中
         let dis = (rightEnter.y - leftEnter.y)/2 // 获取差量
         if(rightEnter.y > leftEnter.y){
-            addRootLineGroup.setAttribute('style', `transform: rotateY(180deg) translateY(${dis}px)`)
+            drawLeftResult.setAttribute('style', `transform: rotateY(180deg) translateY(${dis}px)`)
         } else {
             centerY = leftEnter.y
-            addRootLineRightGroup.setAttribute('style', `transform: translateY(${dis})`)
+            drawRightResult.setAttribute('style', `transform: translateY(${dis})`)
         }
     }
     // 由于文字向上偏移将导致部分溢出,所以将this.svgGroup向下偏移溢出的部分
@@ -242,7 +246,6 @@ SvgMap.prototype.init = function (data, options) {
     this.svgDom.remove()
     return this.svgDom
 }
-// 处理根元素
 SvgMap.prototype.initWalk = function(tree, direction) {
     const gGroup = this.walk(tree, direction, true)
     return gGroup
@@ -252,16 +255,16 @@ SvgMap.prototype.walk = function (tree, direction, root) {
     let hei = 0 // 设置每个元素的偏移高度
     tree.forEach((item) => {
         let textOpt = {
+            'font-size': this.rectStyle['font-size'],
             text: item[this.lableName],
             fill: this.rectStyle.color,
-            'font-size': this.rectStyle['font-size'],
             initY: hei,
         }
         const rectOpt = {
-            fill: this.rectStyle.fill,
             'rx': this.rectStyle['border-radius'],
             'ry': this.rectStyle['border-radius'],
             'padding': this.rectStyle.padding,
+            fill: this.rectStyle.fill,
             initY: hei,
         }
         let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt) : this.cReact(textOpt, rectOpt, direction)
@@ -546,9 +549,8 @@ SvgMap.prototype.drawRootLine = function(right) {
     const cG = createGroup()
     let rootX = 0
     let rootW = 0
-    // 1. 将b放在a的右侧 且与a水平对齐
     right.setAttribute('transform', `translate(${this.globalStyle.rowMargin}, 0)`) // g 没有 x y属性
-    const aHeight = this.findMiddlePosition(right) // 计算a在b垂直方向的中间位置
+    const aHeight = this.findMiddlePosition(right) // 计算垂直方向的中间位置
     const rootCenterX = 0
     const rootCenterY = aHeight
     const M = `${rootCenterX} ${rootCenterY}`
@@ -575,7 +577,6 @@ SvgMap.prototype.drawRootLine = function(right) {
             y: rootCenterY
         }
     }
-
 }
 
 function mapSvg(data, options) {
