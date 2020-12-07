@@ -127,6 +127,7 @@ SvgMap.prototype.initState = function(data, options = {}) {
         }
     } else {
         this.data = copyData
+        this.data.key = 'root'
     }
     this.direction = options.direction|| '' // right->只向右伸展 '' => 左右伸展
     this.keyName = options.key || 'key'
@@ -193,28 +194,35 @@ SvgMap.prototype.init = function (data, options) {
         childRight = this.initWalk(child)
         this.svgGroup.appendChild(childRight)
     }
+    let centerY = ''
+    // 连接中心点和右侧元素
+    let {el: addRootLineRightGroup, enter: rightEnter} = this.drawRootLine(childRight)
+    centerY = rightEnter.y
+    this.svgGroup.appendChild(addRootLineRightGroup)
+    if(!!childLeft){
+        let {el: addRootLineGroup, enter: leftEnter} = this.drawRootLine(childLeft)
+        this.svgGroup.appendChild(addRootLineGroup)
+        addRootLineGroup.setAttribute('style', `transform: rotateY(180deg)`)
+        this.svgGroup.setAttribute('transform', `translate(${this.getRect(addRootLineGroup).width}, 0)`)
+        // 两边元素垂直居中
+        let dis = (rightEnter.y - leftEnter.y)/2 // 获取差量
+        if(rightEnter.y > leftEnter.y){
+            addRootLineGroup.setAttribute('style', `transform: rotateY(180deg) translateY(${dis}px)`)
+        } else {
+            centerY = leftEnter.y
+            addRootLineRightGroup.setAttribute('style', `transform: translateY(${dis})`)
+        }
+    }
     // 创建中点元素
     let RootG = this.createRootG()
     this.svgGroup.appendChild(RootG)
-    if(!!childLeft){
-        // let combine = this.combineGroup(createGroup(), childLeft, this.data)
-        // this.svgGroup.appendChild(combine)
-        // 经过上一步后，RootG 的位置往下偏移，所以需要复位
-        /*RootG.childNodes.forEach(node => {
-            node.setAttribute('y', 0) // （步骤A）相对b的居中位置 + 原本的偏移量
-        })*/
-        this.svgGroup.setAttribute('transform', `translate(${this.getRect(childLeft).width}, 0)`) // g 没有 x y属性
-        // combine.setAttribute('style', `transform: rotate(90deg)`)
-        // combine.setAttribute('style', `transform: rotateY(180deg)`)
-        // combine.setAttribute('transform', 'skewY(180)') // g 没有 x y属性
-        
-    }
-    // 连接中心点和右侧元素
-    if(!!childRight){
-        let combine = this.combineGroup(RootG, childRight, this.data)
-        this.svgGroup.appendChild(combine)
-    }
     this.svgDom.appendChild(this.svgGroup)
+    // 将中点元素放在中心位置
+    const { width: rootW, height: rootY} = this.getRect(RootG)
+    RootG.setAttribute('transform', `translate(-${rootW/2}, ${centerY - rootY/2})`)
+    const { width: svgW, height: svgH } = this.svgDom.getBBox()
+    this.svgDom.setAttribute('width', svgW)
+    this.svgDom.setAttribute('height', svgH)
     this.svgDom.remove()
     return this.svgDom
 }
@@ -376,10 +384,10 @@ SvgMap.prototype.getRect = function(g){
  * */
 SvgMap.prototype.findMiddlePosition =function(el){
     const firstEl = el.firstChild
-    const {y: firstElY} = this.findPositionElY(firstEl)
+    const {y: firstElY, height: firstH} = this.findPositionElY(firstEl)
     const lastEl = el.lastChild
     const {y: lastElY} = this.findPositionElY(lastEl)
-    const result = (lastElY - firstElY*1) / 2 + firstElY*1
+    const result = (lastElY*1 + firstElY*1+firstH*1) / 2 //first的下边与last的上边的中间位置
     return result
 }
 // 获取某在元素在的Y偏移量
@@ -471,7 +479,9 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
     const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
     const bX = `${aWidth + this.globalStyle.rowMargin}` // 计算a,b的间距
     const middleByA = aHeight/2
-    const middleByGroup = this.getRect(b).height/2 // 计算a在b垂直方向的中间位置
+    // const middleByGroup = this.getRect(b).height/2 // 这个方式取到的整体的中间值，这里需要的靠近a最近的那层的中间位置
+    const middleByGroup = this.findMiddlePosition(b) // 计算a在b垂直方向的中间位置
+    console.log('middleByGroup', middleByGroup)
     // 1. 将b放在a的右侧 且与a水平对齐
     b.setAttribute('transform', `translate(${bX}, ${aY})`) // g 没有 x y属性
     // 2. 在上一步对齐的基础上,将 a 放到 b 垂直居中的位置
@@ -519,37 +529,40 @@ SvgMap.prototype.createListGroup = function(svgElArr) {
     })
     return cG
 }
-SvgMap.prototype.drawLine = function(root, right, left, minEl, rightY = 0) {
-    const { x: rootX, y: rootY, width: rootW, height: rootH } = root.getBBox()
-    const rootCenterX = Number(rootX) + Number(rootW) / 2
-    const rootCenterY = Number(rootY) + Number(rootH) / 2
+SvgMap.prototype.drawRootLine = function(right) {
+    const cG = createGroup()
+    let rootX = 0
+    let rootW = 0
+    // 1. 将b放在a的右侧 且与a水平对齐
+    right.setAttribute('transform', `translate(${this.globalStyle.rowMargin}, 0)`) // g 没有 x y属性
+    const aHeight = this.findMiddlePosition(right) // 计算a在b垂直方向的中间位置
+    const rootCenterX = 0
+    const rootCenterY = aHeight
     const M = `${rootCenterX} ${rootCenterY}`
-    if(left) {
-        left.childNodes.forEach(item => {
-            const {y: itemY, height} = this.findPositionElY(item)
-            const targetX = Number(rootX) - this.reactStyle.rowMargin
-            const targetY = Number(itemY) + Number(height) / 2 + ((minEl === left) ? rightY : 0)
-            const Q = `${rootCenterX} ${targetY}`
-            const E = `${targetX} ${targetY}`
-            const line = cEl('path', {
-                d: `M${M} Q ${Q} ${E}`,
-                ...this.lineStyle
-            })
-            this.svgGroup.appendChild(line)
-        })
-    }
     right.childNodes.forEach(item => {
         const {y: itemY, height} = this.findPositionElY(item)
-        const targetX = Number(rootX) +this.reactStyle.rowMargin + rootW
-        const targetY = Number(itemY) + Number(height) / 2 + ((minEl === right) ? rightY : 0)
+        const targetX = Number(rootX) +this.globalStyle.rowMargin + rootW
+        const targetY = Number(itemY) + Number(height) / 2
         const Q = `${rootCenterX} ${targetY}`
         const E = `${targetX} ${targetY}`
         const line = cEl('path', {
             d: `M${M} Q ${Q} ${E}`,
-            ...this.lineStyle
+            style: `stroke:${this.lineStyle.color}`,
+            'stroke-width': this.lineStyle.width,
+            stroke: this.lineStyle.color,
+            fill: 'transparent'
         })
-        this.svgGroup.appendChild(line)
+        cG.appendChild(line)
     })
+    cG.appendChild(right)
+    return {
+        el: cG,
+        enter: {
+            x: rootCenterX,
+            y: rootCenterY
+        }
+    }
+
 }
 
 function mapSvg(data, options) {

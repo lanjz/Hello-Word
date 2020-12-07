@@ -255,6 +255,34 @@ export const min2 = {
       ]
     },
     {
+      label: 1344,
+      children: [
+        {
+          label: 1344,
+          type: 'text'
+
+        },
+        {
+          label: 3455,
+          type: 'text'
+        }
+      ]
+    },
+    {
+      label: 1344,
+      children: [
+        {
+          label: 1344,
+          type: 'text'
+
+        },
+        {
+          label: 3455,
+          type: 'text'
+        }
+      ]
+    },
+    {
       label: 3455,
       children: [
         {

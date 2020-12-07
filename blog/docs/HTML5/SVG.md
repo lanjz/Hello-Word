@@ -14,6 +14,8 @@ SVG元素：`圆形`, `矩形`, `曲线`
 
 - SVG的渲染顺序是“后来居上”，越后面的元素越可见
 
+- `g` 包含的子元素如果使用 `transform` (无论是属性还是`style`设置的)，`g` 的大小将被受影响
+
 - SVG的使用方式
 
   - 如果HTML是XHTML并且声明类型为`application/xhtml+xml`，可以直接把SVG嵌入到XML源码中
