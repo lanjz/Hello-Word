@@ -216,7 +216,8 @@ SvgMap.prototype.init = function (data, options) {
         let {el: addRootLineGroup, enter: leftEnter} = this.drawRootLine(childLeft)
         this.svgGroup.appendChild(addRootLineGroup)
         addRootLineGroup.setAttribute('style', `transform: rotateY(180deg)`)
-        this.svgGroup.setAttribute('transform', `translate(${this.getRect(addRootLineGroup).width}, 0)`)
+        // this.svgGroup 向右偏移,用以完整显示左边的元素
+        setTransform(this.svgGroup, 'translateX', `(${this.getRect(addRootLineGroup).width}px)`)
         // 两边元素垂直居中
         let dis = (rightEnter.y - leftEnter.y)/2 // 获取差量
         if(rightEnter.y > leftEnter.y){
@@ -226,6 +227,8 @@ SvgMap.prototype.init = function (data, options) {
             addRootLineRightGroup.setAttribute('style', `transform: translateY(${dis})`)
         }
     }
+    // 由于文字向上偏移将导致部分溢出,所以将this.svgGroup向下偏移溢出的部分
+    setTransform(this.svgGroup, 'translateY', `(${Math.abs(this.getRect(this.svgGroup).y)}px)`)
     // 创建中点元素
     let RootG = this.createRootG()
     this.svgGroup.appendChild(RootG)
@@ -280,11 +283,6 @@ SvgMap.prototype.walk = function (tree, direction, root) {
         }
         hei += ((this.getRect(svgEl)).height + this.globalStyle.verticalMargin)
         svgElArr.push(svgEl)
-        // todo
-        if(root) {
-            this.addVirtualSvg(this.data, this.svgGroup, svgEl)
-        }
-        //
     })
     return this.createListGroup(svgElArr) // 返回组成G
 }
