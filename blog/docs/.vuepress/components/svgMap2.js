@@ -20,6 +20,19 @@ function getTranslate(val){
     }
     return { x: 0, y: 0 }
 }
+function setTransform(el, key, value){
+    if(!el) return
+    let getValue = el.style.getPropertyValue('transform')
+    if(!getValue){
+        getValue = `${key}${value}`
+    } else if(getValue.indexOf(key) < 0){
+        getValue = `${getValue} ${key}${value}`
+    } else {
+       let reg = new RegExp("(?<="+key+")\\(.*?\\)", "g")
+        getValue = getValue.replace(reg, value)
+    }
+    el.style.setProperty('transform', getValue)
+}
 /**
  * 判断滚轮方向
  * @return { boolean } true-向上; false-向下
@@ -255,7 +268,9 @@ SvgMap.prototype.walk = function (tree, direction, root) {
         }
         // // 如果左侧的元素水平翻转
         if(direction === 'left'){
-            svgEl.setAttribute('style', `transform: rotateY(180deg); transform-origin: ${this.getRect(svgEl).width/2}px ${this.getRect(svgEl).height/2}px`)
+            svgEl.style.setProperty('transform-origin', `${this.getRect(svgEl).width/2}px ${this.getRect(svgEl).height/2}px`)
+            setTransform(svgEl, 'rotateY', '(180deg)') // 使用方法设置,避免其它属性被覆盖
+            // svgEl.style.setProperty('transform', `transform: rotateY(180deg)`)
         }
         if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
             const childSvgEl = this.walk(item.children, direction)
@@ -466,7 +481,7 @@ SvgMap.prototype.cWord = function(textOptions, rectOptions = {}) {
     cG.appendChild(rect)
     cG.appendChild(sText)
     // 为了连线的时候整齐，跟普通rect一样连到中间的点，所以将文本上向偏移到中间位置
-    cG.style.setProperty('transform', `translate(${getTranslate(sText).x}px, ${getTranslate(sText).y-12}px)`)
+    setTransform(cG, 'translate', `(${getTranslate(sText).x}px, ${getTranslate(sText).y-12}px)`)
     cG.dataType = 'text'
     return cG
 }
@@ -507,7 +522,7 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
         const C2 = `${bX - 20} ${endY}` // 结束转弯的位置,子元素左侧位置
         let E = `${bX + 20} ${endY}`
         if(item.dataType === 'text'){ // 是文本元素
-            E = E+` M${bX + 20} ${endY} h ${this.getRect(item).width}` // 结束的位置
+            E = E+` h ${this.getRect(item).width}` // 结束的位置
         }
         const line = cEl('path', {
             d: `M${M} C ${C1} ${C2} ${E}`,
