@@ -1,4 +1,9 @@
-const tree2 = [
+export const tree3 = [
+  {
+    label: '1-1-1',
+  }
+]
+export const tree2 = [
   {
     name: '1-1-1',
     children: [

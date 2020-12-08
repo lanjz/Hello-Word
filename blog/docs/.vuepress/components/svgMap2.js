@@ -55,11 +55,6 @@ function wheelDir(e) {
         }
     }
 }
-
-function cContainer() {
-    const div = document.createElement('div');
-    return div
-}
 function cSvgDom() {
     const svgDom = document.createElementNS('http://www.w3.org/2000/svg','svg');
     svgDom.setAttribute('version','full');
@@ -67,30 +62,6 @@ function cSvgDom() {
     // svgDom.setAttribute('style', `background: #272b2d`)
     svgDom.setAttribute('xmlns','http://www.w3.org/2000/svg');
     return svgDom
-}
-// 创建SVG-文本元素
-/**
- * @params <String> txt : 文本
- * @params <Object> attr: 样式 { fill: '颜色', 'font-size': '文字大小', initY: 偏移高度}
- * */
-function cText(txt, options = {}) {
-    const el = document.createElementNS('http://www.w3.org/2000/svg','text');
-    let { padding = 0, initY, ...attr } = options
-    let [pt, pl] = getPadding(padding)
-    attr = {
-        // dominantBaseline: 'bottom',
-        x: pl,
-        ...attr
-    }
-    Object.keys(attr).forEach(item => {
-        el.setAttribute(item, attr[item]);
-    })
-    el.textContent = txt
-    let rect = this.getRect(el)
-    // svg无法知道文字高度，且文字基准线在底部，当文字出现时文字会向上偏移（偏移量为文字高度）
-    el.setAttribute('transform', `translate(0, ${-rect.y})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
-    el.setAttribute('y', (+pt)+(initY||0));
-    return el
 }
 // 创建SVG-元素
 function cEl(tag, attr) {
@@ -118,7 +89,6 @@ function SvgMap(data, options = {}) {
         console.error('svgMap: 无效的数据源')
     }
 }
-SvgMap.prototype.cText = cText
 /**
  * @params {Object} data: 数据
  * @params {Object} options: 配置项
@@ -196,6 +166,10 @@ SvgMap.prototype.draw = function () {
     this.svgGroup = createGroup()
     this.svgDom.appendChild(this.svgGroup)
     document.body.appendChild(this.svgDom)
+    // 创建中点元素
+    let RootG = this.createRootG()
+    this.svgGroup.appendChild(RootG)
+    this.svgDom.appendChild(this.svgGroup)
     const child = this.data.children || []
     let childRight, childLeft
     if(!this.direction && child.length > 1){
@@ -212,12 +186,12 @@ SvgMap.prototype.draw = function () {
     }
     let centerY = '' // 保存中心点的位置
     // 连接中心点和右侧元素
-    let {el: drawRightResult, enter: rightEnter} = this.drawRootLine(childRight)
+    let {el: drawRightResult, enter: rightEnter} = this.drawRootLine(childRight, RootG)
     centerY = rightEnter.y
-    this.svgGroup.appendChild(drawRightResult)
+    this.svgGroup.insertBefore(drawRightResult, this.svgGroup.firstChild)
     if(!!childLeft){
-        let {el: drawLeftResult, enter: leftEnter} = this.drawRootLine(childLeft)
-        this.svgGroup.appendChild(drawLeftResult)
+        let {el: drawLeftResult, enter: leftEnter} = this.drawRootLine(childLeft, RootG)
+        this.svgGroup.insertBefore(drawLeftResult, this.svgGroup.firstChild)
         // 1. 水平翻转，完成左侧绘制
         drawLeftResult.setAttribute('style', `transform: rotateY(180deg)`)
         // 2. 为了显示翻转后的图形，将 svgGroup 向右偏移
@@ -230,16 +204,18 @@ SvgMap.prototype.draw = function () {
             centerY = leftEnter.y
             drawRightResult.setAttribute('style', `transform: translateY(${dis})`)
         }
+    } else {
+        // x
     }
     // 由于文字向上偏移将导致部分溢出,所以将this.svgGroup向下偏移溢出的部分
     setTransform(this.svgGroup, 'translateY', `(${Math.abs(this.getRect(this.svgGroup).y)}px)`)
-    // 创建中点元素
-    let RootG = this.createRootG()
-    this.svgGroup.appendChild(RootG)
-    this.svgDom.appendChild(this.svgGroup)
     // 将中点元素放在中心位置
     const { width: rootW, height: rootY} = this.getRect(RootG)
     RootG.setAttribute('transform', `translate(-${rootW/2}, ${centerY - rootY/2})`)
+    if(!childLeft){
+        // 没有左元素时， 中心点向左溢出一半的宽度，通过偏移纠正偏移量
+        setTransform(this.svgGroup, 'translateX', `(${Math.abs(this.getRect(this.svgGroup).x)}px)`)
+    }
     const { width: svgW, height: svgH } = this.svgDom.getBBox()
     this.svgDom.setAttribute('width', svgW)
     this.svgDom.setAttribute('height', svgH)
@@ -269,16 +245,16 @@ SvgMap.prototype.walk = function (tree, direction, root) {
         }
         let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt) : this.cReact(textOpt, rectOpt, direction)
         // 如果有子节点, 给当前 rect 右侧添加小圆圈
-        if(item.children&&item.children.length){
+        if(item.children && item.children.length){
             this.appendCircle(svgEl, direction)
         }
-        // // 如果左侧的元素水平翻转
+        // 如果是左侧的元素则水平翻转
         if(direction === 'left'){
             svgEl.style.setProperty('transform-origin', `${this.getRect(svgEl).width/2}px ${this.getRect(svgEl).height/2}px`)
             setTransform(svgEl, 'rotateY', '(180deg)') // 使用方法设置,避免其它属性被覆盖
-            // svgEl.style.setProperty('transform', `transform: rotateY(180deg)`)
         }
-        if(item.children && item.children.length) { // 如果有子节点，则递归子节点后再与当前节点合并成一个大组
+        // 如果有子节点，则递归子节点后再与当前节点合并成一个G{svg}
+        if(item.children && item.children.length) {
             const childSvgEl = this.walk(item.children, direction)
             svgEl = this.combineGroup(svgEl, childSvgEl, item)
         } else {
@@ -287,142 +263,19 @@ SvgMap.prototype.walk = function (tree, direction, root) {
         hei += ((this.getRect(svgEl)).height + this.globalStyle.verticalMargin)
         svgElArr.push(svgEl)
     })
-    return this.createListGroup(svgElArr) // 返回组成G
+    return this.createListGroup(svgElArr) // 返回组成G{svg}
 }
 SvgMap.prototype.appendCircle = function (cG, direction = 'right'){
     const { width, height, y } = this.getRect(cG)
     const circle = cEl('circle', {
         cx: direction === 'left' ? -5: width + 5,
-        cy: y + height/2, // rect 的垂直偏移量 + rect 中间位置
+        cy: y + height/2,
         r: 5,
         fill: this.rectStyle.color,
         'stroke-width': 1,
     })
     cG.appendChild(circle)
 }
-/**
- * 根据 data 元素生成虚拟节点
- * @params { Object } node: 当前节点
- * @params { curDom } node: 当前节点对应的 svg dom
- * @params { childDom } node: 当前节点对应的子节点 dom
- * */
-SvgMap.prototype.addVirtualSvg = function(node, curDom, childDom) {
-    if(!this.virtualSvg[node[this.keyName]]){
-        this.virtualSvg[node[this.keyName]] = {
-            ...node,
-            childDom: []
-        }
-    }
-    if(childDom) {
-        this.virtualSvg[node[this.keyName]].childDom.push(childDom)
-    }
-    if(curDom) {
-        this.virtualSvg[node[this.keyName]].dom = curDom
-    }
-}
-SvgMap.prototype.addEvent = function(){
-    const _this = this
-    this.svgDom.addEventListener('click', function (e) {
-        const key = e.target.getAttribute('key') || ''
-        if(e.target.tagName === 'circle') {
-            _this.virtualSvg[key].hide = !_this.virtualSvg[key].hide
-            _this.virtualSvg[key].childDom.forEach(item => {
-                item.style.display = _this.virtualSvg[key].hide ? 'none' : 'block'
-            })
-            e.target.style.opacity = _this.virtualSvg[key].hide ? '.5' : '1'
-        } else if(e.target.tagName === 'rect' || e.target.tagName === 'text'){
-            _this.callback && _this.callback(_this.virtualSvg[key])
-        }
-    })
-    this.svgDom.addEventListener('mousedown', _this.mousedown)
-    this.svgDom.onmousewheel = this.wheel.bind(this)
-}
-SvgMap.prototype.wheel = function(e){
-    if(wheelDir(e)) {
-        this.scale += 0.1
-    } else {
-        this.scale -= 0.1
-    }
-    this.svgDom.style.setProperty('transform', `translate(${this.translateX }px, ${this.translateY}px) scale(${this.scale})`)
-    e.preventDefault()
-}
-SvgMap.prototype.mousedown = function(e) {
-    let _this = this.that
-    _this.mousedown = true
-    _this.mousedownMoveStartX = e.pageX
-    _this.mousedownMoveStartY = e.pageY
-    _this.svgDom.addEventListener('mousemove', _this.mousemove)
-    _this.svgDom.addEventListener('mouseup', _this.mouseleave)
-    _this.svgDom.addEventListener('mouseleave', _this.mouseleave)
-}
-SvgMap.prototype.mouseleave = function(e) {
-    let _this = this.that
-    _this.mousedown = false
-    _this.translateX = _this.temTranslateX
-    _this.translateY = _this.temTranslateY
-    _this.svgDom.removeEventListener('mousemove', _this.mousemove)
-    _this.svgDom.removeEventListener('mouseleave', _this.mouseleave)
-    _this.svgDom.removeEventListener('mouseleave', _this.mouseleave)
-}
-SvgMap.prototype.mousemove = function(e) {
-    let _this = this.that
-    if(!_this.mousedown) return
-    _this.positionX = (e.pageX - _this.mousedownMoveStartX)
-    _this.positionY = (e.pageY - _this.mousedownMoveStartY)
-    _this.temTranslateX = _this.positionX + _this.translateX
-    _this.temTranslateY = _this.positionY + _this.translateY
-    _this.svgDom.setAttribute('style', `transform: translate(${_this.temTranslateX}px, ${_this.temTranslateY}px) scale(${_this.scale})`)
-}
-
-/**
- * 获取元素几何信息，需要在DOM才能得到这些信息，所以先执行appendChild
- * 要注意appendChild后修改节点位置，所以切勿在插入到正确位置后再执行这个方法
- * */
-SvgMap.prototype.getRect = function(g){
-    if(document.body.contains(g)){
-        let rect = g.getBBox()
-        g.rect = rect
-    } else if(g.rect){
-        return g.rect
-    } else {
-        this.svgGroup.appendChild(g)
-        let rect = g.getBBox()
-        g.rect = rect
-        g.remove()
-    }
-    return g.rect
-}
-
-/**
- *  获取子元素集合中的垂直居中位置
- *  g元素没有记录几何信息
- *  通过查找g元素下的非g元素，来获取当前g的垂直偏移量
- * */
-SvgMap.prototype.findMiddlePosition =function(el){
-    const firstEl = el.firstChild
-    const {y: firstElY, height: firstH} = this.findPositionElY(firstEl)
-    const lastEl = el.lastChild
-    const {y: lastElY} = this.findPositionElY(lastEl)
-    const result = (lastElY*1 + firstElY*1+firstH*1) / 2 //first的下边与last的上边的中间位置
-    return result
-}
-// 获取某在元素在的Y偏移量
-SvgMap.prototype.findPositionElY = function(el){
-    while (el.tagName === 'g'){
-        el = el.firstChild
-    }
-    return {
-        y: el.getAttribute('y'),
-        x: el.getAttribute('x'),
-        width: el.getAttribute('width'),
-        height: el.getAttribute('height'),
-    }
-}
-
-/**
- * @params {g} right
- * @params {g} left 如果没有说明只有一侧
- * */
 SvgMap.prototype.createRootG = function(){
     const textOptions = {
         text: this.data[this.lableName],
@@ -486,23 +339,83 @@ SvgMap.prototype.cWord = function(textOptions, rectOptions = {}) {
     cG.dataType = 'text'
     return cG
 }
+// 创建SVG-文本元素
 /**
- * @params {svg[g]} a 左侧的g元素
- * @params {svg[g]} b a对应的子元素
+ * @params <String> txt : 文本
+ * @params <Object> attr: 样式 { fill: '颜色', 'font-size': '文字大小', initY: 偏移高度}
+ * */
+SvgMap.prototype.cText = function (txt, options = {}) {
+    const el = document.createElementNS('http://www.w3.org/2000/svg','text');
+    let { padding = 0, initY, ...attr } = options
+    let [pt, pl] = getPadding(padding)
+    attr = {
+        // dominantBaseline: 'bottom',
+        x: pl,
+        ...attr
+    }
+    Object.keys(attr).forEach(item => {
+        el.setAttribute(item, attr[item]);
+    })
+    el.textContent = txt
+    let rect = this.getRect(el)
+    // svg无法知道文字高度，且文字基准线在底部，当文字出现时文字会向上偏移（偏移量为文字高度）
+    el.setAttribute('transform', `translate(0, ${-rect.y})`);// 默认情况文本向偏上，不能垂直居中，所以纠正一下
+    el.setAttribute('y', (+pt)+(initY||0));
+    return el
+}
+/**
+ * 绘制中心点到最近元素的线
+ * @params {svg[g]} group
+ * */
+SvgMap.prototype.drawRootLine = function(group, root) {
+    const cG = createGroup()
+    let rootX = 0
+    let rootW = this.getRect(root).width
+    const endPoint = `${rootW + this.globalStyle.rowMargin}` // 计算a,b的间距
+    group.setAttribute('transform', `translate(${endPoint}, 0)`) // g 没有 x y属性
+    const aHeight = this.findMiddlePosition(group) // 计算垂直方向的中间位置
+    const rootCenterX = 0
+    const rootCenterY = aHeight
+    const M = `${rootCenterX} ${rootCenterY}`
+    group.childNodes.forEach(item => {
+        const {y: itemY, height} = this.findPositionElY(item)
+        const targetX = Number(rootX) +this.globalStyle.rowMargin + rootW
+        const targetY = Number(itemY) + Number(height) / 2
+        const Q = `${rootCenterX} ${targetY}`
+        const E = `${targetX} ${targetY}`
+        const line = cEl('path', {
+            d: `M${M} Q ${Q} ${E}`,
+            style: `stroke:${this.lineStyle.color}`,
+            'stroke-width': this.lineStyle.width,
+            stroke: this.lineStyle.color,
+            fill: 'transparent'
+        })
+        cG.appendChild(line)
+    })
+    cG.appendChild(group)
+    return {
+        el: cG,
+        enter: {
+            x: rootCenterX,
+            y: rootCenterY
+        }
+    }
+}
+/**
+ * @params {svg[g]} a: 父级元素
+ * @params {svg[g]} b: a对应的子元素
  * */
 SvgMap.prototype.combineGroup = function(a, b, node) {
     const cG = createGroup()
     const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
     const bX = `${aWidth + this.globalStyle.rowMargin}` // 计算a,b的间距
     const middleByA = aHeight/2
-    // const middleByGroup = this.getRect(b).height/2 // 这个方式取到的整体的中间值，这里需要的靠近a最近的那层的中间位置
+    // const middleByGroup = this.getRect(b).height/2 // 这个方式取到的整体的中间值，这里需要的 a 一级子元素的中间位置
     const middleByGroup = this.findMiddlePosition(b) // 计算a在b垂直方向的中间位置
-    console.log('middleByGroup', middleByGroup)
     // 1. 将b放在a的右侧 且与a水平对齐
     b.setAttribute('transform', `translate(${bX}, ${aY})`) // g 没有 x y属性
     // 2. 在上一步对齐的基础上,将 a 放到 b 垂直居中的位置
     a.childNodes.forEach(node => {
-        // console.log('node', node, node.rect)
         if(node.tagName === 'circle') {
             let curY = node.getAttribute('cy') * 1
             node.setAttribute('cy', middleByGroup+curY-middleByA) // （步骤A）相对b的居中位置 + 原本的偏移量
@@ -538,47 +451,133 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
     return cG
 }
 // 将同父的元素放同一个组中
-SvgMap.prototype.createListGroup = function(svgElArr) {
+SvgMap.prototype.createListGroup = function (svgElArr) {
     const cG = createGroup()
     svgElArr.forEach((item, ind) => {
         cG.appendChild(item)
     })
     return cG
+};
+/**
+ *  获取子元素集合中的垂直居中位置
+ *  @params {svg} el, svg元素
+ * */
+SvgMap.prototype.findMiddlePosition =function(el){
+    const firstEl = el.firstChild
+    const {y: firstElY, height: firstH} = this.findPositionElY(firstEl)
+    const lastEl = el.lastChild
+    const {y: lastElY} = this.findPositionElY(lastEl)
+    const result = (lastElY*1 + firstElY*1+firstH*1) / 2 //first的下边与last的上边的中间位置
+    return result
 }
-SvgMap.prototype.drawRootLine = function(right) {
-    const cG = createGroup()
-    let rootX = 0
-    let rootW = 0
-    right.setAttribute('transform', `translate(${this.globalStyle.rowMargin}, 0)`) // g 没有 x y属性
-    const aHeight = this.findMiddlePosition(right) // 计算垂直方向的中间位置
-    const rootCenterX = 0
-    const rootCenterY = aHeight
-    const M = `${rootCenterX} ${rootCenterY}`
-    right.childNodes.forEach(item => {
-        const {y: itemY, height} = this.findPositionElY(item)
-        const targetX = Number(rootX) +this.globalStyle.rowMargin + rootW
-        const targetY = Number(itemY) + Number(height) / 2
-        const Q = `${rootCenterX} ${targetY}`
-        const E = `${targetX} ${targetY}`
-        const line = cEl('path', {
-            d: `M${M} Q ${Q} ${E}`,
-            style: `stroke:${this.lineStyle.color}`,
-            'stroke-width': this.lineStyle.width,
-            stroke: this.lineStyle.color,
-            fill: 'transparent'
-        })
-        cG.appendChild(line)
-    })
-    cG.appendChild(right)
+/**
+ *  获取元素几何信息
+ *  注意：g 元素没有记录几何信息，通过查找g元素下的非g元素，来获取当前g的垂直偏移量
+ *  @params {svg} el, svg元素
+ * */
+// 获取某在元素在的Y偏移量
+SvgMap.prototype.findPositionElY = function(el){
+    while (el.tagName === 'g'){
+        el = el.firstChild
+    }
     return {
-        el: cG,
-        enter: {
-            x: rootCenterX,
-            y: rootCenterY
-        }
+        y: el.getAttribute('y'),
+        x: el.getAttribute('x'),
+        width: el.getAttribute('width'),
+        height: el.getAttribute('height'),
     }
 }
-
+/**
+ * 获取元素几何信息，需要在DOM才能得到这些信息，所以先执行appendChild
+ * 要注意appendChild后修改节点位置，所以切勿在插入到正确位置后再执行这个方法
+ * */
+SvgMap.prototype.getRect = function (g){
+    if(document.body.contains(g)){
+        let rect = g.getBBox()
+        g.rect = rect
+    } else if(g.rect){
+        return g.rect
+    } else {
+        this.svgGroup.appendChild(g)
+        let rect = g.getBBox()
+        g.rect = rect
+        g.remove()
+    }
+    return g.rect
+}
+/**
+ * 根据 data 元素生成虚拟节点
+ * @params { Object } node: 当前节点
+ * @params { curDom } node: 当前节点对应的 svg dom
+ * @params { childDom } node: 当前节点对应的子节点 dom
+ * */
+SvgMap.prototype.addVirtualSvg = function(node, curDom, childDom) {
+    if(!this.virtualSvg[node[this.keyName]]){
+        this.virtualSvg[node[this.keyName]] = {
+            ...node,
+            childDom: []
+        }
+    }
+    if(curDom) {
+        this.virtualSvg[node[this.keyName]].dom = curDom
+    }
+    if(childDom) {
+        this.virtualSvg[node[this.keyName]].childDom.push(childDom)
+    }
+}
+SvgMap.prototype.addEvent = function(){
+    const _this = this
+    this.svgDom.addEventListener('click', function (e) {
+        const key = e.target.getAttribute('key') || ''
+        if(e.target.tagName === 'circle') {
+            _this.virtualSvg[key].hide = !_this.virtualSvg[key].hide
+            _this.virtualSvg[key].childDom.forEach(item => {
+                item.style.display = _this.virtualSvg[key].hide ? 'none' : 'block'
+            })
+            e.target.style.opacity = _this.virtualSvg[key].hide ? '.5' : '1'
+        } else if(e.target.tagName === 'rect' || e.target.tagName === 'text'){
+            _this.callback && _this.callback(_this.virtualSvg[key])
+        }
+    })
+    this.svgDom.addEventListener('mousedown', _this.mousedown)
+    this.svgDom.onmousewheel = this.wheel.bind(this)
+}
+SvgMap.prototype.wheel = function(e){
+    if(wheelDir(e)) {
+        this.scale += 0.1
+    } else {
+        this.scale -= 0.1
+    }
+    this.svgDom.style.setProperty('transform', `translate(${this.translateX }px, ${this.translateY}px) scale(${this.scale})`)
+    e.preventDefault()
+}
+SvgMap.prototype.mousedown = function(e) {
+    let _this = this.that
+    _this.mousedown = true
+    _this.mousedownMoveStartX = e.pageX
+    _this.mousedownMoveStartY = e.pageY
+    _this.svgDom.addEventListener('mousemove', _this.mousemove)
+    _this.svgDom.addEventListener('mouseup', _this.mouseleave)
+    _this.svgDom.addEventListener('mouseleave', _this.mouseleave)
+}
+SvgMap.prototype.mouseleave = function(e) {
+    let _this = this.that
+    _this.mousedown = false
+    _this.translateX = _this.temTranslateX
+    _this.translateY = _this.temTranslateY
+    _this.svgDom.removeEventListener('mousemove', _this.mousemove)
+    _this.svgDom.removeEventListener('mouseleave', _this.mouseleave)
+    _this.svgDom.removeEventListener('mouseleave', _this.mouseleave)
+}
+SvgMap.prototype.mousemove = function(e) {
+    let _this = this.that
+    if(!_this.mousedown) return
+    _this.positionX = (e.pageX - _this.mousedownMoveStartX)
+    _this.positionY = (e.pageY - _this.mousedownMoveStartY)
+    _this.temTranslateX = _this.positionX + _this.translateX
+    _this.temTranslateY = _this.positionY + _this.translateY
+    _this.svgDom.setAttribute('style', `transform: translate(${_this.temTranslateX}px, ${_this.temTranslateY}px) scale(${_this.scale})`)
+}
 function mapSvg(data, options) {
     return (new SvgMap(data, options)).init(data, options)
 }
