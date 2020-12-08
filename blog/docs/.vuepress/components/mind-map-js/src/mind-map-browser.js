@@ -33,28 +33,6 @@ function setTransform(el, key, value){
     }
     el.style.setProperty('transform', getValue)
 }
-/**
- * 判断滚轮方向
- * @return { boolean } true-向上; false-向下
- * */
-function wheelDir(e) {
-    e = e || window.event;
-    if (e.wheelDelta) {
-        if (e.wheelDelta>0) {
-           return true
-        }
-        if (e.wheelDelta<0) {
-            return false
-        }
-    } else if (e.detail) {
-        if (e.detail > 0) {
-            return false
-        }
-        if(e.detail<0){
-            return true
-        }
-    }
-}
 function cSvgDom() {
     const svgDom = document.createElementNS('http://www.w3.org/2000/svg','svg');
     svgDom.setAttribute('version','full');
@@ -504,53 +482,16 @@ SvgMap.prototype.addEvent = function(){
     const _this = this
     this.svgDom.addEventListener('click', function (e) {
         if(e.target.tagName === 'circle') {
-/*            _this.virtualSvg[key].hide = !_this.virtualSvg[key].hide
-            _this.virtualSvg[key].childDom.forEach(item => {
-                item.style.display = _this.virtualSvg[key].hide ? 'none' : 'block'
-            })
-            e.target.style.opacity = _this.virtualSvg[key].hide ? '.5' : '1'*/
+            // _this.virtualSvg[key].hide = !_this.virtualSvg[key].hide
+            // _this.virtualSvg[key].childDom.forEach(item => {
+            //     item.style.display = _this.virtualSvg[key].hide ? 'none' : 'block'
+            // })
+            // e.target.style.opacity = _this.virtualSvg[key].hide ? '.5' : '1'
         } else if(e.target.tagName === 'rect' || e.target.tagName === 'text'){
             _this.callback && _this.callback(e.target.parentNode['data-info'])
         }
     })
 }
-SvgMap.prototype.wheel = function(e){
-    if(wheelDir(e)) {
-        this.scale += 0.1
-    } else {
-        this.scale -= 0.1
-    }
-    this.svgDom.style.setProperty('transform', `translate(${this.translateX }px, ${this.translateY}px) scale(${this.scale})`)
-    e.preventDefault()
-}
-SvgMap.prototype.mousedown = function(e) {
-    let _this = this.that
-    _this.mousedown = true
-    _this.mousedownMoveStartX = e.pageX
-    _this.mousedownMoveStartY = e.pageY
-    _this.svgDom.addEventListener('mousemove', _this.mousemove)
-    _this.svgDom.addEventListener('mouseup', _this.mouseleave)
-    _this.svgDom.addEventListener('mouseleave', _this.mouseleave)
-}
-SvgMap.prototype.mouseleave = function(e) {
-    let _this = this.that
-    _this.mousedown = false
-    _this.translateX = _this.temTranslateX
-    _this.translateY = _this.temTranslateY
-    _this.svgDom.removeEventListener('mousemove', _this.mousemove)
-    _this.svgDom.removeEventListener('mouseleave', _this.mouseleave)
-    _this.svgDom.removeEventListener('mouseleave', _this.mouseleave)
-}
-SvgMap.prototype.mousemove = function(e) {
-    let _this = this.that
-    if(!_this.mousedown) return
-    _this.positionX = (e.pageX - _this.mousedownMoveStartX)
-    _this.positionY = (e.pageY - _this.mousedownMoveStartY)
-    _this.temTranslateX = _this.positionX + _this.translateX
-    _this.temTranslateY = _this.positionY + _this.translateY
-    _this.svgDom.setAttribute('style', `transform: translate(${_this.temTranslateX}px, ${_this.temTranslateY}px) scale(${_this.scale})`)
-}
 function mapSvg(data, options) {
     return (new SvgMap(data, options)).init(data, options)
 }
-export default mapSvg

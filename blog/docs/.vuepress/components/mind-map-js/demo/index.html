@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body{
+            background: #272b2d;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+<script src="../src/mind-map-browser.js"></script>
+<script>
+  window.onload = function (){
+    console.log('mapSvg', mapSvg)
+    const min2 = {
+      label: '3333',
+      children: [
+        {
+          label: 1344,
+          children: [
+            {
+              label: 1344,
+              type: 'text'
+
+            },
+            {
+              label: 3455,
+              type: 'text'
+            }
+          ]
+        },
+        {
+          label: 1344,
+          children: [
+            {
+              label: 1344,
+              type: 'text'
+
+            },
+            {
+              label: 3455,
+              type: 'text'
+            }
+          ]
+        },
+        {
+          label: 1344,
+          children: [
+            {
+              label: 1344,
+              type: 'text'
+
+            },
+            {
+              label: 3455,
+              type: 'text'
+            }
+          ]
+        },
+        {
+          label: 3455,
+          children: [
+            {
+              label: 13441,
+
+            },
+            {
+              label: 34552
+            },
+            {
+              label: 11111111
+            }
+          ]
+        }
+      ]
+    }
+    const rootStyle = {
+      'font-size': '18px',
+      'border-radius': '2',
+      color: 'blue',
+      fill: 'red',
+      padding: '0 5',
+    }
+    const rectStyle = {
+      'border-radius': '4',
+      padding: '2 8',
+    }
+    let options = {
+      title: 'Orchid',
+      direction: 'right',
+      className: 'abc',
+    }
+    const svg = mapSvg(min2, options)
+    document.body.appendChild(svg)
+  }
+
+</script>
+</html>
