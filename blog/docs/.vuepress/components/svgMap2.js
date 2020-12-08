@@ -95,7 +95,6 @@ function SvgMap(data, options = {}) {
  * @property {String} options.title： 主题
  * @property {String <right, null>} options.direction： svg 延展方向, 默认为 null
  * @property {String} options.name：label 的字段名，默认为 label
- * @property {String} options.key：key 的字段名，默认为 key
  * @property {String} options.className：赋加到 svg 上的类名
  * @property {Function} options.callback：点击元素后的回调函数
  * @property {Function} options.rootStyle：中心点样式
@@ -109,19 +108,16 @@ SvgMap.prototype.init = function(data, options = {}) {
     if(type === '[object Array]'){
         this.data = {
             [options.name||'label']: options.title || 'Root',
-            key: 'root',
             children: copyData
         }
     } else {
         this.data = copyData
-        this.data.key = 'root'
     }
     // right: 只呈现在右侧， 默认左右呈现
     this.direction = options.direction|| ''
-    this.keyName = options.key || 'key'
     this.lableName = options.name || 'label'
     this.callback = options.callback || null
-    this.virtualSvg = {}
+    this.className = options.className || null
     // 中心点样式
     this.rootStyle = {
         'font-size': '18px',
@@ -158,7 +154,9 @@ SvgMap.prototype.init = function(data, options = {}) {
         verticalMargin: 20, // 元素上下间距
         rowMargin: 40, // 元素左右间距
     }
-    return this.draw()
+    let result = this.draw()
+    this.addEvent()
+    return result
 }
 SvgMap.prototype.draw = function () {
     this.svgDom = cSvgDom()
@@ -204,8 +202,6 @@ SvgMap.prototype.draw = function () {
             centerY = leftEnter.y
             drawRightResult.setAttribute('style', `transform: translateY(${dis})`)
         }
-    } else {
-        // x
     }
     // 由于文字向上偏移将导致部分溢出,所以将this.svgGroup向下偏移溢出的部分
     setTransform(this.svgGroup, 'translateY', `(${Math.abs(this.getRect(this.svgGroup).y)}px)`)
@@ -219,6 +215,7 @@ SvgMap.prototype.draw = function () {
     const { width: svgW, height: svgH } = this.svgDom.getBBox()
     this.svgDom.setAttribute('width', svgW)
     this.svgDom.setAttribute('height', svgH)
+    !!this.className&&this.svgDom.classList.add(this.className)
     this.svgDom.remove()
     return this.svgDom
 }
@@ -226,7 +223,7 @@ SvgMap.prototype.initWalk = function(tree, direction) {
     const gGroup = this.walk(tree, direction, true)
     return gGroup
 }
-SvgMap.prototype.walk = function (tree, direction, root) {
+SvgMap.prototype.walk = function (tree, direction) {
     const svgElArr = []
     let hei = 0 // 设置每个元素的偏移高度
     tree.forEach((item) => {
@@ -244,6 +241,7 @@ SvgMap.prototype.walk = function (tree, direction, root) {
             initY: hei,
         }
         let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt) : this.cReact(textOpt, rectOpt, direction)
+        svgEl['data-info'] = item
         // 如果有子节点, 给当前 rect 右侧添加小圆圈
         if(item.children && item.children.length){
             this.appendCircle(svgEl, direction)
@@ -257,8 +255,6 @@ SvgMap.prototype.walk = function (tree, direction, root) {
         if(item.children && item.children.length) {
             const childSvgEl = this.walk(item.children, direction)
             svgEl = this.combineGroup(svgEl, childSvgEl, item)
-        } else {
-            this.addVirtualSvg(item, svgEl, null)
         }
         hei += ((this.getRect(svgEl)).height + this.globalStyle.verticalMargin)
         svgElArr.push(svgEl)
@@ -289,6 +285,7 @@ SvgMap.prototype.createRootG = function(){
         'padding': this.rootStyle.padding,
     }
     let rect = this.cReact(textOptions, rectOptions)
+    rect['data-info'] = this.data
     return rect
 }
 /**
@@ -426,7 +423,6 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
     })
     cG.appendChild(a)
     cG.appendChild(b)
-    this.addVirtualSvg(node,a, b)
     // 绘制连接线
     b.childNodes.forEach(item => {
         const {y: positionY, height} = this.findPositionElY(item) // 获取元素在当前组内的Y偏移量
@@ -445,7 +441,6 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
             stroke: this.lineStyle.color,
             fill: 'transparent'
         })
-        this.virtualSvg[node[this.keyName]].childDom.push(line)
         cG.appendChild(line)
     })
     return cG
@@ -505,42 +500,19 @@ SvgMap.prototype.getRect = function (g){
     }
     return g.rect
 }
-/**
- * 根据 data 元素生成虚拟节点
- * @params { Object } node: 当前节点
- * @params { curDom } node: 当前节点对应的 svg dom
- * @params { childDom } node: 当前节点对应的子节点 dom
- * */
-SvgMap.prototype.addVirtualSvg = function(node, curDom, childDom) {
-    if(!this.virtualSvg[node[this.keyName]]){
-        this.virtualSvg[node[this.keyName]] = {
-            ...node,
-            childDom: []
-        }
-    }
-    if(curDom) {
-        this.virtualSvg[node[this.keyName]].dom = curDom
-    }
-    if(childDom) {
-        this.virtualSvg[node[this.keyName]].childDom.push(childDom)
-    }
-}
 SvgMap.prototype.addEvent = function(){
     const _this = this
     this.svgDom.addEventListener('click', function (e) {
-        const key = e.target.getAttribute('key') || ''
         if(e.target.tagName === 'circle') {
-            _this.virtualSvg[key].hide = !_this.virtualSvg[key].hide
+/*            _this.virtualSvg[key].hide = !_this.virtualSvg[key].hide
             _this.virtualSvg[key].childDom.forEach(item => {
                 item.style.display = _this.virtualSvg[key].hide ? 'none' : 'block'
             })
-            e.target.style.opacity = _this.virtualSvg[key].hide ? '.5' : '1'
+            e.target.style.opacity = _this.virtualSvg[key].hide ? '.5' : '1'*/
         } else if(e.target.tagName === 'rect' || e.target.tagName === 'text'){
-            _this.callback && _this.callback(_this.virtualSvg[key])
+            _this.callback && _this.callback(e.target.parentNode['data-info'])
         }
     })
-    this.svgDom.addEventListener('mousedown', _this.mousedown)
-    this.svgDom.onmousewheel = this.wheel.bind(this)
 }
 SvgMap.prototype.wheel = function(e){
     if(wheelDir(e)) {

@@ -17,7 +17,10 @@
 </body>
 <script type="module">
   import mapSvg from './svgMap2.js'
-  import {min, min2, tree3, tree4, tree} from './data.js'
+  import {min, min2, tree3, tree4, tree, tree2} from './data.js'
+  function cal(data){
+    console.log('data', data)
+  }
   const rootStyle = {
     'font-size': '18px',
     'border-radius': '2',
@@ -29,7 +32,16 @@
     'border-radius': '4',
     padding: '2 8',
   }
-  const svg = mapSvg(tree4, { title: 'Orchid', rootStyle, rectStyle, name: 'name', direction: 'right'})
+  let options = {
+    title: 'Orchid',
+    rootStyle,
+    rectStyle,
+    name: 'name',
+    direction: 'right',
+    className: 'abc',
+    callback: cal
+  }
+  const svg = mapSvg(tree2, options)
   document.body.appendChild(svg)
 
 </script>
