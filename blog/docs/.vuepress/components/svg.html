@@ -17,7 +17,7 @@
 </body>
 <script type="module">
   import mapSvg from './svgMap2.js'
-  import {min, min2, tree3, tree2} from './data.js'
+  import {min, min2, tree3, tree4, tree} from './data.js'
   const rootStyle = {
     'font-size': '18px',
     'border-radius': '2',
@@ -29,7 +29,7 @@
     'border-radius': '4',
     padding: '2 8',
   }
-  const svg = mapSvg(tree2, { title: 'Orchid', rootStyle, rectStyle, name: 'name'})
+  const svg = mapSvg(tree4, { title: 'Orchid', rootStyle, rectStyle, name: 'name', direction: 'right'})
   document.body.appendChild(svg)
 
 </script>

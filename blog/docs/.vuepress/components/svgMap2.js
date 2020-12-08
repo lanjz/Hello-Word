@@ -108,7 +108,7 @@ SvgMap.prototype.init = function(data, options = {}) {
     const type = Object.prototype.toString.call(copyData)
     if(type === '[object Array]'){
         this.data = {
-            label: options.title || 'Root',
+            [options.name||'label']: options.title || 'Root',
             key: 'root',
             children: copyData
         }
@@ -117,7 +117,7 @@ SvgMap.prototype.init = function(data, options = {}) {
         this.data.key = 'root'
     }
     // right: 只呈现在右侧， 默认左右呈现
-    this.direction = options.direction|| '' 
+    this.direction = options.direction|| ''
     this.keyName = options.key || 'key'
     this.lableName = options.name || 'label'
     this.callback = options.callback || null
@@ -371,7 +371,7 @@ SvgMap.prototype.drawRootLine = function(group, root) {
     const cG = createGroup()
     let rootX = 0
     let rootW = this.getRect(root).width
-    const endPoint = `${rootW + this.globalStyle.rowMargin}` // 计算a,b的间距
+    const endPoint = rootW + this.globalStyle.rowMargin // 计算a,b的间距
     group.setAttribute('transform', `translate(${endPoint}, 0)`) // g 没有 x y属性
     const aHeight = this.findMiddlePosition(group) // 计算垂直方向的中间位置
     const rootCenterX = 0
@@ -408,7 +408,7 @@ SvgMap.prototype.drawRootLine = function(group, root) {
 SvgMap.prototype.combineGroup = function(a, b, node) {
     const cG = createGroup()
     const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
-    const bX = `${aWidth + this.globalStyle.rowMargin}` // 计算a,b的间距
+    const bX = aWidth + this.globalStyle.rowMargin // 计算a,b的间距
     const middleByA = aHeight/2
     // const middleByGroup = this.getRect(b).height/2 // 这个方式取到的整体的中间值，这里需要的 a 一级子元素的中间位置
     const middleByGroup = this.findMiddlePosition(b) // 计算a在b垂直方向的中间位置
@@ -434,7 +434,7 @@ SvgMap.prototype.combineGroup = function(a, b, node) {
         const C1 = `${aWidth+20} ${(aY + middleByGroup)}` // 开始转弯的位置
         let endY = Number(positionY) + Number(aY)+height/2 // 结束时的 Y 位置
         const C2 = `${bX - 20} ${endY}` // 结束转弯的位置,子元素左侧位置
-        let E = `${bX + 20} ${endY}`
+        let E = `${bX} ${endY}`
         if(item.dataType === 'text'){ // 是文本元素
             E = E+` h ${this.getRect(item).width}` // 结束的位置
         }
