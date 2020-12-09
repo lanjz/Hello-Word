@@ -1,3 +1,8 @@
+;(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory :
+      typeof define === 'function' && define.amd ? define(factory) :
+        global.mindMap = factory
+}(this, createMind))
 function getPadding(val) {
     if(!val) return [0, 0]
     val = (''+val).trim()
@@ -492,7 +497,6 @@ SvgMap.prototype.addEvent = function(){
         }
     })
 }
-function mapSvg(data, options) {
+function createMind(data, options) {
     return (new SvgMap(data, options)).init(data, options)
 }
-export default mapSvg
