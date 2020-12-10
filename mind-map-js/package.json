@@ -18,6 +18,8 @@
   "author": "lanjz",
   "license": "ISC",
   "devDependencies": {
+    "@babel/preset-env": "^7.12.10",
+    "terser-webpack-plugin": "^5.0.3",
     "webpack": "^5.10.0",
     "webpack-cli": "^4.2.0"
   },

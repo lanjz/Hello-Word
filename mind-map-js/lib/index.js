@@ -1,6 +1,7 @@
 function component() {
   var element = document.createElement('div');
-  element.innerHTML = 'Hello';
+  let a = 'A'
+  element.innerHTML = `Hello${a}`;
   const abc = () => {
     console.log('箭头函数')
   }

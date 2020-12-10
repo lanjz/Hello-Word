@@ -12,7 +12,7 @@
 <body>
 
 </body>
-<script src="../src/svgMap2.js"></script>
+<script src="../src/mind-map-browser.js"></script>
 <script>
   window.onload = function (){
     const min2 = {
@@ -93,7 +93,7 @@
       direction: 'right',
       className: 'abc',
     }
-    const svg = mindMap(min2, options)
+    const svg = mapSvg(min2, options)
     document.body.appendChild(svg)
   }
 
