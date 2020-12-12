@@ -165,13 +165,25 @@ SvgMap.prototype.draw = function () {
         childRight = this.initWalk(child)
         this.svgGroup.appendChild(childRight)
     }
+    this.combineSvg(RootG, childRight, childLeft) // 将三个元素组合在一起
+    // 由于文字向上偏移将导致部分溢出,所以将this.svgGroup向下偏移溢出的部分
+    setTransform(this.svgGroup, 'translateY', `(${Math.abs(this.getRect(this.svgGroup).y)}px)`)
+    const { width: svgW, height: svgH } = this.svgDom.getBBox()
+    this.svgDom.setAttribute('width', svgW)
+    this.svgDom.setAttribute('height', svgH)
+    !!this.className&&this.svgDom.classList.add(this.className)
+    this.svgDom.remove()
+    return this.svgDom
+}
+SvgMap.prototype.combineSvg = function(RootG, childRight, childLeft){
+    if(!childRight) return
     let centerY = '' // 保存中心点的位置
     // 连接中心点和右侧元素
-    let {el: drawRightResult, enter: rightEnter} = this.drawRootLine(childRight, RootG)
+    let {el: drawRightResult, center: rightEnter} = this.drawRootLine(childRight, RootG)
     centerY = rightEnter.y
     this.svgGroup.insertBefore(drawRightResult, this.svgGroup.firstChild)
     if(!!childLeft){
-        let {el: drawLeftResult, enter: leftEnter} = this.drawRootLine(childLeft, RootG)
+        let {el: drawLeftResult, center: leftEnter} = this.drawRootLine(childLeft, RootG)
         this.svgGroup.insertBefore(drawLeftResult, this.svgGroup.firstChild)
         // 1. 水平翻转，完成左侧绘制
         drawLeftResult.setAttribute('style', `transform: rotateY(180deg)`)
@@ -186,8 +198,6 @@ SvgMap.prototype.draw = function () {
             drawRightResult.setAttribute('style', `transform: translateY(${dis})`)
         }
     }
-    // 由于文字向上偏移将导致部分溢出,所以将this.svgGroup向下偏移溢出的部分
-    setTransform(this.svgGroup, 'translateY', `(${Math.abs(this.getRect(this.svgGroup).y)}px)`)
     // 将中点元素放在中心位置
     const { width: rootW, height: rootY} = this.getRect(RootG)
     RootG.setAttribute('transform', `translate(-${rootW/2}, ${centerY - rootY/2})`)
@@ -195,12 +205,6 @@ SvgMap.prototype.draw = function () {
         // 没有左元素时， 中心点向左溢出一半的宽度，通过偏移纠正偏移量
         setTransform(this.svgGroup, 'translateX', `(${Math.abs(this.getRect(this.svgGroup).x)}px)`)
     }
-    const { width: svgW, height: svgH } = this.svgDom.getBBox()
-    this.svgDom.setAttribute('width', svgW)
-    this.svgDom.setAttribute('height', svgH)
-    !!this.className&&this.svgDom.classList.add(this.className)
-    this.svgDom.remove()
-    return this.svgDom
 }
 SvgMap.prototype.initWalk = function(tree, direction) {
     const gGroup = this.walk(tree, direction, true)
@@ -356,13 +360,17 @@ SvgMap.prototype.drawRootLine = function(group, root) {
     const aHeight = this.findMiddlePosition(group) // 计算垂直方向的中间位置
     const rootCenterX = 0
     const rootCenterY = aHeight
+    console.log('aHeight', aHeight)
     const M = `${rootCenterX} ${rootCenterY}`
     group.childNodes.forEach(item => {
         const {y: itemY, height} = this.findPositionElY(item)
         const targetX = Number(rootX) +this.globalStyle.rowMargin + rootW
         const targetY = Number(itemY) + Number(height) / 2
         const Q = `${rootCenterX} ${targetY}`
-        const E = `${targetX} ${targetY}`
+        let E = `${targetX} ${targetY}`
+        if(item.dataType === 'text'){ // 是文本元素
+            E = E+` h ${this.getRect(item).width}` // 结束的位置
+        }
         const line = cEl('path', {
             d: `M${M} Q ${Q} ${E}`,
             style: `stroke:${this.lineStyle.color}`,
@@ -375,7 +383,7 @@ SvgMap.prototype.drawRootLine = function(group, root) {
     cG.appendChild(group)
     return {
         el: cG,
-        enter: {
+        center: {
             x: rootCenterX,
             y: rootCenterY
         }
