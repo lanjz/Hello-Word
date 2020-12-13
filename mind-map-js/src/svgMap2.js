@@ -6,7 +6,7 @@
 function getPadding(val) {
     if(!val) return [0, 0]
     val = (''+val).trim()
-    val = val.split('')
+    val = val.split(' ')
     if(val.length === 1){
         let d = val[0] || 0
         return [d, d]
@@ -116,7 +116,7 @@ SvgMap.prototype.init = function(data, options = {}) {
         'border-radius': '5',
         color: '#fff',
         fill: '#a3c6c0',
-        padding: 10,
+        padding: '2 10',
         ...(options.rectStyle||{})
     }
     // text样式
@@ -190,12 +190,12 @@ SvgMap.prototype.combineSvg = function(RootG, childRight, childLeft){
         // 2. 为了显示翻转后的图形，将 svgGroup 向右偏移
         setTransform(this.svgGroup, 'translateX', `(${this.getRect(drawLeftResult).width}px)`)
         // 3. 设置左右两边图形垂直居中
-        let dis = (rightEnter.y - leftEnter.y)/2 // 获取差量
+        let dis = Math.abs((rightEnter.y - leftEnter.y)) // 获取差量
         if(rightEnter.y > leftEnter.y){
             drawLeftResult.setAttribute('style', `transform: rotateY(180deg) translateY(${dis}px)`)
         } else {
             centerY = leftEnter.y
-            drawRightResult.setAttribute('style', `transform: translateY(${dis})`)
+            drawRightResult.setAttribute('style', `transform: translateY(${dis}px)`)
         }
     }
     // 将中点元素放在中心位置
@@ -360,7 +360,6 @@ SvgMap.prototype.drawRootLine = function(group, root) {
     const aHeight = this.findMiddlePosition(group) // 计算垂直方向的中间位置
     const rootCenterX = 0
     const rootCenterY = aHeight
-    console.log('aHeight', aHeight)
     const M = `${rootCenterX} ${rootCenterY}`
     group.childNodes.forEach(item => {
         const {y: itemY, height} = this.findPositionElY(item)
