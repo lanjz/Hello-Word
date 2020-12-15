@@ -401,7 +401,7 @@ SvgMap.prototype.drawRootLine = function(group, root) {
  * @params {svg[g]} a: 父级元素
  * @params {svg[g]} b: a对应的子元素
  * */
-SvgMap.prototype.combineGroup = function(a, b, node) {
+SvgMap.prototype.combineGroup = function(a, b) {
     const cG = createGroup()
     const {y: aY, width: aWidth, height: aHeight } = this.getRect(a) // 当前A的几何信息
     const bX = aWidth + this.globalStyle.rowMargin // 计算a,b的间距
