@@ -106,8 +106,9 @@ SvgMap.prototype.init = function(data, options = {}) {
         'font-size': '18px',
         'border-radius': '5',
         color: '#fff',
-        fill: 'transparent',
-        padding: 0,
+        // fill: 'transparent',
+        fill: '#a3c6c0',
+        padding: '4 8',
         ...(options.rootStyle||{})
     }
     // rect样式
@@ -115,26 +116,26 @@ SvgMap.prototype.init = function(data, options = {}) {
         'font-size': '16px',
         'border-radius': '5',
         color: '#fff',
-        fill: '#a3c6c0',
+        fill: '#a5a4a4',
         padding: '2 10',
         ...(options.rectStyle||{})
     }
     // text样式
     this.textStyle = {
         'font-size': '16px',
-        color: '#fff',
+        color: '#a5a4a4',
         ...(options.textStyle||{})
     }
     // 连接线样式
     this.lineStyle = {
-        color: this.rectStyle.color,
+        color: this.textStyle.color,
         width: 1,
         fill: 'transparent',
         ...(options.lineStyle||{})
     }
     // 其它布局样式
     this.globalStyle = { 
-        verticalMargin: 20, // 元素上下间距
+        verticalMargin: 25, // 元素上下间距
         rowMargin: 40, // 元素左右间距
     }
     let result = this.draw()
@@ -145,6 +146,7 @@ SvgMap.prototype.draw = function () {
     this.svgDom = cSvgDom()
     this.svgDom.that = this
     this.svgGroup = createGroup()
+    this.svgDom.setAttribute('style', 'opacity: 0; position: fixed; left: 0; top: 0')
     this.svgDom.appendChild(this.svgGroup)
     document.body.appendChild(this.svgDom)
     // 创建中点元素
@@ -171,6 +173,7 @@ SvgMap.prototype.draw = function () {
     const { width: svgW, height: svgH } = this.svgDom.getBBox()
     this.svgDom.setAttribute('width', svgW)
     this.svgDom.setAttribute('height', svgH)
+    this.svgDom.removeAttribute('style')
     !!this.className&&this.svgDom.classList.add(this.className)
     this.svgDom.remove()
     return this.svgDom
@@ -215,6 +218,12 @@ SvgMap.prototype.walk = function (tree, direction) {
     let hei = 0 // 设置每个元素的偏移高度
     tree.forEach((item) => {
         let textOpt = {
+            'font-size': this.textStyle['font-size'],
+            text: item[this.lableName],
+            fill: this.textStyle.color,
+            initY: hei,
+        }
+        let rectTextOpt = {
             'font-size': this.rectStyle['font-size'],
             text: item[this.lableName],
             fill: this.rectStyle.color,
@@ -227,7 +236,7 @@ SvgMap.prototype.walk = function (tree, direction) {
             fill: this.rectStyle.fill,
             initY: hei,
         }
-        let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt) : this.cReact(textOpt, rectOpt, direction)
+        let svgEl = item.type === 'text' ? this.cWord(textOpt, rectOpt) : this.cReact(rectTextOpt, rectOpt, direction)
         svgEl['data-info'] = item
         // 如果有子节点, 给当前 rect 右侧添加小圆圈
         if(item.children && item.children.length){
@@ -254,7 +263,7 @@ SvgMap.prototype.appendCircle = function (cG, direction = 'right'){
         cx: direction === 'left' ? -5: width + 5,
         cy: y + height/2,
         r: 5,
-        fill: this.rectStyle.color,
+        fill: this.lineStyle.color,
         'stroke-width': 1,
     })
     cG.appendChild(circle)
