@@ -12,8 +12,18 @@ const config = {
     path: path.resolve(__dirname, 'dist'),
   },
   optimization: {
-    minimize: false,
-    minimizer: [new TerserPlugin()],
+    usedExports: true,
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+        },
+        extractComments: false,
+      }),
+    ],
   },
   module: {
     rules: [

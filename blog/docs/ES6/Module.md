@@ -8,6 +8,42 @@ ES6 模块跟 CommonJS 模块的不同，主要有以下两个方面：
 
 2. ES6 模块编译时执行，它的对外接口只是一种静态定义，在代码静态解析阶段就会生成而 CommonJS 模块总是在运行时加载
 
+## 静态模块和动态模块
+
+使用 `CommonJS` 加载的就是动态模块
+
+```js
+// 粟子
+var my;
+if (Math.random() > 0.4) {
+    my = require('foo');
+} else {
+    my = require('bar');
+}
+```
+
+ `import` 是静态执行，所以不能使用表达式和变量
+
+```js
+// 粟子
+// 报错
+if (x === 1) {
+  import { foo } from 'module1';
+} else {
+  import { foo } from 'module2';
+}
+```
+
+**静态模块的好处**
+
+- 在编译的时候消除未引用的代码，参考 Webpack 的 `tree shaking`
+
+- 更快地找到 imports
+
+  静态模块结构下的 imports 就好像是一个变量引用一样，可以在编译的时候就确定，而动态引用在使用时就需要在源模块中进行一番查找
+  
+## 两种模式的区别
+
 先来一个问题：在 CommonJS 和 ES6 模块两种场景下，两个文件都引入同一个模块，如果一个文件把导出的值改了，那么在另外文件中这个值会被改变嘛？
 
 分别分析在两种模式下的表现：
@@ -57,7 +93,7 @@ let obj = require('../utils/commonJS')
 console.log(obj) //  ['lanjz']
 ```
 
-因为引用 `CommonJS` 模块时，只是一个铐钡而且还是一个浅铐钡，所以当直接引用的属性时，其实他模块再次取这个模块时，自然也会发生改变
+因为引用 `CommonJS` 模块时，只是一个铐钡而且还是一个浅铐钡，所以当直接修改引用的属性时，其它模块再次取这个模块时，自然也会发生改变
 
 **ES6模块**
 
@@ -156,8 +192,7 @@ import obj from '../utils/index'
 console.log(obj) // 1
 ```
 
-引用的值并没受到影响，因为模块中 `export default obj` 相当于导出是的 `obj` 的值，此时跟 `obj` 是没关系的
-
+引用的值并没受到影响，因为模块中 `export default obj` 相当于导出是的 `obj` 的值，此时跟 `obj` 这个变量名是没关系的
 
 ## CommonJS
 
@@ -194,7 +229,7 @@ import { stat, exists, readFile } from 'fs';
 export var firstName = 'Michael';
 export var lastName = 'Jackson';
 export var year = 1958;
-// 获
+// 或
 export { firstName, lastName, year };
 ```
 
@@ -355,7 +390,7 @@ export 42
 
 当 `import` 命令直接使用一个变量名时，表示获取模块的默认导出的模块(`export default`)
 
-由于 `import` 是静态执行，所以不能使用表达式和变量，这些只有在运行时才能得到结果的语法结构
+由于 `import` 是静态执行，所以不能使用表达式和变量
 
 ```js
 // 报错
@@ -587,7 +622,7 @@ Promise.all([
   import('./module3.js'),
 ])
 .then(([module1, module2, module3]) => {
-   ···
+   //···
 });
 ```
 

@@ -1,3 +1,7 @@
+import { b } from './utils'
+console.log(b)
+/*哈哈*/
+// 呵呵
 function component() {
   var element = document.createElement('div');
   let a = 'A'
