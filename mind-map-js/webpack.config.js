@@ -5,24 +5,25 @@ const config = {
   // mode: 'development',
   mode: 'production',
   entry: {
-    index: './lib/index.js',
+    index: './src/index.js',
+    main: './src/main.js',
   },
   output: {
-    filename: '[name].js',
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   optimization: {
     usedExports: true,
     minimize: true,
+    splitChunks: {
+      chunks: 'all',
+    },
     minimizer: [
       new TerserPlugin({
         terserOptions: {
           output: {
             beautify: true,
           },
-          compress: {
-            pure_funcs: ["console.log", "Math.abs"]
-          }
         }
       })
     ],
