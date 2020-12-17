@@ -1,4 +1,6 @@
-export function a(){
-  console.log('我是a')
+export function MA(){
+  console.log('执行MA')
 }
-export let b = '我是B'
+export function MB(){
+  console.log('执行MB')
+}

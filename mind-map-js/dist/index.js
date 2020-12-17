@@ -1,1 +1,0 @@
-(()=>{"use strict";var e;console.log("我是B"),document.body.appendChild(((e=document.createElement("div")).innerHTML="Hello".concat("A"),new Promise((function(){})),[1,2,3].includes(1),e))})();

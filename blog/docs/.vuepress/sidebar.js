@@ -136,6 +136,7 @@ module.exports = {
     '/Node/Webpack/Babel-Loader',
     '/Node/Webpack/css-loader&style-loader',
     '/Node/Webpack/构建优化方案',
+    '/Node/Webpack/原理/tree-shaking',
   ],
   '/工程化/系统设计/': [
     '/工程化/系统设计/登录系统'

@@ -20,9 +20,6 @@ const config = {
           output: {
             beautify: true,
           },
-          compress: {
-            pure_funcs: ["console.log", "Math.abs"]
-          }
         }
       })
     ],

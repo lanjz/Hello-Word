@@ -1,17 +1,12 @@
-import { b } from './utils'
-console.log(b)
-/*哈哈*/
-// 呵呵
-function component() {
-  var element = document.createElement('div');
-  let a = 'A'
-  element.innerHTML = `Hello${a}`;
-  const abc = () => {
-    console.log('箭头函数')
-  }
-  new Promise(() => {})
-  var b = [1, 2, 3].includes(1);
-  return element;
+import * as utils from './utils'
+import './helper'
+utils.MA()
+new Object()
+var b = Math.abs(-1)
+function fn1(){
+  console.log('fn1')
 }
-
-document.body.appendChild(component());
+function fn2(){
+  console.log('fn2')
+}
+fn2()
