@@ -1,2 +1,3 @@
-import { MA } from './modules/utils'
-MA()
+import _ from 'lodash';
+
+console.log(_.join(['Another', 'module', 'loaded!'], ' '));

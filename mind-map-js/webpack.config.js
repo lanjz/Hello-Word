@@ -1,12 +1,14 @@
 const path = require('path')
 const TerserPlugin = require('terser-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const config = {
-  // mode: 'development',
-  mode: 'production',
+  mode: 'development',
+  // mode: 'production',
   entry: {
     index: './src/index.js',
-    main: './src/main.js',
+    // main: './src/main.js',
   },
   output: {
     filename: '[name].bundle.js',
@@ -16,7 +18,7 @@ const config = {
     usedExports: true,
     minimize: true,
     splitChunks: {
-      chunks: 'all',
+      // chunks: 'all',
     },
     minimizer: [
       new TerserPlugin({
@@ -37,6 +39,12 @@ const config = {
         ]
       }
     ]
-  }
+  },
+  plugins: [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      title: 'Development',
+    }),
+  ]
 }
 module.exports = config
