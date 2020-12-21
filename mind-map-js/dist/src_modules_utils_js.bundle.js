@@ -5,3 +5,5 @@
         eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"MA\": () => /* binding */ MA,\n/* harmony export */   \"MB\": () => /* binding */ MB\n/* harmony export */ });\nfunction MA() {\n  console.log('执行MA');\n}\nfunction MB() {\n  console.log('执行MB');\n}\n\n//# sourceURL=webpack://mind-map/./src/modules/utils.js?");
     }
 } ]);
+
+;console.log('abcccc')

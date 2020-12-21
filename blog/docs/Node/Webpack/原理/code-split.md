@@ -1,6 +1,6 @@
 # code-split
 
-通过一个动态加载的粟子来看下 webpack 打包后的文件是如何处理代码分割的
+通过一个动态加载的粟子来看下 webpack 打包后的文件是如何处理分割后模块的
 
 源文件：
 
@@ -326,6 +326,8 @@ export function MB(){
 
 - `Prefetch` 可能是用于其它页面使用，资源会在当前页面空闲资源加载完后在空闲时间开始
 
+**Prefetch**
+
 将之前代码改造如下：
 
 ```js
@@ -357,4 +359,6 @@ __webpack_require__.F.j = _ => {
             }
         }
 ```
-`__webpack_require__.F.j` 的作用就是动态创建了一个 `<link rel="prefetch" as="script" href="http://localhost:63342/Hello-Word/mind-map-js/dist/src_modules_utils_js.bundle.js">` 到 `document` 中
+`__webpack_require__.F.j` 的作用就是动态创建了一个 `<link rel="prefetch" as="script" href="http://localhost:63342/Hello-Word/mind-map-js/dist/src_modules_utils_js.bundle.js">` 到 `document` 中，这将指示浏览器在空闲时间预取 `src_modules_utils_js.bundle.js` 文件
+
+[https://blog.fundebug.com/2019/04/11/understand-preload-and-prefetch/](https://blog.fundebug.com/2019/04/11/understand-preload-and-prefetch/)
