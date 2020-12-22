@@ -25,7 +25,7 @@ module.exports = {
         text: '网络&算法',
         items: [
           { text: '网络', link: '/network/' },
-          { text: '算法', link: '/language/japanese4' },
+          { text: '算法', link: '/Algorithm/' },
           { text: 'Web安全', link: '/secure/' },
         ]
       },
