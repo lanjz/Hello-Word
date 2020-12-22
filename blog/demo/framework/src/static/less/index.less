@@ -1,0 +1,158 @@
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f6f8f9;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  monospace;
+}
+
+*{
+  box-sizing: border-box;
+}
+.app{
+  height: 100vh;
+  padding-left: 200px;
+}
+.flex{
+  display: flex;
+  .shrink{
+    flex-shrink: 0;
+  }
+  .flex-1{
+    flex-grow: 1;
+  }
+}
+.flex.align-center{
+  align-items: center;
+}
+.flex.flex-end{
+  justify-content: flex-end;
+}
+.flex.flex-column{
+  flex-direction: column;
+}
+.text-ellipsis{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+.relative{
+  position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*布局*/
+.app-side{
+  width: 200px;
+  background: #001529;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.app-head{
+  height: 60px;
+  width: 100%;
+  background: #fff;
+}
+.app-content{}
+.app-main{
+  overflow: auto;
+  padding: 20px;
+  min-width: 400px;
+}
+.app-logo{
+  height: 60px;
+  color: #fff;
+  font-size: 20px;
+  .logo{
+    height: 40px;
+    width: auto;
+    margin-left:20px;
+  }
+  .name{
+    margin-left: 10px;
+    font-size: 16px;
+  }
+}
+.app-menu{
+  overflow: auto;
+}
+.align-right{
+  text-align: right;
+}
+.align-center{
+  text-align: center;
+}
+/*表单*/
+.filer-layout{
+  background: #fff;
+  padding: 20px;
+}
+/*弹层*/
+.modal-title{
+  padding: 0 15px;
+  position: relative;
+  font-size: 16px;
+}
+.modal-title:after{
+  content: '';
+  height: 100%;
+  width: 3px;
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+.modal-title.m-b, .modal-content.m-b{
+  margin-bottom: 15px;
+}
+.modal-content{
+  padding: 0 15px;
+}
+.modal-label{
+  text-align: right;
+  padding: 10px 0;
+  color: #666;
+}
+.modal-value{
+  padding: 10px 0;
+  color: #222;
+}
+.modal-footer{
+  text-align: right;
+}
+.filter-form-control{
+  padding-left: 10px;
+}
+.color-4a67de{
+  color: #4a67de
+}
+.color-FF681D{
+  color: #FF681D;
+}
+.pointer{
+  cursor: pointer;
+}

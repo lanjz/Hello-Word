@@ -219,8 +219,8 @@ SvgMap.prototype.addEvent = function(){
             _this.callback && _this.callback(_this.virtualSvg[key])
         }
     })
-    this.svgDom.addEventListener('mousedown', _this.mousedown)
-    this.svgDom.onmousewheel = this.wheel.bind(this)
+    // this.svgDom.addEventListener('mousedown', _this.mousedown)
+    // this.svgDom.onmousewheel = this.wheel.bind(this)
 }
 SvgMap.prototype.wheel = function(e){
     if(wheelDir(e)) {

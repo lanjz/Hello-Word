@@ -1,4 +1,4 @@
-# ShareWorker
+# ShareWorker?
 
 `ShareWorker`可以让我们多个页面同时控制一个脚本，这个脚本运行在独立的进程中
 

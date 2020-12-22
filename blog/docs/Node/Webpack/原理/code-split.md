@@ -1,5 +1,7 @@
 # code-split
 
+在 webpack 启动的项目中，使用 `import()` 方法就可以实现动态加载模块，被动态加载的模块会被 webpack 分割成独立文件
+
 通过一个动态加载的粟子来看下 webpack 打包后的文件是如何处理分割后模块的
 
 源文件：
@@ -263,7 +265,7 @@ export function MB(){
 
 `0`： - 模块名
 
-`1`:  - 函数：`Function(__unused_webpack_module, __webpack_exports__, __webpack_require__)`，这个函数要执行代码如下：
+`1`：  - 函数：`Function(__unused_webpack_module, __webpack_exports__, __webpack_require__)`，这个函数要执行代码如下：
 
   ```js
   __webpack_require__.r(__webpack_exports__)
@@ -361,4 +363,28 @@ __webpack_require__.F.j = _ => {
 ```
 `__webpack_require__.F.j` 的作用就是动态创建了一个 `<link rel="prefetch" as="script" href="http://localhost:63342/Hello-Word/mind-map-js/dist/src_modules_utils_js.bundle.js">` 到 `document` 中，这将指示浏览器在空闲时间预取 `src_modules_utils_js.bundle.js` 文件
 
-[https://blog.fundebug.com/2019/04/11/understand-preload-and-prefetch/](https://blog.fundebug.com/2019/04/11/understand-preload-and-prefetch/)
+**Prefetch**
+
+使用 `Prefetch` 需要添加配置 `preload-webpack-plugin`
+
+```js
+console.log('AAAAAAAAAAAAA')
+
+document.body.onclick = function (){
+  import(/* webpackPreload: true */ './modules/utils')
+    .then(({ MB }) => {
+      console.log('MB', MB)
+    })
+    .catch((error) => 'An error occurred while loading theS component');
+}
+
+```
+
+使用 `Prefetch` 主要是对 `index.html` 添加 `link` 标签，跟分割模块的逻辑没啥影响
+
+## 总结
+
+webpack 实现自己实现了一个 `_webpack_reuqire_` 来模拟 `import` 的导入，并定义了一个全局属性`__webpack_modules__` 来保存模块
+
+使用动态创建 `script` 标签的方式来加载模块，被加载的模块在加载运行时，会添加到 `__webpack_modules__` 属性中，之后再获取模块内的方法和属性存到到 `export` 属性供调用者使用
+
