@@ -37,8 +37,8 @@ export function normalizeStyleBinding (bindingStyle: any): ?Object {
 }
 
 /**
- * parent component style should be after child's
- * so that parent component's style could override it
+ * parent hllComponent style should be after child's
+ * so that parent hllComponent's style could override it
  */
 export function getStyle (vnode: VNodeWithData, checkChild: boolean): Object {
   const res = {}

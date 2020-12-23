@@ -73,8 +73,8 @@
         );
       }
 
-      // component-defined computed properties are already defined on the
-      // component prototype. We only need to define computed properties defined
+      // hllComponent-defined computed properties are already defined on the
+      // hllComponent prototype. We only need to define computed properties defined
       // at instantiation here.
       if (!(key in vm)) {
         // 如果当前没有计算属性在 data 属性上，执行 defineComputed 方法

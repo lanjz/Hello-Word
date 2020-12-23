@@ -1,6 +1,6 @@
 /* @flow */
 
-// Provides transition support for a single element/component.
+// Provides transition support for a single element/hllComponent.
 // supports transition mode (out-in / in-out)
 
 import { warn } from 'core/util/index'
@@ -29,8 +29,8 @@ export const transitionProps = {
   duration: [Number, String, Object]
 }
 
-// in case the child is also an abstract component, e.g. <keep-alive>
-// we want to recursively retrieve the real component to be rendered
+// in case the child is also an abstract hllComponent, e.g. <keep-alive>
+// we want to recursively retrieve the real hllComponent to be rendered
 function getRealChild (vnode: ?VNode): ?VNode {
   const compOptions: ?VNodeComponentOptions = vnode && vnode.componentOptions
   if (compOptions && compOptions.Ctor.options.abstract) {
@@ -121,7 +121,7 @@ export default {
 
     const rawChild: VNode = children[0]
 
-    // if this is a component root node and the component's
+    // if this is a hllComponent root node and the hllComponent's
     // parent container node also has transition, skip.
     if (hasParentTransition(this.$vnode)) {
       return rawChild
@@ -140,7 +140,7 @@ export default {
     }
 
     // ensure a key that is unique to the vnode type and to this transition
-    // component instance. This key will be used to remove pending leaving nodes
+    // hllComponent instance. This key will be used to remove pending leaving nodes
     // during entering.
     const id: string = `__transition-${this._uid}-`
     child.key = child.key == null
@@ -166,7 +166,7 @@ export default {
       oldChild.data &&
       !isSameChild(child, oldChild) &&
       !isAsyncPlaceholder(oldChild) &&
-      // #6687 component root is a comment node
+      // #6687 hllComponent root is a comment node
       !(oldChild.componentInstance && oldChild.componentInstance._vnode.isComment)
     ) {
       // replace old child transition data with fresh one

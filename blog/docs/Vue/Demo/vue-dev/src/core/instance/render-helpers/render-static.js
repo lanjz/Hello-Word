@@ -18,7 +18,7 @@ export function renderStatic (
   tree = cached[index] = this.$options.staticRenderFns[index].call(
     this._renderProxy,
     null,
-    this // for render fns generated for functional component templates
+    this // for render fns generated for functional hllComponent templates
   )
   markStatic(tree, `__static__${index}`, false)
   return tree

@@ -7,7 +7,7 @@ import router from './router'
 import register from './biz/register'
 Vue.config.productionTip = false
 register()
-// Vue.component('Page', PageIndex)
+// Vue.hllComponent('Page', PageIndex)
 
 /* eslint-disable no-new */
 new Vue({

@@ -17,9 +17,9 @@ render(
 /*
 render(
   <Router>
-    <Route path="/" component={ChildMap}>
-      {/!*<Route path="context" component={Context} />*!/}
-      {/!*<Route path="inbox" component={Inbox} />*!/}
+    <Route path="/" hllComponent={ChildMap}>
+      {/!*<Route path="context" hllComponent={Context} />*!/}
+      {/!*<Route path="inbox" hllComponent={Inbox} />*!/}
     </Route>
   </Router>
   , root)

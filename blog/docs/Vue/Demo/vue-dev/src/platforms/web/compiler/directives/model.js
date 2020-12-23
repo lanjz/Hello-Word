@@ -36,7 +36,7 @@ export default function model (
 
   if (el.component) {
     genComponentModel(el, value, modifiers)
-    // component v-model doesn't need extra runtime
+    // hllComponent v-model doesn't need extra runtime
     return false
   } else if (tag === 'select') {
     genSelect(el, value, modifiers)
@@ -48,14 +48,14 @@ export default function model (
     genDefaultModel(el, value, modifiers)
   } else if (!config.isReservedTag(tag)) {
     genComponentModel(el, value, modifiers)
-    // component v-model doesn't need extra runtime
+    // hllComponent v-model doesn't need extra runtime
     return false
   } else if (process.env.NODE_ENV !== 'production') {
     warn(
       `<${el.tag} v-model="${value}">: ` +
       `v-model is not supported on this element type. ` +
       'If you are working with contenteditable, it\'s recommended to ' +
-      'wrap a library dedicated for that purpose inside a custom component.',
+      'wrap a library dedicated for that purpose inside a custom hllComponent.',
       el.rawAttrsMap['v-model']
     )
   }

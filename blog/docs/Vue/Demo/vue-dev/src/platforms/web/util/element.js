@@ -42,7 +42,7 @@ export function getTagNamespace (tag: string): ?string {
     return 'svg'
   }
   // basic support for MathML
-  // note it doesn't support other MathML elements being component roots
+  // note it doesn't support other MathML elements being hllComponent roots
   if (tag === 'math') {
     return 'math'
   }

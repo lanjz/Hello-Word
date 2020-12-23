@@ -30,9 +30,9 @@ import {
 import {
   isRecyclableComponent,
   renderRecyclableComponentTemplate
-} from 'weex/runtime/recycle-list/render-component-template'
+} from 'weex/runtime/recycle-list/render-hllComponent-template'
 
-// inline hooks to be invoked on component VNodes during patch
+// inline hooks to be invoked on hllComponent VNodes during patch
 const componentVNodeHooks = {
   init (vnode: VNodeWithData, hydrating: boolean): ?boolean {
     if (
@@ -73,7 +73,7 @@ const componentVNodeHooks = {
     if (vnode.data.keepAlive) {
       if (context._isMounted) {
         // vue-router#1212
-        // During updates, a kept-alive component's child components may
+        // During updates, a kept-alive hllComponent's child components may
         // change, so directly walking the tree here may call activated hooks
         // on incorrect children. Instead we push them into a queue which will
         // be processed after the whole patch process ended.
@@ -116,7 +116,7 @@ export function createComponent (
     Ctor = baseCtor.extend(Ctor)
   }
 
-  // if at this stage it's not a constructor or an async component factory,
+  // if at this stage it's not a constructor or an async hllComponent factory,
   // reject.
   if (typeof Ctor !== 'function') {
     if (process.env.NODE_ENV !== 'production') {
@@ -125,13 +125,13 @@ export function createComponent (
     return
   }
 
-  // async component
+  // async hllComponent
   let asyncFactory
   if (isUndef(Ctor.cid)) {
     asyncFactory = Ctor
     Ctor = resolveAsyncComponent(asyncFactory, baseCtor)
     if (Ctor === undefined) {
-      // return a placeholder node for async component, which is rendered
+      // return a placeholder node for async hllComponent, which is rendered
       // as a comment node but preserves all the raw information for the node.
       // the information will be used for async server-rendering and hydration.
       return createAsyncPlaceholder(
@@ -147,10 +147,10 @@ export function createComponent (
   data = data || {}
 
   // resolve constructor options in case global mixins are applied after
-  // component constructor creation
+  // hllComponent constructor creation
   resolveConstructorOptions(Ctor)
 
-  // transform component v-model data into props & events
+  // transform hllComponent v-model data into props & events
   if (isDef(data.model)) {
     transformModel(Ctor.options, data)
   }
@@ -158,16 +158,16 @@ export function createComponent (
   // extract props
   const propsData = extractPropsFromVNodeData(data, Ctor, tag)
 
-  // functional component
+  // functional hllComponent
   if (isTrue(Ctor.options.functional)) {
     return createFunctionalComponent(Ctor, propsData, data, context, children)
   }
 
   // extract listeners, since these needs to be treated as
-  // child component listeners instead of DOM listeners
+  // child hllComponent listeners instead of DOM listeners
   const listeners = data.on
   // replace with listeners with .native modifier
-  // so it gets processed during parent component patch.
+  // so it gets processed during parent hllComponent patch.
   data.on = data.nativeOn
 
   if (isTrue(Ctor.options.abstract)) {
@@ -182,7 +182,7 @@ export function createComponent (
     }
   }
 
-  // install component management hooks onto the placeholder node
+  // install hllComponent management hooks onto the placeholder node
   installComponentHooks(data)
 
   // return a placeholder vnode
@@ -245,7 +245,7 @@ function mergeHook (f1: any, f2: any): Function {
   return merged
 }
 
-// transform component v-model info (value and callback) into
+// transform hllComponent v-model info (value and callback) into
 // prop and event handler respectively.
 function transformModel (options, data: any) {
   const prop = (options.model && options.model.prop) || 'value'

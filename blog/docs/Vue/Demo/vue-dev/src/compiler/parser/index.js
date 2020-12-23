@@ -194,7 +194,7 @@ export function parse (
     }
     if (el.attrsMap.hasOwnProperty('v-for')) {
       warnOnce(
-        'Cannot use v-for on stateful component root element because ' +
+        'Cannot use v-for on stateful hllComponent root element because ' +
         'it renders multiple elements.',
         el.rawAttrsMap['v-for']
       )
@@ -594,7 +594,7 @@ function processOnce (el) {
   }
 }
 
-// handle content being passed to a component as slot,
+// handle content being passed to a hllComponent as slot,
 // e.g. <template slot="xxx">, <div slot-scope="xxx">
 function processSlotContent (el) {
   let slotScope
@@ -665,7 +665,7 @@ function processSlotContent (el) {
         el.slotScope = slotBinding.value || emptySlotScopeToken // force it into a scoped slot for perf
       }
     } else {
-      // v-slot on component, denotes default slot
+      // v-slot on hllComponent, denotes default slot
       const slotBinding = getAndRemoveAttrByRegex(el, slotRE)
       if (slotBinding) {
         if (process.env.NODE_ENV !== 'production') {
@@ -689,7 +689,7 @@ function processSlotContent (el) {
             )
           }
         }
-        // add the component's children to its default slot
+        // add the hllComponent's children to its default slot
         const slots = el.scopedSlots || (el.scopedSlots = {})
         const { name, dynamic } = getSlotName(slotBinding)
         const slotContainer = slots[name] = createASTElement('template', [], el)

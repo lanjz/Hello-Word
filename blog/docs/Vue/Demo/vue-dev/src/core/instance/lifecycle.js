@@ -158,7 +158,7 @@ export function mountComponent (
         )
       } else {
         warn(
-          'Failed to mount component: template or render function not defined.',
+          'Failed to mount hllComponent: template or render function not defined.',
           vm
         )
       }
@@ -193,7 +193,7 @@ export function mountComponent (
 
   // we set this to vm._watcher inside the watcher's constructor
   // since the watcher's initial patch may call $forceUpdate (e.g. inside child
-  // component's mounted hook), which relies on vm._watcher being already defined
+  // hllComponent's mounted hook), which relies on vm._watcher being already defined
   new Watcher(vm, updateComponent, noop, {
     before () {
       if (vm._isMounted && !vm._isDestroyed) {
@@ -223,7 +223,7 @@ export function updateChildComponent (
     isUpdatingChildComponent = true
   }
 
-  // determine whether component has slot children
+  // determine whether hllComponent has slot children
   // we need to do this before overwriting $options._renderChildren.
 
   // check if there are dynamic scopedSlots (hand-written or compiled but with

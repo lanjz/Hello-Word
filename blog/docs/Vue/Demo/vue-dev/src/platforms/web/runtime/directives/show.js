@@ -2,7 +2,7 @@
 
 import { enter, leave } from '../modules/transition'
 
-// recursively search for possible transition defined inside the component root
+// recursively search for possible transition defined inside the hllComponent root
 function locateNode (vnode: VNode): VNodeWithData {
   return vnode.componentInstance && (!vnode.data || !vnode.data.transition)
     ? locateNode(vnode.componentInstance._vnode)

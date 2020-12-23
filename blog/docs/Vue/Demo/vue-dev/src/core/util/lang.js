@@ -1,7 +1,7 @@
 /* @flow */
 
 /**
- * unicode letters used for parsing html tags, component names and property paths.
+ * unicode letters used for parsing html tags, hllComponent names and property paths.
  * using https://www.w3.org/TR/html53/semantics-scripting.html#potentialcustomelementname
  * skipping \u10000-\uEFFFF due to it freezing up PhantomJS
  */

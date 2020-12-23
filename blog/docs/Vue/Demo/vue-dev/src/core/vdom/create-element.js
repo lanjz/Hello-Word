@@ -64,7 +64,7 @@ export function _createElement (
     tag = data.is
   }
   if (!tag) {
-    // in case of component :is set to falsy value
+    // in case of hllComponent :is set to falsy value
     return createEmptyVNode()
   }
   // warn against non-primitive key
@@ -103,7 +103,7 @@ export function _createElement (
         undefined, undefined, context
       )
     } else if ((!data || !data.pre) && isDef(Ctor = resolveAsset(context.$options, 'components', tag))) {
-      // component
+      // hllComponent
       vnode = createComponent(Ctor, data, context, children, tag)
     } else {
       // unknown or unlisted namespaced elements
@@ -115,7 +115,7 @@ export function _createElement (
       )
     }
   } else {
-    // direct component options / constructor
+    // direct hllComponent options / constructor
     vnode = createComponent(tag, data, context, children)
   }
   if (Array.isArray(vnode)) {

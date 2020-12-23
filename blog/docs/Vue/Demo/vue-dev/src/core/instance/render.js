@@ -85,14 +85,14 @@ export function renderMixin (Vue: Class<Component>) {
     let vnode
     try {
       // There's no need to maintain a stack becaues all render fns are called
-      // separately from one another. Nested component's render fns are called
-      // when parent component is patched.
+      // separately from one another. Nested hllComponent's render fns are called
+      // when parent hllComponent is patched.
       currentRenderingInstance = vm
       vnode = render.call(vm._renderProxy, vm.$createElement)
     } catch (e) {
       handleError(e, vm, `render`)
       // return error render result,
-      // or previous vnode to prevent render error causing blank component
+      // or previous vnode to prevent render error causing blank hllComponent
       /* istanbul ignore else */
       if (process.env.NODE_ENV !== 'production' && vm.$options.renderError) {
         try {

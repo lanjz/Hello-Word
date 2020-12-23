@@ -19,7 +19,7 @@ import {
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
 
 /**
- * In some cases we may want to disable observation inside a component's
+ * In some cases we may want to disable observation inside a hllComponent's
  * update computation.
  */
 export let shouldObserve: boolean = true

@@ -70,7 +70,7 @@ export function genElement (el: ASTElement, state: CodegenState): string {
   } else if (el.tag === 'slot') {
     return genSlot(el, state)
   } else {
-    // component or element
+    // hllComponent or element
     let code
     if (el.component) {
       code = genComponent(el.component, el, state)
@@ -271,7 +271,7 @@ export function genData (el: ASTElement, state: CodegenState): string {
   if (el.scopedSlots) {
     data += `${genScopedSlots(el, el.scopedSlots, state)},`
   }
-  // component v-model
+  // hllComponent v-model
   if (el.model) {
     data += `model:{value:${
       el.model.value
@@ -376,8 +376,8 @@ function genScopedSlots (
     )
   })
 
-  // #9534: if a component with scoped slots is inside a conditional branch,
-  // it's possible for the same component to be reused but with different
+  // #9534: if a hllComponent with scoped slots is inside a conditional branch,
+  // it's possible for the same hllComponent to be reused but with different
   // compiled slot content. To avoid that, we generate a unique key based on
   // the generated code of all the slot contents.
   let needsKey = !!el.if
@@ -568,7 +568,7 @@ function genSlot (el: ASTElement, state: CodegenState): string {
   return res + ')'
 }
 
-// componentName is el.component, take it as argument to shun flow's pessimistic refinement
+// componentName is el.hllComponent, take it as argument to shun flow's pessimistic refinement
 function genComponent (
   componentName: string,
   el: ASTElement,

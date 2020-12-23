@@ -127,7 +127,7 @@ strats.data = function (
     if (childVal && typeof childVal !== 'function') {
       process.env.NODE_ENV !== 'production' && warn(
         'The "data" option should be a function ' +
-        'that returns a per-instance value in component ' +
+        'that returns a per-instance value in hllComponent ' +
         'definitions.',
         vm
       )
@@ -268,7 +268,7 @@ const defaultStrat = function (parentVal: any, childVal: any): any {
 }
 
 /**
- * Validate component names
+ * Validate hllComponent names
  */
 function checkComponents (options: Object) {
   for (const key in options.components) {
@@ -279,13 +279,13 @@ function checkComponents (options: Object) {
 export function validateComponentName (name: string) {
   if (!new RegExp(`^[a-zA-Z][\\-\\.0-9_${unicodeRegExp.source}]*$`).test(name)) {
     warn(
-      'Invalid component name: "' + name + '". Component names ' +
+      'Invalid hllComponent name: "' + name + '". Component names ' +
       'should conform to valid custom element name in html5 specification.'
     )
   }
   if (isBuiltInTag(name) || config.isReservedTag(name)) {
     warn(
-      'Do not use built-in or reserved HTML elements as component ' +
+      'Do not use built-in or reserved HTML elements as hllComponent ' +
       'id: ' + name
     )
   }

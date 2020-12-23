@@ -14,7 +14,7 @@ import('./modules/utils')
   .then(({ MB }) => {
     console.log('MB', MB)
   })
-  .catch((error) => 'An error occurred while loading theS component');
+  .catch((error) => 'An error occurred while loading theS hllComponent');
 // ./modules/utils
 export function MA(){
   console.log('执行MA')
@@ -225,7 +225,7 @@ export function MB(){
           console.log('MB', MB);
       })
       .catch(function (error) {
-            return 'An error occurred while loading theS component';
+            return 'An error occurred while loading theS hllComponent';
         });
     //# sourceURL=webpack://mind-map/./src/index.js?
 })();
@@ -340,7 +340,7 @@ document.body.onclick = function (){
     .then(({ MB }) => {
       console.log('MB', MB)
     })
-    .catch((error) => 'An error occurred while loading theS component');
+    .catch((error) => 'An error occurred while loading theS hllComponent');
 }
 
 ```
@@ -375,7 +375,7 @@ document.body.onclick = function (){
     .then(({ MB }) => {
       console.log('MB', MB)
     })
-    .catch((error) => 'An error occurred while loading theS component');
+    .catch((error) => 'An error occurred while loading theS hllComponent');
 }
 
 ```

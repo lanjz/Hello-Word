@@ -100,11 +100,11 @@ export class RenderContext {
           }
           this.cache.set(key, result)
           if (bufferIndex === 0) {
-            // this is a top-level cached component,
+            // this is a top-level cached hllComponent,
             // exit caching mode.
             this.write.caching = false
           } else {
-            // parent component is also being cached,
+            // parent hllComponent is also being cached,
             // merge self into parent's result
             buffer[bufferIndex - 1] += result.html
             const prev = componentBuffer[bufferIndex - 1]

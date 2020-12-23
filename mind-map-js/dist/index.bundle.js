@@ -26,6 +26,6 @@
             value: !0
         });
     }, (() => {
-        eval("/* harmony import */ var _modules_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modules/utils */ \"./src/modules/utils.js\");\nconsole.log('AAAAAAAAAAAAA', _modules_utils__WEBPACK_IMPORTED_MODULE_0__.MB());\n\ndocument.body.onclick = function () {\n  Promise.resolve(/*! import() */).then(__webpack_require__.bind(__webpack_require__, /*! ./modules/utils */ \"./src/modules/utils.js\")).then(function (_ref) {\n    var MB = _ref.MB;\n    console.log('MB', MB);\n  })[\"catch\"](function (error) {\n    return 'An error occurred while loading theS component';\n  });\n};\n\n\nconsole.log('22222222', _modules_utils__WEBPACK_IMPORTED_MODULE_0__);\n\n//# sourceURL=webpack://mind-map/./src/index.js?");
+        eval("/* harmony import */ var _modules_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modules/utils */ \"./src/modules/utils.js\");\nconsole.log('AAAAAAAAAAAAA', _modules_utils__WEBPACK_IMPORTED_MODULE_0__.MB());\n\ndocument.body.onclick = function () {\n  Promise.resolve(/*! import() */).then(__webpack_require__.bind(__webpack_require__, /*! ./modules/utils */ \"./src/modules/utils.js\")).then(function (_ref) {\n    var MB = _ref.MB;\n    console.log('MB', MB);\n  })[\"catch\"](function (error) {\n    return 'An error occurred while loading theS hllComponent';\n  });\n};\n\n\nconsole.log('22222222', _modules_utils__WEBPACK_IMPORTED_MODULE_0__);\n\n//# sourceURL=webpack://mind-map/./src/index.js?");
     })();
 })();

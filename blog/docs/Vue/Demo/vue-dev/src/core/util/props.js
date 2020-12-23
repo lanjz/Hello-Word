@@ -53,7 +53,7 @@ export function validateProp (
   }
   if (
     process.env.NODE_ENV !== 'production' &&
-    // skip validation for weex recycle-list child component props
+    // skip validation for weex recycle-list child hllComponent props
     !(__WEEX__ && isObject(value) && ('@binding' in value))
   ) {
     assertProp(prop, key, value, vm, absent)

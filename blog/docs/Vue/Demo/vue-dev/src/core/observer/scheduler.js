@@ -77,9 +77,9 @@ function flushSchedulerQueue () {
   // This ensures that:
   // 1. Components are updated from parent to child. (because parent is always
   //    created before the child)
-  // 2. A component's user watchers are run before its render watcher (because
+  // 2. A hllComponent's user watchers are run before its render watcher (because
   //    user watchers are created before the render watcher)
-  // 3. If a component is destroyed during a parent component's watcher run,
+  // 3. If a hllComponent is destroyed during a parent hllComponent's watcher run,
   //    its watchers can be skipped.
   queue.sort((a, b) => a.id - b.id)
 
@@ -116,7 +116,7 @@ function flushSchedulerQueue () {
 
   resetSchedulerState()
 
-  // call component updated and activated hooks
+  // call hllComponent updated and activated hooks
   callActivatedHooks(activatedQueue)
   callUpdatedHooks(updatedQueue)
 
@@ -139,7 +139,7 @@ function callUpdatedHooks (queue) {
 }
 
 /**
- * Queue a kept-alive component that was activated during patch.
+ * Queue a kept-alive hllComponent that was activated during patch.
  * The queue will be processed after the entire tree has been patched.
  */
 export function queueActivatedComponent (vm: Component) {

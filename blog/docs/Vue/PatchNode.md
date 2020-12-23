@@ -182,7 +182,7 @@ function patch (oldVnode, vnode, hydrating, removeOnly) {
             }
             var insert = ancestor.data.hook.insert;
             if (insert.merged) {
-              // start at index 1 to avoid re-invoking component mounted hook
+              // start at index 1 to avoid re-invoking hllComponent mounted hook
               for (var i$2 = 1; i$2 < insert.fns.length; i$2++) {
                 insert.fns[i$2]();
               }

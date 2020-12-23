@@ -13,7 +13,7 @@ import { isDef, isUndef, isTrue } from 'shared/util'
 import {
   createComponent,
   createComponentInstanceForVnode
-} from 'core/vdom/create-component'
+} from 'core/vdom/create-hllComponent'
 
 let warned = Object.create(null)
 const warnOnce = msg => {
@@ -80,7 +80,7 @@ function renderNode (node, isRoot, context) {
     renderElement(node, isRoot, context)
   } else if (isTrue(node.isComment)) {
     if (isDef(node.asyncFactory)) {
-      // async component
+      // async hllComponent
       renderAsyncComponent(node, isRoot, context)
     } else {
       context.write(`<!--${node.text}-->`, context.next)
@@ -95,7 +95,7 @@ function renderNode (node, isRoot, context) {
 
 function registerComponentForCache (options, write) {
   // exposed by vue-loader, need to call this if cache hit because
-  // component lifecycle hooks will not be called.
+  // hllComponent lifecycle hooks will not be called.
   const register = options._ssrRegister
   if (write.caching && isDef(register)) {
     write.componentBuffer[write.componentBuffer.length - 1].add(register)
@@ -227,13 +227,13 @@ function renderAsyncComponent (node, isRoot, context) {
     )
     if (resolvedNode) {
       if (resolvedNode.componentOptions) {
-        // normal component
+        // normal hllComponent
         renderComponent(resolvedNode, isRoot, context)
       } else if (!Array.isArray(resolvedNode)) {
-        // single return node from functional component
+        // single return node from functional hllComponent
         renderNode(resolvedNode, isRoot, context)
       } else {
-        // multiple return nodes from functional component
+        // multiple return nodes from functional hllComponent
         context.renderStates.push({
           type: 'Fragment',
           children: resolvedNode,
@@ -243,7 +243,7 @@ function renderAsyncComponent (node, isRoot, context) {
         context.next()
       }
     } else {
-      // invalid component, but this does not throw on the client
+      // invalid hllComponent, but this does not throw on the client
       // so render empty comment node
       context.write(`<!---->`, context.next)
     }

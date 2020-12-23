@@ -38,7 +38,7 @@ function genStaticKeys (keys: string): Function {
 function markStatic (node: ASTNode) {
   node.static = isStatic(node)
   if (node.type === 1) {
-    // do not make component slot content static. this avoids
+    // do not make hllComponent slot content static. this avoids
     // 1. components not able to mutate slot nodes
     // 2. static slot content fails for hot-reloading
     if (
@@ -108,7 +108,7 @@ function isStatic (node: ASTNode): boolean {
     !node.hasBindings && // no dynamic bindings
     !node.if && !node.for && // not v-if or v-for or v-else
     !isBuiltInTag(node.tag) && // not a built-in
-    isPlatformReservedTag(node.tag) && // not a component
+    isPlatformReservedTag(node.tag) && // not a hllComponent
     !isDirectChildOfTemplateFor(node) &&
     Object.keys(node).every(isStaticKey)
   ))

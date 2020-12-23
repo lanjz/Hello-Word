@@ -1,4 +1,5 @@
 import Index from './layout/Index'
+import IndexList from './hllComponent/components/indexList/index'
 import Home from './page/Home'
 import Login from './page/Login'
 import NoPage from './page/404'
@@ -14,9 +15,9 @@ const component = {
     component: { template: ' <router-view></router-view>'},
     children: [
         {
-            path: 'profile2',
-            name: '首页',
-            component: Dir
+            path: 'index-list',
+            name: 'PC索引列表',
+            component: IndexList
         },
         {
             name: '首页2',

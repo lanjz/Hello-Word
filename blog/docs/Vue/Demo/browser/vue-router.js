@@ -100,13 +100,13 @@
         var matched = route.matched[depth];
         var component = matched && matched.components[name];
   
-        // render empty node if no matched route or no config component
+        // render empty node if no matched route or no config hllComponent
         if (!matched || !component) {
           cache[name] = null;
           return h()
         }
   
-        // cache component
+        // cache hllComponent
         cache[name] = { component: component };
   
         // attach instance registration hook
@@ -123,13 +123,13 @@
         }
   
         // also register instance in prepatch hook
-        // in case the same component instance is reused across different routes
+        // in case the same hllComponent instance is reused across different routes
         ;(data.hook || (data.hook = {})).prepatch = function (_, vnode) {
           matched.instances[name] = vnode.componentInstance;
         };
   
         // register instance in init hook
-        // in case kept-alive component be actived when routes changed
+        // in case kept-alive hllComponent be actived when routes changed
         data.hook.init = function (vnode) {
           if (vnode.data.keepAlive &&
             vnode.componentInstance &&
@@ -1336,9 +1336,9 @@
         assert(path != null, "\"path\" is required in a route configuration.");
         assert(
           typeof route.component !== 'string',
-          "route config \"component\" for path: " + (String(
+          "route config \"hllComponent\" for path: " + (String(
             path || name
-          )) + " cannot be a " + "string id. Use an actual component instead."
+          )) + " cannot be a " + "string id. Use an actual hllComponent instead."
         );
       }
   
@@ -1922,9 +1922,9 @@
   
         flatMapComponents(matched, function (def, _, match, key) {
           // if it's a function and doesn't have cid attached,
-          // assume it's an async component resolve function.
+          // assume it's an async hllComponent resolve function.
           // we are not using Vue's default async resolving mechanism because
-          // we want to halt the navigation until the incoming component has been
+          // we want to halt the navigation until the incoming hllComponent has been
           // resolved.
           if (typeof def === 'function' && def.cid === undefined) {
             hasAsync = true;
@@ -1946,7 +1946,7 @@
             });
   
             var reject = once(function (reason) {
-              var msg = "Failed to resolve async component " + key + ": " + reason;
+              var msg = "Failed to resolve async hllComponent " + key + ": " + reason;
                warn(false, msg);
               if (!error) {
                 error = isError(reason)
@@ -2212,11 +2212,11 @@
         var activated = ref.activated;
   
       var queue = [].concat(
-        // in-component leave guards
+        // in-hllComponent leave guards
         extractLeaveGuards(deactivated),
         // global before hooks
         this.router.beforeHooks,
-        // in-component update hooks
+        // in-hllComponent update hooks
         extractUpdateHooks(updated),
         // in-config enter guards
         activated.map(function (m) { return m.beforeEnter; }),
@@ -2264,7 +2264,7 @@
         var postEnterCbs = [];
         var isValid = function () { return this$1.current === route; };
         // wait until async components are resolved before
-        // extracting in-component enter guards
+        // extracting in-hllComponent enter guards
         var enterGuards = extractEnterGuards(activated, postEnterCbs, isValid);
         var queue = enterGuards.concat(this$1.router.resolveHooks);
         runQueue(queue, iterator, function () {
@@ -2841,7 +2841,7 @@
       return this.history && this.history.current
     };
   
-    VueRouter.prototype.init = function init (app /* Vue component instance */) {
+    VueRouter.prototype.init = function init (app /* Vue hllComponent instance */) {
         var this$1 = this;
   
        assert(

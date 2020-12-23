@@ -131,7 +131,7 @@
   /**
    * Check if a tag is a built-in tag.
    */
-  var isBuiltInTag = makeMap('slot,component', true);
+  var isBuiltInTag = makeMap('slot,hllComponent', true);
 
   /**
    * Check if an attribute is a reserved attribute.
@@ -430,12 +430,12 @@
 
     /**
      * Check if a tag is reserved so that it cannot be registered as a
-     * component. This is platform-dependent and may be overwritten.
+     * hllComponent. This is platform-dependent and may be overwritten.
      */
     isReservedTag: no,
 
     /**
-     * Check if an attribute is reserved so that it cannot be used as a component
+     * Check if an attribute is reserved so that it cannot be used as a hllComponent
      * prop. This is platform-dependent and may be overwritten.
      */
     isReservedAttr: no,
@@ -477,7 +477,7 @@
   /*  */
 
   /**
-   * unicode letters used for parsing html tags, component names and property paths.
+   * unicode letters used for parsing html tags, hllComponent names and property paths.
    * using https://www.w3.org/TR/html53/semantics-scripting.html#potentialcustomelementname
    * skipping \u10000-\uEFFFF due to it freezing up PhantomJS
    */
@@ -905,7 +905,7 @@
   var arrayKeys = Object.getOwnPropertyNames(arrayMethods);
 
   /**
-   * In some cases we may want to disable observation inside a component's
+   * In some cases we may want to disable observation inside a hllComponent's
    * update computation.
    */
   var shouldObserve = true;
@@ -1264,7 +1264,7 @@
       if (childVal && typeof childVal !== 'function') {
         warn(
           'The "data" option should be a function ' +
-          'that returns a per-instance value in component ' +
+          'that returns a per-instance value in hllComponent ' +
           'definitions.',
           vm
         );
@@ -1405,7 +1405,7 @@
   };
 
   /**
-   * Validate component names
+   * Validate hllComponent names
    */
   function checkComponents (options) {
     for (var key in options.components) {
@@ -1416,13 +1416,13 @@
   function validateComponentName (name) {
     if (!new RegExp(("^[a-zA-Z][\\-\\.0-9_" + (unicodeRegExp.source) + "]*$")).test(name)) {
       warn(
-        'Invalid component name: "' + name + '". Component names ' +
+        'Invalid hllComponent name: "' + name + '". Component names ' +
         'should conform to valid custom element name in html5 specification.'
       );
     }
     if (isBuiltInTag(name) || config.isReservedTag(name)) {
       warn(
-        'Do not use built-in or reserved HTML elements as component ' +
+        'Do not use built-in or reserved HTML elements as hllComponent ' +
         'id: ' + name
       );
     }
@@ -2279,7 +2279,7 @@
   ) {
     // we are only extracting raw values here.
     // validation and default values are handled in the child
-    // component itself.
+    // hllComponent itself.
     var propOptions = Ctor.options.props;
     if (isUndef(propOptions)) {
       return
@@ -2297,7 +2297,7 @@
             attrs && hasOwn(attrs, keyInLowerCase)
           ) {
             tip(
-              "Prop \"" + keyInLowerCase + "\" is passed to component " +
+              "Prop \"" + keyInLowerCase + "\" is passed to hllComponent " +
               (formatComponentName(tag || Ctor)) + ", but the declared prop name is" +
               " \"" + key + "\". " +
               "Note that HTML attributes are case-insensitive and camelCased " +
@@ -2347,7 +2347,7 @@
   // generated render function is guaranteed to return Array<VNode>. There are
   // two cases where extra normalization is needed:
 
-  // 1. When the children contains components - because a functional component
+  // 1. When the children contains components - because a functional hllComponent
   // may return an Array instead of a single root. In this case, just a simple
   // normalization is needed - if any child is an Array, we flatten the whole
   // thing with Array.prototype.concat. It is guaranteed to be only 1-level deep
@@ -2446,7 +2446,7 @@
           defineReactive$$1(vm, key, result[key], function () {
             warn(
               "Avoid mutating an injected value directly since the changes will be " +
-              "overwritten whenever the provided component re-renders. " +
+              "overwritten whenever the provided hllComponent re-renders. " +
               "injection being mutated: \"" + key + "\"",
               vm
             );
@@ -2558,7 +2558,7 @@
     if (!slots) {
       res = {};
     } else if (slots._normalized) {
-      // fast path 1: child component re-render only, parent did not change
+      // fast path 1: child hllComponent re-render only, parent did not change
       return slots._normalized
     } else if (
       isStable &&
@@ -2824,7 +2824,7 @@
     tree = cached[index] = this.$options.staticRenderFns[index].call(
       this._renderProxy,
       null,
-      this // for render fns generated for functional component templates
+      this // for render fns generated for functional hllComponent templates
     );
     markStatic(tree, ("__static__" + index), false);
     return tree
@@ -3110,7 +3110,7 @@
 
   /*  */
 
-  // inline hooks to be invoked on component VNodes during patch
+  // inline hooks to be invoked on hllComponent VNodes during patch
   var componentVNodeHooks = {
     init: function init (vnode, hydrating) {
       if (
@@ -3152,7 +3152,7 @@
       if (vnode.data.keepAlive) {
         if (context._isMounted) {
           // vue-router#1212
-          // During updates, a kept-alive component's child components may
+          // During updates, a kept-alive hllComponent's child components may
           // change, so directly walking the tree here may call activated hooks
           // on incorrect children. Instead we push them into a queue which will
           // be processed after the whole patch process ended.
@@ -3195,7 +3195,7 @@
       Ctor = baseCtor.extend(Ctor);
     }
 
-    // if at this stage it's not a constructor or an async component factory,
+    // if at this stage it's not a constructor or an async hllComponent factory,
     // reject.
     if (typeof Ctor !== 'function') {
       {
@@ -3204,13 +3204,13 @@
       return
     }
 
-    // async component
+    // async hllComponent
     var asyncFactory;
     if (isUndef(Ctor.cid)) {
       asyncFactory = Ctor;
       Ctor = resolveAsyncComponent(asyncFactory, baseCtor);
       if (Ctor === undefined) {
-        // return a placeholder node for async component, which is rendered
+        // return a placeholder node for async hllComponent, which is rendered
         // as a comment node but preserves all the raw information for the node.
         // the information will be used for async server-rendering and hydration.
         return createAsyncPlaceholder(
@@ -3226,10 +3226,10 @@
     data = data || {};
 
     // resolve constructor options in case global mixins are applied after
-    // component constructor creation
+    // hllComponent constructor creation
     resolveConstructorOptions(Ctor);
 
-    // transform component v-model data into props & events
+    // transform hllComponent v-model data into props & events
     if (isDef(data.model)) {
       transformModel(Ctor.options, data);
     }
@@ -3237,16 +3237,16 @@
     // extract props
     var propsData = extractPropsFromVNodeData(data, Ctor, tag);
 
-    // functional component
+    // functional hllComponent
     if (isTrue(Ctor.options.functional)) {
       return createFunctionalComponent(Ctor, propsData, data, context, children)
     }
 
     // extract listeners, since these needs to be treated as
-    // child component listeners instead of DOM listeners
+    // child hllComponent listeners instead of DOM listeners
     var listeners = data.on;
     // replace with listeners with .native modifier
-    // so it gets processed during parent component patch.
+    // so it gets processed during parent hllComponent patch.
     data.on = data.nativeOn;
 
     if (isTrue(Ctor.options.abstract)) {
@@ -3261,13 +3261,13 @@
       }
     }
 
-    // install component management hooks onto the placeholder node
+    // install hllComponent management hooks onto the placeholder node
     installComponentHooks(data);
 
     // return a placeholder vnode
     var name = Ctor.options.name || tag;
     var vnode = new VNode(
-      ("vue-component-" + (Ctor.cid) + (name ? ("-" + name) : '')),
+      ("vue-hllComponent-" + (Ctor.cid) + (name ? ("-" + name) : '')),
       data, undefined, undefined, undefined, context,
       { Ctor: Ctor, propsData: propsData, listeners: listeners, tag: tag, children: children },
       asyncFactory
@@ -3316,7 +3316,7 @@
     return merged
   }
 
-  // transform component v-model info (value and callback) into
+  // transform hllComponent v-model info (value and callback) into
   // prop and event handler respectively.
   function transformModel (options, data) {
     var prop = (options.model && options.model.prop) || 'value';
@@ -3384,7 +3384,7 @@
       tag = data.is;
     }
     if (!tag) {
-      // in case of component :is set to falsy value
+      // in case of hllComponent :is set to falsy value
       return createEmptyVNode()
     }
     // warn against non-primitive key
@@ -3428,7 +3428,7 @@
           undefined, undefined, context
         );
       } else if ((!data || !data.pre) && isDef(Ctor = resolveAsset(context.$options, 'components', tag))) {
-        // component
+        // hllComponent
         vnode = createComponent(Ctor, data, context, children, tag);
       } else {
         // unknown or unlisted namespaced elements
@@ -3440,7 +3440,7 @@
         );
       }
     } else {
-      // direct component options / constructor
+      // direct hllComponent options / constructor
       vnode = createComponent(tag, data, context, children);
     }
     if (Array.isArray(vnode)) {
@@ -3550,14 +3550,14 @@
       var vnode;
       try {
         // There's no need to maintain a stack because all render fns are called
-        // separately from one another. Nested component's render fns are called
-        // when parent component is patched.
+        // separately from one another. Nested hllComponent's render fns are called
+        // when parent hllComponent is patched.
         currentRenderingInstance = vm;
         vnode = render.call(vm._renderProxy, vm.$createElement);
       } catch (e) {
         handleError(e, vm, "render");
         // return error render result,
-        // or previous vnode to prevent render error causing blank component
+        // or previous vnode to prevent render error causing blank hllComponent
         /* istanbul ignore else */
         if (vm.$options.renderError) {
           try {
@@ -3682,7 +3682,7 @@
 
       var reject = once(function (reason) {
         warn(
-          "Failed to resolve async component: " + (String(factory)) +
+          "Failed to resolve async hllComponent: " + (String(factory)) +
           (reason ? ("\nReason: " + reason) : '')
         );
         if (isDef(factory.errorComp)) {
@@ -3877,7 +3877,7 @@
         var lowerCaseEvent = event.toLowerCase();
         if (lowerCaseEvent !== event && vm._events[lowerCaseEvent]) {
           tip(
-            "Event \"" + lowerCaseEvent + "\" is emitted in component " +
+            "Event \"" + lowerCaseEvent + "\" is emitted in hllComponent " +
             (formatComponentName(vm)) + " but the handler is registered for \"" + event + "\". " +
             "Note that HTML attributes are case-insensitive and you cannot use " +
             "v-on to listen to camelCase events when using in-DOM templates. " +
@@ -4040,7 +4040,7 @@
           );
         } else {
           warn(
-            'Failed to mount component: template or render function not defined.',
+            'Failed to mount hllComponent: template or render function not defined.',
             vm
           );
         }
@@ -4075,7 +4075,7 @@
 
     // we set this to vm._watcher inside the watcher's constructor
     // since the watcher's initial patch may call $forceUpdate (e.g. inside child
-    // component's mounted hook), which relies on vm._watcher being already defined
+    // hllComponent's mounted hook), which relies on vm._watcher being already defined
     new Watcher(vm, updateComponent, noop, {
       before: function before () {
         if (vm._isMounted && !vm._isDestroyed) {
@@ -4105,7 +4105,7 @@
       isUpdatingChildComponent = true;
     }
 
-    // determine whether component has slot children
+    // determine whether hllComponent has slot children
     // we need to do this before overwriting $options._renderChildren.
 
     // check if there are dynamic scopedSlots (hand-written or compiled but with
@@ -4299,9 +4299,9 @@
     // This ensures that:
     // 1. Components are updated from parent to child. (because parent is always
     //    created before the child)
-    // 2. A component's user watchers are run before its render watcher (because
+    // 2. A hllComponent's user watchers are run before its render watcher (because
     //    user watchers are created before the render watcher)
-    // 3. If a component is destroyed during a parent component's watcher run,
+    // 3. If a hllComponent is destroyed during a parent hllComponent's watcher run,
     //    its watchers can be skipped.
     queue.sort(function (a, b) { return a.id - b.id; });
 
@@ -4323,7 +4323,7 @@
             'You may have an infinite update loop ' + (
               watcher.user
                 ? ("in watcher with expression \"" + (watcher.expression) + "\"")
-                : "in a component render function."
+                : "in a hllComponent render function."
             ),
             watcher.vm
           );
@@ -4338,7 +4338,7 @@
 
     resetSchedulerState();
 
-    // call component updated and activated hooks
+    // call hllComponent updated and activated hooks
     callActivatedHooks(activatedQueue);
     callUpdatedHooks(updatedQueue);
 
@@ -4361,7 +4361,7 @@
   }
 
   /**
-   * Queue a kept-alive component that was activated during patch.
+   * Queue a kept-alive hllComponent that was activated during patch.
    * The queue will be processed after the entire tree has been patched.
    */
   function queueActivatedComponent (vm) {
@@ -4674,7 +4674,7 @@
         if (isReservedAttribute(hyphenatedKey) ||
           config.isReservedAttr(hyphenatedKey)) {
           warn(
-            ("\"" + hyphenatedKey + "\" is a reserved attribute and cannot be used as component prop."),
+            ("\"" + hyphenatedKey + "\" is a reserved attribute and cannot be used as hllComponent prop."),
             vm
           );
         }
@@ -4682,7 +4682,7 @@
           if (!isRoot && !isUpdatingChildComponent) {
             warn(
               "Avoid mutating a prop directly since the value will be " +
-              "overwritten whenever the parent component re-renders. " +
+              "overwritten whenever the parent hllComponent re-renders. " +
               "Instead, use a data or computed property based on the prop's " +
               "value. Prop being mutated: \"" + key + "\"",
               vm
@@ -4690,7 +4690,7 @@
           }
         });
       }
-      // static props are already proxied on the component's prototype
+      // static props are already proxied on the hllComponent's prototype
       // during Vue.extend(). We only need to proxy props defined at
       // instantiation here.
       if (!(key in vm)) {
@@ -4785,8 +4785,8 @@
         );
       }
 
-      // component-defined computed properties are already defined on the
-      // component prototype. We only need to define computed properties defined
+      // hllComponent-defined computed properties are already defined on the
+      // hllComponent prototype. We only need to define computed properties defined
       // at instantiation here.
       if (!(key in vm)) {
         defineComputed(vm, key, userDef);
@@ -4857,7 +4857,7 @@
       {
         if (typeof methods[key] !== 'function') {
           warn(
-            "Method \"" + key + "\" has type \"" + (typeof methods[key]) + "\" in the component definition. " +
+            "Method \"" + key + "\" has type \"" + (typeof methods[key]) + "\" in the hllComponent definition. " +
             "Did you reference the function correctly?",
             vm
           );
@@ -4871,7 +4871,7 @@
         if ((key in vm) && isReserved(key)) {
           warn(
             "Method \"" + key + "\" conflicts with an existing Vue instance method. " +
-            "Avoid defining component methods that start with _ or $."
+            "Avoid defining hllComponent methods that start with _ or $."
           );
         }
       }
@@ -4981,9 +4981,9 @@
       vm._isVue = true;
       // merge options
       if (options && options._isComponent) {
-        // optimize internal component instantiation
+        // optimize internal hllComponent instantiation
         // since dynamic options merging is pretty slow, and none of the
-        // internal component options needs special treatment.
+        // internal hllComponent options needs special treatment.
         initInternalComponent(vm, options);
       } else {
         vm.$options = mergeOptions(
@@ -5626,7 +5626,7 @@
       return 'svg'
     }
     // basic support for MathML
-    // note it doesn't support other MathML elements being component roots
+    // note it doesn't support other MathML elements being hllComponent roots
     if (tag === 'math') {
       return 'math'
     }
@@ -5938,7 +5938,7 @@
           if (isUnknownElement$$1(vnode, creatingElmInVPre)) {
             warn(
               'Unknown custom element: <' + tag + '> - did you ' +
-              'register the component correctly? For recursive components, ' +
+              'register the hllComponent correctly? For recursive components, ' +
               'make sure to provide the "name" option.',
               vnode.context
             );
@@ -5978,9 +5978,9 @@
         if (isDef(i = i.hook) && isDef(i = i.init)) {
           i(vnode, false /* hydrating */);
         }
-        // after calling the init hook, if the vnode is a child component
+        // after calling the init hook, if the vnode is a child hllComponent
         // it should've created a child instance and mounted it. the child
-        // component also has set the placeholder vnode's elm.
+        // hllComponent also has set the placeholder vnode's elm.
         // in that case we can just return the element and be done.
         if (isDef(vnode.componentInstance)) {
           initComponent(vnode, insertedVnodeQueue);
@@ -6003,7 +6003,7 @@
         invokeCreateHooks(vnode, insertedVnodeQueue);
         setScope(vnode);
       } else {
-        // empty component root.
+        // empty hllComponent root.
         // skip all element-related modules except for ref (#3455)
         registerRef(vnode);
         // make sure to invoke the insert hook
@@ -6013,7 +6013,7 @@
 
     function reactivateComponent (vnode, insertedVnodeQueue, parentElm, refElm) {
       var i;
-      // hack for #4339: a reactivated component with inner transition
+      // hack for #4339: a reactivated hllComponent with inner transition
       // does not trigger because the inner node's created hooks are not called
       // again. It's not ideal to involve module-specific logic in here but
       // there doesn't seem to be a better way to do it.
@@ -6028,8 +6028,8 @@
           break
         }
       }
-      // unlike a newly created component,
-      // a reactivated keep-alive component doesn't insert itself
+      // unlike a newly created hllComponent,
+      // a reactivated keep-alive hllComponent doesn't insert itself
       insert(parentElm, vnode.elm, refElm);
     }
 
@@ -6148,7 +6148,7 @@
           // directly removing
           rm = createRmCb(vnode.elm, listeners);
         }
-        // recursively invoke hooks on child component root node
+        // recursively invoke hooks on child hllComponent root node
         if (isDef(i = vnode.componentInstance) && isDef(i = i._vnode) && isDef(i.data)) {
           removeAndInvokeRemoveHook(i, rm);
         }
@@ -6339,7 +6339,7 @@
     }
 
     function invokeInsertHook (vnode, queue, initial) {
-      // delay insert hooks for component root nodes, invoke them after the
+      // delay insert hooks for hllComponent root nodes, invoke them after the
       // element is really inserted
       if (isTrue(initial) && isDef(vnode.parent)) {
         vnode.parent.data.pendingInsert = queue;
@@ -6379,7 +6379,7 @@
       if (isDef(data)) {
         if (isDef(i = data.hook) && isDef(i = i.init)) { i(vnode, true /* hydrating */); }
         if (isDef(i = vnode.componentInstance)) {
-          // child component. it should have hydrated its own tree.
+          // child hllComponent. it should have hydrated its own tree.
           initComponent(vnode, insertedVnodeQueue);
           return true
         }
@@ -6453,7 +6453,7 @@
 
     function assertNodeMatch (node, vnode, inVPre) {
       if (isDef(vnode.tag)) {
-        return vnode.tag.indexOf('vue-component') === 0 || (
+        return vnode.tag.indexOf('vue-hllComponent') === 0 || (
           !isUnknownElement$$1(vnode, inVPre) &&
           vnode.tag.toLowerCase() === (node.tagName && node.tagName.toLowerCase())
         )
@@ -6472,7 +6472,7 @@
       var insertedVnodeQueue = [];
 
       if (isUndef(oldVnode)) {
-        // empty mount (likely as component), create new root element
+        // empty mount (likely as hllComponent), create new root element
         isInitialPatch = true;
         createElm(vnode, insertedVnodeQueue);
       } else {
@@ -6541,7 +6541,7 @@
                 // e.g. for directives that uses the "inserted" hook.
                 var insert = ancestor.data.hook.insert;
                 if (insert.merged) {
-                  // start at index 1 to avoid re-invoking component mounted hook
+                  // start at index 1 to avoid re-invoking hllComponent mounted hook
                   for (var i$2 = 1; i$2 < insert.fns.length; i$2++) {
                     insert.fns[i$2]();
                   }
@@ -7159,7 +7159,7 @@
   /*  */
 
   /**
-   * Cross-platform code generation for component v-model
+   * Cross-platform code generation for hllComponent v-model
    */
   function genComponentModel (
     el,
@@ -7338,7 +7338,7 @@
 
     if (el.component) {
       genComponentModel(el, value, modifiers);
-      // component v-model doesn't need extra runtime
+      // hllComponent v-model doesn't need extra runtime
       return false
     } else if (tag === 'select') {
       genSelect(el, value, modifiers);
@@ -7350,14 +7350,14 @@
       genDefaultModel(el, value, modifiers);
     } else if (!config.isReservedTag(tag)) {
       genComponentModel(el, value, modifiers);
-      // component v-model doesn't need extra runtime
+      // hllComponent v-model doesn't need extra runtime
       return false
     } else {
       warn$1(
         "<" + (el.tag) + " v-model=\"" + value + "\">: " +
         "v-model is not supported on this element type. " +
         'If you are working with contenteditable, it\'s recommended to ' +
-        'wrap a library dedicated for that purpose inside a custom component.',
+        'wrap a library dedicated for that purpose inside a custom hllComponent.',
         el.rawAttrsMap['v-model']
       );
     }
@@ -7745,8 +7745,8 @@
   }
 
   /**
-   * parent component style should be after child's
-   * so that parent component's style could override it
+   * parent hllComponent style should be after child's
+   * so that parent hllComponent's style could override it
    */
   function getStyle (vnode, checkChild) {
     var res = {};
@@ -8157,9 +8157,9 @@
     var appearCancelled = data.appearCancelled;
     var duration = data.duration;
 
-    // activeInstance will always be the <transition> component managing this
+    // activeInstance will always be the <transition> hllComponent managing this
     // transition. One edge case to check is when the <transition> is placed
-    // as the root node of a child component. In that case we need to check
+    // as the root node of a child hllComponent. In that case we need to check
     // <transition>'s parent for appear check.
     var context = activeInstance;
     var transitionNode = activeInstance.$vnode;
@@ -8399,7 +8399,7 @@
   /**
    * Normalize a transition hook's argument length. The hook may be:
    * - a merged hook (invoker) with the original in .fns
-   * - a wrapped component method (check ._length)
+   * - a wrapped hllComponent method (check ._length)
    * - a plain function (.length)
    */
   function getHookArgumentsLength (fn) {
@@ -8596,7 +8596,7 @@
 
   /*  */
 
-  // recursively search for possible transition defined inside the component root
+  // recursively search for possible transition defined inside the hllComponent root
   function locateNode (vnode) {
     return vnode.componentInstance && (!vnode.data || !vnode.data.transition)
       ? locateNode(vnode.componentInstance._vnode)
@@ -8683,8 +8683,8 @@
     duration: [Number, String, Object]
   };
 
-  // in case the child is also an abstract component, e.g. <keep-alive>
-  // we want to recursively retrieve the real component to be rendered
+  // in case the child is also an abstract hllComponent, e.g. <keep-alive>
+  // we want to recursively retrieve the real hllComponent to be rendered
   function getRealChild (vnode) {
     var compOptions = vnode && vnode.componentOptions;
     if (compOptions && compOptions.Ctor.options.abstract) {
@@ -8776,7 +8776,7 @@
 
       var rawChild = children[0];
 
-      // if this is a component root node and the component's
+      // if this is a hllComponent root node and the hllComponent's
       // parent container node also has transition, skip.
       if (hasParentTransition(this.$vnode)) {
         return rawChild
@@ -8795,7 +8795,7 @@
       }
 
       // ensure a key that is unique to the vnode type and to this transition
-      // component instance. This key will be used to remove pending leaving nodes
+      // hllComponent instance. This key will be used to remove pending leaving nodes
       // during entering.
       var id = "__transition-" + (this._uid) + "-";
       child.key = child.key == null
@@ -8821,7 +8821,7 @@
         oldChild.data &&
         !isSameChild(child, oldChild) &&
         !isAsyncPlaceholder(oldChild) &&
-        // #6687 component root is a comment node
+        // #6687 hllComponent root is a comment node
         !(oldChild.componentInstance && oldChild.componentInstance._vnode.isComment)
       ) {
         // replace old child transition data with fresh one
@@ -9708,14 +9708,14 @@
     function checkRootConstraints (el) {
       if (el.tag === 'slot' || el.tag === 'template') {
         warnOnce(
-          "Cannot use <" + (el.tag) + "> as component root element because it may " +
+          "Cannot use <" + (el.tag) + "> as hllComponent root element because it may " +
           'contain multiple nodes.',
           { start: el.start }
         );
       }
       if (el.attrsMap.hasOwnProperty('v-for')) {
         warnOnce(
-          'Cannot use v-for on stateful component root element because ' +
+          'Cannot use v-for on stateful hllComponent root element because ' +
           'it renders multiple elements.',
           el.rawAttrsMap['v-for']
         );
@@ -10110,7 +10110,7 @@
     }
   }
 
-  // handle content being passed to a component as slot,
+  // handle content being passed to a hllComponent as slot,
   // e.g. <template slot="xxx">, <div slot-scope="xxx">
   function processSlotContent (el) {
     var slotScope;
@@ -10170,7 +10170,7 @@
             if (el.parent && !maybeComponent(el.parent)) {
               warn$2(
                 "<template v-slot> can only appear at the root level inside " +
-                "the receiving component",
+                "the receiving hllComponent",
                 el
               );
             }
@@ -10183,7 +10183,7 @@
           el.slotScope = slotBinding.value || emptySlotScopeToken; // force it into a scoped slot for perf
         }
       } else {
-        // v-slot on component, denotes default slot
+        // v-slot on hllComponent, denotes default slot
         var slotBinding$1 = getAndRemoveAttrByRegex(el, slotRE);
         if (slotBinding$1) {
           {
@@ -10207,7 +10207,7 @@
               );
             }
           }
-          // add the component's children to its default slot
+          // add the hllComponent's children to its default slot
           var slots = el.scopedSlots || (el.scopedSlots = {});
           var ref$1 = getSlotName(slotBinding$1);
           var name$1 = ref$1.name;
@@ -10642,7 +10642,7 @@
   function markStatic$1 (node) {
     node.static = isStatic(node);
     if (node.type === 1) {
-      // do not make component slot content static. this avoids
+      // do not make hllComponent slot content static. this avoids
       // 1. components not able to mutate slot nodes
       // 2. static slot content fails for hot-reloading
       if (
@@ -10712,7 +10712,7 @@
       !node.hasBindings && // no dynamic bindings
       !node.if && !node.for && // not v-if or v-for or v-else
       !isBuiltInTag(node.tag) && // not a built-in
-      isPlatformReservedTag(node.tag) && // not a component
+      isPlatformReservedTag(node.tag) && // not a hllComponent
       !isDirectChildOfTemplateFor(node) &&
       Object.keys(node).every(isStaticKey)
     ))
@@ -10970,7 +10970,7 @@
     } else if (el.tag === 'slot') {
       return genSlot(el, state)
     } else {
-      // component or element
+      // hllComponent or element
       var code;
       if (el.component) {
         code = genComponent(el.component, el, state);
@@ -11088,7 +11088,7 @@
       !el.key
     ) {
       state.warn(
-        "<" + (el.tag) + " v-for=\"" + alias + " in " + exp + "\">: component lists rendered with " +
+        "<" + (el.tag) + " v-for=\"" + alias + " in " + exp + "\">: hllComponent lists rendered with " +
         "v-for should have explicit keys. " +
         "See https://vuejs.org/guide/list.html#key for more info.",
         el.rawAttrsMap['v-for'],
@@ -11158,7 +11158,7 @@
     if (el.scopedSlots) {
       data += (genScopedSlots(el, el.scopedSlots, state)) + ",";
     }
-    // component v-model
+    // hllComponent v-model
     if (el.model) {
       data += "model:{value:" + (el.model.value) + ",callback:" + (el.model.callback) + ",expression:" + (el.model.expression) + "},";
     }
@@ -11245,8 +11245,8 @@
       )
     });
 
-    // #9534: if a component with scoped slots is inside a conditional branch,
-    // it's possible for the same component to be reused but with different
+    // #9534: if a hllComponent with scoped slots is inside a conditional branch,
+    // it's possible for the same hllComponent to be reused but with different
     // compiled slot content. To avoid that, we generate a unique key based on
     // the generated code of all the slot contents.
     var needsKey = !!el.if;
@@ -11429,7 +11429,7 @@
     return res + ')'
   }
 
-  // componentName is el.component, take it as argument to shun flow's pessimistic refinement
+  // componentName is el.hllComponent, take it as argument to shun flow's pessimistic refinement
   function genComponent (
     componentName,
     el,

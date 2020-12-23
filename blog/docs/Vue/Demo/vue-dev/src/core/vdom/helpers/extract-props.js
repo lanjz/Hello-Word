@@ -16,7 +16,7 @@ export function extractPropsFromVNodeData (
 ): ?Object {
   // we are only extracting raw values here.
   // validation and default values are handled in the child
-  // component itself.
+  // hllComponent itself.
   const propOptions = Ctor.options.props
   if (isUndef(propOptions)) {
     return

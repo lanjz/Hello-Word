@@ -6,7 +6,7 @@ document.body.onclick = function (){
     .then(({ MB }) => {
       console.log('MB', MB)
     })
-    .catch((error) => 'An error occurred while loading theS component');
+    .catch((error) => 'An error occurred while loading theS hllComponent');
 }
 
 import * as utils from './modules/utils'

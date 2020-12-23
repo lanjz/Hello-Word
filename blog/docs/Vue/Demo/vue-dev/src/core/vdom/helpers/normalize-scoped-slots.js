@@ -16,7 +16,7 @@ export function normalizeScopedSlots (
   if (!slots) {
     res = {}
   } else if (slots._normalized) {
-    // fast path 1: child component re-render only, parent did not change
+    // fast path 1: child hllComponent re-render only, parent did not change
     return slots._normalized
   } else if (
     isStable &&

@@ -120,7 +120,7 @@ export function makeMap (
 /**
  * Check if a tag is a built-in tag.
  */
-export const isBuiltInTag = makeMap('slot,component', true)
+export const isBuiltInTag = makeMap('slot,hllComponent', true)
 
 /**
  * Check if an attribute is a reserved attribute.

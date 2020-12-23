@@ -7,11 +7,11 @@ export default class VNode {
   text: string | void;
   elm: Node | void;
   ns: string | void;
-  context: Component | void; // rendered in this component's scope
+  context: Component | void; // rendered in this hllComponent's scope
   key: string | number | void;
   componentOptions: VNodeComponentOptions | void;
-  componentInstance: Component | void; // component instance
-  parent: VNode | void; // component placeholder node
+  componentInstance: Component | void; // hllComponent instance
+  parent: VNode | void; // hllComponent placeholder node
 
   // strictly internal
   raw: boolean; // contains raw HTML? (server only)
@@ -20,7 +20,7 @@ export default class VNode {
   isComment: boolean; // empty comment placeholder?
   isCloned: boolean; // is a cloned node?
   isOnce: boolean; // is a v-once node?
-  asyncFactory: Function | void; // async component factory function
+  asyncFactory: Function | void; // async hllComponent factory function
   asyncMeta: Object | void;
   isAsyncPlaceholder: boolean;
   ssrContext: Object | void;

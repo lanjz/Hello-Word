@@ -20,16 +20,16 @@ function initVirtualComponent (options: Object = {}) {
   const vm: Component = this
   const componentId = options.componentId
 
-  // virtual component uid
+  // virtual hllComponent uid
   vm._uid = `virtual-component-${uid++}`
 
   // a flag to avoid this being observed
   vm._isVue = true
   // merge options
   if (options && options._isComponent) {
-    // optimize internal component instantiation
+    // optimize internal hllComponent instantiation
     // since dynamic options merging is pretty slow, and none of the
-    // internal component options needs special treatment.
+    // internal hllComponent options needs special treatment.
     initInternalComponent(vm, options)
   } else {
     vm.$options = mergeOptions(
@@ -115,7 +115,7 @@ export function resolveVirtualComponent (vnode: MountedComponentVNode): VNode {
       // corresponding virtual components according to the componentId.
       // vm._virtualComponents = {}
       const createVirtualComponent = (componentId, propsData) => {
-        // create virtual component
+        // create virtual hllComponent
         // const subVm =
         new VirtualComponent({
           componentId,

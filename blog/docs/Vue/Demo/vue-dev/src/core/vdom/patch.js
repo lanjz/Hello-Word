@@ -156,7 +156,7 @@ export function createPatchFunction (backend) {
         if (isUnknownElement(vnode, creatingElmInVPre)) {
           warn(
             'Unknown custom element: <' + tag + '> - did you ' +
-            'register the component correctly? For recursive components, ' +
+            'register the hllComponent correctly? For recursive components, ' +
             'make sure to provide the "name" option.',
             vnode.context
           )
@@ -214,9 +214,9 @@ export function createPatchFunction (backend) {
       if (isDef(i = i.hook) && isDef(i = i.init)) {
         i(vnode, false /* hydrating */)
       }
-      // after calling the init hook, if the vnode is a child component
+      // after calling the init hook, if the vnode is a child hllComponent
       // it should've created a child instance and mounted it. the child
-      // component also has set the placeholder vnode's elm.
+      // hllComponent also has set the placeholder vnode's elm.
       // in that case we can just return the element and be done.
       if (isDef(vnode.componentInstance)) {
         initComponent(vnode, insertedVnodeQueue)
@@ -239,7 +239,7 @@ export function createPatchFunction (backend) {
       invokeCreateHooks(vnode, insertedVnodeQueue)
       setScope(vnode)
     } else {
-      // empty component root.
+      // empty hllComponent root.
       // skip all element-related modules except for ref (#3455)
       registerRef(vnode)
       // make sure to invoke the insert hook
@@ -249,7 +249,7 @@ export function createPatchFunction (backend) {
 
   function reactivateComponent (vnode, insertedVnodeQueue, parentElm, refElm) {
     let i
-    // hack for #4339: a reactivated component with inner transition
+    // hack for #4339: a reactivated hllComponent with inner transition
     // does not trigger because the inner node's created hooks are not called
     // again. It's not ideal to involve module-specific logic in here but
     // there doesn't seem to be a better way to do it.
@@ -264,8 +264,8 @@ export function createPatchFunction (backend) {
         break
       }
     }
-    // unlike a newly created component,
-    // a reactivated keep-alive component doesn't insert itself
+    // unlike a newly created hllComponent,
+    // a reactivated keep-alive hllComponent doesn't insert itself
     insert(parentElm, vnode.elm, refElm)
   }
 
@@ -384,7 +384,7 @@ export function createPatchFunction (backend) {
         // directly removing
         rm = createRmCb(vnode.elm, listeners)
       }
-      // recursively invoke hooks on child component root node
+      // recursively invoke hooks on child hllComponent root node
       if (isDef(i = vnode.componentInstance) && isDef(i = i._vnode) && isDef(i.data)) {
         removeAndInvokeRemoveHook(i, rm)
       }
@@ -574,7 +574,7 @@ export function createPatchFunction (backend) {
   }
 
   function invokeInsertHook (vnode, queue, initial) {
-    // delay insert hooks for component root nodes, invoke them after the
+    // delay insert hooks for hllComponent root nodes, invoke them after the
     // element is really inserted
     if (isTrue(initial) && isDef(vnode.parent)) {
       vnode.parent.data.pendingInsert = queue
@@ -612,7 +612,7 @@ export function createPatchFunction (backend) {
     if (isDef(data)) {
       if (isDef(i = data.hook) && isDef(i = i.init)) i(vnode, true /* hydrating */)
       if (isDef(i = vnode.componentInstance)) {
-        // child component. it should have hydrated its own tree.
+        // child hllComponent. it should have hydrated its own tree.
         initComponent(vnode, insertedVnodeQueue)
         return true
       }
@@ -688,7 +688,7 @@ export function createPatchFunction (backend) {
 
   function assertNodeMatch (node, vnode, inVPre) {
     if (isDef(vnode.tag)) {
-      return vnode.tag.indexOf('vue-component') === 0 || (
+      return vnode.tag.indexOf('vue-hllComponent') === 0 || (
         !isUnknownElement(vnode, inVPre) &&
         vnode.tag.toLowerCase() === (node.tagName && node.tagName.toLowerCase())
       )
@@ -707,7 +707,7 @@ export function createPatchFunction (backend) {
     const insertedVnodeQueue = []
 
     if (isUndef(oldVnode)) {
-      // empty mount (likely as component), create new root element
+      // empty mount (likely as hllComponent), create new root element
       isInitialPatch = true
       createElm(vnode, insertedVnodeQueue)
     } else {
@@ -776,7 +776,7 @@ export function createPatchFunction (backend) {
               // e.g. for directives that uses the "inserted" hook.
               const insert = ancestor.data.hook.insert
               if (insert.merged) {
-                // start at index 1 to avoid re-invoking component mounted hook
+                // start at index 1 to avoid re-invoking hllComponent mounted hook
                 for (let i = 1; i < insert.fns.length; i++) {
                   insert.fns[i]()
                 }

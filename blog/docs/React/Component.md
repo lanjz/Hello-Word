@@ -21,7 +21,7 @@ class Welcome extends React.Component {
 ```js
   function Component(props, context, updater) {
     this.props = props;
-    this.context = context; // If a component has string refs, we will assign a different object later.
+    this.context = context; // If a hllComponent has string refs, we will assign a different object later.
 
     this.refs = emptyObject; // We initialize the default updater but the real one gets injected by the
     // renderer.
@@ -86,7 +86,7 @@ function ComponentDummy() {}
 ComponentDummy.prototype = Component.prototype;
 function PureComponent(props, context, updater) {
     this.props = props;
-    this.context = context; // If a component has string refs, we will assign a different object later.
+    this.context = context; // If a hllComponent has string refs, we will assign a different object later.
 
     this.refs = emptyObject;
     this.updater = updater || ReactNoopUpdateQueue;

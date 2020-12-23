@@ -38,9 +38,9 @@ function transformNode (el: ASTElement, options: WeexCompilerOptions) {
 
 function postTransformNode (el: ASTElement, options: WeexCompilerOptions) {
   if (shouldCompile(el, options)) {
-    // mark child component in parent template
+    // mark child hllComponent in parent template
     postTransformComponent(el, options)
-    // mark root in child component template
+    // mark root in child hllComponent template
     postTransformComponentRoot(el)
     // <text>: transform children text into value attr
     if (el.tag === 'text') {

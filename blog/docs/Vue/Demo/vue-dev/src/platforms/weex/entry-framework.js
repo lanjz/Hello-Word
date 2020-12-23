@@ -51,7 +51,7 @@ export function destroyInstance (instanceId: string): void {
 }
 
 /**
- * Refresh an instance with id and new top-level component data.
+ * Refresh an instance with id and new top-level hllComponent data.
  * It will use `Vue.set` on all keys of the new data. So it's better
  * define all possible meaningful keys when instance created.
  */
@@ -106,11 +106,11 @@ function createVueModuleInstance (
   Vue.prototype.$requireWeexModule = weex.requireModule
 
   // Hack `Vue` behavior to handle instance information and data
-  // before root component created.
+  // before root hllComponent created.
   Vue.mixin({
     beforeCreate () {
       const options = this.$options
-      // root component (vm)
+      // root hllComponent (vm)
       if (options.el) {
         // set external data of instance
         const dataOption = options.data
@@ -122,7 +122,7 @@ function createVueModuleInstance (
     },
     mounted () {
       const options = this.$options
-      // root component (vm)
+      // root hllComponent (vm)
       if (options.el && weex.document && instance.app === this) {
         try {
           // Send "createFinish" signal to native.

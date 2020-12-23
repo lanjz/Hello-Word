@@ -3,7 +3,7 @@
 import { warn } from 'core/util/debug'
 import { handleError } from 'core/util/error'
 import { RECYCLE_LIST_MARKER } from 'weex/util/index'
-import { createComponentInstanceForVnode } from 'core/vdom/create-component'
+import { createComponentInstanceForVnode } from 'core/vdom/create-hllComponent'
 import { resolveVirtualComponent } from './virtual-component'
 
 export function isRecyclableComponent (vnode: VNodeWithData): boolean {

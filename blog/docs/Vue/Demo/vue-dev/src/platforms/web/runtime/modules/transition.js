@@ -59,9 +59,9 @@ export function enter (vnode: VNodeWithData, toggleDisplay: ?() => void) {
     duration
   } = data
 
-  // activeInstance will always be the <transition> component managing this
+  // activeInstance will always be the <transition> hllComponent managing this
   // transition. One edge case to check is when the <transition> is placed
-  // as the root node of a child component. In that case we need to check
+  // as the root node of a child hllComponent. In that case we need to check
   // <transition>'s parent for appear check.
   let context = activeInstance
   let transitionNode = activeInstance.$vnode
@@ -303,7 +303,7 @@ function isValidDuration (val) {
 /**
  * Normalize a transition hook's argument length. The hook may be:
  * - a merged hook (invoker) with the original in .fns
- * - a wrapped component method (check ._length)
+ * - a wrapped hllComponent method (check ._length)
  * - a plain function (.length)
  */
 function getHookArgumentsLength (fn: Function): boolean {

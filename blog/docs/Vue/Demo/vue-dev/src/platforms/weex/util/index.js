@@ -5,7 +5,7 @@ import { warn } from 'core/util/index'
 
 export const RECYCLE_LIST_MARKER = '@inRecycleList'
 
-// Register the component hook to weex native render engine.
+// Register the hllComponent hook to weex native render engine.
 // The hook will be triggered by native, not javascript.
 export function registerComponentHook (
   componentId: string,
@@ -23,7 +23,7 @@ export function registerComponentHook (
   warn(`Failed to register component hook "${type}@${hook}#${componentId}".`)
 }
 
-// Updates the state of the component to weex native render engine.
+// Updates the state of the hllComponent to weex native render engine.
 export function updateComponentData (
   componentId: string,
   newData: Object | void,

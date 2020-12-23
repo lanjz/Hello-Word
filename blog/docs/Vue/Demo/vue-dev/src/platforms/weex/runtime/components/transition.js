@@ -1,4 +1,4 @@
-// reuse same transition component logic from web
+// reuse same transition hllComponent logic from web
 export {
   transitionProps,
   extractTransitionData

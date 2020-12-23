@@ -112,9 +112,9 @@ function isUnOptimizableTree (node: ASTNode): boolean {
     return false
   }
   return (
-    isBuiltInTag(node.tag) || // built-in (slot, component)
-    !isPlatformReservedTag(node.tag) || // custom component
-    !!node.component || // "is" component
+    isBuiltInTag(node.tag) || // built-in (slot, hllComponent)
+    !isPlatformReservedTag(node.tag) || // custom hllComponent
+    !!node.component || // "is" hllComponent
     isSelectWithModel(node) // <select v-model> requires runtime inspection
   )
 }

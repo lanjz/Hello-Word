@@ -323,9 +323,9 @@ function flushCallbacks () {
     // This ensures that:
     // 1. Components are updated from parent to child. (because parent is always
     //    created before the child)
-    // 2. A component's user watchers are run before its render watcher (because
+    // 2. A hllComponent's user watchers are run before its render watcher (because
     //    user watchers are created before the render watcher)
-    // 3. If a component is destroyed during a parent component's watcher run,
+    // 3. If a hllComponent is destroyed during a parent hllComponent's watcher run,
     //    its watchers can be skipped.
     queue.sort(function (a, b) { return a.id - b.id; });
 
@@ -347,7 +347,7 @@ function flushCallbacks () {
             'You may have an infinite update loop ' + (
               watcher.user
                 ? ("in watcher with expression \"" + (watcher.expression) + "\"")
-                : "in a component render function."
+                : "in a hllComponent render function."
             ),
             watcher.vm
           );
@@ -362,7 +362,7 @@ function flushCallbacks () {
 
     resetSchedulerState();
 
-    // call component updated and activated hooks
+    // call hllComponent updated and activated hooks
     callActivatedHooks(activatedQueue);
     callUpdatedHooks(updatedQueue);
 
