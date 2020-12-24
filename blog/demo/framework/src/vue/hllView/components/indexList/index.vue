@@ -26,6 +26,12 @@
           </IndexAnchor>
           <div class="content" style="height: 100px"></div>
         </IndexListContent>
+        <IndexListContent index="定时任务补偿2">
+          <IndexAnchor>
+            <div>定时任务补偿</div>
+          </IndexAnchor>
+          <div class="content2" style="height: 100px"></div>
+        </IndexListContent>
       </IndexList>
     </div>
   </div>
@@ -43,7 +49,9 @@ export default {
         {key: '用户管理', label: '用户管理'},
         {key: '配置管理', label: '配置管理'},
         {key: '角色管理', label: '角色管理'},
-        {key: '定时任务补偿', label: '定时任务补偿'}]
+        {key: '定时任务补偿', label: '定时任务补偿'},
+        {key: '定时任务补偿2', label: '定时任务补偿2'},
+        ]
     }
   },
   components: {

@@ -1,5 +1,5 @@
 import Index from './layout/Index'
-import IndexList from './hllComponent/components/indexList/index'
+import IndexList from './hllView/components/indexList/index'
 import Home from './page/Home'
 import Login from './page/Login'
 import NoPage from './page/404'
