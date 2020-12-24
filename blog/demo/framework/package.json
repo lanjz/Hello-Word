@@ -8,6 +8,8 @@
   },
   "scripts": {
     "start": "webpack-dev-server --config webpack.config.js",
+    "start:server": "webpack --config webpack.config/server.js",
+    "start:server2": "webpack --config webpack.config/client.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "lanjz",
@@ -26,10 +28,14 @@
     "babel-loader": "^8.2.2",
     "css-loader": "^5.0.1",
     "element-ui": "^2.14.1",
+    "express": "^4.17.1",
     "file-loader": "^6.2.0",
     "less": "^4.0.0",
     "less-loader": "^7.1.0",
     "style-loader": "^2.0.0",
-    "vue-loader": "^15.9.6"
+    "vue-loader": "^15.9.6",
+    "vuex": "^3.6.0",
+    "vuex-router-sync": "^5.0.0",
+    "webpack-node-externals": "^2.5.2"
   }
 }
