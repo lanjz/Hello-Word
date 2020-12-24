@@ -11,7 +11,7 @@
       </li>
       <li class="actIndex" :style="{ top: curIndex * 45 + 'px' }"></li>
     </ul>
-    <div class="scroll-content" @scroll.passive="scroll" alias-name="index-list" ref="scroll-content">
+    <div class="scroll-content" @scroll.passive="scroll" alias-name="scroll-content" ref="scroll-content">
       <slot></slot>
     </div>
   </div>
@@ -47,9 +47,15 @@ export default {
   },
   methods: {
     scroll(e){
+      if(this.isHandleScroll) { // 表示 scrollTo 触发的滚动
+        if (e.target.scrollTop === this.isHandleScroll.target) {
+          this.isHandleScroll.callback();
+        }
+        return
+      }
       clearTimeout(this.timer)
       this.timer = setTimeout(() => {
-        this.hllBroadcast('IndexListContent', 'update', [e.target.scrollTop])
+        this.hllBroadcast('IndexListContent', 'scrollUpdate', [e.target.scrollTop])
       }, 100)
     },
     setActivity(key){
@@ -62,8 +68,22 @@ export default {
     selectIndex(index){
       this.hllBroadcast('IndexListContent', 'activity', [index])
     },
-    scrollTo(target){
-      this.$refs['scroll-content'].scrollTo(0, target)
+    scrollTo(targetDom, index){
+      let dis = this.$refs['scroll-content'].clientHeight - targetDom.clientHeight
+      let target = dis > 0 ? targetDom.offsetTop - dis : targetDom.offsetTop
+      this.setActivity(index)
+      this.isHandleScroll = {
+        index,
+        target,
+        callback: () => {
+          this.isHandleScroll = null
+
+        }
+      }
+      this.$refs['scroll-content'].scrollTo({
+        top: target,
+        behavior: 'smooth'
+      })
     }
   },
   created() {

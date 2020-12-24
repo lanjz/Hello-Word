@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="height: 500px">
-      <IndexList :indexList="indexList" defaultActivity="用户管理">
+      <IndexList :indexList="indexList" defaultActivity="用户管理" @change="change">
         <IndexListContent index="用户管理">
           <IndexAnchor>
             <div>用户管理</div>
@@ -51,6 +51,11 @@ export default {
     IndexAnchor,
     IndexListContent
   },
+  methods: {
+    change(e){
+      console.log('change', e)
+    }
+  }
 }
 </script>
 <style scoped>
