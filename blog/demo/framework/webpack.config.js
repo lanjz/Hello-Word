@@ -53,9 +53,28 @@ const config = {
         ],
       },
       {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: "style-loader",
+          },
+          {
+            loader: "css-loader",
+          },
+          {
+            loader: "sass-loader",
+          },
+        ],
+      },
+      {
         test: /\.vue$/,
         exclude: /node_modules/,
-        loader: 'vue-loader'
+        loader: 'vue-loader',
+        options: {
+          loaders: {
+            'scss': 'style-loader!css-loader!sass-loader'
+          }
+        }
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,

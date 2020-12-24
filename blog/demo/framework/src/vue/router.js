@@ -1,5 +1,6 @@
 import Index from './layout/Index'
 import IndexList from './hllView/components/indexList/index'
+import Dialog from './hllView/hllComponents/dialog/index'
 import Home from './page/Home'
 import Login from './page/Login'
 import NoPage from './page/404'
@@ -20,9 +21,9 @@ const component = {
             component: IndexList
         },
         {
-            name: '首页2',
-            path: 'profile',
-            component: Bar
+            name: '弹层',
+            path: 'dialog',
+            component: Dialog
         },
         {
             name: '首页3',

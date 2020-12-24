@@ -95,7 +95,6 @@ export default {
 
 <style scoped>
 .index-list{
-  background: #666666;
   height: 100%;
   position: relative;
   display: flex;
