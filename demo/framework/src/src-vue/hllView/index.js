@@ -2,7 +2,7 @@ import emitter from './mixins/emitter'
 import IndexList from './components/indexList/IndexList'
 import IndexListContent from './components/indexList/IndexListContent'
 import IndexAnchor from './components/indexList/IndexAnchor'
-import Modal from './hllComponents/dialog/Modal'
+import Modal from './hllComponents/Modal/Modal'
 const components = [
   IndexList,
   IndexListContent,

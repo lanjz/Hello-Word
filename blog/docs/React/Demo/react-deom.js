@@ -5769,7 +5769,7 @@
       // *don't* warn for <time> even if it's unrecognized by Chrome because
       // it soon will be, and many apps have been using it anyway.
       time: true,
-      // There are working polyfills for <dialog>. Let people use it.
+      // There are working polyfills for <Modal>. Let people use it.
       dialog: true,
       // Electron ships a custom <webview> tag to display external web content in
       // an isolated frame and process.
@@ -19699,7 +19699,7 @@
       logCapturedError(capturedError);
     } catch (e) {
       // This method must not throw, or React internal state will get messed up.
-      // If console.error is overridden, or logCapturedError() shows a dialog that throws,
+      // If console.error is overridden, or logCapturedError() shows a Modal that throws,
       // we want to report this error outside of the normal stack as a last resort.
       // https://github.com/facebook/react/issues/13188
       setTimeout(function () {

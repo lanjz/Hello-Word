@@ -7,13 +7,12 @@
       @action="dialogAction"
       title="dialogVisible"
   >
-    <IndexListPage></IndexListPage>
+    <IndexList></IndexList>
   </HllModal>
 </div>
 </template>
 
 <script>
-import IndexListPage from "../../components/indexList/index";
 export default {
   name: "index",
   data(){
@@ -21,7 +20,6 @@ export default {
       dialogVisible: false
     }
   },
-  components: { IndexListPage },
   methods: {
     dialogAction(type){
       console.log('type', type)

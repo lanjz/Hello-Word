@@ -5602,7 +5602,7 @@
     'caption,col,colgroup,table,thead,tbody,td,th,tr,' +
     'button,datalist,fieldset,form,input,label,legend,meter,optgroup,option,' +
     'output,progress,select,textarea,' +
-    'details,dialog,menu,menuitem,summary,' +
+    'details,Modal,menu,menuitem,summary,' +
     'content,element,shadow,template,blockquote,iframe,tfoot'
   );
 
@@ -9242,7 +9242,7 @@
   // Phrasing Content https://html.spec.whatwg.org/multipage/dom.html#phrasing-content
   var isNonPhrasingTag = makeMap(
     'address,article,aside,base,blockquote,body,caption,col,colgroup,dd,' +
-    'details,dialog,div,dl,dt,fieldset,figcaption,figure,footer,form,' +
+    'details,Modal,div,dl,dt,fieldset,figcaption,figure,footer,form,' +
     'h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,legend,li,menuitem,meta,' +
     'optgroup,option,param,rp,rt,source,style,summary,tbody,td,tfoot,th,thead,' +
     'title,tr,track'

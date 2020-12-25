@@ -1,6 +1,6 @@
 import Index from './layout/Index'
 import IndexList from './hllView/components/indexList/index'
-import Dialog from './hllView/hllComponents/dialog/index'
+import Dialog from './hllView/hllComponents/Modal/index'
 import Home from './page/Home'
 import Login from './page/Login'
 import NoPage from './page/404'
