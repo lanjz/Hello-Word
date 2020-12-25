@@ -5,13 +5,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const config = {
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(process.cwd(), 'dist'),
   },
   resolve: {
     extensions: ['.js', '.vue']
   },
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
+    contentBase: path.resolve(process.cwd(), 'dist'),
     compress: true,
     port: 5050
   },

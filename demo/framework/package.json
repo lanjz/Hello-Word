@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start:v": "webpack-dev-server --config webpack.config/vue.config.js",
+    "build:v": "webpack --config webpack.config/vue.config.js",
     "build:ssr:v:server": "webpack --config webpack.config/ssr-vue-server.js",
     "build:ssr:v:client": "webpack --config webpack.config/ssr-vue-client.js",
     "build:ssr:v": "yarn build:ssr:v:server && yarn build:ssr:v:client && node src/src-vue/server/server.js",
