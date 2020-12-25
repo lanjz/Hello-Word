@@ -196,7 +196,7 @@ Babel 官方帮我们做了一些预设的插件集，称之为 `Preset`，这�
 结合 Webpack 来看下怎么使用 Babel。Webpack 配置：
 
 ```js
-// webpack.config.js
+// vue.config.js
 const path = require('path')
 const config = {
 	mode: 'development',

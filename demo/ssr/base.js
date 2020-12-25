@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
+  mode: 'production',
   module: {
     rules: [
       {
@@ -46,8 +47,8 @@ module.exports = {
   plugins: [
     new VueLoaderPlugin(),
     // new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({
+ /*   new HtmlWebpackPlugin({
       title: 'framework',
-    }),
+    }),*/
   ]
 }

@@ -1,7 +1,7 @@
 // store.js
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+console.log('Vuex', Vuex)
 Vue.use(Vuex)
 
 // 假定我们有一个可以返回 Promise 的

@@ -1,14 +1,14 @@
 <template>
 <div>
   <el-button @click="dialogVisible=true">显示弹层</el-button>
-  <HllDialog
+  <HllPopup
       v-model="dialogVisible"
       autoClose
       @action="dialogAction"
       title="dialogVisible"
   >
     <IndexListPage></IndexListPage>
-  </HllDialog>
+  </HllPopup>
 </div>
 </template>
 

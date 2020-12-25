@@ -1,11 +1,11 @@
-const merge = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const nodeExternals = require('webpack-node-externals')
 const baseConfig = require('./base.js')
 const VueSSRServerPlugin = require('vue-server-renderer/server-plugin')
 
 module.exports = merge(baseConfig, {
   // 将 entry 指向应用程序的 server entry 文件
-  entry: './src/vue/server/entry-server.js',
+  entry: './src/src-vue/server/entry-server.js',
 
   // 这允许 webpack 以 Node 适用方式(Node-appropriate fashion)处理动态导入(dynamic import)，
   // 并且还会在编译 Vue 组件时，

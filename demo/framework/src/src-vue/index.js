@@ -4,8 +4,8 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import routes from './router'
 import App from './App.vue'
-import hllView from './hllView/hllView'
-import '../static/less/index.less'
+import hllView from './hllView'
+import '../common/static/less/index.less'
 Vue.use(VueRouter)
 Vue.use(ElementUI);
 Vue.use(hllView)

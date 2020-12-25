@@ -38,7 +38,7 @@
 
 <script>
 export default {
-  name: 'HllDialog',
+  name: 'HllPopup',
   props: {
     value: Boolean,
     autoClose: Boolean,

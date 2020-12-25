@@ -2,12 +2,12 @@ const path = require('path')
 const server = require('express')()
 const { createBundleRenderer } = require('vue-server-renderer')
 // server.js
-const createApp = require('/path/to/built-server-bundle.js')
-const serverBundle = require('../../../dist/vue-ssr-server-bundle.json')
-const clientManifest = require('../../../dist/vue-ssr-client-manifest.json')
+// const createApp = require('/path/to/built-server-bundle.js')
+const serverBundle = require('../dist/vue-ssr-server-bundle.json')
+const clientManifest = require('../dist/vue-ssr-client-manifest.json')
 const renderer = createBundleRenderer(serverBundle, {
   runInNewContext: false, // 推荐
-  clientManifest, // （可选）客户端构建 manifest
+  clientManifest, // （可选）客户端构f建 manifest
   template: require('fs').readFileSync(path.resolve(__dirname, './index.template.html'), 'utf-8')
 })
 const context = {
@@ -15,10 +15,11 @@ const context = {
   meta: '<meta charset="utf-8">'
 }
 server.get('*', (req, res) => {
-  const app = createApp()
+  // const app = createApp()
 
-  renderer.renderToString(app, context, (err, html) => {
+  renderer.renderToString(context, (err, html) => {
     if (err) {
+      console.log('eerr', err)
       res.status(500).end('Internal Server Error')
       return
     }

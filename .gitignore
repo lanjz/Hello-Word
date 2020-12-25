@@ -74,7 +74,7 @@ typings/
 # 这部分就跟通常情况下的.nuxt一样是不应该加入到版本控制里的，但由于nuxt build之后，
 # 在.nuxt里也会生成一个dist文件夹，我们希望gitignore的只有/dist而不是/.nuxt/dist，因此猜需要做出这里的修改
 /dist
-
+dist
 # vuepress build output
 .vuepress/dist
 */.vuepress/dist
