@@ -1,28 +1,28 @@
 <template>
-  <transition name="dialog-fade">
+  <transition name="modal-fade">
     <div
         v-show="dialogVisible"
-        class="dialog-wrap"
+        class="modal-wrap"
         :style="[
       {'left': collapse ? '64px' : '240px'},
       {'width': collapse ? 'calc(100vw - 64px)' : 'calc(100vw - 240px)'}
     ]">
-      <div class="dialog-content" :style="[{'width': `${width||700}px`}]">
-        <header class="dialog-header">
+      <div class="m-content" :style="[{'width': `${width||700}px`}]">
+        <header class="modal-header">
           <h1>
             {{title}}
             <i v-if="smallTitle" class="hll-small-small-title">{{smallTitle}}</i>
           </h1>
-          <div class="dialog-close">
+          <div class="modal-close">
             <button type="button" class="el-dialog__headerbtn" @click="close">
               <i class="el-dialog__close el-icon el-icon-close"></i>
             </button>
           </div>
         </header>
-        <section class="dialog-main">
+        <section class="modal-main">
           <slot></slot>
         </section>
-        <footer class="dialog-submit" v-if="footBtnList.length">
+        <footer class="modal-submit" v-if="footBtnList.length">
           <el-button
               v-for="(item, index) in footBtnList"
               :key="index"
@@ -38,7 +38,7 @@
 
 <script>
 export default {
-  name: 'HllPopup',
+  name: 'HllModal',
   props: {
     value: Boolean,
     autoClose: Boolean,
@@ -92,15 +92,15 @@ $color: #f16622;          // theme color
 $font-small: 12px;
 $font-large: 18px;
 
-.dialog-fade-enter-active {
-  animation: dialog-fade-in .3s;
+.modal-fade-enter-active {
+  animation: modal-fade-in .3s;
 }
 
-.dialog-fade-leave-active {
-  animation: dialog-fade-out .3s;
+.modal-fade-leave-active {
+  animation: modal-fade-out .3s;
 }
 
-@keyframes dialog-fade-in {
+@keyframes modal-fade-in {
   0% {
     transform: translate3d(0, -20px, 0);
     opacity: 0;
@@ -111,7 +111,7 @@ $font-large: 18px;
   }
 }
 
-@keyframes dialog-fade-out {
+@keyframes modal-fade-out {
   0% {
     transform: translate3d(0, 0, 0);
     opacity: 1;
@@ -122,7 +122,7 @@ $font-large: 18px;
   }
 }
 
-.dialog-wrap:before{
+.modal-wrap:before{
   content: '';
   width: 100%;
   height: calc(100vh - 110px);
@@ -134,11 +134,11 @@ $font-large: 18px;
   bottom: 0;
   z-index: 1;
 }
-.dialog-wrap{
+.modal-wrap{
   position: fixed;
   top: 110px;
   z-index: 5;
-  .dialog-content{
+  .m-content{
     width: 700px;
     max-height: calc(100vh - 170px);
     display: flex;
@@ -151,7 +151,7 @@ $font-large: 18px;
     top: 30px;
     transform: translateX(-50%);
     z-index: 10;
-    .dialog-header{
+    .modal-header{
       width: 100%;
       height: 50px;
       display: inline-flex;
@@ -173,7 +173,7 @@ $font-large: 18px;
           color: #999;
         }
       }
-      .dialog-close{
+      .modal-close{
         width: 50%;
         height: 50px;
         .el-dialog__headerbtn{
@@ -186,11 +186,11 @@ $font-large: 18px;
         }
       }
     }
-    .dialog-main{
+    .modal-main{
       width: 100%;
       min-height: calc(100vh - 420px);
     }
-    .dialog-submit{
+    .modal-submit{
       width: 100%;
       height: 50px;
       position: absolute;

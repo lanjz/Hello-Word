@@ -2,12 +2,12 @@ import emitter from './mixins/emitter'
 import IndexList from './components/indexList/IndexList'
 import IndexListContent from './components/indexList/IndexListContent'
 import IndexAnchor from './components/indexList/IndexAnchor'
-import Dialog from './hllComponents/dialog/Dialog'
+import Modal from './hllComponents/dialog/Modal'
 const components = [
   IndexList,
   IndexListContent,
   IndexAnchor,
-  Dialog
+  Modal
 ]
 export default {
   install(Vue){
