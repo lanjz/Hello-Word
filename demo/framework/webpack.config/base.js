@@ -1,7 +1,13 @@
+const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 module.exports = {
+  output: {
+    path: path.resolve(process.cwd(), 'dist'),
+    publicPath: '/dist/',
+    filename: '[name].[chunkhash].js'
+  },
   module: {
     rules: [
       {

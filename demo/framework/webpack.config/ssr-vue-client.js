@@ -4,7 +4,9 @@ const baseConfig = require('./base.js')
 const VueSSRClientPlugin = require('vue-server-renderer/client-plugin')
 
 module.exports = merge(baseConfig, {
-  entry: './src/src-vue/server/entry-client.js',
+  entry: {
+    app: './src/src-vue/server/entry-client.js'
+  },
   optimization: {
     splitChunks: {
       name: "manifest",
