@@ -43,7 +43,6 @@ if (isProd) {
     templatePath,
     (bundle, options) => {
       renderer = createRenderer(bundle, options)
-      console.log('renderer-----------------', renderer)
     }
   )
 }
@@ -67,7 +66,6 @@ function render(req, res){
     meta: '<meta charset="utf-8">',
     url: req.url
   }
-  console.log('renderer.renderToString', renderer)
   renderer.renderToString(context, (err, html) => {
     if (err) {
       return handleError(err)
@@ -78,10 +76,8 @@ function render(req, res){
     }
   })
 }
-console.log('isProd', isProd)
 app.get('*', isProd ? render : (req, res) => {
   readyPromise.then(() => {
-    console.log('readyPromisereadyPromisereadyPromise')
     return render(req, res)
   })
 })

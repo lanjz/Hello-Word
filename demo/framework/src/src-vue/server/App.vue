@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app">
     <h1> {{name}}</h1>
 <!--    <router-view></router-view>-->
   </div>
@@ -10,7 +10,7 @@ export default {
   name: "App",
   data(){
     return {
-      name: 'App23'
+      name: 'App234-43'
     }
   }
 }

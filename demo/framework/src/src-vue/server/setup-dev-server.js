@@ -8,10 +8,7 @@ const clientConfig = require('../../../webpack.config/ssr-vue-client')
 const serverConfig = require('../../../webpack.config/ssr-vue-server')
 
 const readFile = (fs, file) => {
-  console.log('path.join(clientConfig.output.path, file)', fs)
-  console.log('path.join(clientConfig.output.path, file)', path.join(clientConfig.output.path, file))
   try {
-    console.log('readdirtest11',  fs.readdirSync(path.join(clientConfig.output.path)))
     let fsData = fs.readFileSync(path.join(clientConfig.output.path, file), 'utf-8')
     return fsData
   } catch (e) {
@@ -21,7 +18,6 @@ const readFile = (fs, file) => {
 
 
 module.exports = function setupDevServer (app, templatePath, cb) {
-  console.log('进入 setupDevServer')
   let bundle
   let template
   let clientManifest
@@ -30,7 +26,6 @@ module.exports = function setupDevServer (app, templatePath, cb) {
   const readyPromise = new Promise(r => { ready = r })
   const update = () => {
     if (bundle && clientManifest) {
-      console.log('\x1b[33m%s\x1b[0m', 'update')
       cb(bundle, {
         template,
         clientManifest
@@ -50,12 +45,10 @@ module.exports = function setupDevServer (app, templatePath, cb) {
   // modify client config to work with hot middleware
   clientConfig.entry.app = ['webpack-hot-middleware/client', clientConfig.entry.app]
   clientConfig.output.filename = '[name].js'
-  clientConfig.mode = 'development'
   clientConfig.plugins.push(
     new webpack.HotModuleReplacementPlugin(),
     // new webpack.NoEmitOnErrorsPlugin() // 在编译出现错误时，使用 NoEmitOnErrorsPlugin 来跳过输出阶段。这样可以确保输出资源不会包含错误
   )
-
   // dev middleware
   const clientCompiler = webpack(clientConfig)
   const devMiddleware = require('webpack-dev-middleware')(clientCompiler, {
@@ -65,7 +58,6 @@ module.exports = function setupDevServer (app, templatePath, cb) {
   clientCompiler.plugin('done', stats => {
     stats = stats.toJson()
 
-    console.log('clientCompilerclientCompilerclientCompiler')
     stats.errors.forEach(err => console.error('stats.errors', err))
     stats.warnings.forEach(err => console.warn('stats.warnings',err))
     if (stats.errors.length) return

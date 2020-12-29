@@ -90,6 +90,7 @@ module.exports = {
     '/Vue/VueRouter',
     '/Vue/Vuex',
     '/Vue/Extend',
+    '/Vue/SSR',
     '/Vue/Paas应用',
     '/Vue/吱不吱',
   ],

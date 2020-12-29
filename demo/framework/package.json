@@ -9,11 +9,15 @@
   "scripts": {
     "start:v": "webpack-dev-server --config webpack.config/vue.config.js",
     "build:v": "webpack --config webpack.config/vue.config.js",
+
+    "build:ssr:v2": "yarn build:ssr:v:server && yarn build:ssr:v:client && node src/src-vue/server/server.js",
+
+    "build:ssr:v": "yarn build:ssr:v:server && yarn build:ssr:v:client",
+
+    "start:ssr:v": "node src/src-vue/server.js",
     "build:ssr:v:server": "webpack --config webpack.config/ssr-vue-server.js",
     "build:ssr:v:client": "webpack --config webpack.config/ssr-vue-client.js",
-    "build:ssr:v2": "yarn build:ssr:v:server && yarn build:ssr:v:client && node src/src-vue/server/server.js",
-    "build:ssr:v": "yarn build:ssr:v:server && yarn build:ssr:v:client",
-    "start:ssr:v": "node src/src-vue/server.js",
+    "run:ssr:v": "yarn build:ssr:v:server && yarn build:ssr:v:client && cross-env NODE_ENV=production node src/src-vue/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "lanjz",
@@ -43,6 +47,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "cross-env": "^7.0.3",
     "css-loader": "^5.0.1",
     "element-ui": "^2.14.1",
     "express": "^4.17.1",
