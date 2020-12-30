@@ -41,7 +41,7 @@ new Profile().$mount('#mount-point')
 
 先实现 Toast 组件部分
 
-```js
+```vue
 // Toast.vue
 <template>
   <transition name="fade">
