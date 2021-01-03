@@ -9,7 +9,6 @@ if (window.__INITIAL_STATE__) {
 }
 
 // 在路由导航之前解析数据
-// https://ssr.vuejs.org/zh/guide/data.html#%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%95%B0%E6%8D%AE%E9%A2%84%E5%8F%96-client-data-fetching
 router.onReady(() => {
   // 添加路由钩子函数，用于处理 asyncData.
   // 在初始路由 resolve 后执行，
@@ -37,9 +36,7 @@ router.onReady(() => {
         return c.asyncData({ store, route: to })
       }
     })).then(() => {
-
       // 停止加载指示器(loading indicator)
-
       next()
     }).catch(next)
   })
