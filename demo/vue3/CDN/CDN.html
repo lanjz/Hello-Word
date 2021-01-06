@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="./vue3.global.js"></script>
+</head>
+<body>
+<div id="counter">
+    Counter: {{ counter }}
+</div>
+</body>
+<script>
+window.onload = function (){
+  const CounterApp = {
+    data() {
+      return {
+        counter: 0
+      }
+    },
+    mounted() {
+      setInterval(() => {
+        this.counter++
+      }, 1000)
+    }
+  }
+  let vm = Vue.createApp(CounterApp).mount('#counter')
+  console.log('vm', vm)
+}
+</script>
+</html>
