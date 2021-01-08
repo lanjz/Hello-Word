@@ -1,24 +1,27 @@
 <template>
-  <Comp type="name" v-bind="pop" da="da" @da="action" @click.native="action"></Comp>
+  <Comp></Comp>
 </template>
 
 <script>
 export default {
   name: "index",
+  provide(){
+    return {
+      foo: this.item
+    }
+  },
   data(){
     return {
-      pop: {
-        da: ''
+      item: {
+        name: 'f'
       }
     }
   },
   components: {
     Comp: () => import('./comp.vue')
   },
-  methods: {
-    action(){
-      alert('')
-    }
+  mounted(){
+    console.log('provide-index', this)
   }
 
 }

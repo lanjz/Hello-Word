@@ -1,5 +1,6 @@
 <template>
-  <div class="hello">
+  <div class="hello" @click="action" :ttt="t">
+    <h1>{{onClick}}</h1>
     <h1>{{ msg }}</h1>
     <p>
       For a guide and recipes on how to configure / customize this project,<br>
@@ -34,7 +35,27 @@
 export default {
   name: 'HelloWorld',
   props: {
-    msg: String
+    msg: String,
+    modelModifiers: {
+      default: () => ({})
+    }
+  },
+  data(){
+    return {
+      ttrs: {
+        ttt: 'T'
+      },
+      t: 'vv'
+    }
+  },
+  methods: {
+    action(){
+      alert('actionaction')
+    }
+  },
+  mounted() {
+    console.log('this.#', this.$attrs)
+    console.log('modelModifiers', this.modelModifiers)
   }
 }
 </script>

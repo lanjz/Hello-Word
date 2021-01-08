@@ -1,0 +1,1 @@
+https://vue3js.cn/docs/zh/guide/component-custom-events.html#%E9%AA%8C%E8%AF%81%E6%8A%9B%E5%87%BA%E7%9A%84%E4%BA%8B%E4%BB%B6
