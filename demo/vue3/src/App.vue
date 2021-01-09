@@ -1,5 +1,10 @@
 <template>
-  <HelloWorld :user="user" />
+  <Menu>
+    <MItem index="1-1"><div>选项1</div></MItem>
+    <MItem index="1-1"><div>选项1</div></MItem>
+    <MItem index="1-1"><div>选项1</div></MItem>
+    <MItem index="1-1"><div>选项1</div></MItem>
+  </Menu>
 </template>
 
 <script>
@@ -16,12 +21,15 @@ export default {
     }
   },
   components: {
-    HelloWorld: defineAsyncComponent(() => import('./jsx/demo') )
+    Menu: defineAsyncComponent(() => import('./view/menu/index') ),
+    MItem: defineAsyncComponent(() => import('./view/menu/MenuItem') ),
   },
   methods: {
     action(){
       alert('action')
-    }
+    },
+    handleOpen(){},
+    handleClose(){},
   }
 }
 </script>
