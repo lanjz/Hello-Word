@@ -1,6 +1,6 @@
 
-import IndexList from '../hllView/components/indexList'
-import Dialog from '../hllView/hllComponents/Modal'
+const IndexList = { template: '<div>IndexList</div>' }
+const Dialog = { template: '<div>Dialog</div>' }
 const diff = { template: '<div>diff</div>' }
 
 /*要注意，以 / 开头的嵌套路径会被当作根路径。 这让你充分的使用嵌套组件而无须设置嵌套的路径*/

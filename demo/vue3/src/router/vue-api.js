@@ -1,5 +1,5 @@
-import Props from '../vue-api/props/index'
-import Provide from '../vue-api/provide/index'
+const Props = { template: '<div>Props</div>' }
+const Provide = { template: '<div>Provide</div>' }
 
 /*要注意，以 / 开头的嵌套路径会被当作根路径。 这让你充分的使用嵌套组件而无须设置嵌套的路径*/
 export default {

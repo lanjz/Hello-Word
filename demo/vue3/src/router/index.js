@@ -1,33 +1,22 @@
 import { createRouter,createWebHashHistory} from "vue-router"
-import component from './component'
+import home from './home'
+// import component from './component'
 const Foo = { template: '<div>foo</div>' }
 const Bar = { template: '<div>bar</div>' }
+const About = { template: '<div>About</div>' }
+const NoPage = { template: '<div>404</div>' }
 
-export const home = {
-    path: '/home',
-    name: '首页',
-    component: Foo,
-    children: [
-        {
-            path: '',
-            name: '首页-1',
-            component: Foo
-        },
-        component,
-        Bar
-    ]
-}
 
 const routes = [
-    {
+   {
         path: '/',
         redirect: '/home'
     },
     home,
-    { path: '/login', component: Bar },
+    { path: '/login', component: About },
     { path: '/foo', component: Foo },
     { path: '/bar', component: Bar },
-    { name: '/404', path: '*', component: Bar }
+    { name: '/404', path: '/:catchAll(.*)', component: NoPage }
 ]
 export default createRouter({
     history: createWebHashHistory(),

@@ -1,14 +1,16 @@
 <template>
   <el-menu
       style="border-right: none"
+      :uniqueOpened="true"
       :default-active="defaultActive"
-      @select="selectMenu"
       background-color="#001529"
       text-color="#c0c4cc"
+      active-text-color="#fff"
+      @select="selectMenu"
   >
-    <div v-for="(item, index) in menu" :key="index">
+    <template v-for="(item, index) in menu" :key="index">
       <el-submenu v-if="item.children&&item.children.length" :index="'/'+item.path">
-        <template slot="title">
+        <template #title>
           <i class="el-icon-location"></i>
           <span>{{item.name}}</span>
         </template>
@@ -18,14 +20,15 @@
       </el-submenu>
       <el-menu-item :index="'/'+item.path" v-else>
         <i class="el-icon-menu"></i>
-        <span slot="title">{{item.name}}</span>
+        <template #title>
+          <span>{{item.name}}</span>
+        </template>
       </el-menu-item>
-    </div>
-
+    </template>
   </el-menu>
 </template>
 <script>
-import { home as menu } from '../router'
+import menu from '../../router/home'
 export default {
   data(){
    return {
@@ -42,7 +45,7 @@ export default {
     }
   },
   methods: {
-    selectMenu(key, keyPath) {
+    selectMenu(key) {
       const path = '/home'+key
       if(path !== this.$route.path){
         this.$router.push({
@@ -56,13 +59,17 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style scoped lang="scss">
 ::v-deep{
   .el-submenu.is-opened{
-    background: red;
+    background: #ff5103;
   }
   .el-submenu:hover{
     color: #fff;
+  }
+  .el-menu-item:hover, .el-menu-item:focus {
+    outline: none;
+    background-color: #ff5103;
   }
 }
 </style>
