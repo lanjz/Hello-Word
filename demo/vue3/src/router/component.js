@@ -1,4 +1,4 @@
-
+import Table from '../components/Table'
 const IndexList = { template: '<div>IndexList</div>' }
 const Dialog = { template: '<div>Dialog</div>' }
 const diff = { template: '<div>diff</div>' }
@@ -18,6 +18,11 @@ export default {
             name: '弹层',
             path: 'dialog',
             component: Dialog
+        },
+        {
+            name: '表格',
+            path: 'table',
+            component: Table
         },
         {
             name: '首页3',

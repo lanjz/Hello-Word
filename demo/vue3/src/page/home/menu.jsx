@@ -50,7 +50,7 @@ export default {
   render(){
     const menuAttrs = {
       style: "border-right: none",
-      uniqueOpened: "true",
+      uniqueOpened: true,
       'default-active': this.defaultActive,
       'background-color':"#001529",
       'text-color':"#c0c4cc",
