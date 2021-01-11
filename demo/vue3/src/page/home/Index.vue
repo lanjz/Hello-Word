@@ -21,7 +21,7 @@
 </template>
 <script>
 import Header from './Header'
-import Menu from './menu'
+import Menu from './menu.jsx'
 export default {
   components: {
     Header,

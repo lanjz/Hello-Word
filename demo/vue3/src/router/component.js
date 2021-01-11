@@ -22,7 +22,7 @@ export default {
         {
             name: '首页3',
             path: 'posts',
-            component: diff
+            component: diff,
         }
     ]
 }

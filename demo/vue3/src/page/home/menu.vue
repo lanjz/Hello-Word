@@ -6,9 +6,9 @@
       background-color="#001529"
       text-color="#c0c4cc"
       active-text-color="#fff"
-      @select="selectMenu"
+      @select="pushRouter"
   >
-    <template v-for="(item, index) in menu" :key="index">
+    <template v-for="(item, index) in menuList" :key="index">
       <el-submenu v-if="item.children&&item.children.length" :index="'/'+item.path">
         <template #title>
           <i class="el-icon-location"></i>
@@ -29,47 +29,30 @@
 </template>
 <script>
 import menu from '../../router/home'
+import { useRouter, useRoute } from 'vue-router'
 export default {
-  data(){
-   return {
-     defaultActive: ''
-   }
-  },
-  computed: {
-    menu(){
-      return menu.children
-    },
-    curRoute(){
-      const { path } = this.$route
-      return path.substring(5)
-    }
-  },
-  methods: {
-    selectMenu(key) {
+  setup(){
+    const router = useRouter()
+    const route = useRoute()
+    const defaultActive = route.path.substring(5) || '/'
+    function pushRouter(key) {
       const path = '/home'+key
-      if(path !== this.$route.path){
-        this.$router.push({
+      if(path !== route.path){
+        router.push({
           path
         })
       }
-    },
-  },
-  mounted(){
-    this.defaultActive = this.$route.path.substring(5) || '/'
+    }
+    return {
+      menuList: menu.children,
+      defaultActive,
+      pushRouter
+    }
   }
 }
 </script>
 <style scoped lang="scss">
-::v-deep{
-  .el-submenu.is-opened{
-    background: #ff5103;
-  }
-  .el-submenu:hover{
-    color: #fff;
-  }
-  .el-menu-item:hover, .el-menu-item:focus {
-    outline: none;
-    background-color: #ff5103;
-  }
+:deep.el-menu-item.is-active{
+  background: #ff5103 !important;
 }
 </style>
