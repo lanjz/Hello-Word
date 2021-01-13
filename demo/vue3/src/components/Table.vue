@@ -1,5 +1,10 @@
 <template>
-  <HllTable :tableRow="tableRow" :tableData="tableData"></HllTable>
+  <HllTable
+      ref="hllTable"
+      :tableRow="tableRow"
+      :tableData="tableData"
+      :initialPageInfo="pageInfo"
+  ></HllTable>
 </template>
 
 <script>
@@ -60,7 +65,11 @@ export default {
         address: '上海市普陀区金沙江路 1518 弄',
         zip: 200333
       }
-      ]
+      ],
+      pageInfo: {
+        pageSize: 20,
+        pageNum: 2,
+      }
     }
   },
   components: {
@@ -77,5 +86,8 @@ export default {
       console.log('this.tableData', this.tableData)
     }
   },
+  mounted() {
+    console.log('this', this)
+  }
 }
 </script>

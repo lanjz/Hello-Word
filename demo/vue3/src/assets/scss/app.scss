@@ -80,23 +80,10 @@ code {
 .app-content{}
 .app-main{
   overflow: auto;
-  padding: 20px;
+  padding: 0 20px 20px 20px;
   min-width: 400px;
 }
-.app-logo{
-  height: 60px;
-  color: #fff;
-  font-size: 20px;
-  .logo{
-    height: 40px;
-    width: auto;
-    margin-left:20px;
-  }
-  .name{
-    margin-left: 10px;
-    font-size: 16px;
-  }
-}
+
 .app-menu{
   overflow: auto;
 }
@@ -154,4 +141,10 @@ code {
 }
 .pointer{
   cursor: pointer;
+}
+
+/*表格*/
+.app-table-pagination{
+  text-align: right;
+  margin-top: 10px;
 }

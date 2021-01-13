@@ -563,6 +563,7 @@ var Vue = (function (exports) {
   const shallowReadonlyGet = /*#__PURE__*/ createGetter(true, true);
   const arrayInstrumentations = {};
   ['includes', 'indexOf', 'lastIndexOf'].forEach(key => {
+    debugger
     const method = Array.prototype[key];
     arrayInstrumentations[key] = function (...args) {
       const arr = toRaw(this);
@@ -591,6 +592,7 @@ var Vue = (function (exports) {
   });
   function createGetter(isReadonly = false, shallow = false) {
     return function get(target, key, receiver) {
+      debugger
       if (key === "__v_isReactive" /* IS_REACTIVE */) {
         return !isReadonly;
       }
@@ -9287,6 +9289,7 @@ var Vue = (function (exports) {
     ensureHydrationRenderer().hydrate(...args);
   });
   const createApp = ((...args) => {
+    debugger
     const app = ensureRenderer().createApp(...args);
     {
       injectNativeTagCheck(app);

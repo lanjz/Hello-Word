@@ -19,9 +19,7 @@ window.onload = function (){
       }
     },
     mounted() {
-      setInterval(() => {
-        this.counter++
-      }, 1000)
+      console.log('this', this)
     }
   }
   let vm = Vue.createApp(CounterApp).mount('#counter')

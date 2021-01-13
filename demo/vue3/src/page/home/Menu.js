@@ -57,11 +57,13 @@ export default {
       'active-text-color':"#fff",
     }
     return (
-      <el-menu{...menuAttrs} onSelect={this.pushRouter}>
-        {
-          this.menuList.map((item, index) => <RenderMenu item={item} key={index}></RenderMenu>)
-        }
-      </el-menu>
+      <div className="app-menu-warp">
+        <el-menu{...menuAttrs} onSelect={this.pushRouter}>
+          {
+            this.menuList.map((item, index) => <RenderMenu item={item} key={index}></RenderMenu>)
+          }
+        </el-menu>
+      </div>
     )
   }
 }

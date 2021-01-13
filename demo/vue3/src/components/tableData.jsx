@@ -37,7 +37,6 @@ export default function (){
       fixed: 'right',
       label: "操作",
       prop: "zip",
-      width: "120",
       slot: () => {
         return {
           default: (scope) => [
