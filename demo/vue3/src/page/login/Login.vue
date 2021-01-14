@@ -1,7 +1,7 @@
 <template>
   <div class="login-wrap">
     <div class="login-form">
-      <div class="title">货拉拉司机管理系统</div>
+      <div class="title"></div>
       <div class="form-wrap">
         <el-form :model="loginForm" :rules="rules" ref="loginForm" label-width="50px">
           <el-form-item label="账号" prop="username">
@@ -65,7 +65,6 @@ export default {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: url(//s-oms.huolala.cn/static/cdn/img/login_bg.jpg) no-repeat 50%;
   background-size: cover;
   .login-form{
     position: absolute;

@@ -2,12 +2,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 let devEvn = 'dev'
-export const baseUrl = {
-	local: 'http://10.129.35.47',
-	dev: 'https://pos-dev.huolala.cn/gateway',
-	test: 'https://pos-stg.huolala.cn/gateway',
-	pro: 'https://pos.huolala.cn/gateway',
-}
+export const baseUrl = {}
 const http = new axios.create({
 	baseURL: `${baseUrl[process.env.BUILD_ENV || devEvn]}/pos-admin`
 });
