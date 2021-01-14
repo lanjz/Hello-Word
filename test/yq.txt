@@ -3,121 +3,146 @@
 	"emptLineMap": {
 		"col2": [0, 0],
 		"col0": [],
-		"col1": [0, 0]
+		"col1": []
 	},
 	"userInfo": {
-		"loginType": "01",
-		"customid": "5017052760227373",
-		"usernumber": "186119823553",
-		"currentID": "186119823553",
+		"usernumber": "18649823553",
+		"currentID": "18649823553",
 		"nettype": "11",
 		"paytype": "2",
 		"provincecode": "038",
 		"citycode": "380",
-		"packageName": "畅越冰激凌5G套餐119元",
-		"expireTime": "1608044821025",
+		"loginType": "01",
+		"customid": "5017052760227373",
+		"productType": "01",
+		"expireTime": "1610620060796",
 		"areaCode": "",
 		"custlvl": "三星忠诚用户",
 		"certnum": "5002****3126",
 		"opendate": "20130921183308",
-		"productId": "186119823553",
+		"productId": "18649823553",
 		"packageID": "90934644",
 		"custName": "杨钰琴",
 		"certaddr": "大昌**********",
 		"brand": "4G00",
-		"productType": "01",
-		"subscrbstat": "开通",
-		"certtype": "11",
-		"is_wo": "2",
 		"nickName": "y*琴",
-		"laststatdate": "20201202221922",
+		"laststatdate": "20210103185627",
 		"brand_name": "联通5G",
 		"is_20": false,
 		"is_36": false,
+		"subscrbstat": "开通",
+		"certtype": "11",
+		"is_wo": "2",
+		"lastLoginTime": "2021-01-04 00:38:14",
+		"defaultFlag": "00",
+		"isINUser": "0000",
+		"verifyState": "",
 		"natureQueryNumberInfo": {
-			"number_info": [],
-			"rsp_code": "0000",
-			"cert_name": "杨******",
-			"rsp_desc": "正常/成功",
+			"part_id": "1-5******126",
 			"cert_type": "01",
 			"cert_number": "500******126",
-			"part_id": "1-5******126"
+			"number_info": [],
+			"rsp_code": "0000",
+			"rsp_desc": "正常/成功",
+			"cert_name": "杨******"
 		},
-		"lastLoginTime": "2020-12-15 12:27:41",
-		"isINUser": "0000",
-		"defaultFlag": "00",
 		"loginCustid": "5017052760227373",
-		"verifyState": "",
-		"mapExtraParam_rls": "01",
+		"encryptCert": "qCMH3szBB0OsDUiO4CbS8/2CTgV1izd+CJ9zTYOIiKRHQksXDUcwNEkOV2D52jgAKWZ1jANss3mYlr8kh4xOmYAa+nhfvqG9dyLcxp3QFBJxCFvK9NCmL9WHbMRxfS5lnLeDU0oCAC6m/2qroCsXPZSvmlqiZIQALyzl4AiUz8o=",
+		"mapExtraParam_rls": "06",
 		"custsex": "1",
-		"encryptCert": "da98dXo/F6xmZfNBnR7nfOHE9vskVVJjTjYES07Yh8YsPnMwiDn1AVtjUJxSehyCTXgxv8mFqf/KJgJiwwn4pIzU4WGWle/adYNglUEVxpp/aIQK9Wga4uiaoMMXj5/9Xm/mQbJ+iQ9AT54BPEvMnvDu3nd0JGD2ymAOQbvDFGQ=",
-		"status": "开通"
+		"status": "开通",
+		"packageName": "畅越冰激凌5G套餐49元"
 	},
 	"separateShow": false,
 	"totalMonthData": [{
-		"fee": "119.70",
-		"cycleid": "201912"
-	}, {
-		"fee": "119.30",
+		"fee": "36.30",
 		"cycleid": "202001"
 	}, {
-		"fee": "119.10",
+		"fee": "36.10",
 		"cycleid": "202002"
 	}, {
-		"fee": "119.70",
+		"fee": "36.70",
 		"cycleid": "202003"
 	}, {
-		"fee": "119.40",
+		"fee": "36.40",
 		"cycleid": "202004"
 	}, {
-		"fee": "119.30",
+		"fee": "36.30",
 		"cycleid": "202005"
 	}, {
-		"fee": "119.40",
+		"fee": "36.40",
 		"cycleid": "202006"
 	}, {
-		"fee": "119.90",
+		"fee": "36.90",
 		"cycleid": "202007"
 	}, {
-		"fee": "119.00",
+		"fee": "36.00",
 		"cycleid": "202008"
 	}, {
-		"fee": "119.50",
+		"fee": "36.50",
 		"cycleid": "202009"
 	}, {
-		"fee": "119.50",
+		"fee": "41.50",
 		"cycleid": "202010"
 	}, {
 		"fee": "119.00",
 		"cycleid": "202011"
+	}, {
+		"fee": "119.10",
+		"cycleid": "202012"
 	}],
 	"billList": [{
+		"discnt": "",
 		"amount": "119.00",
 		"leve": "",
+		"lineSize": 2,
+		"integrateItemCode": "1001",
+		"childCount": 1,
 		"lines": [{
+			"discnt": "",
 			"amount": "119.00",
 			"leve": "-",
+			"lineSize": 1,
+			"integrateItemCode": "21229",
+			"childCount": 0,
 			"lines": [],
 			"allLineCount": 1,
-			"integrateItemCode": "21229",
 			"usedCount": "--",
-			"discnt": "",
-			"lineSize": 1,
-			"childCount": 0,
 			"name": "基本套餐费"
 		}],
 		"allLineCount": 2,
-		"integrateItemCode": "1001",
 		"usedCount": "--",
-		"discnt": "",
-		"lineSize": 2,
-		"childCount": 1,
 		"name": "月固定费"
+	}, {
+		"discnt": "",
+		"amount": "0.10",
+		"leve": "",
+		"lineSize": 2,
+		"integrateItemCode": "1002",
+		"childCount": 1,
+		"lines": [{
+			"discnt": "",
+			"amount": "0.10",
+			"leve": "-",
+			"lineSize": 1,
+			"integrateItemCode": "921271",
+			"childCount": 0,
+			"lines": [],
+			"allLineCount": 1,
+			"usedCount": "--",
+			"name": "点对点彩信"
+		}],
+		"allLineCount": 2,
+		"usedCount": "--",
+		"name": "增值业务费"
 	}],
 	"datList": [{
-		"dat": "202011",
-		"datfmt": "2020年11月",
+		"dat": "202012",
+		"datfmt": "2020年12月",
 		"cls": "on"
+	}, {
+		"dat": "202011",
+		"datfmt": "2020年11月"
 	}, {
 		"dat": "202010",
 		"datfmt": "2020年10月"
@@ -148,94 +173,111 @@
 	}, {
 		"dat": "202001",
 		"datfmt": "2020年01月"
-	}, {
-		"dat": "201912",
-		"datfmt": "2019年12月"
 	}],
 	"isDiscount": "",
 	"result": {
 		"balance": "0.00",
 		"areaCode": "0591",
 		"scoreInfo": [{
-			"rsRvScoreAdjust": "0",
 			"rsRvScore3": "0",
 			"rsRvScore2": "0",
+			"rsRvScoreAdjust": "0",
 			"rsRvScore1": "0",
 			"scoreUseValue": "0",
 			"scoreIdleValue": "0"
 		}],
 		"userId": "3817122330422201",
-		"cycleId": "202011",
-		"acctClass": [{
-			"fee": "119.70",
-			"cycleid": "201912"
-		}, {
-			"fee": "119.30",
-			"cycleid": "202001"
-		}, {
-			"fee": "119.10",
-			"cycleid": "202002"
-		}, {
-			"fee": "119.70",
-			"cycleid": "202003"
-		}, {
-			"fee": "119.40",
-			"cycleid": "202004"
-		}, {
-			"fee": "119.30",
-			"cycleid": "202005"
-		}, {
-			"fee": "119.40",
-			"cycleid": "202006"
-		}, {
-			"fee": "119.90",
-			"cycleid": "202007"
-		}, {
-			"fee": "119.00",
-			"cycleid": "202008"
-		}, {
-			"fee": "119.50",
-			"cycleid": "202009"
-		}, {
-			"fee": "119.50",
-			"cycleid": "202010"
-		}, {
-			"fee": "119.00",
-			"cycleid": "202011"
-		}],
-		"billInfo": [{
-			"fee": "119.00",
-			"balance": "",
-			"parentItemCode": "-1",
-			"integrateItem": "月固定费",
-			"usedValue": "",
-			"integrateItemCode": "1001",
-			"adjustAfter": "",
-			"discnt": "",
-			"adjustBefore": ""
-		}, {
-			"fee": "119.00",
-			"balance": "",
-			"parentItemCode": "1001",
-			"integrateItem": "基本套餐费",
-			"usedValue": "",
-			"integrateItemCode": "21229",
-			"adjustAfter": "",
-			"discnt": "",
-			"adjustBefore": ""
-		}],
-		"allFee": "119.00",
-		"writeOffFee": "119.00",
-		"recvFeeUsed": "119.00",
-		"presentFeeUsed": "0.00",
+		"cycleId": "202012",
 		"resultMemo": "备注信息",
 		"adjustFee": "0.00",
 		"backFee": "0.00",
 		"actionFeeUsed": "0.00",
 		"derateFee": "0.00",
-		"serialNumber": "186119823553",
+		"billInfo": [{
+			"discnt": "",
+			"fee": "119.00",
+			"balance": "",
+			"parentItemCode": "-1",
+			"integrateItemCode": "1001",
+			"integrateItem": "月固定费",
+			"usedValue": "",
+			"adjustAfter": "",
+			"adjustBefore": ""
+		}, {
+			"discnt": "",
+			"fee": "119.00",
+			"balance": "",
+			"parentItemCode": "1001",
+			"integrateItemCode": "21229",
+			"integrateItem": "基本套餐费",
+			"usedValue": "",
+			"adjustAfter": "",
+			"adjustBefore": ""
+		}, {
+			"discnt": "",
+			"fee": "0.10",
+			"balance": "",
+			"parentItemCode": "-1",
+			"integrateItemCode": "1002",
+			"integrateItem": "增值业务费",
+			"usedValue": "",
+			"adjustAfter": "",
+			"adjustBefore": ""
+		}, {
+			"discnt": "",
+			"fee": "0.10",
+			"balance": "",
+			"parentItemCode": "1002",
+			"integrateItemCode": "921271",
+			"integrateItem": "点对点彩信",
+			"usedValue": "",
+			"adjustAfter": "",
+			"adjustBefore": ""
+		}],
+		"allFee": "119.10",
+		"acctClass": [{
+			"fee": "36.30",
+			"cycleid": "202001"
+		}, {
+			"fee": "36.10",
+			"cycleid": "202002"
+		}, {
+			"fee": "36.70",
+			"cycleid": "202003"
+		}, {
+			"fee": "36.40",
+			"cycleid": "202004"
+		}, {
+			"fee": "36.30",
+			"cycleid": "202005"
+		}, {
+			"fee": "36.40",
+			"cycleid": "202006"
+		}, {
+			"fee": "36.90",
+			"cycleid": "202007"
+		}, {
+			"fee": "36.00",
+			"cycleid": "202008"
+		}, {
+			"fee": "36.50",
+			"cycleid": "202009"
+		}, {
+			"fee": "41.50",
+			"cycleid": "202010"
+		}, {
+			"fee": "119.00",
+			"cycleid": "202011"
+		}, {
+			"fee": "119.10",
+			"cycleid": "202012"
+		}],
+		"writeOffFee": "119.10",
+		"recvFeeUsed": "119.10",
+		"presentFeeUsed": "0.00",
+		"serialNumber": "18649823553",
 		"success": true,
-		"busiOrder": "BUSI012012152107180437314364",
+		"busiOrder": "BUSI012101141627520384677133",
 		"respCode": "0000",
 		"respDesc": "成功"
 	},
@@ -245,8 +287,8 @@
 		"usedScore": 0
 	},
 	"success": true,
-	"curDate": "202011",
-	"queryTime": "查询时间：2020年12月15日 21:07:18",
+	"curDate": "202012",
+	"queryTime": "查询时间：2021年01月14日 16:28:08",
 	"isForTotal": "",
 	"LoginType": "01",
 	"groupInfo": null
