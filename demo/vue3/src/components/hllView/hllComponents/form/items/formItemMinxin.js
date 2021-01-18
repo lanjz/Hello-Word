@@ -30,7 +30,8 @@ export default {
       immediate: true
     },
     'modelData.name': function (val){
-      this.$emit('input', val)
+      console.log('modelData.name', val)
+      this.$emit('update:modelValue', val)
     },
     value: {
       handler: function (val){

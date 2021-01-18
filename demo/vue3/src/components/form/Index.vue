@@ -1,19 +1,17 @@
 <template>
 <div>
   <HllForm
+      ref="curFrom"
       :formConfig="forConfig"
       v-model="formDate"
+      label-width="80px"
   ></HllForm>
-  <Test
-      v-model="formDate"
-  ></Test>
 </div>
 </template>
 
 <script>
 import HllForm from '../../components/hllView/hllComponents/form/Form'
 import { formConfig } from './createFormConfig'
-import Test from './test'
 export default {
   name: "Index",
   data(){
@@ -26,7 +24,6 @@ export default {
   },
   components: {
     HllForm,
-    Test
   },
   watch: {
     formDate: {
@@ -34,7 +31,6 @@ export default {
         console.log('watcg', this.formDate)
       },
       deep: true,
-      immediate: true
     },
     age: function (){
       console.log('age', this.age)
@@ -43,6 +39,15 @@ export default {
   computed: {
     forConfig(){
       return formConfig.call(this)
+    },
+  },
+  methods: {
+    validform(){
+      console.log('this.$refs[\'curFrom\']', this.$refs['curFrom'])
+      this.$refs['curFrom'].validate()
+      .then(res => {
+        console.log('res', res)
+      })
     }
   },
   mounted() {
