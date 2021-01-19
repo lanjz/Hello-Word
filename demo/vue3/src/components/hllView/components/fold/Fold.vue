@@ -6,7 +6,7 @@
         <slot></slot>
       </div>
     </div>
-    <div class="fold-toggle" v-if="!disable&&isOverflow" :style="{'height': cssHeight}" >
+    <div class="fold-toggle" v-if="!disable&&isOverflow" >
       <span v-if="hide" @click="hide=false">更多选项</span>
       <span v-else @click="hide=true">收起</span>
     </div>
@@ -23,7 +23,16 @@
 <script>
 export default {
   name: "Fold",
-  props: ['height', 'type', 'hideAction', 'disable'],
+  props: {
+    height: {
+      default(){
+        return '57'
+      }
+    },
+    type: {},
+    hideAction: {},
+    disable: {},
+  },
   data(){
     return {
       cssHeight: (/\d$/).test(this.height)? this.height + 'px' : this.height,
@@ -63,10 +72,9 @@ export default {
         this.cssHeight = this.hideHeight = clientHeight+'px'
         this.update()
       }
-
     }
   },
-  destroyed(){
+  unmounted(){
     window.removeEventListener('resize', this.update)
   }
 }
@@ -92,33 +100,21 @@ input{
   display: flex;
   align-items: center;
   padding: 0 7px;
+  flex-shrink: 0;
+  height: 40px;
   span{
     word-break: break-all;
     display: inline-block;
     color: #f16622;
     cursor: pointer;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    width: 60px;
+    //overflow: hidden;
+    //white-space: nowrap;
+    //text-overflow: ellipsis;
+    //width: 60px;
     text-align: center;
   }
 }
-.fold-action{
-  //align-items: center;
+:deep.el-button.el-button--default {
+  background: #dcdfe6;
 }
-::v-deep{
-  .el-button.el-button--default {
-    background: #dcdfe6;
-  }
-}
-</style>
-
-<style lang="scss" scoped>
-.searchPanel{
-  ::v-deep{
-
-  }
-}
-
 </style>

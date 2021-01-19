@@ -1,22 +1,48 @@
 import { ref } from 'vue'
 import Input from './items/Input'
+import DatePicker from './items/DatePicker'
+import Radio from './items/Radio'
+import './hll-form.scss'
 const formMap = {
   input: Input,
+  datePicker: DatePicker,
+  radio: Radio,
 }
 
-function layout({inline, itemOffset, itemSpan, globalOffset, globalSpan}){
-  let attr = {
-    style: {}
+function setLayout(data){
+  const {inline, itemOffset, itemSpan, globalOffset, globalSpan} = data
+  let style = {}
+  let span = itemSpan || globalSpan || (inline ? NaN : 24)
+  let offset = itemOffset || globalOffset || NaN
+  if(offset){
+    if((offset+'').indexOf('px') > -1){ // 带px 设置样式
+      style.marginLeft = offset
+      offset = undefined
+    } else {
+      offset = +offset // 设置珊格需要为number 类型
+    }
   }
-  let span = ''
-  let offset = itemOffset || globalOffset || ''
-  if(offset&&(offset+'').indexOf('px') < -1){ // 为纯数字，设置珊格属性
-    attr.offset = offset
-  } else { // 带px 设置样式
-    style.marginLeft =offset
+  if(span){
+    if((span+'').indexOf('px') > -1){ // 带px设置样式
+      style.width = offset
+      style.flex = 'none'
+      span = undefined
+    } else {
+      span = +span  // 设置珊格需要为number 类型
+    }
+  }
+  const result = { style }
+  if(offset){
+    result.offset = offset
   }
   if(inline){ // 如果设置了表单为内联形式，则不设置栅格
-    return attr
+    result.style.flex='none'
+    return result
+  } else {
+    if(span){
+      result.span = span
+    }
+    return result
   }
 }
 
@@ -30,27 +56,13 @@ function RenderItem({ inline, formItemData, formData, globalOffset, globalSpan }
     itemSpan,
     ...itemData // 运用表单项中的属性
   } = formItemData
-  const offset = itemOffset || globalOffset || ''
   let Item = formMap[type]
   if(Item || itemSlot){
-    const getSpan = itemSpan || globalSpan || ''
-    let span = 24
-    if(inline){
-      span = null
-    } else if(getSpan){
-      span = {span &&(span+'').indexOf('px')<0 ? +span : null}
-    }
+    const layoutAttr = setLayout({ inline,itemOffset, itemSpan, globalOffset, globalSpan })
     return (
       <el-col
         key={itemData.model}
-        style={
-          {
-            marginLeft: (offset+'').indexOf('px')>-1 ? offset : '',
-            width: (span+'').indexOf('px')>-1 ? span : '',
-          }
-        }
-        span={span&&(span+'').indexOf('px')<0 ? +span : null}
-        offset={offset&&(offset+'').indexOf('px')<0 ? +offset : null}
+        {...layoutAttr}
       >
         {
           itemSlot
@@ -104,7 +116,7 @@ export default {
   render () {
     if(!this.modelValue) return null
     return (
-      <el-form model={this.modelValue} ref="hllViewFrom" inline={this.inline}>
+      <el-form class="hll-from-container" model={this.modelValue} ref="hllViewFrom" inline={this.inline}>
         <el-row>
           {
             this.formConfig.map((item, index) => (
@@ -122,6 +134,7 @@ export default {
           }
         </el-row>
       </el-form>
+
     )
   }
 }

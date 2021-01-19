@@ -5,14 +5,13 @@ export default {
     formItemData: {},
     modelValue: {},
   },
-  setup () {},
-  render () {
-    const { modelValue } = this
+  setup() {},
+  render() {
     const { model, slot, ...attrs } = this.formItemData
     return (
       <el-input
         {...attrs}
-        vModel={modelValue[model]}
+        vModel={this.modelValue[model]}
         v-slots={slot ? slot() : null}
       >
       </el-input>

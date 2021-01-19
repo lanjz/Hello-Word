@@ -38,6 +38,9 @@ code {
 .flex.flex-column{
   flex-direction: column;
 }
+.flex.between{
+  justify-content: space-between;
+}
 .text-ellipsis{
   overflow:hidden;
   text-overflow:ellipsis;
@@ -147,4 +150,11 @@ code {
 .app-table-pagination{
   text-align: right;
   margin-top: 10px;
+}
+.search-container{
+  background: #fff;
+  padding: 15px 20px 0 20px;
+}
+.table-container{
+  margin-top: 20px;
 }

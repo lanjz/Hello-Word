@@ -1082,7 +1082,7 @@ console.log(bar(7)); // 返回 42
 
 异步任务可分为两类：微任务（`micro task`）和宏任务（`macro task`）
 
-microtask（又称为宏任务）：script(整体代码)、`setTimeout`、`setInterval`、`I/O`、`UI交互事件`、`postMessage`、`MessageChannel`、`setImmediate`(Node.js 环境)
+macrotask（又称为宏任务）：script(整体代码)、`setTimeout`、`setInterval`、`I/O`、`UI交互事件`、`postMessage`、`MessageChannel`、`setImmediate`(Node.js 环境)
 
 microtask（又称为微任务）: `Promise.then`、`MutaionObserver`、`process.nextTick`(Node.js 环境)
 

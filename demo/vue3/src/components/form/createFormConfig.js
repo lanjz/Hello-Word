@@ -5,7 +5,13 @@ export function formConfig() {
       type: 'input',
       model: 'name',
       placeholder: '销售城市',
-      rules: [{ required: true, message: '请输入活动名称', trigger: 'blur' }]
+      'suffix-icon':"el-icon-date",
+      rules: [{ required: true, message: '请输入活动名称', trigger: 'blur' }],
+      slot: () => (
+        {
+          prepend: [<div>A</div>]
+        }
+      )
     },
     {
       label:"姓名",
@@ -19,7 +25,7 @@ export function formConfig() {
       type: 'input',
       model: 'age3',
       placeholder: '请输入姓名',
-      rules: [{ required: true, message: '请输入姓名', trigger: 'blur' }]
+      rules: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
     },
   ]
 }

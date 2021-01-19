@@ -5,6 +5,7 @@
       :formConfig="forConfig"
       v-model="formDate"
       label-width="80px"
+      inline
   ></HllForm>
 </div>
 </template>
