@@ -51,7 +51,7 @@ export default {
       'max-height': "650",
     }
     return (
-      <>
+      <div>
         <el-table
           {...tableAttrs}
         >
@@ -80,7 +80,7 @@ export default {
             onSizeChange={this.handleSizeChange}
         ></el-pagination>
       </div>
-      </>
+      </div>
     )
   }
 }

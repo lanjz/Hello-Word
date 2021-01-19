@@ -2,11 +2,13 @@ import { ref } from 'vue'
 import Input from './items/Input'
 import DatePicker from './items/DatePicker'
 import Radio from './items/Radio'
+import Select from './items/Select'
 import './hll-form.scss'
 const formMap = {
   input: Input,
   datePicker: DatePicker,
   radio: Radio,
+  select: Select,
 }
 
 function setLayout(data){

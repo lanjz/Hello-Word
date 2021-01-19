@@ -32,6 +32,7 @@ export default {
   setup(){
     const router = useRouter()
     const route = useRoute()
+    console.log('router', router)
     const defaultActive = route.path.substring(5) || '/'
     function pushRouter(key) {
       const path = '/home'+key

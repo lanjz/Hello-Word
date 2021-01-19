@@ -867,7 +867,7 @@ Scope chain = Activation object + [[Scope]]
 作用域链 = 活动对象 + [[Scope]]
 ```
 
-EMCAScript使用静态作用域，即作用是在函数创建产生，且不会被改变
+EMCAScript使用静态作用域，即作用域是在函数创建产生，且不会被改变
 
 ```js
 function foo() {

@@ -1,6 +1,7 @@
 import component from './component'
 import vueApi from './vue-api'
 import dataBoard from './dataBoard'
+import resourceMange from './resourceManage'
 import Home from '../page/home/Index';
 const Foo = { template: '<div>foo</div>' }
 export default {
@@ -15,6 +16,7 @@ export default {
     },
     component,
     vueApi,
-    dataBoard
+    dataBoard,
+    resourceMange,
   ]
 }
