@@ -7,7 +7,8 @@ import Modal from './hllComponents/modal/Modal'
 import Neat from './hllComponents/neat/Neat'
 import NeatItem from './hllComponents/neat/NeatItem'
 import HllTable from './hllComponents/table/HllTable'
-/*import HllUpload from './hllComponents/upload/HllUpload'
+import HllUpload from './hllComponents/upload/HllUpload'
+/*
 import PreviewFile from './hllComponents/preivew/PreviewFile'
 import PreviewImage from './hllComponents/preivew/PreviewImage'
 */
@@ -21,7 +22,8 @@ const components = [
   Modal,
   Neat,
   NeatItem,
-/*  HllUpload,
+  HllUpload,
+/*
   PreviewFile,
   PreviewImage,*/
   Form,

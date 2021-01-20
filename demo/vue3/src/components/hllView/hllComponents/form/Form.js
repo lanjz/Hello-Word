@@ -118,7 +118,7 @@ export default {
   render () {
     if(!this.modelValue) return null
     return (
-      <el-form class="hll-from-container" model={this.modelValue} ref="hllViewFrom" inline={this.inline}>
+      <el-form class="hll-form-container" model={this.modelValue} ref="hllViewFrom" inline={this.inline}>
         <el-row>
           {
             this.formConfig.map((item, index) => (

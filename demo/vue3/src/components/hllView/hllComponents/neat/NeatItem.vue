@@ -1,5 +1,5 @@
 <template>
-  <div class="hll-neat-item" :class="{'align-center': !!alignCenter}">
+  <el-col v-bind="$attrs" :span="12" class="hll-neat-item" :class="{'align-center': !!alignCenter}">
     <div class="label">
       <span v-if="label">{{label||''}}</span>
       <slot name="label"></slot>
@@ -7,20 +7,20 @@
     <div class="value">
       <slot></slot>
     </div>
-  </div>
+  </el-col>
 </template>
 
 <script>
 export default {
   name: "HllNeatItem",
   componentAlias: "HllNeatItem",
-  props: ['label', 'alignCenter']
+  props: ['label', 'alignCenter'],
+
 }
 </script>
 
 <style scoped lang="scss">
 .hll-neat-item{
-  width: 50%;
   margin-bottom: 10px;
   display: flex;
   flex-wrap: wrap;

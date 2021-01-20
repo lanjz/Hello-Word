@@ -1,7 +1,7 @@
 <template>
-  <div class="neat-wrap">
+  <el-row>
     <slot></slot>
-  </div>
+  </el-row>
 </template>
 
 <script>
@@ -10,11 +10,3 @@ export default {
   componentAlias: "HllNeat",
 }
 </script>
-
-<style scoped>
-.neat-wrap{
-  width: 100%;
-  display: inline-flex;
-  flex-wrap: wrap;
-}
-</style>

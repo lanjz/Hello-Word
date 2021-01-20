@@ -22,8 +22,11 @@
 
 </template>
 <script>
-import { delUploadFile } from '@/api/common';
-import _ from 'lodash';
+function delUploadFile(){}
+function cloneDeep(tar){
+  if(typeof tar !== 'object') return tar
+  return JSON.parse(JSON.stringify(tar))
+}
 let acceptFiles = [
   '.JPG', '.PNG', '.JPEG', '.GIF',
   '.PDF', '.XLSX', '.XLS', '.DOC',
@@ -92,7 +95,7 @@ export default {
     // 手动上传
     submit() {
       const find = this.$refs.elUpload.uploadFiles.find(item => item.status === 'ready')
-      if(!!find){
+      if(find){
         this.$refs.elUpload.submit();
       } else {
         this.$message.error('没有需要上传的文件');
@@ -190,11 +193,11 @@ export default {
         this.isLoading = false
         const errInfo = []
         this.submitResult.forEach(item => {
-          if(!!item.err){
+          if(item.err){
             errInfo.push(item.data.file.name)
           }
         })
-        this.fsList = _.cloneDeep(fileList.filter(item => {
+        this.fsList = cloneDeep(fileList.filter(item => {
           if(!item.row && item.url){
             return true
           }
@@ -220,14 +223,14 @@ export default {
     },
     // 保存最后的文件状态，用于还原使用
     saveLastFileList(fileList){
-      this.lastFileList = _.cloneDeep(fileList)
+      this.lastFileList = cloneDeep(fileList)
     },
     handleError(err) {
       this.isLoading = false
       let errMsg = err.type ? err.type : err
       this.$message.error(errMsg);
       this.$emit('uploadResult', [{err: errMsg}]);
-      this.fsList = _.cloneDeep(this.getValidValue()) //  上传失败还原最初的列表
+      this.fsList = cloneDeep(this.getValidValue()) //  上传失败还原最初的列表
     },
     getValidValue(fileList = this.value){
       // 在手动上传的情况下，双向绑定的值可能会存在未上传的文件
@@ -236,7 +239,7 @@ export default {
       return originFile
     },
     resetFs(){
-      this.fsList = _.cloneDeep(this.lastFileList||this.getValidValue()||[])
+      this.fsList = cloneDeep(this.lastFileList||this.getValidValue()||[])
     },
     // 查看文件
     handlePreview(file) {
