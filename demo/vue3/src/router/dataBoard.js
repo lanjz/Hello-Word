@@ -22,7 +22,7 @@ export default {
     },
     {
       name: '异常司机',
-      path: 'driver-abnormal',
+      path: 'accout-abnormal',
       component: AbnormalDriver
     },
     {
@@ -32,7 +32,7 @@ export default {
     },
     {
       name: '司机详情',
-      path: 'driver-detail',
+      path: 'accout-detail',
       component: DriverDetail
     }
   ]

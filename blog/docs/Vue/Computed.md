@@ -529,3 +529,5 @@ this.cleanupDeps();
  # 总结
 
  通过 `Object.defineProperty(target, key, sharedPropertyDefinition);` 方法，当前访问 `compunted` 上的属性时，将被代理到这个 `compunted` 属性对应的 `Watcher` 上，然后通过 ` watcher.evaluate()` 执行对应原 `compunted` 计算方法求值
+ 
+ `conputed` 依赖的属性会收集 `render Watcher`，所以这些依赖的属性更新时会重新渲染组件，在渲染组件的过程中会访问到 `computed` 属性，再计算对应的方法返回得到值

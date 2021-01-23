@@ -14,7 +14,7 @@ export default {
     },
     {
       name: '司机管理',
-      path: 'driver',
+      path: 'accout',
       component: Driver
     }
   ]

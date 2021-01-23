@@ -4,7 +4,7 @@
 
 Vue 中使用 `Virtual Dom` 的概念，它表示 DOM 节点的 JavaScript 对象，一个 `Virtual Dom` 节点包含相应 DOM 节点的 `标签`，`属性`，`子节点`，`事件` 等的属性，它是对真实 DOM 节点的抽象表示。
 
-Vue 在更新视图的时候在，并不是直接 DOM 上进行更新，而是先在 `Virtual Dom` 上进行相应的更新操作，最后再映射到真实 DOM 中
+Vue 在更新视图的时候在，并不是直接 DOM 上进行更新，而是先在 `Virtual Dom` 上进行相应从上面代码可以看到判断新旧相同的规则为的更新操作，最后再映射到真实 DOM 中
 
 ### Virtual DOM的优点
 
@@ -261,7 +261,7 @@ function patch (oldVnode, vnode, hydrating, removeOnly) {
 
 1. 首先判断 `key` 是否相同，如果都没有 `key` （都是 `undefined`），获取有相同的 `key`，则继续往下判断
 
-2. 判断 `tag`、`isComment`、`data`属性是否相同，如果是 `input` 元素则还对通过 `sameInputType`, 判断是否是相同的表单
+2. 判断 `tag`、`isComment`、`data`(是否都存在)是否相同，如果是 `input` 元素则还对通过 `sameInputType`, 判断是否是相同的表单
 
 ### patchVnode
 
