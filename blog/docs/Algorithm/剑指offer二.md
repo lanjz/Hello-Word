@@ -379,6 +379,217 @@ var missingNumber = function(nums) {
 };
 ```
 
+## 整数反转
+
+给你一个 32 位的有符号整数 x ，返回 x 中每位上的数字反转后的结果。
+
+如果反转后整数超过 32 位的有符号整数的范围 [−231,  231 − 1] ，就返回 0
+
+假设环境不允许存储 64 位整数（有符号或无符号）。
+ 
+
+示例 1：
+
+```
+输入：x = 123
+输出：321
+```
+
+示例 2：
+
+```
+输入：x = -123
+输出：-321
+```
+
+示例 3：
+
+```
+输入：x = 120
+输出：21
+```
+
+示例 4：
+
+```
+输入：x = 0
+输出：0
+```
+
+```js
+/**
+ * @param {number} x
+ * @return {number}
+ */
+var reverse = function(x) {
+    let result = 0;
+    while(x !== 0) {
+        result = result * 10 + x % 10;
+        x = (x / 10) | 0;
+    }
+    return (result | 0) === result ? result : 0;
+};
+```
+
+思路：
+
+1. `result * 10 + x % 10` 取出末位 `x % 10`（负数结果还是负数，无需关心正负），拼接到 `result` 中。
+
+2. `x / 10` 去除末位，`| 0` 强制转换为32位有符号整数。
+
+3. 通过 `| 0` 取整，无论正负，只移除小数点部分（正数向下取整，负数向上取整）。
+
+4. `result | 0` 超过32位的整数转换结果不等于自身，可用作溢出判断。
+
+## 回文数
+
+判断一个整数是否是回文数。回文数是指正序（从左向右）和倒序（从右向左）读都是一样的整数。
+
+示例 1:
+
+```
+输入: 121
+输出: true
+```
+
+示例 2:
+
+```
+输入: -121
+输出: false
+解释: 从左向右读, 为 -121 。 从右向左读, 为 121- 。因此它不是一个回文数。
+```
+
+示例 3:
+
+```
+输入: 10
+输出: false
+解释: 从右向左读, 为 01 。因此它不是一个回文数。
+```
+
+解
+
+```js
+/**
+ * @param {number} x
+ * @return {boolean}
+ */
+var isPalindrome = function(x) {
+    if(x < 0) return false
+    let _x = x
+    let result = 0
+    while(_x){
+        result = result*10+_x%10
+        _x = (_x/10)|0
+    }
+    return result === x? true: false
+};
+```
+
+给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串，判断字符串是否有效。
+
+## 有效的括号
+
+有效字符串需满足：
+
+左括号必须用相同类型的右括号闭合。
+左括号必须以正确的顺序闭合。
+注意空字符串可被认为是有效字符串。
+
+示例 1:
+
+```
+输入: "()"
+输出: true
+```
+
+示例 2:
+
+```
+输入: "()[]{}"
+输出: true
+```
+
+示例 3:
+
+```
+输入: "(]"
+输出: false
+```
+
+示例 4:
+
+```
+输入: "([)]"
+输出: false
+```
+
+示例 5:
+
+```
+输入: "{[]}"
+输出: true
+```
+
+解
+
+```js
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isValid = function(s) {
+    if(s.length < 2) return false
+    let stack = []
+    for(let i of s){
+        if((i == '{' || i == '[' || i == '(')){
+            stack.push(i)
+        } else if(i === ']'&&stack.pop() !== '['){
+            return false
+        } else if(i === '}'&&stack.pop() !== '{'){
+            return false
+        } else if(i === ')'&&stack.pop() !== '('){
+            return false
+        }
+    }
+    return stack.length ? false : true
+};
+```
+
+## 最大子序和
+
+给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+
+示例:
+
+```
+输入: [-2,1,-3,4,-1,2,1,-5,4]
+输出: 6
+解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+```
+
+进阶:
+
+如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解
+
+解一：动态规划
+
+```js
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxSubArray = function(nums) {
+    let pre = 0, max = nums[0]
+    for(let i of nums){
+        pre = Math.max(pre+i, i)
+        max = Math.max(pre, max)
+    }
+    return max
+};
+```
+
 https://leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/solution/zui-xiao-de-kge-shu-by-leetcode-solution/
 
 https://github.com/yugef3h/leetcode-cn-js

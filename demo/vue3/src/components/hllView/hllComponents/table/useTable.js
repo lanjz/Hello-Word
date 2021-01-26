@@ -52,10 +52,11 @@ const data = [
       zip: 200333
     }
   ]
-export default function usePagination(paging) {
+export default function usePagination(paging, formDate) {
   const dataTotal = ref(0)
   const tableData = ref([])
   const fetchData = function (){
+    console.log('formDate', formDate)
     console.log('paging', paging)
     dataTotal.value = 50
     tableData.value = data

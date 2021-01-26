@@ -1,3 +1,4 @@
+import { toRefs  } from 'vue'
 import usePagination from './usePagination'
 import useTable from './useTable'
 export default {
@@ -5,6 +6,7 @@ export default {
   componentAlias: "HllTable",
   props: {
     tableRow: Array,
+    formDate: Object,
     initialPageInfo: {
       type: Object,
       default: function (){
@@ -25,8 +27,10 @@ export default {
     }
   },
   setup(props){
+    console.log('---props', props.formDate)
+    const {formDate} = toRefs(props)
     const { paging, handleSizeChange, handleCurrentChange, forceUpdatePage } = usePagination(props.initialPageInfo)
-    const { dataTotal, tableData } = useTable(paging)
+    const { dataTotal, tableData } = useTable(paging, formDate)
     function getData(){
       return {
         pageInfo: paging,
