@@ -1,7 +1,7 @@
 <template>
   <div class="abnormal-driver">
     <div class="search-container">
-      <Fold>
+      <Fold @submit="submit" @clear="clear">
         <HllForm
             ref="curFrom"
             :formConfig="searchConfig"
@@ -21,6 +21,7 @@
           ref="hllTable"
           :tableRow="tableRow"
           :tableData="tableData"
+          :formDate="formDate"
       ></HllTable>
     </div>
     <el-dialog title="新增车队" v-model="dialogFormVisible" width="600px">
@@ -107,11 +108,27 @@ export default {
           zip: 200333
         }
       ],
-      dialogFormVisible: true
+      dialogFormVisible: false
+    }
+  },
+  watch: {
+    formDate: {
+      handler: function (){
+        console.log('watch', this.formDate)
+      },
+      deep: true
     }
   },
   methods: {
-    submit(){},
+    submit(){
+      this.$refs.hllTable.forceUpdate()
+      console.log('submit')
+    },
+    clear(){
+      console.log('submit')
+      this.formDate = {}
+      this.$refs.hllTable.forceUpdate()
+    },
     handleClick(){
       this.$confirm('确认关闭？')
     },

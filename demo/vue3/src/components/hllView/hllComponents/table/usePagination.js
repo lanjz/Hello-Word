@@ -23,7 +23,9 @@ export default function usePagination(pagination = {}) {
 
   }
   function forceUpdatePage(page = paging.value){
-    paging.value = page
+    paging.value = {
+      ...page
+    }
   }
   return {
     paging,
