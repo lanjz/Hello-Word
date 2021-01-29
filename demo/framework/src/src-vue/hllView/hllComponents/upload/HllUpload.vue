@@ -22,8 +22,9 @@
 
 </template>
 <script>
-import { delUploadFile } from '@/api/common';
-import _ from 'lodash';
+// import { delUploadFile } from '@/api/common';
+// import _ from 'lodash';
+function delUploadFile(){}
 let acceptFiles = [
   '.JPG', '.PNG', '.JPEG', '.GIF',
   '.PDF', '.XLSX', '.XLS', '.DOC',
@@ -194,12 +195,12 @@ export default {
             errInfo.push(item.data.file.name)
           }
         })
-        this.fsList = _.cloneDeep(fileList.filter(item => {
+/*        this.fsList = _.cloneDeep(fileList.filter(item => {
           if(!item.row && item.url){
             return true
           }
           return item.status !== 'fail' && item.response && item.response.code === 0
-        }))
+        }))*/
         this.saveLastFileList(this.fsList)
         if(errInfo.length){
           this.$message.error(`以下文件上传失败：${errInfo}`);
@@ -220,14 +221,14 @@ export default {
     },
     // 保存最后的文件状态，用于还原使用
     saveLastFileList(fileList){
-      this.lastFileList = _.cloneDeep(fileList)
+      // this.lastFileList = _.cloneDeep(fileList)
     },
     handleError(err) {
       this.isLoading = false
       let errMsg = err.type ? err.type : err
       this.$message.error(errMsg);
       this.$emit('uploadResult', [{err: errMsg}]);
-      this.fsList = _.cloneDeep(this.getValidValue()) //  上传失败还原最初的列表
+      // this.fsList = _.cloneDeep(this.getValidValue()) //  上传失败还原最初的列表
     },
     getValidValue(fileList = this.value){
       // 在手动上传的情况下，双向绑定的值可能会存在未上传的文件
@@ -236,7 +237,7 @@ export default {
       return originFile
     },
     resetFs(){
-      this.fsList = _.cloneDeep(this.lastFileList||this.getValidValue()||[])
+      // this.fsList = _.cloneDeep(this.lastFileList||this.getValidValue()||[])
     },
     // 查看文件
     handlePreview(file) {

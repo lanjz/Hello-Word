@@ -138,6 +138,7 @@ export default {
       })
     },
     setIndexMenu(info){
+      console.log('info', info)
       if(this.indexList.length) return // 使用 props菜单
       const { index} = info
       let find = this.indexMenu.find(item => item.index === index)
