@@ -10,6 +10,7 @@ import NeatItem from './hllComponents/neat/NeatItem'
 // import PreviewFile from './hllComponents/preivew/PreviewFile'
 // import PreviewImage from './hllComponents/preivew/PreviewImage'
 import Form from './hllComponents/form/Form'
+import Form2 from './hllComponents/form2/Form'
 // api 组件
 // import PreviewFileApi from './hllComponents/preivew/api'
 const components = [
@@ -24,6 +25,8 @@ const components = [
   // PreviewImage,
   Form,
   Fold,
+  Form2
+  
 ]
 const apiCom = [
   // PreviewFileApi
