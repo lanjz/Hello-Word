@@ -2,42 +2,25 @@ function getDefaultValue(type){
   return ['checkbox'].includes(type) ? [] : ''
 }
 export default {
-  props: ['formItemData', 'formAttrs', 'value', 'formData'],
+  props: ['formItemData', 'value', 'formData'],
   componentAlias: 'HllFormItem',
   data(){
     return {
-      modelData: {
-        name: getDefaultValue(this.formItemData.type)
-      },
       key: '',
       attrs: {},
-      rules: {
-        name: []
-      }
     }
   },
   watch: {
     formItemData: {
       handler: function (value){
-        const { model, type, rules, slot,...attrs } = value
+        const { model, type, slot,...attrs } = value
         this.key = model
         this.attrs = attrs
         this.type = type
-        this.rules.name = rules || []
       },
       deep: true,
       immediate: true
     },
-    'modelData.name': function (val){
-      this.$emit('input', val)
-    },
-    value: {
-      handler: function (val){
-        this.modelData.name = typeof val === 'undefined' ? getDefaultValue(this.formItemData.type) : val
-      },
-      deep: true,
-      immediate: true
-    }
   },
   methods: {
     validate(){

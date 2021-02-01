@@ -1,25 +1,15 @@
 <template>
-  <el-form
-    :model="modelData"
-    :rules="rules"
-    ref="modelData"
-    v-bind="formAttrs"
-    :class="`hll-${formItemData.type}`"
-  >
-    <el-form-item :label="formItemData.label" prop="name">
-      <el-input v-model="modelData.name" v-bind="attrs">
-        <template v-if="formItemData.slot&&formItemData.slot.slotName" :slot="formItemData.slot.slotName">
-          <render
-            v-if="typeof formItemData.slot.render === 'function'"
-            :render="formItemData.slot.render"
-          />
-          <span v-if="formItemData.slot.content">
+  <el-input v-model="formData[key]" v-bind="attrs">
+    <template v-if="formItemData.slot&&formItemData.slot.slotName" :slot="formItemData.slot.slotName">
+      <render
+          v-if="typeof formItemData.slot.render === 'function'"
+          :render="formItemData.slot.render"
+      />
+      <span v-if="formItemData.slot.content">
             {{formItemData.slot.content}}
           </span>
-        </template>
-      </el-input>
-    </el-form-item>
-  </el-form>
+    </template>
+  </el-input>
 </template>
 
 <script>

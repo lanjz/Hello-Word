@@ -16,13 +16,12 @@
           :offset="((item.itemOffset||itemOffset)&&((item.itemOffset||itemOffset)+'').indexOf('px')<0) ? +(item.itemOffset||itemOffset) : NaN"
           v-if="!item.hide"
       >
-        <el-form-item :label="item.label" prop="name" :class="`hll-${item.type}`">
+        <el-form-item :label="item.label" prop="name" :class="`hll-${item.type}`" :rules="item.rules">
           <slot :name="item.slotType"  v-if="item.type === 'slot'"></slot>
-          <render :render="item.render" :item="item" v-if="item.type === 'render'" :formData="value" />
+          <render :render="item.render" :item="item" v-else-if="item.type === 'render'" :formData="value" />
           <component
-              v-else
+              v-else-if="formMap[item.type]"
               :is="formMap[item.type]"
-              :formAttrs="$attrs"
               :formItemData="item"
               :formData="value"
               v-model="value[item.model]"
@@ -52,7 +51,7 @@ import HllUpload from './items/Upload'
 import Title_1 from './auxiliary/Title_1'
 const formMap = {
   input: 'HllInput',
-  select: 'HllSelect',
+/*  select: 'HllSelect',
   datePicker: 'HllDatePicker',
   dateRange: 'HllDateRange',
   switch: 'HllSwitch',
@@ -66,7 +65,7 @@ const formMap = {
   dateTimePicker: 'HllDateTimePicker',
   dateTimeRange: 'HllDateTimeRange',
   upload: 'HllUpload',
-  title_1: 'Title_1'
+  title_1: 'Title_1'*/
 }
 export default {
   name: "HForm",

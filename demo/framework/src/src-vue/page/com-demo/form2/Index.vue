@@ -156,6 +156,14 @@ export default {
         },
       ],
     }
+  },
+  watch: {
+    searchForm: {
+      handler: function (){
+        console.log('searchForm', this.searchForm)
+      },
+      deep: true
+    }
   }
 }
 </script>
