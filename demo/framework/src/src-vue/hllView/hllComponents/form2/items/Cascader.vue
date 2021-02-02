@@ -1,28 +1,18 @@
 <template>
-  <el-form
-    :model="modelData"
-    :rules="rules"
-    ref="modelData"
-    v-bind="formAttrs"
-    :class="`hll-${formItemData.type}${formItemData.props&&formItemData.props.multiple?'-multiple':''}`"
+  <el-cascader
+      v-model="formData[key]"
+      v-bind="attrs"
+      :options="formItemData.options"
   >
-    <el-form-item :label="formItemData.label" prop="name">
-      <el-cascader
-        v-model="modelData.name"
-        v-bind="attrs"
-        :options="formItemData.options"
-      >
-        <template slot-scope="{ node, data }" v-if="!!formItemData.optionRender&&typeof formItemData.optionRender === 'function'">
-          <render
-            :subRender="formItemData.optionRender"
-            :formItemData="value"
-            :data="data"
-            :node="node"
-          />
-        </template>
-      </el-cascader>
-    </el-form-item>
-  </el-form>
+    <template slot-scope="{ node, data }" v-if="!!formItemData.optionRender&&typeof formItemData.optionRender === 'function'">
+      <render
+          :subRender="formItemData.optionRender"
+          :formItemData="value"
+          :data="data"
+          :node="node"
+      />
+    </template>
+  </el-cascader>
 </template>
 
 <script>

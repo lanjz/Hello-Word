@@ -1,53 +1,42 @@
 <template>
-  <el-form
-    :model="modelData"
-    :rules="rules"
-    ref="modelData"
-    v-bind="formAttrs"
-    :class="`hll-${formItemData.type}${formItemData.multiple?'-multiple':''}`"
-  >
-    <el-form-item :label="formItemData.label" prop="name">
-      <el-select v-model="modelData.name" v-bind="attrs" v-if="!formItemData.group">
-        <el-option
-          v-for="item in formItemData.options"
-          :label="item.label"
+  <el-select v-model="formData[key]" v-bind="attrs" v-if="!formItemData.group">
+    <el-option
+        v-for="item in formItemData.options"
+        :label="item.label"
+        :disabled="item.disabled"
+        :value="item.value"
+        :key="item.value"
+    >
+      <render
+          v-if="typeof formItemData.optionRender === 'function'"
+          :render="formItemData.optionRender"
+          :formItemData="value"
+          :item="item"
+      />
+    </el-option>
+  </el-select>
+  <el-select v-model="formData[key]" v-bind="attrs" v-else>
+    <el-option-group
+        v-for="group in formItemData.options"
+        :key="group.label"
+        :label="group.label"
+    >
+      <el-option
+          v-for="item in group.options"
           :disabled="item.disabled"
+          :label="item.label"
           :value="item.value"
           :key="item.value"
-        >
-          <render
-            v-if="typeof formItemData.optionRender === 'function'"
+      >
+        <render
+            v-if="!!formItemData.optionRender&&typeof formItemData.optionRender === 'function'"
             :render="formItemData.optionRender"
             :formItemData="value"
             :item="item"
-          />
-        </el-option>
-      </el-select>
-      <el-select v-model="modelData.name" v-bind="attrs" v-else>
-        <el-option-group
-          v-for="group in formItemData.options"
-          :key="group.label"
-          :label="group.label"
-        >
-          <el-option
-            v-for="item in group.options"
-            :disabled="item.disabled"
-            :label="item.label"
-            :value="item.value"
-            :key="item.value"
-          >
-            <render
-              v-if="!!formItemData.optionRender&&typeof formItemData.optionRender === 'function'"
-              :render="formItemData.optionRender"
-              :formItemData="value"
-              :item="item"
-            />
-          </el-option>
-        </el-option-group>
-      </el-select>
-
-    </el-form-item>
-  </el-form>
+        />
+      </el-option>
+    </el-option-group>
+  </el-select>
 </template>
 
 <script>

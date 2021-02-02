@@ -1,6 +1,6 @@
 <template>
   <div style="height: 300px;border: solid 1px red">
-    <IndexList  :defaultActivity="2">
+    <IndexList :defaultActivity="2">
       <hllForm
           :formConfig="formConfig"
           v-model="searchForm"

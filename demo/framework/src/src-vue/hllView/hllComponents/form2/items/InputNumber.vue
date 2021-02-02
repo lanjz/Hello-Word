@@ -1,15 +1,5 @@
 <template>
-  <el-form
-    :model="modelData"
-    :rules="rules"
-    ref="modelData"
-    v-bind="formAttrs"
-    :class="`hll-${formItemData.type}`"
-  >
-    <el-form-item :label="formItemData.label" prop="name">
-      <el-input-number v-model="modelData.name" v-bind="attrs"></el-input-number>
-    </el-form-item>
-  </el-form>
+  <el-input-number v-model="formData[key]" v-bind="attrs"></el-input-number>
 </template>
 
 <script>

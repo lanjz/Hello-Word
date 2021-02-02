@@ -1,5 +1,6 @@
 <template>
   <el-form
+      :class="{'inline': inline}"
       :model="value"
       ref="el-form"
       v-bind="$attrs"
@@ -16,15 +17,22 @@
           :offset="((item.itemOffset||itemOffset)&&((item.itemOffset||itemOffset)+'').indexOf('px')<0) ? +(item.itemOffset||itemOffset) : NaN"
           v-if="!item.hide"
       >
-        <el-form-item :label="item.label" prop="name" :class="`hll-${item.type}`" :rules="item.rules">
-          <slot :name="item.slotType"  v-if="item.type === 'slot'"></slot>
-          <render :render="item.render" :item="item" v-else-if="item.type === 'render'" :formData="value" />
+        <el-form-item
+            :label="item.label"
+            prop="name"
+            :class="[
+                `${item.isRange ? 'hll-'+item.formType+'-range': 'hll-'+item.formType }`,
+                `${item.type? 'hll-'+item.formType+'-'+item.type:  'hll-'+item.formType+'-default'}`,
+            ]"
+            :rules="item.rules"
+        >
+          <slot :name="item.slotType"  v-if="item.formType === 'slot'"></slot>
+          <render :render="item.render" :item="item" v-else-if="item.formType === 'render'" :formData="value" />
           <component
-              v-else-if="formMap[item.type]"
-              :is="formMap[item.type]"
+              v-else-if="formMap[item.formType]"
+              :is="formMap[item.formType]"
               :formItemData="item"
               :formData="value"
-              v-model="value[item.model]"
           />
         </el-form-item>
       </el-col>
@@ -37,35 +45,29 @@
 import HllInput from './items/Input'
 import HllSelect from './items/Select'
 import HllDatePicker from './items/DatePicker'
-import HllDateRange from './items/DateRange'
 import HllSwitch from './items/Switch'
 import HllCheckBox from './items/Checkbox'
 import HllRadio from './items/Radio'
-import HllTextarea from './items/Textarea'
 import HllCascader from './items/Cascader'
 import HllInputNumber from './items/InputNumber'
 import HllTimePicker from './items/TimePicker'
-import HllDateTimePicker from './items/DateTimePicker'
-import HllDateTimeRange from './items/DateTimeRange'
 import HllUpload from './items/Upload'
 import Title_1 from './auxiliary/Title_1'
+import IndexContent from './auxiliary/IndexContent'
 const formMap = {
   input: 'HllInput',
-/*  select: 'HllSelect',
+  select: 'HllSelect',
   datePicker: 'HllDatePicker',
-  dateRange: 'HllDateRange',
+  timePicker: 'HllTimePicker',
+  timeSelect: 'HllTimePicker',
   switch: 'HllSwitch',
   checkbox: 'HllCheckBox',
   radio: 'HllRadio',
-  textarea: 'HllTextarea',
   cascader: 'HllCascader',
   inputNumber: 'HllInputNumber',
-  timePicker: 'HllTimePicker',
-  timeSelect: 'HllTimePicker',
-  dateTimePicker: 'HllDateTimePicker',
-  dateTimeRange: 'HllDateTimeRange',
   upload: 'HllUpload',
-  title_1: 'Title_1'*/
+  indexTitle: 'IndexContent',
+  title_1: 'Title_1',
 }
 export default {
   name: "HForm",
@@ -81,18 +83,15 @@ export default {
     HllInput,
     HllSelect,
     HllDatePicker,
-    HllDateRange,
     HllSwitch,
     HllCheckBox,
     HllRadio,
-    HllTextarea,
     HllCascader,
     HllInputNumber,
     HllTimePicker,
-    HllDateTimePicker,
-    HllDateTimeRange,
     HllUpload,
     Title_1,
+    IndexContent,
     render: {
       props: {
         render: Function,
@@ -111,46 +110,13 @@ export default {
   },
   methods: {
     resetFields() {
-      this.$children.forEach((child) => {
-        if(this.isHllFormItem(child)){
-          child.resetFields()
-        }
-      });
+      this.$refs['el-form'].resetFields()
     },
     validate(fn){
-      let asyncArr = []
-      this.$children.forEach((child) => {
-        if(this.isHllFormItem(child) && child.validate){
-          asyncArr.push(child.validate())
-        }
-      });
-      Promise.all(asyncArr)
-          .then(res => {
-            let message = {}
-            let valid = true
-            let data = {}
-            res.forEach(item => {
-              const { key, message:itemMessage, valid:itemValid, data: itemData } = item
-              Object.assign(data, itemData)
-              !itemValid && (message[key] = itemMessage.name)
-              if(!itemValid && valid){
-                valid = false
-              }
-            })
-            fn(valid, message, data)
-          })
-    },
-    isHllFormItem(child){
-      return child.$options.componentAlias === 'HllFormItem'
+      this.$refs['el-form'].validate(fn)
     },
     getFormData(){
-      let data = {}
-      this.$children.forEach((child) => {
-        if(this.isHllFormItem(child)){
-          Object.assign(data, child.getData())
-        }
-      });
-      return data
+      return this.value
     },
   },
   mounted() {
@@ -159,6 +125,7 @@ export default {
     } else if(typeof this.value !== 'object'){
       throw new Error('v-model不是对象')
     }
+    console.log('-', this.$refs['el-form'])
   }
 }
 </script>
@@ -184,7 +151,7 @@ export default {
     .hll-timePicker-range, .hll-dateRange{
       width: 305px;
     }
-    .hll-select, .hll-select-multiple, .hll-datePicker, .hll-timePicker, .hll-cascader-multiple{
+    .hll-select, .hll-select-multiple, .hll-datePicker-default, .hll-timePicker-default, .hll-cascader-multiple{
       width: 200px;
     }
     .hll-select-multiple{

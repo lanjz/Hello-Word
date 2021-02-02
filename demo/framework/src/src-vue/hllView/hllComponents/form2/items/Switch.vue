@@ -1,19 +1,9 @@
 <template>
-  <el-form
-    :model="modelData"
-    :rules="rules"
-    ref="modelData"
-    v-bind="formAttrs"
-    :class="`hll-${formItemData.type}`"
+  <el-switch
+      v-model="formData[key]"
+      v-bind="attrs"
   >
-    <el-form-item :label="formItemData.label" prop="name">
-      <el-switch
-        v-model="modelData.name"
-        v-bind="attrs"
-      >
-      </el-switch>
-    </el-form-item>
-  </el-form>
+  </el-switch>
 </template>
 
 <script>

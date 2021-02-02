@@ -1,20 +1,10 @@
 <template>
-  <el-form
-    :model="modelData"
-    :rules="rules"
-    ref="modelData"
-    v-bind="formAttrs"
-    :class="`hll-${formItemData.type}`"
-  >
-    <el-form-item :label="formItemData.label" prop="name">
-      <el-date-picker
-        type="date"
-        v-model="modelData.name"
-        v-bind="attrs"
-        :pickerOptions="pickerOptions"
-      ></el-date-picker>
-    </el-form-item>
-  </el-form>
+  <el-date-picker
+      :type="formItemData.type||'date'"
+      v-model="formData[key]"
+      v-bind="attrs"
+      :pickerOptions="pickerOptions"
+  ></el-date-picker>
 </template>
 
 <script>

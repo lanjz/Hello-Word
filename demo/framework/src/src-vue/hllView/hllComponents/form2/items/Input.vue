@@ -5,9 +5,7 @@
           v-if="typeof formItemData.slot.render === 'function'"
           :render="formItemData.slot.render"
       />
-      <span v-if="formItemData.slot.content">
-            {{formItemData.slot.content}}
-          </span>
+      <span v-if="formItemData.slot.content">{{formItemData.slot.content}}</span>
     </template>
   </el-input>
 </template>
@@ -17,16 +15,6 @@ import formItemMinxin from './formItemMinxin';
 export default {
   name: 'HllInput',
   mixins: [formItemMinxin],
-  components: {
-    render: {
-      props: {
-        render: Function,
-      },
-      render (h) {
-        return this.render&&this.render(h)
-      }
-    }
-  },
 }
 </script>
 
