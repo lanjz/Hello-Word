@@ -3,7 +3,11 @@
       :index="formItemData.index"
       :label="formItemData.text"
   >
-    {{formItemData.text}}
+    <div class="item-title">
+      {{formItemData.text}}
+      <div class="line"></div>
+    </div>
+
   </IndexListContent>
 </template>
 
