@@ -11,19 +11,21 @@
 </div>
 </body>
 <script>
-window.onload = function (){
-  const CounterApp = {
-    data() {
-      return {
-        counter: 0
+  window.onload = function (){
+    const CounterApp = {
+      data() {
+        return {
+          counter: {
+            cou: 1
+          }
+        }
+      },
+      mounted() {
+        console.log('this', this)
       }
-    },
-    mounted() {
-      console.log('this', this)
     }
+    let vm = Vue.createApp(CounterApp).mount('#counter')
+    console.log('vm', vm)
   }
-  let vm = Vue.createApp(CounterApp).mount('#counter')
-  console.log('vm', vm)
-}
 </script>
 </html>

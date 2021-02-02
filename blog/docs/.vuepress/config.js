@@ -33,6 +33,7 @@ module.exports = {
         text: '框架',
         items: [
           { text: 'Vue', link: '/Vue/' },
+          { text: 'Vue3', link: '/Vue3/' },
           { text: 'React', link: '/React/' },
         ]
       },

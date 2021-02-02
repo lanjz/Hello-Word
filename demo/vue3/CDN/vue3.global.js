@@ -563,7 +563,6 @@ var Vue = (function (exports) {
   const shallowReadonlyGet = /*#__PURE__*/ createGetter(true, true);
   const arrayInstrumentations = {};
   ['includes', 'indexOf', 'lastIndexOf'].forEach(key => {
-    debugger
     const method = Array.prototype[key];
     arrayInstrumentations[key] = function (...args) {
       const arr = toRaw(this);
@@ -637,6 +636,7 @@ var Vue = (function (exports) {
   const shallowSet = /*#__PURE__*/ createSetter(true);
   function createSetter(shallow = false) {
     return function set(target, key, value, receiver) {
+      debugger
       const oldValue = target[key];
       if (!shallow) {
         value = toRaw(value);
@@ -5277,6 +5277,7 @@ var Vue = (function (exports) {
       {
         startMeasure(instance, `init`);
       }
+      debugger
       setupComponent(instance);
       {
         endMeasure(instance, `init`);
@@ -6429,8 +6430,7 @@ var Vue = (function (exports) {
         : ref
       : null);
   };
-  const createVNode = ( createVNodeWithArgsTransform
-  );
+  const createVNode = ( createVNodeWithArgsTransform);
   function _createVNode(type, props = null, children = null, patchFlag = 0, dynamicProps = null, isBlockNode = false) {
     if (!type || type === NULL_DYNAMIC_COMPONENT) {
       if ( !type) {
@@ -9289,7 +9289,6 @@ var Vue = (function (exports) {
     ensureHydrationRenderer().hydrate(...args);
   });
   const createApp = ((...args) => {
-    debugger
     const app = ensureRenderer().createApp(...args);
     {
       injectNativeTagCheck(app);

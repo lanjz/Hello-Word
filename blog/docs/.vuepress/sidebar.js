@@ -95,6 +95,9 @@ module.exports = {
     '/Vue/Paas应用',
     '/Vue/吱不吱',
   ],
+  '/Vue3/': [
+    '/Vue3/响应式原理'
+  ],
   '/React/': [
     '/React/Fiber',
     '/React/高阶组件',
