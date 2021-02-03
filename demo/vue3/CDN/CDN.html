@@ -7,7 +7,7 @@
 </head>
 <body>
 <div id="counter">
-    Counter: {{ counter }}
+    Counter: <span v-for="item in counter" :key="item">{{item}}</span>
 </div>
 </body>
 <script>
@@ -15,9 +15,12 @@
     const CounterApp = {
       data() {
         return {
-          counter: {
-            cou: 1
-          }
+          counter: 5
+        }
+      },
+      watch: {
+        counter: function (val){
+          console.log('watch', val)
         }
       },
       mounted() {

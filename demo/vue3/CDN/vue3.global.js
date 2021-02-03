@@ -591,7 +591,6 @@ var Vue = (function (exports) {
   });
   function createGetter(isReadonly = false, shallow = false) {
     return function get(target, key, receiver) {
-      debugger
       if (key === "__v_isReactive" /* IS_REACTIVE */) {
         return !isReadonly;
       }
@@ -636,7 +635,7 @@ var Vue = (function (exports) {
   const shallowSet = /*#__PURE__*/ createSetter(true);
   function createSetter(shallow = false) {
     return function set(target, key, value, receiver) {
-      debugger
+      
       const oldValue = target[key];
       if (!shallow) {
         value = toRaw(value);
@@ -678,6 +677,7 @@ var Vue = (function (exports) {
     return result;
   }
   function ownKeys(target) {
+    
     track(target, "iterate" /* ITERATE */, isArray(target) ? 'length' : ITERATE_KEY);
     return Reflect.ownKeys(target);
   }
@@ -751,6 +751,7 @@ var Vue = (function (exports) {
   }
   function size(target, isReadonly = false) {
     target = target["__v_raw" /* RAW */];
+    
     !isReadonly && track(toRaw(target), "iterate" /* ITERATE */, ITERATE_KEY);
     return Reflect.get(target, 'size', target);
   }
@@ -826,6 +827,7 @@ var Vue = (function (exports) {
       const target = observed["__v_raw" /* RAW */];
       const rawTarget = toRaw(target);
       const wrap = isReadonly ? toReadonly : isShallow ? toShallow : toReactive;
+      
       !isReadonly && track(rawTarget, "iterate" /* ITERATE */, ITERATE_KEY);
       return target.forEach((value, key) => {
         // important: make sure the callback is
@@ -844,6 +846,7 @@ var Vue = (function (exports) {
       const isKeyOnly = method === 'keys' && targetIsMap;
       const innerIterator = target[method](...args);
       const wrap = isReadonly ? toReadonly : isShallow ? toShallow : toReactive;
+      
       !isReadonly &&
       track(rawTarget, "iterate" /* ITERATE */, isKeyOnly ? MAP_KEY_ITERATE_KEY : ITERATE_KEY);
       // return a wrapped iterator which returns observed versions of the
@@ -5277,7 +5280,7 @@ var Vue = (function (exports) {
       {
         startMeasure(instance, `init`);
       }
-      debugger
+      
       setupComponent(instance);
       {
         endMeasure(instance, `init`);
@@ -11535,7 +11538,7 @@ var Vue = (function (exports) {
   const prohibitedKeywordRE = new RegExp('\\b' +
     ('do,if,for,let,new,try,var,case,else,with,await,break,catch,class,const,' +
       'super,throw,while,yield,delete,export,import,return,switch,default,' +
-      'extends,finally,continue,debugger,function,arguments,typeof,void')
+      'extends,finally,continue,,function,arguments,typeof,void')
       .split(',')
       .join('\\b|\\b') +
     '\\b');
