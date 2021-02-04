@@ -96,6 +96,9 @@ module.exports = {
     '/Vue/吱不吱',
   ],
   '/Vue3/': [
+    '/Vue3/使用区别',
+    '/Vue3/SFC还是JSX',
+    '/Vue3/createApp',
     '/Vue3/响应式原理',
     '/Vue3/watch',
   ],

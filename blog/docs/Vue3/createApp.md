@@ -82,13 +82,13 @@ function baseCreateRenderer(){
 }
 ```
 
-从上面代码可以看到通过 `createRenderer` 创建的一个 `renderer`, 这个`renderer` 只包含了三个属性
+从上面代码可以看到首先是通过 `createRenderer` 创建的一个 `renderer`, 这个`renderer` 只包含了三个属性
 
 - `render`： 创建VNode方法
 
 - `hydrate`: 是否服务渲染的标识
 
-- `createApp`: 创建一个Vue应用实例的方法
+- `createApp`: 通过 `createAppAPI(render, hydrate)` 返回一个创建Vue应用实例的方法
 
 `createAppAPI(render, hydrate)` 定义如下：
 
@@ -104,7 +104,7 @@ function baseCreateRenderer(){
       const context = createAppContext();
       const installedPlugins = new Set();
       let isMounted = false;
-      const app = (context.app = { // 创建一个 app 对应并保存到 context.app 中
+      const app = (context.app = { // 创建一个 app 应用并保存到 context.app 中
         _uid: uid$1++,
         _component: rootComponent,
         _props: rootProps,
@@ -244,11 +244,11 @@ function baseCreateRenderer(){
 
 从上面代码可以看到 `createApp` 返回一个 `app` 对象，这个对象就是返回的 vue 应用实例，这个对象定义了  `use`、`mixin`、`component`、`mount`等方法让我们可以添加全局方法、插件、组件等
 
-至此， `app` 的创建大概捋了下，`app` 的包含的属性如下图：
+至此， `app` 的创建大概捋了下，整个过程就是利用闭包创建一个对象， 一个app 的包含的属性如下图：
 
 ![](./static/app.jpg)
 
-接下来通过 `mounted` 方法的调用看下，代码怎么玩转的
+接下来看下 `mounted` 方法的调用，看下应用怎么挂载的
 
 ## mounted
 
@@ -388,7 +388,7 @@ const mountComponent = (initialVNode, container, anchor, parentComponent, parent
 };
 ```
 
-`mountComponent` 方法先是通过 `createComponentInstance` 创建组件的 VNode 对象，源码如：
+`mountComponent` 方法先是通过 `createComponentInstance` 创建一个对象，这里暂时取名就组件实例对象，源码：
 
 ```js
   function createComponentInstance(vnode, parent, suspense) {
@@ -522,77 +522,35 @@ const mountComponent = (initialVNode, container, anchor, parentComponent, parent
   }
 ```
 
-`createRenderContext` 方法的目的就是组当组件 `insatcne` 代理一些方法：
+`createRenderContext` 方法的目的就是给当前组件 `insatcne` 代理一些方法：
 
 - `$el`、`$data`、`$attrs`、`$props`等等
 
-- 包含使用 `app.config.globalProperties` 添加的全局属性和方法，也在这里做了代理
+- 包括使用 `app.config.globalProperties` 添加的全局属性和方法，也在这里做了代理
 
-`createComponentInstance` 执行完后返回当前创建的 `instance`,回到 `mountComponent` 方法中：
+`createComponentInstance` 执行完后返回当前创建的 `instance`,回到 `mountComponent` 方法中，接下直接看 `setupRenderEffect(instance, initialVNode, container, anchor, parentSuspense, isSVG, optimized);` 方法的调用
 
 ```js
-const mountComponent = (initialVNode, container, anchor, parentComponent, parentSuspense, isSVG, optimized) => {
-  const instance = (initialVNode.component = createComponentInstance(initialVNode, parentComponent, parentSuspense));
-  if ( instance.type.__hmrId) {
-    registerHMR(instance);
-  }
-  {
-    pushWarningContext(initialVNode);
-    startMeasure(instance, `mount`);
-  }
-  // inject renderer internals for keepAlive
-  if (isKeepAlive(initialVNode)) {
-    instance.ctx.renderer = internals;
-  }
-  // resolve props and slots for setup context
-  {
-    startMeasure(instance, `init`);
-  }
-  setupComponent(instance);
-  {
-    endMeasure(instance, `init`);
-  }
-  // setup() is async. This component relies on async logic to be resolved
-  // before proceeding
-  if ( instance.asyncDep) {
-    parentSuspense && parentSuspense.registerDep(instance, setupRenderEffect);
-    // Give it a placeholder if this is not hydration
-    // TODO handle self-defined fallback
-    if (!initialVNode.el) {
-      const placeholder = (instance.subTree = createVNode(Comment));
-      processCommentNode(null, placeholder, container, anchor);
-    }
-    return;
-  }
-  setupRenderEffect(instance, initialVNode, container, anchor, parentSuspense, isSVG, optimized);
-  {
-    popWarningContext();
-    endMeasure(instance, `mount`);
-  }
+const setupRenderEffect = (instance, initialVNode, container, anchor, parentSuspense, isSVG, optimized) => {
+  // create reactive effect for rendering
+  instance.update = effect(function componentEffect() {
+   // componentEffect 代码
+  },  createDevEffectOptions(instance) );
 };
+// createDevEffectOptions 返回四个属性
+function createDevEffectOptions(instance) {
+  return {
+     scheduler: queueJob,
+     allowRecurse: true,
+     onTrack: instance.rtc ? e => invokeArrayFns(instance.rtc, e) : void 0,
+     onTrigger: instance.rtg ? e => invokeArrayFns(instance.rtg, e) : void 0
+  };
+}
 ```
 
-这里大部代码暂时没看出作用，所以先重点关注下最后的 `setupRenderEffect(instance, initialVNode, container, anchor, parentSuspense, isSVG, optimized);`
+上面给 `instance.update` 赋值一个 `effect`，先看下 `effect` 的定义，**终于来了一个重点：这里的 `effect` 相当于 vue2.0的 `watcher`**
 
 ```js
-    const setupRenderEffect = (instance, initialVNode, container, anchor, parentSuspense, isSVG, optimized) => {
-      // create reactive effect for rendering
-      instance.update = effect(function componentEffect() {
-       // componentEffect 代码
-      },  createDevEffectOptions(instance) );
-    };
-```
-
-```js
-  // createDevEffectOptions 返回四个属性
-  function createDevEffectOptions(instance) {
-    return {
-      scheduler: queueJob,
-      allowRecurse: true,
-      onTrack: instance.rtc ? e => invokeArrayFns(instance.rtc, e) : void 0,
-      onTrigger: instance.rtg ? e => invokeArrayFns(instance.rtg, e) : void 0
-    };
-  }
   // effect
   function effect(fn, options = EMPTY_OBJ) {
     if (isEffect(fn)) {
@@ -621,7 +579,7 @@ const mountComponent = (initialVNode, container, anchor, parentComponent, parent
           enableTracking();
           effectStack.push(effect); // 添加当前的 effect 到 effectStack 数组中
           activeEffect = effect; // activeEffect 为全局属性，保存当前的 effect
-          return fn(); // 执行回调， 即 componentEffect 中的代码，开始渲染组件
+          return fn(); // 执行回调， 即 componentEffect 方法
         }
         finally {
           // 渲染完成后将当前的 effect 推出
@@ -665,303 +623,154 @@ const mountComponent = (initialVNode, container, anchor, parentComponent, parent
   }
 ```
 
-// 回到 setupRenderEffect 方法
+当执行的 `effect` 的时候，将当前 `effect` 保存到全局，最后执行回调 `fn`  即 `componentEffect` 方法渲染组件到DOM，这部分的过程先不细究，这里就完成了组件一次渲染同时在渲染过程中问到依赖的属性时，全局的 `effect` 就被当前的属性收集
+
+## 组件更新
+
+接下来大概分析当属性更新时，如果重新触发组件的更新
+
+当属性更新时，被 `proxy` 的 `set` 劫持，执行 `trigger(target, "set" /* SET */, key, value, oldValue)` 方法，这个方法就是取出收集的 `effect` 执行 `effect.options.scheduler(effect)` 方法
+
+回到上文找到`scheduler` 方法定义的位置，在 `setupRenderEffect` 中的 `createDevEffectOptions` 中
+
 ```js
-    const setupRenderEffect = (instance, initialVNode, container, anchor, parentSuspense, isSVG, optimized) => {
-      // create reactive effect for rendering
-      instance.update = effect(function componentEffect() {
-        if (!instance.isMounted) {
-          let vnodeHook;
-          const { el, props } = initialVNode;
-          const { bm, m, parent } = instance;
-          // beforeMount hook
-          if (bm) {
-            invokeArrayFns(bm);
-          }
-          // onVnodeBeforeMount
-          if ((vnodeHook = props && props.onVnodeBeforeMount)) {
-            invokeVNodeHook(vnodeHook, parent, initialVNode);
-          }
-          // render
-          {
-            startMeasure(instance, `render`);
-          }
-          const subTree = (instance.subTree = renderComponentRoot(instance));
-          {
-            endMeasure(instance, `render`);
-          }
-          if (el && hydrateNode) {
-            {
-              startMeasure(instance, `hydrate`);
-            }
-            // vnode has adopted host node - perform hydration instead of mount.
-            hydrateNode(initialVNode.el, subTree, instance, parentSuspense);
-            {
-              endMeasure(instance, `hydrate`);
-            }
-          }
-          else {
-            {
-              startMeasure(instance, `patch`);
-            }
-            patch(null, subTree, container, anchor, instance, parentSuspense, isSVG);
-            {
-              endMeasure(instance, `patch`);
-            }
-            initialVNode.el = subTree.el;
-          }
-          // mounted hook
-          if (m) {
-            queuePostRenderEffect(m, parentSuspense);
-          }
-          // onVnodeMounted
-          if ((vnodeHook = props && props.onVnodeMounted)) {
-            const scopedInitialVNode = initialVNode;
-            queuePostRenderEffect(() => {
-              invokeVNodeHook(vnodeHook, parent, scopedInitialVNode);
-            }, parentSuspense);
-          }
-          // activated hook for keep-alive roots.
-          // #1742 activated hook must be accessed after first render
-          // since the hook may be injected by a child keep-alive
-          const { a } = instance;
-          if (a &&
-            initialVNode.shapeFlag & 256 /* COMPONENT_SHOULD_KEEP_ALIVE */) {
-            queuePostRenderEffect(a, parentSuspense);
-          }
-          instance.isMounted = true;
-          // #2458: deference mount-only object parameters to prevent memleaks
-          initialVNode = container = anchor = null;
-        }
-        else {
-          // updateComponent
-          // This is triggered by mutation of component's own state (next: null)
-          // OR parent calling processComponent (next: VNode)
-          let { next, bu, u, parent, vnode } = instance;
-          let originNext = next;
-          let vnodeHook;
-          {
-            pushWarningContext(next || instance.vnode);
-          }
-          if (next) {
-            next.el = vnode.el;
-            updateComponentPreRender(instance, next, optimized);
-          }
-          else {
-            next = vnode;
-          }
-          // beforeUpdate hook
-          if (bu) {
-            invokeArrayFns(bu);
-          }
-          // onVnodeBeforeUpdate
-          if ((vnodeHook = next.props && next.props.onVnodeBeforeUpdate)) {
-            invokeVNodeHook(vnodeHook, parent, next, vnode);
-          }
-          // render
-          {
-            startMeasure(instance, `render`);
-          }
-              const nextTree = renderComponentRoot(instance);
-          {
-            endMeasure(instance, `render`);
-          }
-          const prevTree = instance.subTree;
-          instance.subTree = nextTree;
-          {
-            startMeasure(instance, `patch`);
-          }
-          patch(prevTree, nextTree,
-            // parent may have changed if it's in a teleport
-            hostParentNode(prevTree.el),
-            // anchor may have changed if it's in a fragment
-            getNextHostNode(prevTree), instance, parentSuspense, isSVG);
-          {
-            endMeasure(instance, `patch`);
-          }
-          next.el = nextTree.el;
-          if (originNext === null) {
-            // self-triggered update. In case of HOC, update parent component
-            // vnode el. HOC is indicated by parent instance's subTree pointing
-            // to child component's vnode
-            updateHOCHostEl(instance, nextTree.el);
-          }
-          // updated hook
-          if (u) {
-            queuePostRenderEffect(u, parentSuspense);
-          }
-          // onVnodeUpdated
-          if ((vnodeHook = next.props && next.props.onVnodeUpdated)) {
-            queuePostRenderEffect(() => {
-              invokeVNodeHook(vnodeHook, parent, next, vnode);
-            }, parentSuspense);
-          }
-          {
-            devtoolsComponentUpdated(instance);
-          }
-          {
-            popWarningContext();
-          }
-        }
-      },  createDevEffectOptions(instance) );
-    };
+const setupRenderEffect = (instance, initialVNode, container, anchor, parentSuspense, isSVG, optimized) => {
+  // create reactive effect for rendering
+  instance.update = effect(function componentEffect() {
+   // componentEffect 代码
+  },  createDevEffectOptions(instance) );
+};
+// createDevEffectOptions 返回四个属性
+function createDevEffectOptions(instance) {
+  return {
+     scheduler: queueJob,
+     allowRecurse: true,
+     onTrack: instance.rtc ? e => invokeArrayFns(instance.rtc, e) : void 0,
+     onTrigger: instance.rtg ? e => invokeArrayFns(instance.rtg, e) : void 0
+  };
+}
 ```
 
-上面代码重点看下 `const subTree = (instance.subTree = renderComponentRoot(instance))` 
+```js
+//queueJob
+  function queueJob(job) {
+    // the dedupe search uses the startIndex argument of Array.includes()
+    // by default the search index includes the current job that is being run
+    // so it cannot recursively trigger itself again.
+    // if the job is a watch() callback, the search will start with a +1 index to
+    // allow it recursively trigger itself - it is the user's responsibility to
+    // ensure it doesn't end up in an infinite loop.
+    if ((!queue.length ||
+      !queue.includes(job, isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex)) &&
+      job !== currentPreFlushParentJob) {
+      queue.push(job);
+      queueFlush();
+    }
+  }
+```
+
+根据上文， `scheduler` 的作用就是将当前 `effect` 添加到微任务队列 `queue` 中，执行 `queueFlush();`, 待事件循环清理
 
 ```js
-  function renderComponentRoot(instance) {
-    const { type: Component, vnode, proxy, withProxy, props, propsOptions: [propsOptions], slots, attrs, emit, render, renderCache, data, setupState, ctx } = instance;
-    let result;
-    currentRenderingInstance = instance;
-    {
-      accessedAttrs = false;
+  function queueFlush() {
+    if (!isFlushing && !isFlushPending) {
+      isFlushPending = true;
+      currentFlushPromise = resolvedPromise.then(flushJobs);
     }
+  }
+```
+
+```js
+  function flushJobs(seen) {
+    isFlushPending = false;
+    isFlushing = true;
+    {
+      seen = seen || new Map();
+    }
+    flushPreFlushCbs(seen);
+    // Sort queue before flush.
+    // This ensures that:
+    // 1. Components are updated from parent to child. (because parent is always
+    //    created before the child so its render effect will have smaller
+    //    priority number)
+    // 2. If a component is unmounted during a parent component's update,
+    //    its update can be skipped.
+    queue.sort((a, b) => getId(a) - getId(b));
     try {
-      let fallthroughAttrs;
-      if (vnode.shapeFlag & 4 /* STATEFUL_COMPONENT */) {
-        // withProxy is a proxy with a different `has` trap only for
-        // runtime-compiled render functions using `with` block.
-        const proxyToUse = withProxy || proxy;
-        // 这里触发了 `render` 方法
-        result = normalizeVNode(render.call(proxyToUse, proxyToUse, renderCache, props, setupState, data, ctx));
-        fallthroughAttrs = attrs;
-      }
-      else {
-        // functional
-        const render = Component;
-        // in dev, mark attrs accessed if optional props (attrs === props)
-        if (true && attrs === props) {
-          markAttrsAccessed();
-        }
-        result = normalizeVNode(render.length > 1
-          ? render(props, true
-            ? {
-              get attrs() {
-                markAttrsAccessed();
-                return attrs;
-              },
-              slots,
-              emit
-            }
-            : { attrs, slots, emit })
-          : render(props, null /* we know it doesn't need it */));
-        fallthroughAttrs = Component.props
-          ? attrs
-          : getFunctionalFallthrough(attrs);
-      }
-      // attr merging
-      // in dev mode, comments are preserved, and it's possible for a template
-      // to have comments along side the root element which makes it a fragment
-      let root = result;
-      let setRoot = undefined;
-      if (true && result.patchFlag & 2048 /* DEV_ROOT_FRAGMENT */) {
-        ;
-        [root, setRoot] = getChildRoot(result);
-      }
-      if (Component.inheritAttrs !== false && fallthroughAttrs) {
-        const keys = Object.keys(fallthroughAttrs);
-        const { shapeFlag } = root;
-        if (keys.length) {
-          if (shapeFlag & 1 /* ELEMENT */ ||
-            shapeFlag & 6 /* COMPONENT */) {
-            if (propsOptions && keys.some(isModelListener)) {
-              // If a v-model listener (onUpdate:xxx) has a corresponding declared
-              // prop, it indicates this component expects to handle v-model and
-              // it should not fallthrough.
-              // related: #1543, #1643, #1989
-              fallthroughAttrs = filterModelListeners(fallthroughAttrs, propsOptions);
-            }
-            root = cloneVNode(root, fallthroughAttrs);
+      for (flushIndex = 0; flushIndex < queue.length; flushIndex++) {
+        const job = queue[flushIndex];
+        if (job) {
+          if (true) {
+            checkRecursiveUpdates(seen, job);
           }
-          else if (true && !accessedAttrs && root.type !== Comment) {
-            const allAttrs = Object.keys(attrs);
-            const eventAttrs = [];
-            const extraAttrs = [];
-            for (let i = 0, l = allAttrs.length; i < l; i++) {
-              const key = allAttrs[i];
-              if (isOn(key)) {
-                // ignore v-model handlers when they fail to fallthrough
-                if (!isModelListener(key)) {
-                  // remove `on`, lowercase first letter to reflect event casing
-                  // accurately
-                  eventAttrs.push(key[2].toLowerCase() + key.slice(3));
-                }
-              }
-              else {
-                extraAttrs.push(key);
-              }
-            }
-            if (extraAttrs.length) {
-              warn(`Extraneous non-props attributes (` +
-                `${extraAttrs.join(', ')}) ` +
-                `were passed to component but could not be automatically inherited ` +
-                `because component renders fragment or text root nodes.`);
-            }
-            if (eventAttrs.length) {
-              warn(`Extraneous non-emits event listeners (` +
-                `${eventAttrs.join(', ')}) ` +
-                `were passed to component but could not be automatically inherited ` +
-                `because component renders fragment or text root nodes. ` +
-                `If the listener is intended to be a component custom event listener only, ` +
-                `declare it using the "emits" option.`);
-            }
-          }
+          callWithErrorHandling(job, null, 14 /* SCHEDULER */);
         }
       }
-      // inherit directives
-      if (vnode.dirs) {
-        if (true && !isElementRoot(root)) {
-          warn(`Runtime directive used on component with non-element root node. ` +
-            `The directives will not function as intended.`);
-        }
-        root.dirs = root.dirs ? root.dirs.concat(vnode.dirs) : vnode.dirs;
+    }
+    finally {
+      flushIndex = 0;
+      queue.length = 0;
+      flushPostFlushCbs(seen);
+      isFlushing = false;
+      currentFlushPromise = null;
+      // some postFlushCb queued jobs!
+      // keep flushing until it drains.
+      if (queue.length || pendingPostFlushCbs.length) {
+        flushJobs(seen);
       }
-      // inherit transition data
-      if (vnode.transition) {
-        if (true && !isElementRoot(root)) {
-          warn(`Component inside <Transition> renders non-element root node ` +
-            `that cannot be animated.`);
-        }
-        root.transition = vnode.transition;
-      }
-      if (true && setRoot) {
-        setRoot(root);
-      }
-      else {
-        result = root;
-      }
+    }
+  }
+```
+
+```js
+  function callWithErrorHandling(fn, instance, type, args) {
+    let res;
+    try {
+      res = args ? fn(...args) : fn();
     }
     catch (err) {
-      handleError(err, instance, 1 /* RENDER_FUNCTION */);
-      result = createVNode(Comment);
+      handleError(err, instance, type);
     }
-    currentRenderingInstance = null;
-    return result;
+    return res;
   }
 ```
 
-上面代码执行 `render` 方法，将我们的组件解决成 DOM 节点，生成的 DOM 节点再传入 `normalizeVNode` 方法中：
+最终会执行的 `job` 回调， 加成一下 `createReactiveEffect` 方法的调用
+
+根据上文中的 `scheduler` 的调用， `effect.options.scheduler(effect)`
 
 ```js
-  function normalizeVNode(child) {
-    if (child == null || typeof child === 'boolean') {
-      // empty placeholder
-      return createVNode(Comment);
-    }
-    else if (isArray(child)) {
-      // fragment
-      return createVNode(Fragment, null, child);
-    }
-    else if (typeof child === 'object') {
-      // already vnode, this should be the most common since compiled templates
-      // always produce all-vnode children arrays
-      return child.el === null ? child : cloneVNode(child);
-    }
-    else {
-      // strings and numbers
-      return createVNode(Text, null, String(child));
-    }
+  function createReactiveEffect(fn, options) {
+    const effect = function reactiveEffect() {
+      if (!effect.active) {
+        return options.scheduler ? undefined : fn();
+      }
+      if (!effectStack.includes(effect)) {
+        cleanup(effect);
+        try {
+          enableTracking();
+          effectStack.push(effect);
+          activeEffect = effect;
+          return fn();
+        }
+        finally {
+          effectStack.pop();
+          resetTracking();
+          activeEffect = effectStack[effectStack.length - 1];
+        }
+      }
+    };
+    effect.id = uid++;
+    effect.allowRecurse = !!options.allowRecurse;
+    effect._isEffect = true;
+    effect.active = true;
+    effect.raw = fn;
+    effect.deps = [];
+    effect.options = options;
+    return effect;
   }
 ```
-`normalizeVNode` 方法调用了 `createVNode(Text, null, String(child))`
+
+可以看到队列中的的 `job` 就是 `reactiveEffect`， `reactiveEffect` 执行 `fn` 回调 即 `componentEffect` 方法渲染组件
+
+好像跑题了~

@@ -1,4 +1,4 @@
-# watch
+# Watch
 
 通过简单的 `watch` 使用粟子来走下源码:
 
@@ -173,7 +173,13 @@ if (!asMixin && deferredWatch.length) {
   }
 ```
 
-### 重温 effect
+`doWatch` 的作用就是创建一个 `effect`,及用于 `effect` 使用的 `getter` 和 `job`
+
+- `getter` 方法用于读取 `watch 属性` 的值
+
+- `job` 方法用于执行 `watch handler`
+
+## 重温 effect
 
 ```js
   function effect(fn, options = EMPTY_OBJ) {
@@ -221,11 +227,11 @@ if (!asMixin && deferredWatch.length) {
 
 执行 `effect` 接收的参数：
 
-- fn： `effect` 回调，对于 `渲染 effect` ，这个回调是渲染组件，对于 `watch effect`,这个回调是获取 `watch` 属性值的方法
+- fn： `effect` 回调，对于 `渲染 effect` ，这个回调是渲染组件，对于 `watch effect`，  这个回调是获取 `watch` 属性值的方法
 
-- options: 配置项，重点是其中的一个 `scheduler` 属性，`scheduler` 就是当前 `effect` 要执行 `job` 添加到微任务队列中
+- options: 配置项，重点是其中的一个 `scheduler` 属性，`scheduler` 的作用就是添加一个 `job` 到微任务队列中
 
-  对于 `渲染 effect` ，这个 `job` 是渲染组件，对于 `watch effect`,这个 `job` 是 `watch` 属性对应的 `hanler`
+  对于 `渲染 effect` ，这个 `job` 是 `渲染 effect` 本身，对于 `watch effect`,这个 `job` 是 `watch` 属性对应的 `handler`
 
 每次执行 `effect` 的时候返回 `createReactiveEffect()` 方法的回调
 

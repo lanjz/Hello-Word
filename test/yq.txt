@@ -3,19 +3,18 @@
 	"emptLineMap": {
 		"col2": [0, 0],
 		"col0": [],
-		"col1": []
+		"col1": [0, 0]
 	},
 	"userInfo": {
+		"loginType": "01",
+		"customid": "5017052760227373",
+		"citycode": "380",
 		"usernumber": "18649823553",
 		"currentID": "18649823553",
 		"nettype": "11",
 		"paytype": "2",
 		"provincecode": "038",
-		"citycode": "380",
-		"loginType": "01",
-		"customid": "5017052760227373",
-		"productType": "01",
-		"expireTime": "1610620060796",
+		"expireTime": "1612409742777",
 		"areaCode": "",
 		"custlvl": "三星忠诚用户",
 		"certnum": "5002****3126",
@@ -25,18 +24,19 @@
 		"custName": "杨钰琴",
 		"certaddr": "大昌**********",
 		"brand": "4G00",
-		"nickName": "y*琴",
-		"laststatdate": "20210103185627",
-		"brand_name": "联通5G",
-		"is_20": false,
-		"is_36": false,
+		"productType": "01",
 		"subscrbstat": "开通",
 		"certtype": "11",
 		"is_wo": "2",
-		"lastLoginTime": "2021-01-04 00:38:14",
-		"defaultFlag": "00",
-		"isINUser": "0000",
+		"nickName": "y*琴",
+		"laststatdate": "20210203222755",
+		"brand_name": "联通5G",
+		"is_20": false,
+		"is_36": false,
+		"encryptCert": "TosWvzGyPtCyPbJi4zDxkCHqsIR5sosvwingTNH7KwmUZD8KACvT2oQDVVRtiHK6zhzoLwt2PsgvVn9NZ1+jlCZrpLzKxIzHsN2jNJ0qL0/zRX/ZSfGvXSO4LyjMjCyu+JowUAOkMQ8yAdbKs4kwY6hGlq/D6m3ho/u+g6+hTAs=",
 		"verifyState": "",
+		"bindCustID": "",
+		"lastLoginTime": "2021-02-04 09:24:45",
 		"natureQueryNumberInfo": {
 			"part_id": "1-5******126",
 			"cert_type": "01",
@@ -46,18 +46,16 @@
 			"rsp_desc": "正常/成功",
 			"cert_name": "杨******"
 		},
-		"loginCustid": "5017052760227373",
-		"encryptCert": "qCMH3szBB0OsDUiO4CbS8/2CTgV1izd+CJ9zTYOIiKRHQksXDUcwNEkOV2D52jgAKWZ1jANss3mYlr8kh4xOmYAa+nhfvqG9dyLcxp3QFBJxCFvK9NCmL9WHbMRxfS5lnLeDU0oCAC6m/2qroCsXPZSvmlqiZIQALyzl4AiUz8o=",
-		"mapExtraParam_rls": "06",
+		"defaultFlag": "00",
+		"isINUser": "0000",
+		"mapExtraParam_rls": "01",
 		"custsex": "1",
+		"loginCustid": "5017052760227373",
 		"status": "开通",
 		"packageName": "畅越冰激凌5G套餐49元"
 	},
 	"separateShow": false,
 	"totalMonthData": [{
-		"fee": "36.30",
-		"cycleid": "202001"
-	}, {
 		"fee": "36.10",
 		"cycleid": "202002"
 	}, {
@@ -90,56 +88,106 @@
 	}, {
 		"fee": "119.10",
 		"cycleid": "202012"
+	}, {
+		"fee": "133.8",
+		"cycleid": "202101"
 	}],
 	"billList": [{
-		"discnt": "",
 		"amount": "119.00",
 		"leve": "",
-		"lineSize": 2,
 		"integrateItemCode": "1001",
-		"childCount": 1,
+		"allLineCount": 2,
+		"usedCount": "--",
 		"lines": [{
-			"discnt": "",
 			"amount": "119.00",
 			"leve": "-",
-			"lineSize": 1,
 			"integrateItemCode": "21229",
-			"childCount": 0,
-			"lines": [],
 			"allLineCount": 1,
 			"usedCount": "--",
+			"lines": [],
+			"lineSize": 1,
+			"childCount": 0,
+			"discnt": "",
 			"name": "基本套餐费"
 		}],
-		"allLineCount": 2,
-		"usedCount": "--",
+		"lineSize": 2,
+		"childCount": 1,
+		"discnt": "",
 		"name": "月固定费"
 	}, {
-		"discnt": "",
-		"amount": "0.10",
+		"amount": "0.20",
 		"leve": "",
-		"lineSize": 2,
 		"integrateItemCode": "1002",
-		"childCount": 1,
-		"lines": [{
-			"discnt": "",
-			"amount": "0.10",
-			"leve": "-",
-			"lineSize": 1,
-			"integrateItemCode": "921271",
-			"childCount": 0,
-			"lines": [],
-			"allLineCount": 1,
-			"usedCount": "--",
-			"name": "点对点彩信"
-		}],
 		"allLineCount": 2,
 		"usedCount": "--",
+		"lines": [{
+			"amount": "0.20",
+			"leve": "-",
+			"integrateItemCode": "921247",
+			"allLineCount": 1,
+			"usedCount": "--",
+			"lines": [],
+			"lineSize": 1,
+			"childCount": 0,
+			"discnt": "",
+			"name": "点对点短信"
+		}],
+		"lineSize": 2,
+		"childCount": 1,
+		"discnt": "",
 		"name": "增值业务费"
+	}, {
+		"amount": "9.60",
+		"leve": "",
+		"integrateItemCode": "1005",
+		"allLineCount": 2,
+		"usedCount": "--",
+		"lines": [{
+			"amount": "9.60",
+			"leve": "-",
+			"integrateItemCode": "423999",
+			"allLineCount": 1,
+			"usedCount": "--",
+			"lines": [],
+			"lineSize": 1,
+			"childCount": 0,
+			"discnt": "",
+			"name": "国内通话费"
+		}],
+		"lineSize": 2,
+		"childCount": 1,
+		"discnt": "",
+		"name": "语音通话费"
+	}, {
+		"amount": "5.00",
+		"leve": "",
+		"integrateItemCode": "1009",
+		"allLineCount": 2,
+		"usedCount": "--",
+		"lines": [{
+			"amount": "5.00",
+			"leve": "-",
+			"integrateItemCode": "921275",
+			"allLineCount": 1,
+			"usedCount": "--",
+			"lines": [],
+			"lineSize": 1,
+			"childCount": 0,
+			"discnt": "",
+			"name": "手机上网流量费"
+		}],
+		"lineSize": 2,
+		"childCount": 1,
+		"discnt": "",
+		"name": "上网费"
 	}],
 	"datList": [{
-		"dat": "202012",
-		"datfmt": "2020年12月",
+		"dat": "202101",
+		"datfmt": "2021年01月",
 		"cls": "on"
+	}, {
+		"dat": "202012",
+		"datfmt": "2020年12月"
 	}, {
 		"dat": "202011",
 		"datfmt": "2020年11月"
@@ -170,31 +218,22 @@
 	}, {
 		"dat": "202002",
 		"datfmt": "2020年02月"
-	}, {
-		"dat": "202001",
-		"datfmt": "2020年01月"
 	}],
 	"isDiscount": "",
 	"result": {
 		"balance": "0.00",
 		"areaCode": "0591",
 		"scoreInfo": [{
+			"rsRvScoreAdjust": "0",
 			"rsRvScore3": "0",
 			"rsRvScore2": "0",
-			"rsRvScoreAdjust": "0",
 			"rsRvScore1": "0",
 			"scoreUseValue": "0",
 			"scoreIdleValue": "0"
 		}],
 		"userId": "3817122330422201",
-		"cycleId": "202012",
-		"resultMemo": "备注信息",
-		"adjustFee": "0.00",
-		"backFee": "0.00",
-		"actionFeeUsed": "0.00",
-		"derateFee": "0.00",
+		"cycleId": "202101",
 		"billInfo": [{
-			"discnt": "",
 			"fee": "119.00",
 			"balance": "",
 			"parentItemCode": "-1",
@@ -202,9 +241,9 @@
 			"integrateItem": "月固定费",
 			"usedValue": "",
 			"adjustAfter": "",
-			"adjustBefore": ""
+			"adjustBefore": "",
+			"discnt": ""
 		}, {
-			"discnt": "",
 			"fee": "119.00",
 			"balance": "",
 			"parentItemCode": "1001",
@@ -212,33 +251,71 @@
 			"integrateItem": "基本套餐费",
 			"usedValue": "",
 			"adjustAfter": "",
-			"adjustBefore": ""
+			"adjustBefore": "",
+			"discnt": ""
 		}, {
-			"discnt": "",
-			"fee": "0.10",
+			"fee": "0.20",
 			"balance": "",
 			"parentItemCode": "-1",
 			"integrateItemCode": "1002",
 			"integrateItem": "增值业务费",
 			"usedValue": "",
 			"adjustAfter": "",
-			"adjustBefore": ""
+			"adjustBefore": "",
+			"discnt": ""
 		}, {
-			"discnt": "",
-			"fee": "0.10",
+			"fee": "0.20",
 			"balance": "",
 			"parentItemCode": "1002",
-			"integrateItemCode": "921271",
-			"integrateItem": "点对点彩信",
+			"integrateItemCode": "921247",
+			"integrateItem": "点对点短信",
 			"usedValue": "",
 			"adjustAfter": "",
-			"adjustBefore": ""
-		}],
-		"allFee": "119.10",
-		"acctClass": [{
-			"fee": "36.30",
-			"cycleid": "202001"
+			"adjustBefore": "",
+			"discnt": ""
 		}, {
+			"fee": "9.60",
+			"balance": "",
+			"parentItemCode": "-1",
+			"integrateItemCode": "1005",
+			"integrateItem": "语音通话费",
+			"usedValue": "",
+			"adjustAfter": "",
+			"adjustBefore": "",
+			"discnt": ""
+		}, {
+			"fee": "9.60",
+			"balance": "",
+			"parentItemCode": "1005",
+			"integrateItemCode": "423999",
+			"integrateItem": "国内通话费",
+			"usedValue": "",
+			"adjustAfter": "",
+			"adjustBefore": "",
+			"discnt": ""
+		}, {
+			"fee": "5.00",
+			"balance": "",
+			"parentItemCode": "-1",
+			"integrateItemCode": "1009",
+			"integrateItem": "上网费",
+			"usedValue": "",
+			"adjustAfter": "",
+			"adjustBefore": "",
+			"discnt": ""
+		}, {
+			"fee": "5.00",
+			"balance": "",
+			"parentItemCode": "1009",
+			"integrateItemCode": "921275",
+			"integrateItem": "手机上网流量费",
+			"usedValue": "",
+			"adjustAfter": "",
+			"adjustBefore": "",
+			"discnt": ""
+		}],
+		"allFee": "133.8",
+		"acctClass": [{
 			"fee": "36.10",
 			"cycleid": "202002"
 		}, {
@@ -271,13 +348,21 @@
 		}, {
 			"fee": "119.10",
 			"cycleid": "202012"
+		}, {
+			"fee": "133.8",
+			"cycleid": "202101"
 		}],
-		"writeOffFee": "119.10",
-		"recvFeeUsed": "119.10",
+		"writeOffFee": "133.8",
+		"recvFeeUsed": "133.8",
 		"presentFeeUsed": "0.00",
+		"resultMemo": "备注信息",
+		"adjustFee": "0.00",
+		"backFee": "0.00",
+		"actionFeeUsed": "0.00",
+		"derateFee": "0.00",
 		"serialNumber": "18649823553",
 		"success": true,
-		"busiOrder": "BUSI012101141627520384677133",
+		"busiOrder": "BUSI012102041107480464793089",
 		"respCode": "0000",
 		"respDesc": "成功"
 	},
@@ -287,8 +372,8 @@
 		"usedScore": 0
 	},
 	"success": true,
-	"curDate": "202012",
-	"queryTime": "查询时间：2021年01月14日 16:28:08",
+	"curDate": "202101",
+	"queryTime": "查询时间：2021年02月04日 11:08:07",
 	"isForTotal": "",
 	"LoginType": "01",
 	"groupInfo": null

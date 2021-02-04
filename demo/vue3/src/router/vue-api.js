@@ -1,4 +1,4 @@
-const Props = { template: '<div>Props</div>' }
+import Props from '../compositionApi/props/AttrProps'
 const Provide = { template: '<div>Provide</div>' }
 
 /*要注意，以 / 开头的嵌套路径会被当作根路径。 这让你充分的使用嵌套组件而无须设置嵌套的路径*/
