@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "archiver": "^5.2.0",
+    "node-ssh": "^11.1.1"
+  }
+}

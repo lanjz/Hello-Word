@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const Service = require('../lib/service')
+const Service = require('..')
 const service = new Service()
 
 const rawArgv = process.argv.slice(2)
