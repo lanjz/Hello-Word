@@ -3,9 +3,9 @@ module.exports = {
   script: "npm run build:dev",
   host: "",
   port: '',
-  username: "carhll",
+  username: "",
   password: "",
   distPath: "build",
-  publishPath: "/home/data/webroot/pos-admin.huolala.cn",
+  publishPath: "",
   isRemoveRemoteFile: true,
 }
