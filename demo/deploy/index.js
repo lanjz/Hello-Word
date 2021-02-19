@@ -1,21 +1,9 @@
-/*  //在服务器上cwd配置的路径下执行sh deploy.sh脚本来实现发布
-  ssh.execCommand('sh deploy.sh', { cwd:'/usr/bin/XXXXX' }).then(function(result) {
-    console.log('远程STDOUT输出: ' + result.stdout)
-    console.log('远程STDERR输出: ' + result.stderr)
-    if (!result.stderr){
-      console.log('发布成功!');
-      process.exit(0);
-    }
-  });*/
-
 const path = require('path');
 const archiver =require('archiver');
 const fs = require('fs');
 const { NodeSSH } = require('node-ssh')
 const ssh = new NodeSSH();
 const config = require('./deploy.config');
-
-
 
 const srcPath = path.resolve(__dirname, config.distPath); // 要上传的文件
 if(!fs.existsSync(srcPath)){
@@ -144,3 +132,15 @@ function removeLocalZip(){
   console.log('成功删除本地压缩文件')
 }
 doJob();
+
+/**
+ * 在服务器上cwd配置的路径下执行sh deploy.sh脚本来实现发布
+  ssh.execCommand('sh deploy.sh', { cwd:'/usr/bin/XXXXX' }).then(function(result) {
+    console.log('远程STDOUT输出: ' + result.stdout)
+    console.log('远程STDERR输出: ' + result.stderr)
+    if (!result.stderr){
+      console.log('发布成功!');
+      process.exit(0);
+    }
+  });
+ */
