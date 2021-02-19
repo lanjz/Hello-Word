@@ -1,6 +1,6 @@
 const sidebar = require('./sidebar')
 module.exports = {
-  title: 'Hello VuePress',
+  title: 'Hello Wold',
   // theme: '@vuepress/blog',
   description: 'Just playing around',
   extraWatchFiles: ['./sidebar.js'],
