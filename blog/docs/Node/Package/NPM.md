@@ -85,7 +85,7 @@
 
 2. 在 `src` 目录下新一个 `lib` 文件夹，放置需要封装的 `vue` 组件
 
-3. 修改 `vue.config.js` 文件
+3. 修改 `vue.deploy.config.js` 文件
 
 ```js
 {

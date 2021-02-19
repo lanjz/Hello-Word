@@ -3,7 +3,7 @@
 如果在 Webpack 配置中，只配置了 `css-loader` ,而没有配置 `style-loader` ,打包后我们会发现样式并没有应用于DOM 元素中
 
 ```js
-// vue.config.js
+// vue.deploy.config.js
 {
     test: /.css$/,
     loader: 'css-loader',

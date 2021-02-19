@@ -59,7 +59,7 @@ module.exports = {
   description: '初始化项目',
   apply: () => {
     if (checkDeployConfigExists()) {
-      error('deploy.config.js 配置文件已存在')
+      error('deploy.deploy.config.js 配置文件已存在')
       process.exit(1)
     } else {
       getUserInputInfo().then((userInputInfo) => {
@@ -67,7 +67,7 @@ module.exports = {
         formatConfigFile()
         succeed(
           `配置文件生成成功，请查看项目目录下的 ${underline(
-            'deploy.config.js'
+            'deploy.deploy.config.js'
           )} 文件确认配置是否正确`
         )
         process.exit(0)

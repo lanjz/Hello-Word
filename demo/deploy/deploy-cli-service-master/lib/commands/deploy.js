@@ -331,7 +331,7 @@ module.exports = {
       }
     } else {
       error(
-        'deploy.config.js 文件不存，请使用 deploy-cli-service init 命令创建'
+        'deploy.deploy.config.js 文件不存，请使用 deploy-cli-service init 命令创建'
       )
       process.exit(1)
     }

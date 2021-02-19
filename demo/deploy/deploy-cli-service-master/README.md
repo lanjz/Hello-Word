@@ -58,13 +58,13 @@ deploy-cli-service -h
 deploy-cli-service init # 或者使用简写 deploy-cli-service i
 ```
 
-根据提示填写内容，会在项目根目录下生成 `deploy.config.js` 文件，初始化配置只会生成 `dev` (开发环境)、`test` (测试环境)、`prod` (生产环境) 三个配置，再有其他配置可参考模板自行配置。
+根据提示填写内容，会在项目根目录下生成 `deploy.deploy.config.js` 文件，初始化配置只会生成 `dev` (开发环境)、`test` (测试环境)、`prod` (生产环境) 三个配置，再有其他配置可参考模板自行配置。
 
 ![](https://ae01.alicdn.com/kf/Uf9bb311b13764e4aa25c51d57b52bdc2Z.jpg)
 
 #### 2.3 手动创建或修改配置文件
 
-在项目根目录下手动创建 `deploy.config.js` 文件，复制以下代码按情况修改即可。
+在项目根目录下手动创建 `deploy.deploy.config.js` 文件，复制以下代码按情况修改即可。
 
 ```javascript
 module.exports = {
