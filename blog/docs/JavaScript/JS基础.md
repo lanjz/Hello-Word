@@ -693,6 +693,8 @@ class Square extends Polygon {
 }
 
 var square = new Square(2);
+square instanceof Square // true
+square instanceof Polygon // true
 ```
 
 > JavaScript中的`class` 仍然是基于原型的
@@ -761,14 +763,14 @@ t1.__proto__ === t2.__proto__ // true
 
 ```
 
-注意自己实现的`_new`方法并不是与`new`完成一样,继续上个例子来简单做下演示：
+注意自己实现的`_new`方法并不是与`new`完全一样,继续上个例子来简单做下演示：
 
 ```js
-console.log('获取构造方法：'， t1.constructor) // 获取构造方法: ƒ Object() { [native code] }
+console.log('获取构造方法：', t1.constructor) // 获取构造方法: ƒ Object() { [native code] }
 t1.constructor === Object.prototype.constructor // true
 // 使用原生new
 var t3 = new t(5)
-console.log('获取构造方法：'， t1.constructor) // 获取构造方法: ƒ t(arg){ this.a = arg }
+console.log('获取构造方法：', t3.constructor) // 获取构造方法: ƒ t(arg){ this.a = arg }
 ```
 
 ## Javascript内存模式
