@@ -1,3 +1,13 @@
+/*  //在服务器上cwd配置的路径下执行sh deploy.sh脚本来实现发布
+  ssh.execCommand('sh deploy.sh', { cwd:'/usr/bin/XXXXX' }).then(function(result) {
+    console.log('远程STDOUT输出: ' + result.stdout)
+    console.log('远程STDERR输出: ' + result.stderr)
+    if (!result.stderr){
+      console.log('发布成功!');
+      process.exit(0);
+    }
+  });*/
+
 const path = require('path');
 const archiver =require('archiver');
 const fs = require('fs');
@@ -28,7 +38,7 @@ function startZip() {
         return;
       }
       console.log('已生成zip包');
-      uploadFile();
+      doJob();
     });
 
   archive.pipe(output);// 压缩内容输出到 zip
@@ -37,43 +47,11 @@ function startZip() {
   archive.finalize(); // 执行打包
 }
 
-//将dist目录上传至正式环境
-function uploadFile() {
-  console.log('开始ssh连接...');
-  ssh.connect({
-    host: config.host,
-    port: config.port,
-    username: config.username,
-    password: config.password,
-  }).then(function () {
-    console.log('ssh连接成功...');
-    console.log('上传本地压缩文件');
-    //上传网站的发布包至configs中配置的远程服务器的指定地址
-    ssh.putFile(localPublishZipPath, remotePublishZipPath).then(function(status) {
-      console.log('上传文件成功');
-      startRemoteShell();// 上传成功后触发远端脚本
-    }).catch(err=>{
-      console.log('文件传输异常:',err);
-      process.exit(0);
-    });
-  }).catch(err=>{
-    console.log('ssh连接失败:',err);
-    process.exit(0);
-  });
-}
-
 //执行远端部署脚本
-async function startRemoteShell(remotePublishPath) {
-/*  //在服务器上cwd配置的路径下执行sh deploy.sh脚本来实现发布
-  ssh.execCommand('sh deploy.sh', { cwd:'/usr/bin/XXXXX' }).then(function(result) {
-    console.log('远程STDOUT输出: ' + result.stdout)
-    console.log('远程STDERR输出: ' + result.stderr)
-    if (!result.stderr){
-      console.log('发布成功!');
-      process.exit(0);
-    }
-  });*/
+async function doJob(remotePublishPath) {
   try {
+    await connectSSH()
+    await uploadFile()
     await removeRemoteFile()
     await unzipRemoteFile()
   }catch (err){
@@ -82,7 +60,33 @@ async function startRemoteShell(remotePublishPath) {
     process.exit(0);
   }
 }
-// 解决上传的文件
+// 上传文件
+function connectSSH(){
+  console.log('开始ssh连接...');
+  return ssh.connect({
+    host: config.host,
+    port: config.port,
+    username: config.username,
+    password: config.password,
+  }).then(function () {
+    console.log('ssh连接成功...');
+  }).catch(err=>{
+    console.log('ssh连接失败:',err);
+    throw err
+  });
+}
+// 上传文件
+function uploadFile(){
+  console.log('上传本地压缩文件');
+  //上传网站的发布包至configs中配置的远程服务器的指定地址
+  return ssh.putFile(localPublishZipPath, remotePublishZipPath).then(function(status) {
+    console.log('上传文件成功');
+  }).catch(err=>{
+    console.log('文件传输异常:',err);
+    throw err
+  });
+}
+// 解压上传的文件
 function unzipRemoteFile(){
   console.log('开始解压文件', remotePublishZipPath)
   return ssh.execCommand(`unzip -o ${remotePublishZipPath} -d ${remotePublishPath}`)

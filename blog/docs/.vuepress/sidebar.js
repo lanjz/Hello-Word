@@ -115,7 +115,11 @@ module.exports = {
   ],
   '/Algorithm/': [
     '/Algorithm/时间&空间复杂度',
-    '/Algorithm/算法题二',
+    '/Algorithm/简单排序',
+    '/Algorithm/动态规划',
+    '/Algorithm/剑指offer二',
+    '/Algorithm/算法题一',
+    '/Algorithm/小题',
   ],
   '/network/': [
     '/network/HTTP及演变',
