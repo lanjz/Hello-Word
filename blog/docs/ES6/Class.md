@@ -10,7 +10,7 @@ function Point(x, y) {
 
 Point.prototype.toString = function () {
   return '(' + this.x + ', ' + this.y + ')';
-};
+};类的内部所有定义的方法
 
 var p = new Point(1, 2);
 
@@ -155,6 +155,23 @@ Object.keys(Point.prototype)
 Object.getOwnPropertyNames(Point.prototype)
 // ["constructor","toString"]
 
+class ClassPoint {
+  constructor() {
+    // ...
+  }
+
+  toString() {
+    // ...
+  }
+
+  toValue() {
+    // ...
+  }
+}
+Object.keys(ClassPoint.prototype)
+// []
+Object.getOwnPropertyNames(ClassPoint.prototype)
+// ["constructor","toString", "toValue"]
 ```
 
 ## 静态属性和静态方法
@@ -180,7 +197,7 @@ class Fo extends  Foo{
 Fo.prop // 1
 ```
 
-要注意的静态方法可以写在 Class 内部， 而静态方法写在写在 Class 外部。因为 ES6 明确规定，Class 内部只有静态方法，没有静态属性。现在有一个提案提供了类的静态属性，写法是在实例属性的前面，加上 `static` 关键字
+要注意的静态方法可以写在 Class 内部， 而静态属性写在 Class 外部。因为 ES6 明确规定，Class 内部只有静态方法，没有静态属性。现在有一个提案提供了类的静态属性，写法是在实例属性的前面，加上 `static` 关键字
 
 ```js
 class MyClass {

@@ -122,26 +122,26 @@ for (var value of range(0, 3)) {
 例子二：
 
 ```js
-let obj = {
-  data: [ 'hello', 'world' ],
-  [Symbol.iterator]() {
-    const self = this;
-    let index = 0;
+  let obj = {a: 1, b: 2}
+  obj[Symbol.iterator] = function (){
+    let self = this
+    let index = 0
     return {
       next() {
-        if (index < self.data.length) {
-          return {
-            value: self.data[index++],
-            done: false
-          };
-        } else {
-          return { value: undefined, done: true };
+        console.log('this', this) // 指向 return 出来的对象
+        console.log('self', self)
+        if(index < Object.keys(self).length){
+          return {value: Object.keys(self)[index++], done: false}
         }
+        return {value: undefined, done: true}
       }
-    };
+    }
   }
-};
+  for(let i of obj){
+    console.log(i) // 输出 a, b
+  }
 ```
+
 
 ## 调用 Iterator 接口的场合
 
@@ -234,7 +234,7 @@ for (let x of obj) {
 
 遍历器对象除了具有 `next` 方法，还具有两个方法
 
--`return`： 如果 `for...of`循环提前退出（通常是因为出错，或者有 `break` 语句），就会调用 `return` 方法。如果一个对象在完成遍历前，需要清理或释放资源，就可以部署 `return` 方法
+- `return`： 如果 `for...of`循环提前退出（通常是因为出错，或者有 `break` 语句），就会调用 `return` 方法。如果一个对象在完成遍历前，需要清理或释放资源，就可以部署 `return` 方法
 
   ```js
   // 情况一

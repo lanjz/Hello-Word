@@ -205,7 +205,7 @@ Node.js 要求 ES6 模块采用 `.mjs` 后缀文件名。也就是说，只要�
 }
 ```
 
-面代码指定项目的入口脚本为 `./src/index.js` ，它的格式为 ES6 模块。如果没有 `type` 字段，`index.js` 就会被解释为 CommonJS 模块
+上面代码指定项目的入口脚本为 `./src/index.js` ，它的格式为 ES6 模块。如果没有 `type` 字段，`index.js` 就会被解释为 CommonJS 模块
 
 然后，`import` 命令就可以加载这个模块
 
@@ -316,7 +316,7 @@ import submodule from 'es-module-package/submodule';
 
 ## ES6 模块加载 CommonJS 模块
 
-目前，一个模块同时支持 ES6 和 CommonJS 两种格式的常见方法是，`package.json` 文件的 `main` 字段指定 CommonJS 入口，给 Node.js 使用；`module` 字段指定 ES6 模块入口，给打包工具使用，因为 Node.js 不认识 ``module` 字段。
+目前，一个模块同时支持 ES6 和 CommonJS 两种格式的常见方法是，`package.json` 文件的 `main` 字段指定 CommonJS 入口，给 Node.js 使用；`module` 字段指定 ES6 模块入口，给打包工具使用，因为 Node.js 不认识 `module` 字段。
 
 有了上一节的条件加载以后，Node.js 本身就可以同时处理两种模块
 
