@@ -92,6 +92,7 @@ module.exports = {
     '/Vue/Vuex',
     '/Vue/Extend',
     '/Vue/SSR',
+    '/Vue/共享状态思想',
     '/Vue/Paas应用',
     '/Vue/吱不吱',
   ],
@@ -110,7 +111,6 @@ module.exports = {
     '/React/Diff',
     '/React/性能优化',
     '/React/React高级指引',
-    '/React/Redux',
     '/React/服务端渲染',
   ],
   '/Algorithm/': [

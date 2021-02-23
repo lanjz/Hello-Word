@@ -141,7 +141,7 @@ Babel 官方帮我们做了一些预设的插件集，称之为 `Preset`，这�
 
 4. `@babel/preset-env`
 
-###　生成（Code Generation）
+### 生成（Code Generation）
 
 用 `babel-generator` 通过 AST 树生成 ES5 代码。
 
@@ -426,7 +426,36 @@ document.body.appendChild(component());
     }
 
   ```
-  
+
+例子：
+
+源码
+
+```js
+const fn = () => {}
+new Promise(()=> {})
+var b = [1, 2, 3];
+b.includes(1)
+```
+
+编译后
+
+```js
+"use strict";
+
+require("core-js/modules/es7.array.includes");
+
+require("core-js/modules/es6.promise");
+
+require("core-js/modules/es6.object.to-string");
+
+var fn = function fn() {};
+
+new Promise(function () {});
+var b = [1, 2, 3];
+b.includes(1);
+```
+
 结合 `@babel/preset-env` 的配置，可以解决引用 `polyfill` 过大的问题，但对于第二个问题需要使用 `babel-runtime` 解决
 
 ### runtime
@@ -452,12 +481,31 @@ document.body.appendChild(component());
 }
 ```
 
+源码：
+
 ```js
-// 输入的ES6代码
-var sym = Symbol();
-// 通过transform-runtime转换后的ES5+runtime代码 
-var _symbol = require("babel-runtime/core-js/symbol");
-var sym = (0, _symbol.default)();
+const fn = () => {}
+new Promise(()=> {})
+var b = [1, 2, 3];
+b.includes(1)
+```
+
+编译后结果为：
+
+```js
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime-corejs3/helpers/interopRequireDefault");
+
+var _includes = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/includes"));
+
+var _promise = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/promise"));
+
+var fn = function fn() {};
+
+new _promise["default"](function () {});
+var b = [1, 2, 3];
+(0, _includes["default"])(b).call(b, 1);
 ```
 
 从上面代码可以看到，当我们要使用 `Symbol` 时，这个方法是从 `babel-runtime/core-js/symbol` 导出的，这样既有了 Symbol 的功能，同时又没有像 `polyfill` 那样污染全局环境
@@ -478,13 +526,6 @@ var sym = (0, _symbol.default)();
 
 `transform-runtime` 在 `.babelrc` 里配置的时候，还可以设置 `helpers`、`polyfill`、`regenerator` 这三个开关，以自行决定` runtime` 是否要引入对应的功能
 
-**由于 runtime 不会污染全局空间，所以实例方法是无法工作的（因为这必须在原型链上添加这个方法，这是和polyfill最大的不同）**
-
-```js
-var arr = ['a', 'b', 'c'];
-arr.fill(7);  // 实例方法不行
-Array.prototype.fill.apply(arr, 7);  // 用原型链来调用也是不行
-```
 
 > 注意：这里一定要配置 `corejs`，同时安装 `@babel/runtime-corejs2`，不配置的情况下 `@babel/plugin-transform-runtime` 默认是不引入这些 `polyfill` 的`helper` 的
 
@@ -576,7 +617,27 @@ Array.prototype.fill.apply(arr, 7);  // 用原型链来调用也是不行
 }
 ```
 
-[Babel 的工作原理以及怎么写一个 Babel 插件](https://cloud.tencent.com/developer/article/1520124)
+
+最佳配置应该是这个：
+
+```js
+{
+  "presets": [
+    ["@babel/preset-env",
+      {
+        "useBuiltIns": "usage"
+      }
+    ]
+  ],
+  "plugins": [
+    [
+      "@babel/plugin-transform-runtime", {
+      "corejs": 2
+    }
+    ]
+  ]
+}
+```
 
 [史上最清晰易懂的babel配置解析](https://segmentfault.com/a/1190000018721165)
 

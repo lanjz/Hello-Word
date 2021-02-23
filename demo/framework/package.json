@@ -7,13 +7,11 @@
     "lib": "lib"
   },
   "scripts": {
+    "webpack": "webpack-dev-server --config webpack.config/test.js",
     "start:v": "webpack-dev-server --config webpack.config/vue.config.js",
     "build:v": "webpack --config webpack.config/vue.config.js",
-
     "build:ssr:v2": "yarn build:ssr:v:server && yarn build:ssr:v:client && node src/src-vue/server/server.js",
-
     "build:ssr:v": "yarn build:ssr:v:server && yarn build:ssr:v:client",
-
     "start:ssr:v": "node src/src-vue/server.js",
     "build:ssr:v:server": "webpack --config webpack.config/ssr-vue-server.js",
     "build:ssr:v:client": "webpack --config webpack.config/ssr-vue-client.js",
@@ -24,7 +22,9 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/plugin-transform-runtime": "^7.12.17",
     "@babel/preset-env": "^7.12.10",
+    "@babel/runtime-corejs3": "^7.12.18",
     "babel-loader": "^8.2.2",
     "chokidar": "^3.4.3",
     "clean-webpack-plugin": "^3.0.0",

@@ -9,7 +9,8 @@
     "start:r": "webpack-dev-server --config webpack_config/webpack.config.js --colors --env.bool --env.entry=react",
     "build": "webpack --config webpack_config/webpack.prod.js --env.NODE_ENV=local",
     "start:m": "node webpack_config/dev.multi.server.js --env.multi",
-    "build:m": "webpack --config webpack_config/webpack.prod.js --env.NODE_ENV=local --env.multi"
+    "build:m": "webpack --config webpack_config/webpack.prod.js --env.NODE_ENV=local --env.multi",
+    "babel": "babel Babel_CLI --out-dir lib"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
