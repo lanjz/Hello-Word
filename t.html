@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<ul id="ul">
+    <li>1</li>
+    <li>2</li>
+    <li>2</li>
+</ul>
+<script>
+    document.getElementById('ul').onclick = function (e){
+      console.log(e)
+      if(e.target.tagName === 'LI'){
+        console.log(e.target.innerText)
+      }
+    }
+    Array.prototype.findDuplicate = function (n){
+      let map = {}
+      let result = []
+      for(let i in this){
+        map[i] = (map[i]||0) +1
+        if(map[i] >= n){
+          result.push(i)
+        }
+      }
+      return result
+    }
+</script>
+</body>
+</html>
