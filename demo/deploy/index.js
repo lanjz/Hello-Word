@@ -3,14 +3,25 @@ const archiver =require('archiver');
 const fs = require('fs');
 const { NodeSSH } = require('node-ssh')
 const ssh = new NodeSSH();
-const config = require('./deploy.config');
-
-const srcPath = path.resolve(__dirname, config.distPath); // 要上传的文件
+const cwd = process.cwd()
+let deployConfigPath = path.resolve(cwd, './deploy.config.js')
+if(!fs.existsSync(deployConfigPath)){
+  console.log(`请添加deploy.config.js文件`, deployConfigPath)
+  return
+}
+const deployConfig = require(deployConfigPath);
+let ENV = process.argv[2]
+const config = deployConfig&&deployConfig[ENV] ? deployConfig[ENV] : null
+if(!config){
+  console.log(`需要完善配置信息`)
+  return
+}
+const srcPath = path.resolve(cwd, config.distPath); // 要上传的文件
 if(!fs.existsSync(srcPath)){
   console.log(`不存在${config.distPath}目录`)
   return
 }
-const localZipPath = path.resolve(__dirname, `${config.distPath}.zip`); // 压缩名件名
+const localZipPath = path.resolve(cwd, `${config.distPath}.zip`); // 压缩名件名
 let remotePublishZipPath = path.resolve(config.publishPath, `${config.distPath}.zip`)
 let remotePublishPath = path.resolve(config.publishPath, `/${config.distPath}`)
 
