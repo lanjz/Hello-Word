@@ -379,7 +379,7 @@ var missingNumber = function(nums) {
 };
 ```
 
-## 整数反转
+## [整数反转](https://leetcode-cn.com/problems/reverse-integer/)
 
 给你一个 32 位的有符号整数 x ，返回 x 中每位上的数字反转后的结果。
 

@@ -121,8 +121,8 @@ module.exports = {
     '/Algorithm/简单排序',
     '/Algorithm/动态规划',
     '/Algorithm/剑指offer二',
-    '/Algorithm/算法题一',
     '/Algorithm/小题',
+    '/Algorithm/字节前端',
   ],
   '/network/': [
     '/network/HTTP及演变',
