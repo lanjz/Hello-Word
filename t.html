@@ -11,7 +11,7 @@
     <li>2</li>
 </ul>
 <script>
-    document.getElementById('ul').onclick = function (e){
+/*    document.getElementById('ul').onclick = function (e){
       console.log(e)
       if(e.target.tagName === 'LI'){
         console.log(e.target.innerText)
@@ -27,7 +27,31 @@
         }
       }
       return result
-    }
+    }*/
+/*    document.body.addEventListener('click', function (){
+      Promise.resolve().then(() => {
+        console.log('a')
+      })
+      console.log('b')
+    })
+    document.body.addEventListener('click', function (){
+      Promise.resolve().then(() => {
+        console.log('a1')
+      })
+      console.log('b1')
+    })*/
+    setTimeout(function (){
+      Promise.resolve().then(() => {
+        console.log('a')
+      })
+      console.log('b')
+    })
+    setTimeout(function (){
+      Promise.resolve().then(() => {
+        console.log('a')
+      })
+      console.log('b')
+    })
 </script>
 </body>
 </html>

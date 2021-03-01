@@ -9,5 +9,6 @@ module.exports = {
    unzipDirName: undefined, // 解压后的文件名，默认与 distPath 一致
    isRemoveRemoteZip: true, // 发布成功后是否删除上传的压缩文件
    isRemoveLocalZip: true, // 发布成功后是否删除本地的压缩文件
+   exec: ''
  }
 }

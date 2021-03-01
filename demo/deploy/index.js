@@ -3,28 +3,38 @@ const archiver =require('archiver');
 const fs = require('fs');
 const { NodeSSH } = require('node-ssh')
 const ssh = new NodeSSH();
+const { log, err } = require('./utils/index')
 const cwd = process.cwd()
 let deployConfigPath = path.resolve(cwd, './deploy.config.js')
 if(!fs.existsSync(deployConfigPath)){
-  console.log(`请添加deploy.config.js文件`, deployConfigPath)
+  err(`请添加deploy.config.js文件`, deployConfigPath)
   return
 }
 const deployConfig = require(deployConfigPath);
 let ENV = process.argv[2]
 const config = deployConfig&&deployConfig[ENV] ? deployConfig[ENV] : null
 if(!config){
-  console.log(`需要完善配置信息`)
+  err(`需要完善配置信息`)
   return
 }
 const srcPath = path.resolve(cwd, config.distPath); // 要上传的文件
 if(!fs.existsSync(srcPath)){
-  console.log(`不存在${config.distPath}目录`)
+  err(`不存在${config.distPath}目录`)
   return
 }
 const localZipPath = path.resolve(cwd, `${config.distPath}.zip`); // 压缩名件名
-let remotePublishZipPath = path.resolve(config.publishPath, `${config.distPath}.zip`)
-let remotePublishPath = path.resolve(config.publishPath, `/${config.distPath}`)
-
+let remotePublishZipPath = config.publishPath + `/${config.distPath}.zip`
+let remotePublishPath =  config.publishPath + `/${config.distPath}`
+async function doExec(){
+  try {
+    await connectSSH() // 连接 ssh
+    await runExec(config.exec) // 连接 ssh
+  }catch (err){
+    err(err)
+  }finally {
+    process.exit(0);
+  }
+}
 //执行远端部署脚本
 async function doJob() {
   try {
@@ -40,20 +50,20 @@ async function doJob() {
       await removeLocalZip() // 移除本地的压缩包
     }
   }catch (err){
-    console.log(err)
+    err(err)
   }finally {
     process.exit(0);
   }
 }
 //压缩文件
 function startZip() {
-  console.log('开始压缩目录...');
+  log('开始压缩目录...');
   return new Promise((resolve, reject) => {
     const archive = archiver('zip', {
       zlib: { level: 9 } //递归扫描最多5层
     })
       .on('error', function(err) {
-        console.log('压缩失败')
+        err('压缩失败')
         reject(err);//压缩过程中如果有错误则抛出
       });
     const output = fs.createWriteStream(localZipPath)
@@ -61,11 +71,11 @@ function startZip() {
         /*压缩结束时会触发close事件，然后才能开始上传，
           否则会上传一个内容不全且无法使用的zip包*/
         if (err) {
-          console.log('关闭archiver异常:',err);
+          err('关闭archiver异常:',err);
           reject(err)
           return;
         }
-        console.log('已生成zip包');
+        log('已生成zip包');
         resolve();
       });
 
@@ -77,80 +87,98 @@ function startZip() {
 }
 // 上传文件
 function connectSSH(){
-  console.log('开始ssh连接...');
+  log('开始ssh连接...');
   return ssh.connect({
     host: config.host,
     port: config.port,
     username: config.username,
     password: config.password,
   }).then(function () {
-    console.log('ssh连接成功...');
+    log('ssh连接成功...');
   }).catch(err=>{
-    console.log('ssh连接失败:',err);
+    err('ssh连接失败:',err);
     throw err
   });
 }
 // 上传文件
 function uploadFile(){
-  console.log('上传本地压缩文件');
+  log('上传本地压缩文件:', localZipPath, '到:', remotePublishZipPath);
   //上传网站的发布包至configs中配置的远程服务器的指定地址
   return ssh.putFile(localZipPath, remotePublishZipPath).then(function(status) {
-    console.log('上传文件成功');
+    log('上传文件成功');
   }).catch(err=>{
-    console.log('文件传输异常:',err);
+    err('文件传输异常:',err);
     throw err
   });
 }
 // 解压上传的文件
 function unzipRemoteFile(){
-  console.log('开始解压文件：', remotePublishZipPath)
+  log('开始解压文件：', remotePublishZipPath, '到：', remotePublishPath)
   return ssh.execCommand(`unzip -o ${remotePublishZipPath} -d ${remotePublishPath}`)
     .then(() => {
-      console.log('解压成功')
+      log('解压成功')
     })
     .catch(err => {
-      console.log('解压失败')
+      err('解压失败')
       throw err
     })
 }
 function removeRemoteFile(){
-  console.log('删除远程文件：'+remotePublishPath)
+  log('删除远程文件：'+remotePublishPath)
   // 货拉拉需要使用 /bin/rm 删除文件
   return ssh.execCommand(`/bin/rm -rf ${remotePublishPath}`)
     .then(() => {
-      console.log('删除远程文件成功')
+      log('删除远程文件成功')
     })
     .catch(err => {
-      console.log('删除远程文件失败')
+      err('删除远程文件失败')
       throw err
     })
 }
 function removeRemoteZip(){
-  console.log('删除远程压缩文件：'+remotePublishZipPath)
+  log('删除远程压缩文件：'+remotePublishZipPath)
   // 货拉拉需要使用 /bin/rm 删除文件
   return ssh.execCommand(`/bin/rm -rf ${remotePublishZipPath}`)
     .then(() => {
-      console.log('删除远程压缩文件成功')
+      log('删除远程压缩文件成功')
     })
     .catch(err => {
-      console.log('删除远程压缩文件失败')
+      err('删除远程压缩文件失败')
       throw err
     })
 }
 function removeLocalZip(){
-  console.log('删除本地压缩文件:'+localZipPath)
+  log('删除本地压缩文件:'+localZipPath)
   fs.unlinkSync(localZipPath)
-  console.log('成功删除本地压缩文件')
+  log('成功删除本地压缩文件')
 }
-doJob();
+function runExec(code){
+  return ssh.execCommand(code)
+    .then((result) => {
+      console.log('远程STDOUT输出: ' + result.stdout)
+      if (!result.stderr){
+        log('执行命令成功', code)
+      }
+    })
+    .catch(err => {
+      log('执行命令成功')
+      throw err
+    })
+}
+if(config.exec){
+  doExec(); // 连接ssh 直接执行命令的
+} else {
+  doJob();
+}
+
 
 /**
  * 在服务器上cwd配置的路径下执行sh deploy.sh脚本来实现发布
   ssh.execCommand('sh deploy.sh', { cwd:'/usr/bin/XXXXX' }).then(function(result) {
-    console.log('远程STDOUT输出: ' + result.stdout)
-    console.log('远程STDERR输出: ' + result.stderr)
+    err('远程STDOUT输出: ' + result.stdout)
+    err('远程STDERR输出: ' + result.stderr)
     if (!result.stderr){
-      console.log('发布成功!');
+      err('发布成功!');
       process.exit(0);
     }
   });
