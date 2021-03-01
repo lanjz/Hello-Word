@@ -23,9 +23,8 @@ if(!fs.existsSync(srcPath)){
   return
 }
 const localZipPath = path.resolve(cwd, `${config.distPath}.zip`); // 压缩名件名
-let remotePublishZipPath = path.resolve(config.publishPath, `${config.distPath}.zip`)
-let remotePublishPath = path.resolve(config.publishPath, `/${config.distPath}`)
-
+let remotePublishZipPath = config.publishPath + `/${config.distPath}.zip`
+let remotePublishPath =  config.publishPath + `/${config.distPath}`
 async function doExec(){
   try {
     await connectSSH() // 连接 ssh
@@ -103,7 +102,7 @@ function connectSSH(){
 }
 // 上传文件
 function uploadFile(){
-  log('上传本地压缩文件');
+  log('上传本地压缩文件:', localZipPath, '到:', remotePublishZipPath);
   //上传网站的发布包至configs中配置的远程服务器的指定地址
   return ssh.putFile(localZipPath, remotePublishZipPath).then(function(status) {
     log('上传文件成功');
@@ -114,7 +113,7 @@ function uploadFile(){
 }
 // 解压上传的文件
 function unzipRemoteFile(){
-  log('开始解压文件：', remotePublishZipPath)
+  log('开始解压文件：', remotePublishZipPath, '到：', remotePublishPath)
   return ssh.execCommand(`unzip -o ${remotePublishZipPath} -d ${remotePublishPath}`)
     .then(() => {
       log('解压成功')
@@ -155,8 +154,11 @@ function removeLocalZip(){
 }
 function runExec(code){
   return ssh.execCommand(code)
-    .then(() => {
-      log('执行命令成功', code)
+    .then((result) => {
+      console.log('远程STDOUT输出: ' + result.stdout)
+      if (!result.stderr){
+        log('执行命令成功', code)
+      }
     })
     .catch(err => {
       log('执行命令成功')
