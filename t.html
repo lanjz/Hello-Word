@@ -40,18 +40,16 @@
       })
       console.log('b1')
     })*/
-    setTimeout(function (){
-      Promise.resolve().then(() => {
-        console.log('a')
-      })
-      console.log('b')
-    })
-    setTimeout(function (){
-      Promise.resolve().then(() => {
-        console.log('a')
-      })
-      console.log('b')
-    })
+window.onerror = function(e){
+  console.log('eee', e)
+}
+try {
+  a
+} catch (e){
+  throw e
+} finally {
+  throw new Error('fifff')
+}
 </script>
 </body>
 </html>
