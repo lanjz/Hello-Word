@@ -14,7 +14,6 @@
       </div>
       <div class="app-main flex-1">
         <RouterMap></RouterMap>
-        <div id="frame"></div>
         <router-view></router-view>
       </div>
     </div>

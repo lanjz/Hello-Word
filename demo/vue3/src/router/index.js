@@ -11,8 +11,9 @@ const NoPage = { template: '<div>404</div>' }
 
 const routes = [
    {
-        path: '/',
-        redirect: '/home'
+     path: '/',
+     component: Bar
+        // redirect: '/home'
     },
     home,
     { path: '/login', component: Login },
