@@ -1,0 +1,14 @@
+.hll-form-container{
+  .el-form-item {
+    margin-bottom: 20px;
+  }
+}
+@media (max-width: 900px){
+  .hll-form-container.el-form--inline{
+    .el-form-item__label {
+      margin: 0;
+      display: none !important;
+    }
+  }
+
+}
