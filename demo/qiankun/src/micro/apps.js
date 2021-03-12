@@ -4,7 +4,7 @@ const apps = [
     entry: "//localhost:8081",
     // entry: "//https://www.baidu.com/",
     container: "#frame",
-    activeRule: "/vue",
+    activeRule: "/home/vue",
   },
 ];
 
