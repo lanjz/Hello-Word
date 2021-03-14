@@ -14,16 +14,18 @@ const routes = [
         path: '/',
         redirect: '/home'
     },
+  { name: '/404', path: '/:catchAll(.*)', component: NoPage },
   {
     path: '/:microApp+',// 匹配微项目
     component: { template: '<div>microApp</div>' }
   },
-    // home,
+    home,
     { path: '/login', component: Login },
+    { path: '/login', component: Foo },
     { path: '/foo', component: Foo },
     { path: '/bar', component: Bar },
     { path: '/guan', component: Guan },
-    { name: '/404', path: '/:catchAll(.*)', component: NoPage },
+    
 
 ]
 export default createRouter({
