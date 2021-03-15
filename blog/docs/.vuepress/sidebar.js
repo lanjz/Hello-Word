@@ -157,9 +157,11 @@ module.exports = {
     '/Node/Webpack/css-loader&style-loader',
     '/Node/Webpack/构建优化方案',
     '/Node/Webpack/配置小记',
+    '/Node/Webpack/library',
     '/Node/Webpack/原理/tree-shaking',
     '/Node/Webpack/原理/code-split',
     '/Node/Webpack/原理/模块热替换',
+
   ],
   '/工程化/系统设计/': [
     '/工程化/系统设计/登录系统',

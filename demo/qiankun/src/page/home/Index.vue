@@ -2,7 +2,8 @@
   <div class="app">
     <div class="app-side flex flex-column">
       <div class="app-logo">
-        <img src="../../assets/image/logo.png" class="logo" alt="logo" />
+       <span style="font-size: 22px">微前端</span>
+<!--        <img src="../../assets/image/logo.png" class="logo" alt="logo" />-->
       </div>
       <div class="app-menu flex-1">
         <Menu></Menu>

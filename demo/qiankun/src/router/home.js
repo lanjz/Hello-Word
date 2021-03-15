@@ -5,8 +5,7 @@ import resourceMange from './resourceManage'
 import accountManage from './accountManage'
 import Home from '../page/home/Index';
 const Foo = { template: '<div>foo</div>' }
-const Shou = { template: '<div>首页</div>' }
-const MicroApp = { template: '<div id="frame"></div>' }
+const Shou = { template: '<div>首2页</div>' }
 export default {
   path: '/home',
   name: '首页',
@@ -17,24 +16,14 @@ export default {
       name: '首页-1',
       component: Shou
     },
-    // component,
+    component,
     // vueApi,
     // dataBoard,
     // resourceMange,
     // accountManage,
-/*    {
-      path: ':microApp+',// 匹配微项目
-      component: MicroApp
-    },*/
-  
     {
-      path: 'abc',// 匹配微项目
-      component: MicroApp
+      path: ':microApp(.*)',// 匹配微项目
+      component: { template: '<div id="frame"></div>' }
     },
-    {
-      path: ':catchAll(.*)',// 匹配微项目
-      component: MicroApp
-    },
-
   ]
 }
