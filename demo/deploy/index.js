@@ -22,9 +22,10 @@ if(!fs.existsSync(srcPath)){
   err(`不存在${config.distPath}目录`)
   return
 }
-const localZipPath = path.resolve(cwd, `${config.distPath}.zip`); // 压缩名件名
-let remotePublishZipPath = config.publishPath + `/${config.distPath}.zip`
-let remotePublishPath =  config.publishPath + `/${config.distPath}`
+const targetPath = config.unzipDirName||config.distPath
+const localZipPath = path.resolve(cwd, `${targetPath}.zip`); // 压缩名件名
+let remotePublishZipPath = config.publishPath + `/${targetPath}.zip`
+let remotePublishPath =  config.publishPath + `/${targetPath}`
 async function doExec(){
   try {
     await connectSSH() // 连接 ssh
