@@ -1,4 +1,4 @@
-import { createRouter,createWebHashHistory} from "vue-router"
+import { createRouter,createWebHistory} from "vue-router"
 import Login from '../page/login/Login'
 import home from './home'
 import Guan from '../page/guan/404'
@@ -10,19 +10,18 @@ const NoPage = { template: '<div>404</div>' }
 
 
 const routes = [
-   {
-     path: '/',
-     component: Bar
-        // redirect: '/home'
-    },
-    home,
-    { path: '/login', component: Login },
-    { path: '/foo', component: Foo },
-    { path: '/bar', component: Bar },
-    { path: '/guan', component: Guan },
-    { name: '/404', path: '/:catchAll(.*)', component: NoPage }
+  {
+    path: '/',
+    redirect: '/home'
+  },
+  home,
+  { path: '/login', component: Login },
+  { path: '/foo', component: Foo },
+  { path: '/bar', component: Bar },
+  { path: '/guan', component: Guan },
+  { name: '/404', path: '/:catchAll(.*)', component: NoPage }
 ]
 export default createRouter({
-    history: createWebHashHistory(),
-    routes: routes
+  history: createWebHistory( '/vue/'),
+  routes: routes,
 })

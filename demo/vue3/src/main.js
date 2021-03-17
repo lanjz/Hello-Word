@@ -24,6 +24,12 @@ if (!window.__POWERED_BY_QIANKUN__) {
 }
 export async function mount(props){
   console.log("VueMicroApp mount", props);
+  props.onGlobalStateChange((state, prev) => {
+    // state: 变更后的状态; prev 变更前的状态
+    console.log('子应用监听到变量', state, prev);
+  }, true);
+
+  // props.setGlobalState({list: 'abc'});
   render(props);
 }
 export async function bootstrap(){

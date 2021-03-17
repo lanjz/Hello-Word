@@ -19,6 +19,7 @@
       </div>
   </div>
   <div class="flex align-center">
+    {{global}}
     <img src="https://i.gtimg.cn/club/item/face/img/8/15918_100.gif" alt="" class="user-avatar"/>
     <div class="flex align-center">
       <el-dropdown trigger="click">
@@ -40,6 +41,7 @@ import { mapState } from 'vuex'
 export default {
   computed: {
     ...mapState('userinfo', ['userinfo']),
+    ...mapState('global', ['global']),
   }
 }
 </script>

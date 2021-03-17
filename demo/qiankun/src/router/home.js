@@ -16,13 +16,17 @@ export default {
       name: '首页-1',
       component: Shou
     },
-    component,
-    // vueApi,
-    // dataBoard,
-    // resourceMange,
-    // accountManage,
     {
-      path: ':microApp(.*)',// 匹配微项目
+      path: '/abc',// 匹配微项目
+      component: Foo
+    },
+    component,
+    vueApi,
+    dataBoard,
+    resourceMange,
+    accountManage,
+    {
+      path: '/vue/:microApp(.*)',// 匹配微项目
       component: { template: '<div id="frame"></div>' }
     },
   ]

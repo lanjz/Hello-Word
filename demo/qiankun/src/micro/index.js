@@ -5,6 +5,7 @@ import {
   addGlobalUncaughtErrorHandler,
   start,
 } from "qiankun";
+import './actions'
 
 // 微应用注册信息
 import apps from "./apps";
