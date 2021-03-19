@@ -5,9 +5,6 @@ const apps = [
     entry: "//localhost:8081",
     container: "#frame",
     activeRule: "/vue",
-    props:  {
-      store //共享主应用的store实例
-    }
   },
 ];
 

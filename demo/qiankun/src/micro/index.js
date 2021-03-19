@@ -4,12 +4,13 @@ import {
   registerMicroApps,
   addGlobalUncaughtErrorHandler,
   start,
+  initGlobalState
 } from "qiankun";
-import './actions'
 
 // 微应用注册信息
 import apps from "./apps";
-
+import store from '../store'
+console.log('store', store)
 /**
  * 注册微应用
  * 第一个参数 - 微应用的注册信息
@@ -43,6 +44,28 @@ addGlobalUncaughtErrorHandler((event) => {
     this.$message.error('微应用加载失败，请检查应用是否可运行');
   }
 });
+
+// 设置通信
+const state = {
+  baseStore: store.state,
+  commit: store.commit,
+  dispatch: store.dispatch
+}
+export const actions = initGlobalState(state);
+actions.onGlobalStateChange((state, prev) => {
+  // state: 变更后的状态; prev 变更前的状态
+  console.log('主应用onGlobalStateChange', state, prev);
+});
+// actions.setGlobalState(state);
+actions.offGlobalStateChange();
+store.subscribe((mutation, state) => {
+  console.log('state', state)
+  actions.setGlobalState({
+    baseStore: store.state,
+    commit: store.commit,
+    dispatch: store.dispatch
+  });
+})
 
 // 导出 qiankun 的启动函数
 export default start;
