@@ -29,5 +29,9 @@ export default {
       path: '/vue/:microApp(.*)',// 匹配微项目
       component: { template: '<div id="frame"></div>' }
     },
+    {
+      path: '/react/:microApp(.*)',
+      component: { template: '<div id="frame"></div>' }
+    }
   ]
 }
