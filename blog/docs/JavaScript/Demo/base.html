@@ -60,4 +60,36 @@
   // Hello
 
 </script>
+<script>
+	function _new2(fn, ...arg){
+		const obj = {}
+		console.log('obj', obj.constructor.toString())
+		obj.__proto__ = fn.prototype
+		fn.apply(obj, arg)
+        console.log('obj22', obj.constructor.toString())
+		return obj
+	}
+
+	// 效果一样
+	function _new(fn, ...arg){
+		const ttt = Object.create({})
+        console.log('ttt', ttt.constructor.toString())
+		const obj = Object.create(fn.prototype)
+        console.log('obj3', obj.constructor.toString())
+		fn.apply(obj, arg)
+		return obj
+	}
+
+	function t(arg){
+		this.a = arg
+	}
+
+	var t1 = _new(t, 1)
+    // console.log(t1.constructor)
+	var t2 = _new2(t, 10)
+    // console.log(t2.constructor)
+	var t3 = new t(11)
+    // console.log(t3.constructor)
+
+</script>
 </html>

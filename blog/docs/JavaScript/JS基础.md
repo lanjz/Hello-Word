@@ -146,12 +146,12 @@ var o = {}
 | -1         | "-1"        | true  | new Number(-1)        |
 | 1          | "1"         | true  | new Number(1)         |
 
-| 对象   | 字符串 | 数字  | 布尔值 |
-| ----- | ------| ----- |-----:|
-| {}    | "[object Object]"    | --    | true |
-| []    | ""    | 0     | true |
-| [9]   | "9"   | 9     | true |
-| ['a'] | "a"   | NaN  | true |
+| 对象   | 字符串             | 数字  | 布尔值 |
+| ----- | ------------------| ----- |-----:|
+| {}    | "[object Object]" | NaN   | true |
+| []    | ""                | 0     | true |
+| [9]   | "9"               | 9     | true |
+| ['a'] | "a"               | NaN   | true |
 
 从上表中可以看到有几个点需要注意：
 
@@ -163,13 +163,13 @@ var o = {}
 
 - `Null` 转数字为 `0`
 
-- 原始值到对象的转换也是非常简单，原始值是通过`new String()`,`new Number`或`new Boolean()`构造函数，转换为它们各自的包装对象
+- 原始值到对象的转换也是非常简单，原始值是通过`new String()`、`new Number`或`new Boolean()`构造函数，转换为它们各自的包装对象
 
 ### 基本类型的转换
 
 **显示类型转换**
 
-使用`String()`,`Number`，`Boolean()`或`Object()`可以做显式类型转换
+使用`String()`,`Number()`，`Boolean()`或`Object()`可以做显式类型转换
 
 ```js
 Number('3') // 3
@@ -545,7 +545,7 @@ JS进行比较时，有以下特征
 
 - 数字==布尔：布尔类型会转换成数字(false是0，true是1)，再进行比较
 
-- 数字==字符串：把字符串转化为数，再比较
+- 数字==字符串：把字符串转化为数字，再比较
 
 - null==null: true
 
@@ -582,6 +582,22 @@ JS进行比较时，有以下特征
 
 答案是 [true, true]
 
+**平时要注意判断变量是否是 `undefined` 或 `null` 的情况注意：检查属性是否 `undefined` 还不够。该属性可能存在，但其值恰好设置为 `undefined`。**
+
+- 不要直接使用 `!变量` 来判断变量是否有值，当变量的值为 `0` 时，将会被误判成 `false`
+
+- 使用 `undefined` 和 `null` 除了跟`undefined` 和 `null` 比较为 `true` 以外跟其它值都是 `false` ，所以可以根据这个特性来判断变量是否是`undefined` 或 `null`。 如 `变量 === undefind||变量 === null`
+
+  ```js
+  var abc
+  abc === undefined // true
+  abc == undefined // true
+  abc == 'undefined' // false
+  abc === 'undefined' // false
+  abc == null // true
+  abc === null // false 类型不同
+  ```
+  
 ## 操作符
 
 > 只能操作一个值的操作符叫做**一元操作符**
@@ -674,17 +690,16 @@ f.prototype.c = 4;
 
 var o = new f()
 
-o.hasOwnProperty(a) // true
-o.hasOwnProperty(b) // true
-o.hasOwnProperty(c) // false
+o.hasOwnProperty('a') // true
+o.hasOwnProperty('b') // true
+o.hasOwnProperty('c') // false
 o.__proto__.hasOwnProperty('c') // true
 ```
 
 `o`自身没有名为 `hasOwnProperty`的属性,`hasOwnProperty` 是 `Object.prototype` 的属性.因此 `o` 继承了 `Object.prototype` 的 `hasOwnProperty`
    
-`hasOwnProperty`是 JavaScript 中处理属性并且不会遍历原型链的方法之一,另一种方法是`Object.keys()`)
+`hasOwnProperty`是 JavaScript 中处理属性并且不会遍历原型链的方法之一,另一种方法是`Object.keys()`
 
-注意：检查属性是否 `undefined` 还不够。该属性可能存在，但其值恰好设置为 `undefined`。
 
 ### 创建对象及原型链
 
@@ -747,18 +762,18 @@ var g = new Graph();
 
 **使用 `Object.create` 创建的对象**
 
-可以调用`Object.create`方法来创建一个新对象。新对象的原型就是调用 `create` 方法时传入的第一个参数
+可以调用 `Object.create` 方法来创建一个新对象。这个对象的 `__proto__` 指定调用 `create` 方法时传入的第一个参数
 
 ```js
 var a = {a: 1}; 
-// a ---> Object.prototype ---> null
+// a.__proto__ ---> Object.prototype.__proto__ ---> null
 
 var b = Object.create(a);
-// b ---> a ---> Object.prototype ---> null
+// b.__proto__ ---> a.__proto__ ---> Object.prototype.__proto__ ---> null
 console.log(b.a); // 1 (继承而来)
 
 var c = Object.create(b);
-// c ---> b ---> a ---> Object.prototype ---> null
+// c.__proto__ ---> b.__proto__ ---> a.__proto__ ---> Object.prototype.__proto__ ---> null
 
 var d = Object.create(null);
 // d ---> null
@@ -824,27 +839,34 @@ var a2 = new A()
 
 - 创建一个新对象
 
-- 新对象有`__proto__`指向`A.prototype`，即`a1.[[Prototype]] = A.prototype`
+- 新对象的 `__proto__` 指向 `A.prototype`，即 `a1.[[Prototype]] = A.prototype`
 
 - 运行函数 `A()` 把 `this` 指向新对象之前设置
 
 然后当您访问实例的属性时，JavaScript 首先会检查它们是否直接存在于该对象上，如果不存在，则会 `[[Prototype]]` 中查找。
 
-自己实现`new`方法
+自己实现`new`方法`
 
 ```js
 function _new(fn, ...arg){
     const obj = {}
-    obj.__proto__ = fn.protype
+    console.log(obj.constructor) // function Object() { [native code] }
+    obj.__proto__ = fn.prototype
     fn.apply(obj, arg)
+    console.log(obj.constructor) // function t(arg){this.a = arg}
     return obj
 }
 
 // 效果一样
 function _new(fn, ...arg){
-    const obj = Object.create(fn)
+	
+    const obj = Object.create(fn.prototype)
+    console.log(obj.constructor) // function t(arg){this.a = arg}
     fn.apply(obj, arg)
     return obj
+    // 以下测试使用
+    const ttt = Object.create({})
+    console.log(obj.constructor) // function Object() { [native code] }
 }
 
 function t(arg){
@@ -856,18 +878,9 @@ var t2 = _new(t, 10)
 t1.a // 1
 t2.a // 10
 t1.__proto__ === t2.__proto__ // true
-
 ```
 
-注意自己实现的`_new`方法并不是与`new`完全一样,继续上个例子来简单做下演示：
-
-```js
-console.log('获取构造方法：', t1.constructor) // 获取构造方法: ƒ Object() { [native code] }
-t1.constructor === Object.prototype.constructor // true
-// 使用原生new
-var t3 = new t(5)
-console.log('获取构造方法：', t3.constructor) // 获取构造方法: ƒ t(arg){ this.a = arg }
-```
+上面的 `constructor` 指向让人感觉有点困惑
 
 ## Javascript内存模式
 
@@ -1076,6 +1089,7 @@ function SubType(){
     SuperType.call(this, 'black')
 }
 SubType.prototype = Object.create(SuperType.prototype)
+// console.log(SubType.prototype.constructor) // SuperType
 SubType.prototype.constructor = SubType
 const instance = new SuperType()
 const instance2 = new SubType()
