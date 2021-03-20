@@ -125,4 +125,4 @@ Flex 是 `Flexible Box` 的缩写，意为"弹性布局"，用来为盒状模型
 
 - 解决方案： 给 `flex项` 设计样式：`min-width：0`
 
-![阮一峰的网络日志 - Flex 布局教程](http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html)
+[阮一峰的网络日志 - Flex 布局教程](http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html)
