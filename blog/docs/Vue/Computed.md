@@ -1,6 +1,6 @@
 # Computed
 
-此下面例子为例：
+以下面例子为例：
 
 ```js
 <div id="app">

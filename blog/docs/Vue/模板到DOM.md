@@ -89,7 +89,7 @@ Vue中模块最终都会转换成 `render` 函数，这个 `render` 函数的作
   
 除了 `_c` 、 `_l`，`Vue` 中还内置其它的生成 `VNode` 方法，如 `_v` 对应 `createTextVNode` 创建文本 `VNode`、`_s` 是生成字符串方法等等等等等等等，这里就不一一列表了
   
-##　通过`render`方法，创建VNode
+## 通过`render`方法，创建VNode
 
 上文中 `render` 方法开始是 `with(this)`，函数体中用到变量都从这个 `this` 中获取，在 Vue 中这个 `this` 是指向Vue实例的，这里作为演示，我们使用一个简单对象调用 `render` 方法
 
