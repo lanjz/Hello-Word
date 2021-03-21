@@ -1,6 +1,7 @@
 import { createRouter,createWebHistory} from "vue-router"
 import Login from '../page/login/Login'
 import home from './home'
+import Test from '../page/Test'
 import Guan from '../page/guan/404'
 // import component from './component'
 const Foo = { template: '<div>foo</div>' }
@@ -13,6 +14,10 @@ const routes = [
   {
     path: '/',
     redirect: '/home'
+  },
+  {
+    path: "/test",
+    component: Test
   },
   home,
   { path: '/login', component: Login },

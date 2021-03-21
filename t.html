@@ -11,45 +11,29 @@
     <li>2</li>
 </ul>
 <script>
-/*    document.getElementById('ul').onclick = function (e){
-      console.log(e)
-      if(e.target.tagName === 'LI'){
-        console.log(e.target.innerText)
-      }
-    }
-    Array.prototype.findDuplicate = function (n){
-      let map = {}
-      let result = []
-      for(let i in this){
-        map[i] = (map[i]||0) +1
-        if(map[i] >= n){
-          result.push(i)
+    function me(obj, mp = new WeakMap){
+        let keys = Object.keys(obj)
+        for(let item of keys){
+            let value = obj[item]
+            if(typeof value === 'object' ){
+                if(mp.has(value)){
+                    return true
+                } else {
+                    mp.set(value, true)
+                    return me(value, mp)
+                }
+            }
         }
-      }
-      return result
-    }*/
-/*    document.body.addEventListener('click', function (){
-      Promise.resolve().then(() => {
-        console.log('a')
-      })
-      console.log('b')
-    })
-    document.body.addEventListener('click', function (){
-      Promise.resolve().then(() => {
-        console.log('a1')
-      })
-      console.log('b1')
-    })*/
-window.onerror = function(e){
-  console.log('eee', e)
-}
-try {
-  a
-} catch (e){
-  throw e
-} finally {
-  throw new Error('fifff')
-}
+        return false
+    }
+    let obj = {
+        a: 1
+    }
+    obj = {
+        a: 1,
+        b: obj
+    }
+    console.log( me(obj))
 </script>
 </body>
 </html>

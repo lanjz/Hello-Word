@@ -29,7 +29,7 @@ const clientCompiler = webpack(clientConfig) // clientConfig 为客户端 webpac
 
 **2. 监听文件变化后自动打包，并将 webpack 打包后的文件发送给服务**
 
-这一步需要用到 `webpack-dev-middleware`，`webpack-dev-middleware` 执行结果返回一个 `express` 中间件函数，它能将 webpack 编译后的文件存储到内存中，然后在问 express 服务时，将内存中对应的资源输出返回
+这一步需要用到 `webpack-dev-middleware`，`webpack-dev-middleware` 执行结果返回一个 `express` 中间件函数，它能将 webpack 编译后的文件存储到内存中，然后在访问 express 服务时，将内存中对应的资源输出返回
 
 ```js
 const devMiddleware = require('webpack-dev-middleware')(clientCompiler, {
@@ -72,7 +72,7 @@ clientConfig.plugins.push(
 app.use(require('webpack-hot-middleware')(clientCompiler, { heartbeat: 5000 }))
 ```
 
-**4. 打包完成后，重新生成 render **
+**4. 打包完成后，重新生成 render**
 
 重新打包也就重新生成了 `vue-ssr-server-bundle.json` 文件，所以我们需要监听打包完成事件，生成新的 `renderer`
 
