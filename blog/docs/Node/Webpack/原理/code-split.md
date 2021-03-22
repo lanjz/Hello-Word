@@ -251,7 +251,20 @@ export function MB(){
 
 ### bundle代码分析
 
-先看下打包出来的入口文件中两个重要包含的属性和方法：
+首先要知道打包出来的文件代码都使用自执行函数形成一个单独的块级作用域
+
+```js
+(function(){
+  var name = 'lan'
+})();
+(function(){
+  var name = 'jz'
+})();
+```
+
+上面的两个 `name` 仅限于自己所在块级作用域中有效
+
+之后看下打包出来的入口文件中两个重要包含的属性和方法：
 
 **__webpack_require__**
 
@@ -381,6 +394,88 @@ document.body.onclick = function (){
 ```
 
 使用 `Prefetch` 主要是对 `index.html` 添加 `link` 标签，跟分割模块的逻辑没啥影响
+
+### Demo
+
+上面的分析反复看到过自己都有点懵，所以写个简单的 demo 方便理解 webpack 的模块化原理
+
+```js
+(function (){
+	var modules = {} // 用于保存模块
+	let _resolve = null
+    // 获取模块，如果已经加载过则直接取，如果未加载过则直接 JSONP 加载模块
+    function getModule(name){
+		return new Promise((resolve) => {
+			if(modules[name]){
+				resolve()
+            } else {
+                _resolve = resolve
+                JSonP()
+            }
+        })
+    }
+    // 子模块会调用这个方法，保存下载的模块到 modules
+    var webpackJsonpCallback = (parent, data) => {
+        if(parent){ // 关于这行的作用，直接看后面的解释，当前选略过
+            parent(data)
+        }
+        modules[data.key] = data.content
+        _resolve&&_resolve()
+    }
+	var chunkLoadingGlobal = self["webpackChunkbase"] = self["webpackChunkbase"] || []
+	chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
+    // 业务代码
+	const btn = document.createElement('button')
+	btn.innerText = '按钮'
+	btn.addEventListener('click', function (){
+		getModule('module1')
+			.then(() => {
+				console.log('成功加载了模块MB', modules['module1'])
+			})
+			.catch((error) => 'An error occurred while loading theS hllComponent');
+	})
+	document.body.appendChild(btn)
+})();
+
+// 模块子模块加截完成
+function JSonP(){
+	setTimeout(() => {
+		self["webpackChunkbase"].push({
+          key: 'module1',
+          content: "我是module1"
+        })
+	}, 1000)
+}
+``` 
+
+**关于子模块加载的思考：**
+
+从上文分析我们知道当子模块加载后会执行一个全局的方法 `(self.webpackChunkmind_map = self.webpackChunkmind_map || []).push()`，将当前模块内容保存到主模块 `webpack_module_cache` 中。
+
+那么问题了，如果当前页面同时加了多个被 webpack 打包出来的文件，也就是存在多个主模块，这里每个主模块都实现了相同的模块加载的方法，那么当子模块加载的时候怎么知道当前添加到哪个主文件中呢，按正常的逻辑 `self.webpackChunkmind_map` 应该是指向最后一个赋值的地方，那么无论哪个主模块加载的子模块都将添加到最后个加载的主模块中，如果真这样的话肯定会有问题，webpack 考虑到了这一点，所以注意一下这行代码：
+
+```js
+	var chunkLoadingGlobal = self["webpackChunkbase"] = self["webpackChunkbase"] || []
+	chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
+```
+
+假设当前有页面加载了两个 webpack 打包出来的文件，第一个主模块运行时没有 `self["webpackChunkbase"]`，所以 `chunkLoadingGlobal = []`，将这个方法通过下面那行的 `bind`保存到 `webpackJsonpCallback` 参数中
+
+当加载了第二个主模块时 `self["webpackChunkbase"] = 之前模块的chunkLoadingGlobal`，也通过 `bind` 保存到 `webpackJsonpCallback` 参数中
+
+之后当子模块加载完后执行 `webpackJsonpCallback` 方法，看代码：
+
+```js
+    var webpackJsonpCallback = (parent, data) => {
+        if(parent){ // 有parent，执行之前的 webpackJsonpCallback 方法
+            parent(data)
+        }
+        modules[data.key] = data.content
+        _resolve&&_resolve()
+    }
+```
+
+`parent` 表示之前模块的 `webpackJsonpCallback` 方法，有的话就执行。也就是说某个主模块加载的子模块，将会被所有主模块收集！
 
 ## 总结
 

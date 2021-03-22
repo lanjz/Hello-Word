@@ -9,7 +9,11 @@ import './assets/scss/element-variables.scss'
 import './assets/scss/app.scss'
 import startQiankun from "./micro/index";
 
-startQiankun()
+startQiankun({
+	sandbox: {
+		experimentalStyleIsolation: true
+	}
+})
 
 const app = createApp(App)
 app.use(ElementPlus, {locale})
