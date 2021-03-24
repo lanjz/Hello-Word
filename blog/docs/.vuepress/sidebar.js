@@ -113,6 +113,10 @@ module.exports = {
     '/React/React高级指引',
     '/React/服务端渲染',
   ],
+  '/qiankun/': [
+    '/qiankun/qiankun原理',
+    '/qiankun/importHtmlEntry',
+  ],
   '/NA/': [
     '/NA/微信小程序',
   ],
@@ -165,7 +169,7 @@ module.exports = {
   ],
   '/工程化/系统设计/': [
     '/工程化/系统设计/登录系统',
-    '/工程化/系统设计/微前端',
+    '/工程化/系统设计/微前端'
   ],
   '/HTML5/': [
     '/HTML5/HTML5新特性',

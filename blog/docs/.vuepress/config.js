@@ -35,6 +35,7 @@ module.exports = {
           { text: 'Vue', link: '/Vue/' },
           { text: 'Vue3', link: '/Vue3/' },
           { text: 'React', link: '/React/' },
+          { text: 'qiankun', link: '/qiankun/' },
           { text: '跨平台', link: '/NA/' },
         ]
       },
