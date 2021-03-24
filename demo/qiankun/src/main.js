@@ -8,6 +8,8 @@ import hllView from './components/hllView/index'
 import './assets/scss/element-variables.scss'
 import './assets/scss/app.scss'
 import startQiankun from "./micro/index";
+import { abc } from './teest'
+console.log('abc', abc)
 
 startQiankun({
 	sandbox: {

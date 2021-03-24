@@ -7,6 +7,7 @@ import store from './store'
 import hllView from './components/hllView/index'
 import './assets/scss/element-variables.scss'
 import './assets/scss/app.scss'
+import './test/test'
 
 let app = null;
 function render(props = {}){
