@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+	let fakeWindow = {}
+    let rawWindow = window
+	function createFakeWindow(global=window) {
+		Object.getOwnPropertyNames(global)
+			.filter((p) => {
+				const descriptor = Object.getOwnPropertyDescriptor(global, p);
+				return descriptor.configurable;
+			})
+			.forEach((p) => {
+				const descriptor = Object.getOwnPropertyDescriptor(global, p);
+				if (descriptor) {
+					Object.defineProperty(fakeWindow, p, Object.freeze(descriptor));
+				}
+			});
+
+		return fakeWindow;
+	}
+	const proxy = new Proxy(createFakeWindow(), {
+		set: (target, p, value) => {
+            if (!target.hasOwnProperty(p) && rawWindow.hasOwnProperty(p)) {
+                const descriptor = Object.getOwnPropertyDescriptor(rawWindow, p);
+                const { writable, configurable, enumerable } = descriptor
+                if (writable) {
+                    Object.defineProperty(target, p, {
+                        configurable,
+                        enumerable,
+                        writable,
+                        value,
+                    });
+                }
+            } else {
+                target[p] = value;
+            }
+            return true;
+		},
+		get(target, p) {
+			return target[p]||rawWindow[p]
+		},
+	});
+	console.log(window.youName) // undefined
+    proxy.youName = 'lanjz'
+    console.log(window.youName) // undefined
+    console.log(proxy.youName) // lanjz
+    console.log(proxy.document) // #document
+
+  (function (window){
+  	// 子应用的运行水箱
+    // 这里对全局window 的操作将被隔离，不会影响到外部的全局 window
+  })(proxy)
+</script>
+</html>

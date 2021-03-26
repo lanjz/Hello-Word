@@ -30,7 +30,6 @@ export function patchLooseSandbox(
   excludeAssetFilter?: CallableFunction,
 ): Freer {
   let dynamicStyleSheetElements: Array<HTMLLinkElement | HTMLStyleElement> = [];
-
   const unpatchDynamicAppendPrototypeFunctions = patchHTMLDynamicAppendPrototypeFunctions(
     /*
       check if the currently specified application is active

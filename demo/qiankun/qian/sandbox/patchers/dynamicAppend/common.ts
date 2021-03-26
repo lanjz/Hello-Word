@@ -174,7 +174,6 @@ function getOverwrittenAppendChildOrInsertBefore(opts: {
           }
 
           const mountDOM = appWrapperGetter();
-
           if (scopedCSS) {
             // exclude link elements like <link rel="icon" href="favicon.ico">
             const linkElementUsingStylesheet =

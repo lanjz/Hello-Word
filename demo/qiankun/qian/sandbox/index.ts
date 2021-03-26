@@ -58,6 +58,7 @@ export function createSandboxContainer(
      * 也可能是从 unmount 之后再次唤醒进入 mount
      */
     async mount() {
+      debugger
       /* ------------------------------------------ 因为有上下文依赖（window），以下代码执行顺序不能变 ------------------------------------------ */
 
       /* ------------------------------------------ 1. 启动/恢复 沙箱------------------------------------------ */
@@ -89,6 +90,7 @@ export function createSandboxContainer(
      * 恢复 global 状态，使其能回到应用加载之前的状态
      */
     async unmount() {
+      debugger
       // record the rebuilders of window side effects (event listeners or timers)
       // note that the frees of mounting phase are one-off as it will be re-init at next mounting
       sideEffectsRebuilders = [...bootstrappingFreers, ...mountingFreers].map((free) => free());

@@ -49,7 +49,8 @@ addGlobalUncaughtErrorHandler((event) => {
 const state = {
   baseStore: store.state,
   commit: store.commit,
-  dispatch: store.dispatch
+  dispatch: store.dispatch,
+  test: 1
 }
 export const actions = initGlobalState(state);
 actions.onGlobalStateChange((state, prev) => {
@@ -57,7 +58,7 @@ actions.onGlobalStateChange((state, prev) => {
   console.log('主应用onGlobalStateChange', state, prev);
 });
 // actions.setGlobalState(state);
-actions.offGlobalStateChange();
+// actions.offGlobalStateChange();
 store.subscribe((mutation, state) => {
   console.log('state', state)
   actions.setGlobalState({

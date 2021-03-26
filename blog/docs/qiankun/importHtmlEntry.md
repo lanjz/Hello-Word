@@ -152,6 +152,8 @@ export default function importHTML(url, opts = {}) {
 
 - `embedHTML`： 包含样式的 html 内容
 
+- `assetPublicPath`: 当前资源的路径根域名
+
 - `getExternalScripts`: 获取JS内容的方法，可以是内联JS也可以了资源地址
 
 - `getExternalStyleSheets`: 获取样式内容的方法，可以是内联样式也可以了资源地址

@@ -49,6 +49,7 @@ export function patchAtBootstrapping(
   scopedCSS: boolean,
   excludeAssetFilter?: CallableFunction,
 ): Freer[] {
+  debugger
   const patchersInSandbox = {
     [SandBoxType.LegacyProxy]: [
       () => patchLooseSandbox(appName, elementGetter, sandbox.proxy, false, scopedCSS, excludeAssetFilter),

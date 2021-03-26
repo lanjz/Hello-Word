@@ -37,8 +37,10 @@ if (!window.__POWERED_BY_QIANKUN__) {
   render();
 }
 function backgroundAction(app, props){
+  console.log('props', props)
   if (window.__POWERED_BY_QIANKUN__) {
     props.onGlobalStateChange((state, prev) => {
+      console.log('子应用onGlobalStateChange')
       if(app.config.globalProperties.$baseStore){
         app.config.globalProperties.$baseStore.state = state.baseStore
       } else {

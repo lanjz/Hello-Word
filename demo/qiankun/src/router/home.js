@@ -30,6 +30,10 @@ export default {
       component: { template: '<div id="frame"></div>' }
     },
     {
+      path: '/abc/:microApp(.*)',// 匹配微项目
+      component: { template: '<div id="frame"></div>' }
+    },
+    {
       path: '/react/:microApp(.*)',
       component: { template: '<div id="frame"></div>' }
     }

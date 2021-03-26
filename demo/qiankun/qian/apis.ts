@@ -22,7 +22,6 @@ export function registerMicroApps<T extends ObjectType>(
   const unregisteredApps = apps.filter((app) => !microApps.some((registeredApp) => registeredApp.name === app.name));
 
   microApps = [...microApps, ...unregisteredApps];
-  debugger
   console.log('aaaaaaaaaaaaaaaa')
   unregisteredApps.forEach((app) => {
     const { name, activeRule, loader = noop, props, ...appConfig } = app;
@@ -36,7 +35,7 @@ export function registerMicroApps<T extends ObjectType>(
         const { mount, ...otherMicroAppConfigs } = (
           await loadApp({ name, props, ...appConfig }, frameworkConfiguration, lifeCycles)
         )();
-
+        debugger
         return {
           mount: [async () => loader(true), ...toArray(mount), async () => loader(false)],
           ...otherMicroAppConfigs,
