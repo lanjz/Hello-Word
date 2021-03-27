@@ -1,3 +1,4 @@
+import microMenu from '../../micro/apps'
 import menu from '../../router/home'
 import { useRouter, useRoute } from 'vue-router'
 const MenuItem = (item, prefix) => {
@@ -32,11 +33,26 @@ export default {
   setup(){
     const router = useRouter()
     const route = useRoute()
-    console.log('router', router)
     const defaultActive = route.path.substring(5) || '/'
     function pushRouter(key) {
+      console.log(arguments)
+      if(typeof key === 'object' && key.activeRule){ // 微应用
+        // let { activeRule } = key
+        // console.log('router22', router, key.activeRule[activeRule.length-1] === '/' ? key.activeRule:key.activeRule+'/')
+        // router.push(key.activeRule[activeRule.length-1] === '/' ? key.activeRule:key.activeRule+'/')
+        return
+      }
+      console.log('key', key)
       const path = '/home'+key
       if(path !== route.path){
+        router.push({
+          path
+        })
+      }
+    }
+    function openMenu(path){
+      const isMacroPath = microMenu.find(item => item.activeRule === path)
+      if(isMacroPath){ // 目标是微任务路径
         router.push({
           path
         })
@@ -45,7 +61,8 @@ export default {
     return {
       menuList: menu.children,
       defaultActive,
-      pushRouter
+      pushRouter,
+      openMenu
     }
   },
   render(){
@@ -59,11 +76,30 @@ export default {
     }
     return (
       <div className="app-menu-warp">
-        <el-menu{...menuAttrs} onSelect={this.pushRouter}>
+        <el-menu{...menuAttrs} onSelect={this.pushRouter} onOpen={this.openMenu}>
           {
             this.menuList.map((item, index) => <RenderMenu item={item} key={index}></RenderMenu>)
           }
-        </el-menu>
+          {
+            microMenu && microMenu.length &&
+            <el-menu-item-group title="微应用">
+              {{
+                title: () => <div>分组一</div>
+              }}
+              {
+                microMenu.map(item => (
+                  <el-submenu index={item.activeRule}>
+                    {{
+                      title: () => <div>{item.name}</div>,
+                      default: () => <el-menu-item index={item.name}>{item.name}</el-menu-item>
+                    }}
+                  </el-submenu>
+                ))
+              }
+            </el-menu-item-group>
+            
+          }
+      </el-menu>
       </div>
     )
   }

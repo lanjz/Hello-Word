@@ -4,11 +4,11 @@ import dataBoard from './dataBoard'
 import resourceMange from './resourceManage'
 import accountManage from './accountManage'
 import Home from '../page/home/Index';
-const Foo = { template: '<div>foo</div>' }
-const Shou = { template: '<div>首2页</div>' }
+const Shou = { template: '<div>HOME 页面</div>' }
 export default {
   path: '/home',
   name: '首页',
+  alias: '/home',
   component: Home,
   children: [
     {
@@ -16,15 +16,16 @@ export default {
       name: '首页-1',
       component: Shou
     },
-    {
-      path: '/abc',// 匹配微项目
-      component: Foo
-    },
     component,
     vueApi,
     dataBoard,
     resourceMange,
     accountManage,
+  /*
+    {
+      path: '/a/:microApp(.*)',// 匹配微项目
+      component: Shou
+    },
     {
       path: '/vue/:microApp(.*)',// 匹配微项目
       component: { template: '<div id="frame"></div>' }
@@ -36,6 +37,6 @@ export default {
     {
       path: '/react/:microApp(.*)',
       component: { template: '<div id="frame"></div>' }
-    }
+    }*/
   ]
 }

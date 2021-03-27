@@ -27,9 +27,11 @@ export async function bootstrap(){
 }
 export async function unmount(){
   console.log("VueMicroApp unmount");
-  app.$destroy();
+  app.unmount();
+  app._container.innerHTML = '';
   app = null;
   // router = null;
+  // history.destroy();
 }
 
 // 独立运行时，直接挂载应用
