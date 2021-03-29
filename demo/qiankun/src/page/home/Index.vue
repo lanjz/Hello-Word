@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div class="base-app">
     <div class="app-side flex flex-column">
       <div class="app-logo">
        <span style="font-size: 22px">微前端</span>
@@ -38,7 +38,7 @@ export default {
     ...mapActions('userinfo', ['getUserinfo'])
   },
   mounted() {
-    this.getUserinfo()
+    // this.getUserinfo()
   }
 }
 </script>
