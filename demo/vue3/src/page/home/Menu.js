@@ -32,8 +32,8 @@ export default {
   setup(){
     const router = useRouter()
     const route = useRoute()
-    console.log('router', router)
     const defaultActive = route.path.substring(5) || '/'
+    console.log('defaultActive', defaultActive)
     function pushRouter(key) {
       const path = '/home'+key
       if(path !== route.path){
@@ -52,14 +52,11 @@ export default {
     const menuAttrs = {
       style: "border-right: none",
       uniqueOpened: true,
-      'default-active': this.defaultActive,
-      'background-color':"#001529",
-      'text-color':"#c0c4cc",
-      'active-text-color':"#fff",
+      defaultActive: this.defaultActive
     }
     return (
       <div className="app-menu-warp">
-        <el-menu{...menuAttrs} onSelect={this.pushRouter}>
+        <el-menu{...menuAttrs} onSelect={this.pushRouter} mode="horizontal">
           {
             this.menuList.map((item, index) => <RenderMenu item={item} key={index}></RenderMenu>)
           }

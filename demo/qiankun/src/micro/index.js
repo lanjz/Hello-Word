@@ -5,12 +5,11 @@ import {
   addGlobalUncaughtErrorHandler,
   start,
   initGlobalState
-} from "../../qian/index";
+} from "qiankun";
 
 // 微应用注册信息
 import apps from "./apps";
 import store from '../store'
-console.log('store', store)
 /**
  * 注册微应用
  * 第一个参数 - 微应用的注册信息

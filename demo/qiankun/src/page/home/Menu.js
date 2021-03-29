@@ -1,6 +1,8 @@
+import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
 import microMenu from '../../micro/apps'
 import menu from '../../router/home'
-import { useRouter, useRoute } from 'vue-router'
 const MenuItem = (item, prefix) => {
   const slots = {
     default: () => <i className="el-icon-menu"></i>,
@@ -29,20 +31,37 @@ const SubMenu = (item, prefix) => {
 function RenderMenu({item, prefix = '/'}){
   return item.children&&item.children.length ? SubMenu(item, prefix) : MenuItem(item, prefix)
 }
+// 判断当前路径是微应用路径
+function isMicroPath(path){
+  let match = path.split('/')
+  if(match && match[1]){
+    return microMenu.find(item => item.activeRule === '/'+match[1])
+  }
+  return false
+}
+function getSubPath(path){
+  if(isMicroPath(path)){  // 目标是微任务路径
+    return path
+  }
+  return path.substring(5) || '/'
+}
 export default {
   setup(){
     const router = useRouter()
     const route = useRoute()
-    const defaultActive = route.path.substring(5) || '/'
+    const store = useStore()
+    const defaultActive = ref(getSubPath(route.path))
+    onBeforeRouteUpdate((to) => {
+      console.log('onBeforeRouteUpdate')
+      defaultActive.value = getSubPath(to.path)
+    });
     function pushRouter(key) {
-      console.log(arguments)
-      if(typeof key === 'object' && key.activeRule){ // 微应用
-        // let { activeRule } = key
-        // console.log('router22', router, key.activeRule[activeRule.length-1] === '/' ? key.activeRule:key.activeRule+'/')
-        // router.push(key.activeRule[activeRule.length-1] === '/' ? key.activeRule:key.activeRule+'/')
+      if(isMicroPath(key)){ // 目标是微任务路径
+        router.push({
+          path: key
+        })
         return
       }
-      console.log('key', key)
       const path = '/home'+key
       if(path !== route.path){
         router.push({
@@ -51,8 +70,7 @@ export default {
       }
     }
     function openMenu(path){
-      const isMacroPath = microMenu.find(item => item.activeRule === path)
-      if(isMacroPath){ // 目标是微任务路径
+      if(isMicroPath(path) && window.location.pathname.indexOf(path) !== 0){ // 目标是微任务路径
         router.push({
           path
         })
@@ -60,6 +78,7 @@ export default {
     }
     return {
       menuList: menu.children,
+      microMenuList: store.state.global.microMenu,
       defaultActive,
       pushRouter,
       openMenu
@@ -91,7 +110,9 @@ export default {
                   <el-submenu index={item.activeRule}>
                     {{
                       title: () => <div>{item.name}</div>,
-                      default: () => <el-menu-item index={item.name}>{item.name}</el-menu-item>
+                      default: () => {
+                        return (this.microMenuList[item.activeRule]||[]).map(i => <el-menu-item index={i.path}>{i.name}</el-menu-item>)
+                      }
                     }}
                   </el-submenu>
                 ))

@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory, useRouter} from "vue-router"
+import {createRouter, createWebHistory} from "vue-router"
 import Login from '../page/login/Login'
 import home from './home'
 import microMenu from "../micro/apps";
@@ -16,6 +16,7 @@ const appRoute = createRouter({
   history: createWebHistory(),
   routes: routes
 })
+// 动态注册微任务路由
 function getMicroRouter(router){
   if(!microMenu) return []
   let component = { template: '<div id="frame">微应用</div>' }

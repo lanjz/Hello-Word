@@ -1,25 +1,12 @@
 <template>
-  <div class="app">
-    <div class="app-content flex-1 relative flex flex-column">
-      <div class="app-head">
-        <Menu></Menu>
-      </div>
-      <div class="app-main flex-1">
-        <RouterMap></RouterMap>
-        <router-view></router-view>
-      </div>
-    </div>
+  <div>
+    <h1>父应用Store：</h1>
+    {{$baseStore&&$baseStore.state||'当前为独立运行模式'}}
   </div>
 </template>
 <script>
 import { mapState, mapActions } from 'vuex'
-import Menu from './Menu.js'
-import RouterMap from './RouterMap.js'
 export default {
-  components: {
-    Menu,
-    RouterMap
-  },
   computed: {
     ...mapState('userinfo', ['useinfo'])
   },

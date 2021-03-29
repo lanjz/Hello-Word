@@ -47,6 +47,14 @@ function backgroundAction(app, props){
         app.config.globalProperties.$baseStore.state = state.baseStore
       } else {
         app.config.globalProperties.$baseStore = reactive({state: state.baseStore })
+        // 向父应用传递快捷菜单导航
+        state.commit('global/MICRO_MENU_UPDATE', {
+          key: '/vue',
+          list: [
+            {path: '/vue/home/component/form', name: '表单'},
+            {path: '/vue/home/component/table', name: '表格'},
+          ]
+        })
       }
     }, true)
   }
