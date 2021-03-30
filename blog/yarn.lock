@@ -7313,6 +7313,11 @@ supports-color@^7.1.0:
   dependencies:
     has-flag "^4.0.0"
 
+svg-mind-js@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/svg-mind-js/-/svg-mind-js-1.0.1.tgz#77824819169693acf446a3296a50f589d5c4fea7"
+  integrity sha512-moT33lL5QK10+4ZFL+Rl+ZUuWHU5i7irjUcV3SB1GbiAEErEXxE+8sxPcm8Sl4P3BOEZObgyYLQRS8sUqMjBEA==
+
 svg-tags@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npm.taobao.org/svg-tags/download/svg-tags-1.0.0.tgz#58f71cee3bd519b59d4b2a843b6c7de64ac04764"

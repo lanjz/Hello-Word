@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import mapSvg from './svgMap'
+import mapSvg from 'svg-mind-js'
 import meun from '../config'
 const { nav = [], sidebar = {} } = meun.themeConfig
 export default {
@@ -37,16 +37,16 @@ export default {
     },
     initSvgTree(){
       const { path } = this.$route
-      const svgTree = this.getItemTree(sidebar[path])
-      const name = path.substring(1, path.length-1)
+      let deCodePath = decodeURI(path)
+      const svgTree = this.getItemTree(sidebar[deCodePath])
+      const name = deCodePath.substring(1, deCodePath.length-1)
       const _this = this
       const svg = mapSvg(svgTree, {
         title: name,
-        theme: 'light',
         callback(tar) {
           console.log('tar', tar)
           _this.$router.push({
-            path: `${tar.key}.html`
+            path: `${tar.key}${tar.type === 'text' ? '.html': ''}`
           })
         }
       })

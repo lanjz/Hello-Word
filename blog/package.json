@@ -12,6 +12,7 @@
     "vuepress": "^1.5.1"
   },
   "dependencies": {
-    "cross-env": "^7.0.2"
+    "cross-env": "^7.0.2",
+    "svg-mind-js": "^1.0.1"
   }
 }

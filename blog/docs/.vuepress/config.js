@@ -77,6 +77,7 @@ module.exports = {
           { text: 'Mac', link: '/利其器/' },
         ]
       },
+      { text: '关于我', link: '/Im/' },
       // { text: 'External', link: 'https://google.com' },
     ],
     sidebar

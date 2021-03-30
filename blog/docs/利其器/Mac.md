@@ -124,7 +124,7 @@ cd "$(brew --repo)" && git remote set-url origin https://github.com/Homebrew/bre
 
 ### nvm
 
-- node
+- node
 
 ### npm 
 
