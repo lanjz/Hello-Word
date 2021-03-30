@@ -114,6 +114,7 @@ module.exports = {
     '/React/服务端渲染',
   ],
   '/qiankun/': [
+    '/qiankun/微前端',
     '/qiankun/qiankun原理',
     '/qiankun/importHtmlEntry',
   ],
@@ -168,8 +169,7 @@ module.exports = {
 
   ],
   '/工程化/系统设计/': [
-    '/工程化/系统设计/登录系统',
-    '/工程化/系统设计/微前端'
+    '/工程化/系统设计/登录系统'
   ],
   '/HTML5/': [
     '/HTML5/HTML5新特性',
