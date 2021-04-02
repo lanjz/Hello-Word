@@ -461,7 +461,7 @@ var Vue = (function (exports) {
       dep.add(activeEffect);
       activeEffect.deps.push(dep);
       if ( activeEffect.options.onTrack) {
-        activeEffect.options.onTrack({
+        activeEffect.opttriggerions.onTrack({
           effect: activeEffect,
           target,
           type,

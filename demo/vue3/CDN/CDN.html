@@ -8,7 +8,7 @@
 <body>
 <div id="counter">
     Counter: <span v-for="item in counter" :key="item">{{item}}</span>
-    {{repositories}}
+    {{info}}
 </div>
 </body>
 <script>
@@ -32,12 +32,16 @@
           console.log('watch', val)
         }
       },
+      created() {
+        this.info = Vue.ref({
+          name: 'lanjz'
+        })
+      },
       mounted() {
-        console.log('this', this.repositories)
+        console.log('this', this)
       }
     }
     let vm = Vue.createApp(CounterApp).mount('#counter')
-    console.log('vm', vm)
   }
 </script>
 </html>
