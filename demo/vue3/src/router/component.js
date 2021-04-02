@@ -1,6 +1,6 @@
 import Table from '../components/Table'
 import Form from '../components/form/Index'
-const IndexList = { template: '<div>IndexList</div>' }
+import IndexList from '../components/IndexList/Index'
 // const Dialog = { template: '<div>Dialog</div>' }
 const diff = { template: '<div>diff</div>' }
 

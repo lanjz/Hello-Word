@@ -177,5 +177,6 @@ module.exports = {
     '/HTML5/WebWorker',
     '/HTML5/ShareWorker',
     '/HTML5/Preload和Prefetch',
+    '/HTML5/IntersectionObserver',
   ]
 }
