@@ -8,6 +8,7 @@
 <body>
 <div id="counter">
     Counter: <span v-for="item in counter" :key="item">{{item}}</span>
+    {{repositories}}
 </div>
 </body>
 <script>
@@ -18,13 +19,21 @@
           counter: 5
         }
       },
+    setup (props, context) {
+      	console.log('context', context)
+        let repositories = [1]
+
+        return {
+            repositories,
+        }
+    },
       watch: {
         counter: function (val){
           console.log('watch', val)
         }
       },
       mounted() {
-        console.log('this', this)
+        console.log('this', this.repositories)
       }
     }
     let vm = Vue.createApp(CounterApp).mount('#counter')

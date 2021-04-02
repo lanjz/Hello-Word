@@ -1063,7 +1063,7 @@ var Vue = (function (exports) {
     return isReactive(value) || isReadonly(value);
   }
   function toRaw(observed) {
-    return ((observed && toRaw(observed["__v_raw" /* RAW */])) || observed);
+    return ((observed && (observed["__v_raw" /* RAW */])) || observed);
   }
   function markRaw(value) {
     def(value, "__v_skip" /* SKIP */, true);
@@ -5264,6 +5264,7 @@ var Vue = (function (exports) {
       }
     };
     const mountComponent = (initialVNode, container, anchor, parentComponent, parentSuspense, isSVG, optimized) => {
+      debugger
       const instance = (initialVNode.component = createComponentInstance(initialVNode, parentComponent, parentSuspense));
       if ( instance.type.__hmrId) {
         registerHMR(instance);

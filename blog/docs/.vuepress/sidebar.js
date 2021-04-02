@@ -102,6 +102,7 @@ module.exports = {
     '/Vue3/createApp',
     '/Vue3/响应式原理',
     '/Vue3/watch',
+    '/Vue3/setup',
   ],
   '/React/': [
     '/React/Fiber',
