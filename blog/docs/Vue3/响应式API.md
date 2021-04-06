@@ -167,9 +167,9 @@ function createSetter(shallow = false) {
 
 **作用？**
 
-由于 `reactive` 必须传递一个对象, 所以导致在企业开发中，如果我们只想让某个变量实现响应式的时候会非常麻烦 ，所以Vue3就给我们提供了 `ref` 方法, 实现对简单值的监听
+由于 `reactive` 必须传递一个对象, 所以导致在企业开发中，如果我们只想让某个变量实现响应式的时候会非常麻烦 ，所以Vue3就给我们提供了 `ref` 方法, 为非对象的基础数据类型创建响应性
 
-## ref
+### ref
 
 接受一个内部值并返回一个响应式且可变的 ref 对象。ref 对象具有指向内部值的单个 `property .value`
 
@@ -209,7 +209,7 @@ class RefImpl {
 
 当调用 `ref` 实际是生成了一个 `RefImpl` 实例，并且对外定义了 `value` 属性，当 `set` 和 `get` 时，分别也会调用对应用 `trigger` 发布事件和 `track` 收集事件
 
-## unref
+### unref
 
 如果参数为 ref，则返回内部值，否则返回参数本身。这是 `val = isRef(val) ? val.value : val`
 
@@ -221,7 +221,7 @@ class RefImpl {
   }
 ```
 
-## toRef
+### toRef
 
 可以用来为源响应式对象上的 property 性创建一个 ref。然后可以将 ref 传递出去，从而保持对其源 property 的响应式连接
 
@@ -233,11 +233,25 @@ function toRef(object, key) {
       ? object[key]
       : new ObjectRefImpl(object, key);
   }
+// ObjectRefImpl
+  class ObjectRefImpl {
+    constructor(_object, _key) {
+      this._object = _object;
+      this._key = _key;
+      this.__v_isRef = true;
+    }
+    get value() {
+      return this._object[this._key];
+    }
+    set value(newVal) {
+      this._object[this._key] = newVal;
+    }
+  }
 ```
 
-如果已经是 ref 对象则直接返回，否则调用 `ObjectRefImpl` 生成一个 ref
+如果已经是 ref 对象则直接返回，否则调用 `ObjectRefImpl` 生成一个 ref，跟 `RefImpl` 相比少了在 `get/set` 方法触发了少了主动触发收集事件和派发事件的操作，因为 `toRef` 的对象本身就是响应式对象了
 
-## toRefs
+### toRefs
 
 将响应式对象转换为普通对象，其中结果对象的每个 property 都是指向原始对象相应 property 的ref。
 

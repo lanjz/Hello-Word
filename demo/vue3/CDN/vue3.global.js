@@ -1551,6 +1551,7 @@ var Vue = (function (exports) {
   }
   const getId = (job) => job.id == null ? Infinity : job.id;
   function flushJobs(seen) {
+    debugger
     isFlushPending = false;
     isFlushing = true;
     {
@@ -5264,7 +5265,6 @@ var Vue = (function (exports) {
       }
     };
     const mountComponent = (initialVNode, container, anchor, parentComponent, parentSuspense, isSVG, optimized) => {
-      debugger
       const instance = (initialVNode.component = createComponentInstance(initialVNode, parentComponent, parentSuspense));
       if ( instance.type.__hmrId) {
         registerHMR(instance);
@@ -12762,6 +12762,7 @@ var Vue = (function (exports) {
     if (exp && !exp.content.trim()) {
       exp = undefined;
     }
+    debugger
     let shouldCache = context.cacheHandlers && !exp;
     if (exp) {
       const isMemberExp = isMemberExpression(exp.content);
@@ -13494,6 +13495,7 @@ var Vue = (function (exports) {
   initDev();
   const compileCache = Object.create(null);
   function compileToFunction(template, options) {
+    debugger
     if (!isString(template)) {
       if (template.nodeType) {
         template = template.innerHTML;
@@ -13534,8 +13536,8 @@ var Vue = (function (exports) {
     // with keys that cannot be mangled, and can be quite heavy size-wise.
     // In the global build we know `Vue` is available globally so we can avoid
     // the wildcard object.
-    const render = ( new Function(code)()
-    );
+    debugger
+    const render = (new Function(code)());
     render._rc = true;
     return (compileCache[key] = render);
   }

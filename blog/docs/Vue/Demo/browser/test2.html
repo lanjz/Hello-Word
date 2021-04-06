@@ -6,30 +6,31 @@
 </head>
 <body>
   <div id="app">
-    <div v-for="(item, ind) in t" :key="item.id" :class="'A'+item" @click="doa"><span>{{item.name}}</span></div>
+      <h1>静态节点一：</h1>
+      Counter:
+      <span v-for="item in counter" :key="item">{{item}}</span>
+      <h2>静态节点一：</h2>
+      {{info}}
   </div>
 <script>
   var app = new Vue({
     el: '#app',
     data: {
-      t: [
-        {id: 1, name: '一'},
-        {id: 2, name: '二'},
-        {id: 3, name: '三'},
-        {id: 4, name: '四'},
-        {id: 5, name: '五'},
-      ],
+      counter: 5
     },
-    methods:{
-      doa(){
-        this.t.push(this.t.splice(0,1)[0])
-      }
+    watch: {
+        counter: function (val){
+            console.log('watch', val)
+        }
     },
-    beforeCreate(){
+    created() {
+        this.info = Vue.observable({
+            name: 'lanjz'
+        })
     },
-    mounted(){
-      console.log(this)
-    },
+    mounted() {
+        console.log('this', this)
+    }
   })
 </script>
 <style>

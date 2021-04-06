@@ -3288,6 +3288,7 @@
     // check inline-template render functions
     var inlineTemplate = vnode.data.inlineTemplate;
     if (isDef(inlineTemplate)) {
+      debugger
       options.render = inlineTemplate.render;
       options.staticRenderFns = inlineTemplate.staticRenderFns;
     }
@@ -3532,6 +3533,7 @@
     Vue.prototype._render = function () {
       var vm = this;
       var ref = vm.$options;
+      debugger
       var render = ref.render;
       var _parentVnode = ref._parentVnode;
 
@@ -11652,6 +11654,7 @@
 
 
   function createFunction (code, errors) {
+    debugger
     try {
       return new Function(code)
     } catch (err) {

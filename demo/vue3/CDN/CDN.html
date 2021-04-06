@@ -7,29 +7,30 @@
 </head>
 <body>
 <div id="counter">
-    Counter: <span v-for="item in counter" :key="item">{{item}}</span>
-    {{info}}
+    <h1>静态节点一：</h1>
+    Counter:
+    <span v-for="item in counter" :key="item">{{item}}</span>
+    <h2>静态节点一：</h2>
+    <div @click="handler">{{info}}</div>
 </div>
 </body>
 <script>
   window.onload = function (){
     const CounterApp = {
+        cacheHandlers:true,
       data() {
         return {
           counter: 5
         }
       },
-    setup (props, context) {
-      	console.log('context', context)
-        let repositories = [1]
-
-        return {
-            repositories,
-        }
-    },
       watch: {
         counter: function (val){
           console.log('watch', val)
+        }
+      },
+      methods: {
+        handler(){
+          console.log('handler')
         }
       },
       created() {
