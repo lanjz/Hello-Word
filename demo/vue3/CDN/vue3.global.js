@@ -5722,6 +5722,7 @@ var Vue = (function (exports) {
             patch(null, nextChild, container, anchor, parentComponent, parentSuspense, isSVG);
           }
           else if (moved) {
+            debugger
             // move if:
             // There is no stable subsequence (e.g. a reverse)
             // OR current node is not among the stable sequence
