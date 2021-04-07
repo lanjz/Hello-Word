@@ -97,6 +97,7 @@ module.exports = {
     '/Vue/吱不吱',
   ],
   '/Vue3/': [
+    '/Vue3/V3升级目的',
     '/Vue3/使用区别',
     '/Vue3/SFC还是JSX',
     '/Vue3/createApp',
@@ -104,7 +105,6 @@ module.exports = {
     '/Vue3/watch',
     '/Vue3/setup',
     '/Vue3/响应式API',
-    '/Vue3/V3升级目的',
     '/Vue3/Diff',
   ],
   '/React/': [
