@@ -148,8 +148,8 @@ module.exports = {
   ],
   '/Node/基础/': [
     '/Node/基础/认识Node',
-    '/Node/基础/基础使用',
     '/Node/基础/事件循环',
+    '/Node/基础/基础使用',
     '/Node/基础/Node模块',
     '/Node/基础/守护服务',
   ],
