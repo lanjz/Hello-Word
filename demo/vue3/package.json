@@ -15,6 +15,7 @@
     "import-html-entry": "^1.11.1",
     "prerender-spa-plugin": "^3.4.0",
     "vue": "^3.0.0",
+    "vue-meta-info": "^0.1.7",
     "vue-router": "4.0.0-beta.13",
     "vuex": "^4.0.0-rc.2"
   },

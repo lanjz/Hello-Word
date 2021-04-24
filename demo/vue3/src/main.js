@@ -1,4 +1,5 @@
 import { createApp, reactive } from 'vue/dist/vue.esm-bundler.js'
+import MetaInfo from 'vue-meta-info'
 import ElementPlus from 'element-plus';
 import locale from 'element-plus/lib/locale/lang/zh-cn'
 import App from './App.vue'
@@ -16,6 +17,7 @@ function render(props = {}){
   app.use(router)
   app.use(store)
   app.use(hllView)
+  app.use(MetaInfo)
   backgroundAction(app, props)
   app.mount('#app2')
 }

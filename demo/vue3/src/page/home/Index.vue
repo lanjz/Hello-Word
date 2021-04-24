@@ -27,7 +27,15 @@ export default {
     ...mapActions('userinfo', ['getUserinfo'])
   },
   mounted() {
+  },
+  metaInfo: {
+    title: 'My Example App', // set a title
+    meta: [{                 // set meta
+      name: 'keyWords',
+      content: 'My Example App'
+    }]
   }
+
 }
 </script>
 <style scoped lang="scss">

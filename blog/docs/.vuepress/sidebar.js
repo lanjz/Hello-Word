@@ -106,6 +106,7 @@ module.exports = {
     '/Vue3/setup',
     '/Vue3/响应式API',
     '/Vue3/Diff',
+    '/Vue3/预渲染',
   ],
   '/React/': [
     '/React/Fiber',
