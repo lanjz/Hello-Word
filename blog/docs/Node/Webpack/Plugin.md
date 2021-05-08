@@ -24,13 +24,27 @@ class BasicPlugin{
 
 // 导出 Plugin
 module.exports = BasicPlugin;
+// 新写法
+class BasicPlugin{
+  // 在构造函数中获取用户给该插件传入的配置
+  constructor(options){
+  }
+
+  // Webpack 会调用 BasicPlugin 实例的 apply 方法给插件实例传入 compiler 对象
+  apply(compiler){
+    compiler.hooks.compilation.tap('BasicPlugin', (compilation) => {
+    	console.log('compilation')
+	})
+  }
+}
+
 ```
 
 1. 在 webpack 启动后，它会去执行我们配置的 `new BasicPlugin(options)` 初始化一个插件实例
 
 2. 在初始化 `compiler` 对象之后，会调用 `basicPlugin.apply(compiler)` 方法将 `compiler` 传入
 
-3. 插件获得 `compiler` 对象后，就可以通过 `compiler.plugin('事件名', 回调函数)` 的方式进行监听 Webpack 广播出来的事件了
+3. 插件获得 `compiler` 对象后，就可以通过 `compiler.hooks.someHook.tap('当前插件名', 回调函数)` 的方式进行监听 Webpack 广播出来的事件了
 
 ```js
 class HelloWorldPlugin {
@@ -40,17 +54,17 @@ class HelloWorldPlugin {
   apply (compiler) {
     console.log(`Hello World`)
     // compilation（'编译器'对'编译ing'这个事件的监听）
-    compiler.plugin('compile', function () {
+    compiler.hooks.compile.tap('HelloWorldPlugin', function () {
       console.log(`The compiler is starting to compile...-----`)
     })
     // compilation（'编译器'对'编译ing'这个事件的监听）
-    compiler.plugin('compilation', function (compilation) {
+    compiler.hooks.compilation.tap('HelloWorldPlugin', function (compilation) {
       console.log(`The compiler is starting a new compilation...-----`)
-      compilation.plugin('optimize', function () {
+      compilation.hooks.optimize.tap('HelloWorldPlugin', function () {
         console.log('The compilation is starting to optimize files...')
       })
     })
-    compiler.plugin('done', function () {
+    compiler.hooks.done.tap('HelloWorldPlugin', function () {
       console.log(`done......`)
     })
   }
@@ -65,6 +79,30 @@ module.exports = HelloWorldPlugin
 当 Webpack 以开发模式运行时，每一个文件变化，一个新的 `compilation` 就会被创建
 
 [webpack hook](https://www.webpackjs.com/api/compiler-hooks/)
+
+### 粟子
+
+制作一个给输出的 HTML 页面添加内容的插件，用于解决单文件项目首屏空白问题
+
+```js
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+class FirstScreen{
+	constructor() {}
+	apply (compiler) {
+		compiler.hooks.compilation.tap('FirstScreen', (compilation) => {
+			HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
+				'FirstScreen', 
+				(data, cb) => {
+					console.log('data', data)
+					data.html = data.html.replace('<div id="app"></div>',`<div id="app">我的骨架屏</div>`)
+					cb(null, data)
+				}
+			)
+		})
+	}
+}
+module.exports = FirstScreen
+```
 
 ## 常用插件
 

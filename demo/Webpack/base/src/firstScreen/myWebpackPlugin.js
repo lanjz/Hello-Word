@@ -5,16 +5,20 @@ class FirstScreen{
 		console.log('FirstScreen-options', options)
 	}
 	apply (compiler) {
-		compiler.hooks.compilation.tap('FirstScreen', (compilation) => {
-			console.log('The compiler is starting a new compilation...')
-			HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
-				'FirstScreen', // <-- Set a meaningful name here for stacktraces
-				(data, cb) => {
-					console.log('data', data)
-					data.html += 'The Magic Footer'
-					cb(null, data)
-				}
-			)
+		console.log(`Hello World`)
+		// compilation（'编译器'对'编译ing'这个事件的监听）
+		compiler.hooks.compile.tap('FirstScreen', function () {
+			console.log(`The compiler is starting to compile...-----`)
+		})
+		// compilation（'编译器'对'编译ing'这个事件的监听）
+		compiler.hooks.compilation.tap('FirstScreen', function (compilation) {
+			console.log(`The compiler is starting a new compilation...-----`)
+			compilation.hooks.optimize.tap('FirstScreen', function () {
+				console.log('The compilation is starting to optimize files...')
+			})
+		})
+		compiler.hooks.done.tap('FirstScreen', function () {
+			console.log(`done......`)
 		})
 	}
 }

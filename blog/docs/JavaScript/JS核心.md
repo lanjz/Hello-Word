@@ -1152,6 +1152,8 @@ foo.bar(); //  foo
   - `history.back()`
 
   - 用户交互
+  
+  - requestAnimationFrame
 
   - 其中包括常见 `DOM2`（addEventListener）和 `DOM0`（onHandle）级事件监听回调函数。如 `click` 事件回调函数等
 
