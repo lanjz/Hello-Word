@@ -1,7 +1,7 @@
 const path = require('path')
 
 let plugins = []
-if(process.env.NODE_ENV == "production" ){
+/*if(process.env.NODE_ENV == "production" ){
   const PrerenderSPAPlugin = require('prerender-spa-plugin')
   const Renderer = PrerenderSPAPlugin.PuppeteerRenderer
   plugins.push(
@@ -16,8 +16,11 @@ if(process.env.NODE_ENV == "production" ){
       }),
     })
   )
+}*/
+if(process.env.NODE_ENV == "production" ){
+  const MyWebpackPlugin = require('./myWebpackPlugin')
+  plugins.push(new MyWebpackPlugin('./page'))
 }
-
 module.exports = {
   lintOnSave: false,
   devServer: {
