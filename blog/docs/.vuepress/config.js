@@ -6,7 +6,8 @@ module.exports = {
   extraWatchFiles: ['./sidebar.js'],
   port: 5000,
   base: '/lanjz/',
-  sidebar: 'auto',
+
+  sidebarDepth: 2,
   themeConfig: {
     sidebarDepth: 2,
     nav: [
@@ -62,6 +63,7 @@ module.exports = {
         items: [
           { text: '前端优化总结', link: '/工程化/前端优化总结/' },
           { text: '系统设计', link: '/工程化/系统设计/' },
+          { text: 'Preload&Prefetch', link: '/工程化/预加载&预解析' },
           { text: '重构代码原则', link: '/工程化/重构改善既有代码的设计' },
           { text: '开发与调试', link: '/工程化/开发与调试技巧' },
           { text: '组件设计', link: '/工程化/组件设计的基本原则' },
