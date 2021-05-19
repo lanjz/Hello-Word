@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "vuepress dev docs",
+    "dev2": "vuepress dev docs --temp .temp",
     "build": "vuepress build docs"
   },
   "devDependencies": {
