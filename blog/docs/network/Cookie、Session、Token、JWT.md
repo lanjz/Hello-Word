@@ -40,27 +40,33 @@ HTTP是无状态的协议（对于事务处理没有记忆能力，每次客户�
 
   每个 cookie 都会绑定单一的域名，无法在别的域名下获取使用，一级域名和二级域名之间是允许共享使用的（靠的是 domain）。
   
-# session
+## session
 
-`session` 是另一种记录服务器和客户端会话状态的机制,`session` 是基于 `cookie` 实现的，`session` 存储在服务器端，`sessionId` 会被存储到客户端的`cookie` 中
+什么 session ？
 
-session 认证流程
+开发者为了实现中断和继续等操作，将 user agent 和 server 之间一对一的交互，抽象为“会话”，进而衍生出“会话状态”，也就是 session 的概念
 
-- 用户第一次请求服务器的时候，服务器根据用户提交的相关信息，创建对应的 Session,并生成一个`sessionId`
+如何实现 session ？ 
 
-- 将`sessionId`通过`cookie`的形式返回给浏览器
+实现 session 需要借助 cookie 和后端的一种存储机制来实现
 
-- 当用户第二次访问服务器的时候，会自动携带设置的`cookie`传给服务器
+上面所说的存储机制就是服务端保存的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中
 
-- 服务器接收到客户端传回的`cookie`获取到其中的`sessionId`,再根据 `SessionID` 查找对应的 `Session` 信息进行身份验证
+### session 认证流程
 
-# Cookie 和 Session 的区别
+- 用户第一次请求服务器的时候，服务器根据用户提交的相关信息，创建对应的 Session, 并生成一个`sessionId`
+
+- 将`sessionId` 保存 `cookie` 中并返回给浏览器
+
+- 当用户第二次访问服务器的时候，会自动携带设置的 `cookie` 传给服务器
+
+- 服务器接收到客户端传回的 `cookie` 获取到其中的 `sessionId`,再根据 `SessionID` 查找对应的 `Session` 信息进行身份验证
+
+### Cookie 和 Session 的区别
+
+- `session` 存储在服务器端，`sessionId` 会被存储到客户端的 `cookie` 中，而 `cookie` 存储在浏览器端
 
 - 存取值的类型不同：Cookie 只支持存字符串数据，想要设置其他类型的数据，需要将其转换成字符串，Session 可以存任意数据类型
-
-- 有效期不同： Cookie 可设置为长时间保持，比如我们经常使用的默认登录功能，Session 一般失效时间较短，客户端关闭（默认情况下）或者 Session 超时都会失效。
-
-  session的过期时间是从从session不活动的时候开始计算，如果session一直活动，session就总不会过期。从该Session未被访问开始计时; 一旦Session被访问,计时清0;
 
 - 存储大小不同： 单个 Cookie 保存的数据不能超过 4K，Session 可存储数据远高于 Cookie，但是当访问量过多，会占用过多的服务器资源。
 
