@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # Mac 使用小记
 
 ## Shell 命令

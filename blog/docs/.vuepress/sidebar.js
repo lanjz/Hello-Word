@@ -12,10 +12,6 @@ module.exports = {
   '/secure/': [
     '/secure/'
   ],
-  '/利其器/': [
-    '/利其器/Mac',
-    '/利其器/Github',
-  ],
   '/JavaScript/': [
     '/JavaScript/JS基础',
     '/JavaScript/JS核心',

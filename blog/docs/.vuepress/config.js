@@ -77,7 +77,8 @@ module.exports = {
       {
         text: '利其器',
         items: [
-          { text: 'Mac', link: '/利其器/' },
+          { text: 'Mac', link: '/利其器/Mac' },
+          { text: 'Github', link: '/利其器/Github' },
         ]
       },
       { text: '关于我', link: '/Im/' },
