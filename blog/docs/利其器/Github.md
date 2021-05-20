@@ -60,7 +60,7 @@ git config --global user.email 'x@xxx'
 
 克隆命令：`git clone https://lanjz:123@git.test.com/abc/demo`
 
-## 回滚
+## 本地回滚
 
 `git reset`
 
