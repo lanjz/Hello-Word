@@ -68,19 +68,9 @@ export default {
 </script>
 
 <style scope>
-.app{
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
+.home-page{
+  min-height: 100vh;
   background: #272b2d;
-}
-.container{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
+  padding-top: 2.2rem;
 }
 </style>

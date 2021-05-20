@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@vuepress/theme-blog": "^2.2.0",
-    "vuepress": "^1.5.1"
+    "vuepress": "^1.8.2"
   },
   "dependencies": {
     "cross-env": "^7.0.2",
