@@ -10,10 +10,9 @@ function Point(x, y) {
 
 Point.prototype.toString = function () {
   return '(' + this.x + ', ' + this.y + ')';
-};类的内部所有定义的方法
+};
 
 var p = new Point(1, 2);
-
 ```
 
 上面的代码用 ES6 的class改写，就是下面这样
@@ -176,6 +175,12 @@ Object.getOwnPropertyNames(ClassPoint.prototype)
 
 ## 静态属性和静态方法
 
+静态属性和静态方法的特点：
+
+- 只能通过类访问
+
+- 可以被子类继承
+
 ### 静态属性
 
 静态属性指的是 Class 本身的属性，即 `Class.propName` ，而不是定义在实例对象（ `this` ）上的属性
@@ -186,11 +191,7 @@ class Foo {
 
 Foo.prop = 1;
 Foo.prop // 1
-```
-
-父类的静态属性，也会被子类继承
-
-```js
+// 继续
 class Fo extends  Foo{
 }
 
@@ -211,7 +212,7 @@ class MyClass {
 
 ### 静态方法
 
-加上 `static` 关键字，就表示该方法不会被实例继承，而是直接通过类来调用，这就称为“静态方法”
+在类方法前面加上 `static` 关键字，就变成了“静态方法”
 
 ```js
 class Foo {
@@ -222,47 +223,22 @@ class Foo {
 
 Foo.classMethod() // 'hello'
 
-var foo = new Foo();
-foo.classMethod()
+var foo = new Foo(); 
+foo.classMethod() // 静态属性和静态方法都通过实例访问
 // TypeError: foo.classMethod is not a function
-```
-
-**注意，如果静态方法包含this关键字，这个this指的是类，而不是实例**
-
-```js
-class Foo {
-  static bar() {
-    this.baz();
-  }
-  static baz() {
-    console.log('hello');
-  }
-  baz() {
-    console.log('world');
-  }
-}
-
-Foo.bar() // hello
-```
-
-父类的静态方法不能被实例继续，但是可以被子类继承
-
-```js
-class Foo {
-  static classMethod() {
-    return 'hello';
-  }
-}
 
 class Bar extends Foo {
 }
-
 Bar.classMethod() // 'hello'
 ```
 
+:::tip
+注意，如果静态方法包含this关键字，这个this指的是类，而不是实例
+:::
+
 ## 私有方法和私有属性
 
- ES6 没有提供私有，只能通过变通方法模拟实现
+ES6 没有提供私有方法和属性，只能通过变通方法模拟实现
 
  ```js
 class Widget {
@@ -315,27 +291,22 @@ Reflect.ownKeys(myClass.prototype)
 
 ## 类的实例
 
-实例的属性除非显式定义在其本身（即定义在 `this` 对象上），否则都是定义在原型上
+实例的属性显式定义在其本身（即定义在 `this` 对象上），类方法定义在原型上
 
 ```js
 //定义类
 class Point {
-
   constructor(x, y) {
     this.x = x;
     this.y = y;
   }
-
   toString() {
     return '(' + this.x + ', ' + this.y + ')';
   }
-
 }
 
 var point = new Point(2, 3);
-
 point.toString() // (2, 3)
-
 point.hasOwnProperty('x') // true
 point.hasOwnProperty('y') // true
 point.hasOwnProperty('toString') // false
@@ -512,26 +483,7 @@ class Rectangle {
 var obj = new Rectangle(3, 4); // 输出 true
 ```
 
-需要注意的是，子类继承父类时，`new.target` 会返回子类
-
-```js
-class Rectangle {
-  constructor(length, width) {
-    console.log(new.target === Rectangle);
-    // ...
-  }
-}
-
-class Square extends Rectangle {
-  constructor(length, width) {
-    super(length, width);
-  }
-}
-
-var obj = new Square(3); // 输出 false
-```
-
-利用这个特点，可以写出不能独立使用、必须继承后才能使用的类
+需要注意的是，子类继承父类时，`new.target` 会返回子类，利用这个特点，可以写出不能独立使用、必须继承后才能使用的类
 
 ```js
 class Shape {
@@ -552,3 +504,326 @@ class Rectangle extends Shape {
 var x = new Shape();  // 报错
 var y = new Rectangle(3, 4);  // 正确
 ```
+
+## 总结
+
+- 静态属性和方法只能通过类访问且能被子类继承，但不能通过实例访问
+
+- 目前不能直接实现 `私有属性和私有方法`
+
+- 创建实例后，类的属性定义在实例本身，类的方法定义在实例的原型对象上
+
+### 与普通方法的区别
+
+1. 类的内部所有定义的方法，都是不可枚举的
+
+2. class类必须new调用，不能直接执行
+
+3. class类不存在变量提升
+
+4. class类有static静态方法
+
+## Babel 对类的转换
+
+**类的实现**
+
+粟子：
+
+```js
+class Parent {
+    constructor(name,age){
+        this.name = name;
+        this.age = age;
+    }
+    speakSomething(){
+        console.log("I can speek chinese");
+    }
+    static showName(){
+       console.log('showName')
+    }
+}
+Parent.some = 'some'
+```
+
+经 babel 转码之后
+
+```js
+"use strict";
+
+function _classCallCheck(instance, Constructor) {
+    // 判断是不是通过 new 来调用这个方法
+    if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+    }
+}
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false; // ES6 类方式和静态方法是不可枚举的，所以设置 enumerable 为 false
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor); // 通过 `Object.defineProperty` 代理到新的实例对象中
+  }
+}
+
+
+function _createClass(Constructor, protoProps, staticProps) {
+  // 通过参数名可以推测调用 defineProperties 方法时，对于类方法
+  // 将类方法赋值到 Constructor.prototype 上
+  // 对于类的静态方法调用 defineProperties 方法，将静态方法赋值到 Constructor 属性上
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+// 修改了 Parent 的定义，通过自执行函数返回内容的 Parent 函数
+let Parent = /*#__PURE__*/ (function () {
+  function Parent(name, age) {
+    _classCallCheck(this, Parent); // 判断是不是通过 new 调用函数
+    this.name = name;
+    this.age = age;
+  }
+  _createClass(  // 给当前类添加类方法和静态方法
+    Parent,
+    [
+      {
+        key: "speakSomething",
+        value: function speakSomething() {
+          console.log("I can speek chinese");
+        }
+      }
+    ],
+    [
+      {
+        key: "showName",
+        value: function showName() {
+          console.log("showName");
+        }
+      }
+    ]
+  );
+
+  return Parent;
+})();
+Parent.some = "some"; // 直接赋值静态属性
+```
+
+从上面的例子可以看到并结合上文对类的解析，可以知道 Babel 对类的转换大体为以下步骤：
+
+1. 通过 `instance instanceof Constructor`，判断是否是通过 `new` 方法调用父类
+
+2. 类属性属性赋值到实例对象上
+
+3. 类方法设置在对象的原型中
+
+4. 静态方法和静态属性直接设置在实例对象中
+
+5. 类方法和静态方法设置为不可枚举属性
+
+**继承实现**
+
+粟子
+
+```js
+class Parent {
+    constructor(name,age){
+        this.name = name;
+        this.age = age;
+    }
+    speakSomething(){
+        console.log("I can speek chinese");
+    }
+    static showName(){
+       console.log('showName')
+    }
+}
+Parent.some = 'some'
+class Child extends Parent {
+    constructor(name,age){
+        super(name,age);
+    }
+    coding(){
+       console.log("I can code JS");
+    }
+}
+var c = new Child("job",30);
+c.coding()
+```
+
+转码之后的代码变成了这样
+
+```js
+"use strict";
+
+function _inherits(subClass, superClass) {
+  // 父类只能是函数
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+  // 继承父类的类方法，添加 constructor 属性 值为自身
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: { value: subClass, writable: true, configurable: true }
+  }); 
+  // 设置 __proto__
+  // 子类也是一函数，它的  __proto__ 指类父类
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf =
+    Object.setPrototypeOf ||
+    function _setPrototypeOf(o, p) {
+      o.__proto__ = p;
+      return o;
+    };
+  return _setPrototypeOf(o, p);
+}
+
+function _createSuper(Derived) {
+  var hasNativeReflectConstruct = _isNativeReflectConstruct(); // 是否支持 Reflect
+  return function _createSuperInternal() {
+    var Super = _getPrototypeOf(Derived), // 获取父类
+      result;
+    if (hasNativeReflectConstruct) {
+      var NewTarget = _getPrototypeOf(this).constructor;
+      result = Reflect.construct(Super, arguments, NewTarget); //Reflect.construct() 方法的行为有点像 new 操作符构造函数 ， 相当于运行 new target(...args).
+    } else {
+      result = Super.apply(this, arguments); // 上面分支不好理解的各话，就理解这里，调用父类，设置给当前的子类实例添加类属性
+    }
+    return _possibleConstructorReturn(this, result);
+  };
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError(
+      "this hasn't been initialised - super() hasn't been called"
+    );
+  }
+  return self;
+}
+
+function _isNativeReflectConstruct() {
+  if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+  if (Reflect.construct.sham) return false;
+  if (typeof Proxy === "function") return true;
+  try {
+    Boolean.prototype.valueOf.call(
+      Reflect.construct(Boolean, [], function () {})
+    );
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf
+    ? Object.getPrototypeOf
+    : function _getPrototypeOf(o) {
+        return o.__proto__ || Object.getPrototypeOf(o);
+      };
+  return _getPrototypeOf(o);
+}
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+// 实现父类
+let Parent = /*#__PURE__*/ (function () {
+  function Parent(name, age) {
+    _classCallCheck(this, Parent);
+
+    this.name = name;
+    this.age = age;
+  }
+
+  _createClass(
+    Parent,
+    [
+      {
+        key: "speakSomething",
+        value: function speakSomething() {
+          console.log("I can speek chinese");
+        }
+      }
+    ],
+    [
+      {
+        key: "showName",
+        value: function showName() {
+          console.log("showName");
+        }
+      }
+    ]
+  );
+
+  return Parent;
+})();
+
+Parent.some = "some";
+
+let Child = /*#__PURE__*/ (function (_Parent) {
+  _inherits(Child, _Parent); // 子类继续父类方法，并设置 __proto__
+
+  var _super = _createSuper(Child); // 返回 _createSuperInternal 方法
+
+  function Child(name, age) {  // 创建子类方法
+    _classCallCheck(this, Child);
+
+    return _super.call(this, name, age);
+  }
+ 
+  // 给子类添加方法
+  _createClass(Child, [
+    {
+      key: "coding",
+      value: function coding() {
+        console.log("I can code JS");
+      }
+    }
+  ]);
+
+  return Child;
+})(Parent);
+
+var c = new Child("job", 30);
+c.coding();
+```
+
+总结一下流程：
+
+1. 用创建类的步骤创建子类 Child
+
+2. 调用 `_inherits(Child, _Parent)` 方法，继承父类的类方法同时添加 constructor 属性指向为自身（Fn.prototype.constructor = Fn）
+
+这两步完成的子类的创建
+
+当子类被 `new` 时执行 `_super.call(this, name, age)`，相当于执行父类方法，通过 `call` 将 `this` 指向当前实例，给实例添加父类属性
