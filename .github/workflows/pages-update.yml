@@ -27,13 +27,18 @@ jobs:
         with:
           node-version: '12.x'  #使用nodejs 12.x版本
 
-      - name: vuepress-deploy
-        uses: jenkey2011/vuepress-deploy@master
-        env:
+      # 1、生成静态文件
+      - name: Build
+        run: cd blog&&npm install && npm run build #安装以来并打包，执行的是项目我们定义的命令
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
           ACCESS_TOKEN: ${{ secrets.DEPLOY_KEY }}
-          TARGET_BRANCH: master
-          BUILD_SCRIPT: cd blog&&npm install && npm run build #安装以来并打包，执行的是项目我们定义的命令
-          BUILD_DIR: blog/docs/.vuepress/dist/
+          REPOSITORY_NAME: lanjz/blog
+          BRANCH: master
+          FOLDER: blog/docs/.vuepress/dist
+          #注意这里的 public 是仓库根目录下的 public，也就是 npm run build 生成静态资源的路径，比如有的人是 `docs/.vuepress/dist`
 
       # 3、同步到 gitee 的仓库
       - name: Sync to Gitee
