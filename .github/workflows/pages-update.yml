@@ -31,7 +31,6 @@ jobs:
         uses: jenkey2011/vuepress-deploy@master
         env:
           ACCESS_TOKEN: ${{ secrets.DEPLOY_KEY }}
-          TARGET_REPO: lanjz/blog
           TARGET_BRANCH: master
           BUILD_SCRIPT: cd blog&&npm install && npm run build #安装以来并打包，执行的是项目我们定义的命令
           BUILD_DIR: blog/docs/.vuepress/dist/
