@@ -26,6 +26,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '12.x'  #使用nodejs 12.x版本
+      # 1、生成静态文件
+      - name: Build
         run: cd blog&&npm install && npm run build #安装以来并打包，执行的是项目我们定义的命令
 
       # 2、部署到 GitHub Pages
