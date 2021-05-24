@@ -1,0 +1,64 @@
+name: Deploy Github Pages # 该Action的名字
+
+# on:何时触发该事件.
+on:
+  # 在push或pull请求事件时触发工作流，但只针对主分支
+  push:
+    branches: [ master ]
+  # 允许从Actions选项卡手动运行此工作流
+  workflow_dispatch:
+
+# 工作流运行由一个或多个jobs组成，这些job可以按顺序或并行运行
+jobs:
+  # 此工作流包含一个名为“build-deploy”的job。
+  build-deploy:
+
+    runs-on: ubuntu-latest # job运行于什么虚拟机上：最新版 Ubuntu
+
+    # steps表示将作为job一部分执行的一系列任务
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master # 切换分支到master
+        with:
+          persist-credentials: false
+
+      - name: Build
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'  #使用nodejs 12.x版本
+        run: cd blog&&npm install && npm run build #安装以来并打包，执行的是项目我们定义的命令
+
+      # 2、部署到 GitHub Pages
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.DEPLOY_KEY }}
+          REPOSITORY_NAME: blog/lanjz.github.io
+          BRANCH: master
+          FOLDER: blog/docs/.vuepress/dist
+          #注意这里的 public 是仓库根目录下的 public，也就是 npm run build 生成静态资源的路径，比如有的人是 `docs/.vuepress/dist`
+
+      # 3、同步到 gitee 的仓库
+      - name: Sync to Gitee
+        uses: wearerequired/git-mirror-action@master
+        env:
+          # 注意在 Settings->Secrets 配置 GIT id_rsa
+          SSH_PRIVATE_KEY: ${{ secrets.GITEE_R_P_KEY }}
+        with:
+          # 注意替换为你的 GitHub 源仓库地址
+          source-repo: git@github.com:lanjz/blog.git
+          # 注意替换为你的 Gitee 目标仓库地址
+          destination-repo: git@gitee.com:codebeat/lanjz.git
+
+      # 4、部署到 Gitee Pages
+      - name: Build Gitee Pages
+        uses: yanglbme/gitee-pages-action@main
+        with:
+          # 注意替换为你的 Gitee 用户名
+          gitee-username: ${{ secrets.GITEE_USERNAME }}
+          # 注意在 Settings->Secrets 配置 GITEE_PASSWORD
+          gitee-password: ${{ secrets.GITEE_PASSWORD }}
+          # 注意替换为你的 Gitee 仓库，仓库名严格区分大小写，请准确填写，否则会出错
+          gitee-repo: lanjz/lanjz
+          # 要部署的分支，默认是 master，若是其他分支，则需要指定（指定的分支必须存在）
+          branch: master
