@@ -30,12 +30,12 @@ jobs:
       - name: Build
         run: cd blog&&npm install && npm run build #安装以来并打包，执行的是项目我们定义的命令
 
-      # 2、部署到 GitHub Pages
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.DEPLOY_KEY }}
-          REPOSITORY_NAME: lanjz/blog
+          REPOSITORY_NAME: blog/lanjz.github.io
           BRANCH: master
           FOLDER: blog/docs/.vuepress/dist
           #注意这里的 public 是仓库根目录下的 public，也就是 npm run build 生成静态资源的路径，比如有的人是 `docs/.vuepress/dist`
