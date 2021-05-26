@@ -4,7 +4,8 @@ name: Deploy Github Pages # 该Action的名字
 on:
   # 在push或pull请求事件时触发工作流，但只针对主分支
   push:
-    branches: [ master ]
+    # branches: [ master ]
+    branches: []
   # 允许从Actions选项卡手动运行此工作流
   workflow_dispatch:
 
