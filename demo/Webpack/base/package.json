@@ -4,7 +4,8 @@
   "main": "src/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "webpack"
+    "start": "webpack",
+    "babel": "babel src/babel/src.js --out-dir src/babel/lib"
   },
   "dependencies": {
     "clean-webpack-plugin": "^3.0.0",
@@ -12,5 +13,10 @@
     "webpack": "^5.25.1",
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/plugin-transform-arrow-functions": "^7.13.0"
   }
 }
