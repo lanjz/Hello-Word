@@ -715,7 +715,7 @@ var o = {a: 1};
   
 - 对象都继承于 `Object.prototype` ,`Object.prototype` 中包含 `hasOwnProperty`, `toString` 等方法
 
-- 原型链如下: `o ---> Object.prototype ---> null`
+- 原型链如下: `o.__proto__ ---> Object.prototype ---> null`
   
 创建数组：
 
@@ -724,7 +724,7 @@ var a = ["yo", "whadup", "?"];
 ```
 - 数组都继承于 `Array.prototype` ,`Array.prototype` 中包含 `indexOf`, `forEach` 等方法
 
-- 原型链如下: `a ---> Array.prototype ---> Object.prototype ---> null`
+- 原型链如下: `a.__proto__ ---> Array.prototype ---> Object.prototype ---> null`
 
 创建函数：
  
@@ -735,7 +735,24 @@ function f(){
 ```
 - 函数都继承于 `Function.prototype`，`Function.prototype` 中包含 `call`, `bind`等方法
 
-- 原型链如下: `f ---> Function.prototype ---> Object.prototype ---> null`
+- 原型链如下: `f.__proto__ ---> Function.prototype ---> Object.prototype ---> null`
+
+**注意以下粟子**
+
+```js
+Functon.prototype.aaa='aaa'
+function fn(){}
+fn.prototype.bbb='bbb'
+Object.prototype.ccc='ccc'
+
+var ob = new fn()
+ob.ccc // ccc
+ob.bbb // bbb
+ob.aaa // undefined
+
+fn.aaa // aaa
+
+```
  
 **使用构造器创建的对象**
  

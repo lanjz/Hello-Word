@@ -1,39 +1,32 @@
+<!-- test.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title></title>
 </head>
+
 <body>
-<ul id="ul">
-    <li>1</li>
-    <li>2</li>
-    <li>2</li>
-</ul>
+<div class="test1">test12</div>
+<div id="hello"></div>
 <script>
-    function me(obj, mp = new WeakMap){
-        let keys = Object.keys(obj)
-        for(let item of keys){
-            let value = obj[item]
-            if(typeof value === 'object' ){
-                if(mp.has(value)){
-                    return true
-                } else {
-                    mp.set(value, true)
-                    return me(value, mp)
-                }
-            }
-        }
-        return false
+    // 待defer脚本下载完成后响应
+    function alertMsg() {
+        alert("123");
     }
-    let obj = {
-        a: 1
-    }
-    obj = {
-        a: 1,
-        b: obj
-    }
-    console.log( me(obj))
 </script>
+<input type="button" id="button1" onclick="alertMsg()" />
+<script src="./test.js" defer></script>
+<div class="test2">test2</div>
 </body>
+<style>
+    .test1 {
+        color: red;
+        font-size: 50px;
+    }
+
+    .test2 {
+        color: yellow;
+        font-size: 50px;
+    }
+</style>
 </html>

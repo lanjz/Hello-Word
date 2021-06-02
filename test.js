@@ -1,3 +1,9 @@
+// test.js
+
+for (let i = 0; i < 100000; i++) {
+  console.log(i);
+}
+document.getElementById("hello").innerHTML = "hello world";
 function resolve() {
   return new Promise((resolve) => {
     setTimeout(() => {
