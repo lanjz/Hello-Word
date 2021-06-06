@@ -6,35 +6,17 @@
 </head>
 <body>
 <script>
+    var obj = new Proxy({name: 'lanjz'}, {
+        set(target, propery, value){
+            console.log('属性不可设置', target, propery, value)
 
-  function p(time, sue) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if(sue) {
-          resolve('res')
-        } else {
-          reject('err')
+        },
+        deleteProperty(target, propery){
+            console.log('属性不可删除', target, propery)
         }
-      }, time)
     })
-  }
-  function p2() {
-    return p(1000)
-      .catch(err => {
-        return p(1000, true)
-      })
-  }
-  let start = (new Date()).getTime()
-
-  Promise.race([p(10000), p2()])
-    .then(res => {
-      console.log((new Date()).getTime() - start)
-      console.log('res', res)
-    })
-    .catch(err => {
-      console.log((new Date()).getTime() - start)
-      console.log('err', err)
-    })
+    console.log(obj)
+    Object.defineProperty()
 </script>
 </body>
 </html>
