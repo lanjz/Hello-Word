@@ -5,7 +5,7 @@ module.exports = {
   description: 'Just playing around',
   extraWatchFiles: ['./sidebar.js'],
   port: 5000,
-  base: '/appupdate.189.cn/',
+  base: '/lanjz/',
 
   sidebarDepth: 2,
   themeConfig: {
