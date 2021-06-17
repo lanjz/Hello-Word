@@ -4,12 +4,17 @@
   "main": "src/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "webpack",
+    "build": "webpack",
+    "start": "webpack serve --open",
     "babel": "babel src/babel/src.js --out-dir src/babel/lib"
   },
   "dependencies": {
     "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^5.2.6",
     "html-webpack-plugin": "^5.3.1",
+    "less": "^4.1.1",
+    "less-loader": "^9.1.0",
+    "style-loader": "^2.0.0",
     "webpack": "^5.25.1",
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2"

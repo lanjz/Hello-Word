@@ -8,7 +8,7 @@ Plugin 在 `plugins` 中单独配置，类型为数组，每一项是一个 `Plu
 ## 自定义插件
 
 简单的DEMO
-
+// 旧版本写法
 ```js
 class BasicPlugin{
   // 在构造函数中获取用户给该插件传入的配置
@@ -21,9 +21,9 @@ class BasicPlugin{
     })
   }
 }
-
 // 导出 Plugin
 module.exports = BasicPlugin;
+
 // 新写法
 class BasicPlugin{
   // 在构造函数中获取用户给该插件传入的配置
@@ -106,10 +106,6 @@ module.exports = FirstScreen
 
 ## 常用插件
 
-### 优化类
-
-以下跟 Webpack 构建过程中，可以帮助优化构建性能和速度的插件
-
 ### speed-measure-webpack-plugin
 
 简称 SMP，在构建时会输出 Webpack 打包过程中 Loader 和 Plugin 的耗时，有助于找到构建过程中的性能瓶颈
@@ -121,7 +117,7 @@ module.exports = smp.wrap(config)
 // config是当前webpack的配置
 ```
 
-在使用这个插件的时候，`config` 不要直接包含 `devServer：hot` 的配置，要不要会报 `Module Replacement is disabled` 的错误，暂时不知道原因，所以使用的时候用在不包含不要直接包含 `devServer：hot`，`common.webpack` 的配置中
+在使用这个插件的时候，`config` 不要直接包含 `devServer：hot` 的配置，要不要会报 `Module Replacement is disabled` 的错误，暂时不知道原因
 
 ### webpack-bundle-analyzer
 
@@ -154,15 +150,6 @@ module.exports = smp.wrap(config)
 3. 在 `package.json` 的 `scripts` 里加入下面这句话，就可以 `yarn build` 之后看到 `webpack-bundle-analyzer` 的效果：
 
   `"analyz": "NODE_ENV=production npm_config_report=true npm run build"`
-
-### webpack-merge
-
-提取公共配置，减少重复配置代码
-
-```js
-const merge = require('webpack-merge');
-const config = merge(common, {config})
-```
 
 ### webpack-dashboard
 
@@ -237,6 +224,8 @@ plugin: [
 
 ### web-webpack-plugin
 
+作用同 HtmlWebpackPlugin
+
 [文档](https://github.com/gwuhaolin/web-webpack-plugin/blob/master/readme_zh.md)
 
 ### clean-webpack-plugin
@@ -261,6 +250,16 @@ const UglifyJSPlugin = require('terser-webpack-plugin');
             }),
 
         ]
+```
+
+x5 之后的版本这个插件已经内置了
+
+```js
+module.exports = {
+  optimization: {
+    minimize: true,
+  },
+};
 ```
 
 ### mini-css-extract-plugin
@@ -306,5 +305,15 @@ module.exports = {
     })
   ]
 }
-
 ```
+
+### VueLoaderPlugin
+
+配置 `vue` 需要这个插件
+
+### HotModuleReplacementPlugin
+
+模块热更新需要使用这个，HotModuleReplacementPlugin 的作用就是将 HMR runtime 注入到 bundle.js，使得 bundle.js 可以和 HMR server 建立 websocket 的通信连接
+
+webpack-dev-sever 内部对 `HotModuleReplacementPlugin` 插件做了判断，当配置了 `devServer.hot:true` 时，就自动添加这个插件
+
