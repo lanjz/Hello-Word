@@ -1,6 +1,17 @@
 {
+  "presets": [
+    ["@babel/preset-env",
+      {
+        "useBuiltIns": "usage",
+        "corejs": 2
+      }
+    ]
+  ],
   "plugins": [
-    "./src/babel/myBabelPlugin.js",
-    "@babel/plugin-transform-arrow-functions"
+    [
+      "@babel/plugin-transform-runtime", {
+      "corejs": 2
+    }
+    ]
   ]
 }

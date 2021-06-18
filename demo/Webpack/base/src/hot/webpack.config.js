@@ -5,6 +5,7 @@ const path = require('path')
 console.log( '----', path.resolve(__dirname, 'loader'))
 module.exports = {
     mode: 'development',
+    target: ['web', 'es5'],
     entry: path.resolve(__dirname, './index.js') ,
     output: {
         filename: 'demo.js', // 输出文件的文件
@@ -43,7 +44,7 @@ module.exports = {
                     },
                 ],
             },
-            {
+/*            {
                 test: /\.(css|less)$/,
                 use: [
                     {
@@ -51,7 +52,15 @@ module.exports = {
                     },
                 ],
                 include: path.resolve(__dirname, 'css')
-            },
+            },*/
+            {
+                test: /\.js/,
+                use: [
+                    'babel-loader'
+                ],
+                exclude: /core-js|runtime/,
+                // include: path.resolve(__dirname)
+            }
         ],
     },
 
