@@ -110,7 +110,7 @@ Webpack 负责对代码进行标记，把 `import & export` 标记为三类：
 
 - 没被使用过的 export 标记为 `/* unused harmony export [FuncName] */`，其中 `[FuncName]` 为 export 的方法名称
 
-通过以下配置可以查看上面的打包效果：
+通过以下配置可以查看上面的打包的文件效果：
 
 ```js
  mode: 'development',
@@ -119,7 +119,15 @@ Webpack 负责对代码进行标记，把 `import & export` 标记为三类：
  },
 ```
 
+可以发现文件里就会多这些标志的出现
+
 之后就是通过 `TerserPlugin` 对标记了 `unused` 模块进行删除
+
+或者直接通过 `production` 模式打包，查看最终结果
+
+```js
+ mode: 'production'
+```
 
 **实现原理可以简单的概况：**
 
@@ -186,4 +194,8 @@ export default class Util {
 
 如上文中的 `import './helper'`
 
-如果希望这个文件是可以完全删除的，可以通过在 `package.json` 配置 `sideEffects` 属性来控制，比如设置 `"sideEffects": false`，表示所有代码都不包含副作用, 来告知 webpack，它可以安全地删除未用到的 `export` 文件代码，还可以进行更细致的配置，这里不做探究
+如果希望这个文件是可以完全删除的，可以通过在 `package.json` 配置 `sideEffects` 属性来控制，比如设置 `"sideEffects": false`，表示所有代码都不包含副作用, 来告知 webpack，它可以安全地删除未用到的 `export` 文件代码，还可以进行更细致的配置
+
+## 总结
+
+ES Modules 是静态处理的，在编译阶段可以确定模块的依赖关系，对未使用得模块进行标记，之后通过 TerserPlugin 插件这些没用到的模块进行删除 

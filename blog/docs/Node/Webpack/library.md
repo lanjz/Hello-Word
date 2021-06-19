@@ -144,7 +144,7 @@ this.doDemoLib // { doDemo: F}
 this.doDemoLib.doDemo() // demo
 ```
 
-`doDemoLib` 挂载在了 `this` 对象上，在浏览器中相当于 `window` 对象了，所以`libraryTarget: 'window'` 也是同时
+`doDemoLib` 挂载在了 `this` 对象上，在浏览器中相当于 `window` 对象了，所以`libraryTarget: 'window'` 也是同理
 
 **umd**
 

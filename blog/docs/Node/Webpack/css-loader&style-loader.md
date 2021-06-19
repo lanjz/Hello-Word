@@ -31,7 +31,7 @@ document.getElementsByTagName("body")[0].appendChild(div);
 
 我们在 `index.js` 打印看下 css 解析后的内容
 
-![](https://upload-images.jianshu.io/upload_images/10812004-1db169a3934ed1c8.png?imageMogr2/auto-orient/strip|imageView2/2/w/567/format/webp)
+![](../static/style-css.png)
 
 根据这个格式我们更改一下 `index.js` 代码
 
