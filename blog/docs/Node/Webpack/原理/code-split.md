@@ -38,7 +38,7 @@ export function MB(){
     var __webpack_modules__ = {}, __webpack_module_cache__ = {}, inProgress, dataWebpackPrefix;
     /**
      * 获取模块的 export
-     * @params {String} e: 模块佝
+     * @params {String} e: 模块
      * */
     function __webpack_require__(e) {
         // 如果已经获取过，则直接拿出来使用
@@ -65,6 +65,7 @@ export function MB(){
         // __webpack_require__.f 保存着要加载的模块，遍历这些模块分别获取模块
         return Promise.all(Object.keys(__webpack_require__.f)
           .reduce(((r, _) => {
+              // 这里会执行 __webpack_require__.f.j
               // 真正获取某模块的方法 e=>模块名 r => 当前Promise[]
               return __webpack_require__.f[_](e, r), r
           }), []))
@@ -208,11 +209,13 @@ export function MB(){
         r.push = r => {
             for (var a, t, [i, o, c] = r, n = 0, u = []; n < i.length; n++) {
                 // 下载成功后，将e中保存 resolve 保存到 u 中，并将 e[t] 重置为0
-                t = i[n]
+                t = i[n] // t表示模块名
+                // e 是否包含这个 t 这个属性，
                 __webpack_require__.o(e, t) && e[t] && u.push(e[t][0])
                 e[t] = 0;
             }
-            // o[a] 是对应的模块中的要执行的代码，保存到 __webpack_require__.m 中
+            // o： { 模块： 添加模块的方法}
+            // 将这个模块及对应的方法 保存到  __webpack_require__.m 中
             for (a in o) __webpack_require__.o(o, a) && (__webpack_require__.m[a] = o[a]);
             for (c && c(__webpack_require__), _(r); u.length; ) u.shift()(); // 取出 resolve 并执行
         };
@@ -318,6 +321,17 @@ export function MB(){
 - 执行主文件方法 `console.log('AAAAAAAAAAAAA')`
 
 - 调用 `__webpack_require__.e("src_modules_utils_js")` 获取 "src_modules_utils_js" 模块内容
+
+    ```js
+      __webpack_require__.e = e => {
+        // __webpack_require__.f 保存着要加载的模块，遍历这些模块分别获取模块
+        return Promise.all(Object.keys(__webpack_require__.f)
+          .reduce(((r, _) => {
+              // 真正获取某模块的方法 e=>模块名 r => 当前Promise[]
+              return __webpack_require__.f[_](e, r), r
+          }), []))
+       }
+    ```
 
   - 调用 `__webpack_require__.f[_]` 获取模块,这里实际执行的是 `__webpack_require__.f.j`
   
