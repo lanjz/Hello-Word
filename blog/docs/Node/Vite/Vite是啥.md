@@ -47,4 +47,9 @@ vite是直接启动开发服务器，请求哪个模块再对该模块进行实�
 
 webpack会先打包，然后启动开发服务器，请求服务器时直接给予打包结果
 
+https://cn.vitejs.dev/guide/#command-line-interface
+
+https://jishuin.proginn.com/p/763bfbd29d7f
+
+https://bbs.huaweicloud.com/blogs/271090
 
