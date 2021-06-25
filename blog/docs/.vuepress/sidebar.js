@@ -170,6 +170,9 @@ module.exports = {
     '/Node/Webpack/配置小记',
 
   ],
+  '/Node/Vite/': [
+    '/Node/Vite/Vite是啥',
+  ],
   '/工程化/系统设计/': [
     '/工程化/系统设计/登录系统'
   ],

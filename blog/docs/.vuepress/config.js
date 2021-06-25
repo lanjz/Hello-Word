@@ -47,6 +47,7 @@ module.exports = {
           { text: 'API', link: '/Node/Api/' },
           { text: 'yarn&npm', link: '/Node/Package/' },
           { text: 'Webpack', link: '/Node/Webpack/' },
+          { text: 'Vite', link: '/Node/Vite/' },
           /*  {
              text: 'Webpack',
              items: [
