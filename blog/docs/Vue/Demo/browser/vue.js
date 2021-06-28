@@ -5,7 +5,7 @@
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define(factory) :
+    typeof define === 'functioncreateComputedGetter ' && define.amd ? define(factory) :
       (global = global || self, global.Vue = factory());
 }(this, function () { 'use strict';
 
@@ -1038,7 +1038,7 @@
       enumerable: true,
       configurable: true,
       get: function reactiveGetter () {
-        // debugger
+        debugger
         console.log('key', key)
         var value = getter ? getter.call(obj) : val;
         if (Dep.target) {
@@ -3533,7 +3533,6 @@
     Vue.prototype._render = function () {
       var vm = this;
       var ref = vm.$options;
-      debugger
       var render = ref.render;
       var _parentVnode = ref._parentVnode;
 
@@ -4834,6 +4833,7 @@
 
   function createComputedGetter (key) {
     return function computedGetter () {
+      debugger
       var watcher = this._computedWatchers && this._computedWatchers[key];
       if (watcher) {
         if (watcher.dirty) {
@@ -11654,7 +11654,6 @@
 
 
   function createFunction (code, errors) {
-    debugger
     try {
       return new Function(code)
     } catch (err) {

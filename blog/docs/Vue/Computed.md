@@ -229,9 +229,9 @@
 
 并且如果尝试去修改 `computed` 上的属性，将会触发上面的 `set` 中的 `warn` 提示
 
-到此 `compuntd` 的初始化就完成了，接下就是看看当访问 `computed` 时做了什么
+到此 `compunted` 的初始化就完成了，接下就是看看当访问 `computed` 时做了什么
 
-## 访问compuntd属性
+## 访问computed属性
 
 假设当前组件进入渲染阶段（注意：进入渲染阶段时，执行的是`redner Watcher`，并且在渲染完成前，这个 `redner Watcher` 一直存在于全局属性 `Dep.target` 中），此时如果有用到 `computed` 属性并且在访问当前 `compuntd` 属性时，将会执行下面代码块：
 
@@ -365,11 +365,28 @@ this.cleanupDeps();
 
 以上面例子为例， 因为组件渲染时有用到 `name` 属性（且在 `bind` 访问之前），所以 `name` 属性对应的 `Dep` 已经有了 `render Watcher`，此时就会不重复添加了，而 `message` 属性的 `Dep` 中并没有 `render Watcher` ，所以会添加当前的 `render Watcher`, 那么问题来了既然渲染没有用到这个属性，为什么要添加 `render Watcher` 呢？
 
-## 更新compuntd依赖
+## 更新computed依赖
 
 按之前 `render Watcher` 和 `watch Watcher` 的更新机制，当依赖的属性更新时，这些 `Watcher` 将被收集到到一个微任务队列中，并且会按 `watcher id` 作为升序排序来触发这些  `Watcher run` 方法
 
-但是 `computed Watcher` 依赖的计算属性更新时并不会将当前的 `conputed Watcher` 添加到微任务队列中，以上面例子为例，当 `this.message = "message_B"` 执行后，将更新 `render Watcher` ，然后在更新组件的时候会访问到 `computed` 属性，此时会重新执行计算函数得到新值。这也就可以理解为什么即使计算依赖的属性没有在渲染中用到也会将 `render Watcher` 添加到 `Dep` 的原因。
+但是 `computed Watcher` 依赖的计算属性更新时并不会将当前的 `conputed Watcher` 添加到微任务队列中，以上面例子为例，当 `this.message = "message_B"` 执行后，`meaaage` 属性 `Dep` 此时有两个 Watcher: `render Watcher` 和 `conputed Watcher`，所以会遍历这两个依次执行 `watcher.update` 方法
+
+```js
+  Watcher.prototype.update = function update () {
+    /* istanbul ignore else */
+    if (this.lazy) {
+      this.dirty = true;
+    } else if (this.sync) {
+      this.run();
+    } else {
+      queueWatcher(this);
+    }
+  };
+```
+
+但是要注意的是`computed Watcher` 的 `this.lazy = true`，根据上面的代码不会执行 `queueWatcher(this)`，所以 `computed Watcher` 不会添加到更新队列中
+
+所以只会执行 `render Watcher`的 `update` ，然后在更新组件的时候会访问到 `computed` 属性，此时会重新执行计算函数得到新值。这也就可以理解为什么即使计算依赖的属性没有在渲染中用到也会将 `render Watcher` 添加到 `Dep` 的原因。
 
 **如果 `watch` 中有监听 `computed` 属性时，更新机制又是怎样的呢？**
 
@@ -526,8 +543,10 @@ this.cleanupDeps();
 
  注意此时 `watcher.dirty` 为 `false`，所以不会重复执行 `computed` 请问，而是直接返回 `watcher.value` ，也就是之前得到的值 
 
- # 总结
+ ## 总结
 
- 通过 `Object.defineProperty(target, key, sharedPropertyDefinition);` 方法，当前访问 `compunted` 上的属性时，将被代理到这个 `compunted` 属性对应的 `Watcher` 上，然后通过 ` watcher.evaluate()` 执行对应原 `compunted` 计算方法求值
+对于 `cmpunted` 也会创建一个 `Watcher`，并以 `key-conputedWatcher` 的形式保存到 `computedWatchers` 中
+
+ 然后跟 `data` 属性类似，`computed` 属性的访问也是通过 `Object.defineProperty(target, key, sharedPropertyDefinition);` 方法做了一层代理，当前访问 `compunted` 上的属性时，将被代理到这个 `_computedWatchers ` 属性对应的  `computedWatchers` 上，然后通过 ` watcher.evaluate()` 执行对应原 `compunted` 计算方法求值
  
  `conputed` 依赖的属性会收集 `render Watcher`，所以这些依赖的属性更新时会重新渲染组件，在渲染组件的过程中会访问到 `computed` 属性，再计算对应的方法返回得到值
