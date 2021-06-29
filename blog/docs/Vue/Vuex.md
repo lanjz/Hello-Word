@@ -155,16 +155,47 @@ function resetStoreVM (store, state, hot) {
 **那么 `getters` 和 `state` 是如何建立依赖逻辑的呢，** 我们再看这段代码逻辑：
 
 ```js
-forEachValue(wrappedGetters, (fn, key) => {
-    // use computed to leverage its lazy-caching mechanism
-    computed[key] = () => fn(store)
-    Object.defineProperty(store.getters, key, {
-      get: () => store._vm[key],
-      enumerable: true // for local getters
-    })
-  })
+var computed = {};
+forEachValue(wrappedGetters, function (fn, key) {
+  // use computed to leverage its lazy-caching mechanism
+  // direct inline function use will lead to closure preserving oldVm.
+  // using partial to return function with only arguments preserved in closure environment.
+  computed[key] = partial(fn, store);
+  Object.defineProperty(store.getters, key, {
+    get: function () { return store._vm[key]; },
+    enumerable: true // for local getters
+  });
+});
+/**
+* forEach for object
+*/
+function forEachValue (obj, fn) {
+  Object.keys(obj).forEach(function (key) { return fn(obj[key], key); });
+}
+// partial
+function partial (fn, arg) {
+  return function () {
+    return fn(arg)
+  }
+}
 ```
 
-当根据 `key` 访问 `store.getters` 的某一个 `getter` 的时候，实际上就是访问了 `store._vm[key]`，也就是 `computed[key]`，在执行 `computed[key]` 对应的函数的时候，会执行 `rawGetter(local.state,...)` 方法，那么就会访问到 `store.state` ，进而访问到 `store._vm._data.$$state` ，这样就建立了一个依赖关系。
-当 `store.state` 发生变化的时候，下一次再访问 `store.getters` 的时候会重新计算
+从上面的代理可以看到定义了一个 `computed` 对象，然后使用 `forEachValue` 遍历 `wrappedGetters` 给 `computed` 赋值
+ 
+ `forEachValue`第二个参数函数的每第一个参数 `fn` 就是每个 `getter` 的计算函数，第二个参数就是 `getter` 的 `key`
+
+内部 `partial(fn, store)`，也就是执行`getter` 的计算函数，并把 `store` 参数传入，这样 `getter` 方法就访问到 `state`, `getters` 等属性
+
+然后在实例 Vue 时，将上面的 `computed` 传入使用
+
+```js
+  store._vm = new Vue({
+    data: {
+      $$state: state
+    },
+    computed: computed
+  });
+```
+
+所以当根据 `key` 访问 `store.getters` 的某一个 `getter` 的时候，实际上就是访问了 `store._vm[key]`，`store._vm` 就是 Vue 实例，然后就会从 `computed[key]` 计算函数，也就是上文说的 `partial(fn, store)`
 

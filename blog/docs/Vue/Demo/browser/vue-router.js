@@ -1240,6 +1240,7 @@
   
       Vue.mixin({
         beforeCreate: function beforeCreate () {
+          debugger
           if (isDef(this.$options.router)) {
             this._routerRoot = this;
             this._router = this.$options.router;
@@ -1256,7 +1257,10 @@
       });
   
       Object.defineProperty(Vue.prototype, '$router', {
-        get: function get () { return this._routerRoot._router }
+        get: function get () {
+          console.log(22);
+          return this._routerRoot._router
+        }
       });
   
       Object.defineProperty(Vue.prototype, '$route', {

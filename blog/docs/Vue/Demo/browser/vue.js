@@ -1038,8 +1038,6 @@
       enumerable: true,
       configurable: true,
       get: function reactiveGetter () {
-        debugger
-        console.log('key', key)
         var value = getter ? getter.call(obj) : val;
         if (Dep.target) {
           dep.depend();

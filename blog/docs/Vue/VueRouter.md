@@ -35,19 +35,7 @@ function pushHash (path) {
 
 每个组件都有一个 `$route/$router` 属性，这个 `$route/$router` 是从哪来的咧？
 
-Vue 在安装 `vue-router` 插件的时候，会调用 `vue-router` 中的 `install` 方法，`install` 中这么两行语句
-
-```js
- Object.defineProperty(Vue.prototype, '$router', {
-    get: function get () { return this._routerRoot._router }
-  });
-  
-Object.defineProperty(Vue.prototype, '$route', {
-  get: function get () { return this._routerRoot._route }
-});
-```
-
-原来 `$route/$router` 是 `this._routerRoot` 上面的两个属性， `this._routerRoot` 属性也在 `install` 中定义的：
+Vue 在安装 `vue-router` 插件的时候，会调用 `vue-router` 中的 `install` 方法，`install` 中有个 `Vue.mixin` 方法
 
 ```js
 Vue.mixin({
@@ -68,20 +56,34 @@ Vue.mixin({
 });
 ```
 
-`_routerRoot` 是在利用 `Vue.mixin` 方法在每个组件注入的一个属性，如果有 `this.$options.router` 则指向当前 Vue 实例，否则则取 `$parent` 父组件上的 `_routerRoot`。这里可以得到两个讯息
+`_routerRoot` 是利用 `Vue.mixin` 方法在每个组件注入的一个属性，注入方式分两种情况：
 
-1. 整个 Vue 项目中所有组件只有一个 `_routerRoot` 
+1. 判断是否存在 `this.$options.router`，一般来说只有根组件才会这个属性，因为这个属性初始化 Vue 实例时传入的，这个 `router` 就是 `vue-router` 的实例
 
-2. 所有  `_routerRoot` 属性来源于根 `Vue` 实例，因为只有根 `Vue` 实例才有 `this.$options.router` 属性。 这个 `router` 属性在入口文件启动项目的时候添加的 
+   ```js
+    new Vue({
+        router,
+        render:(h)=> h(App)
+    }).$mount(root)
+   ``` 
+
+2. 否则取 `$parent` 父组件上的 `_routerRoot`
+
+所以每个组件都会有一个 `_routerRoot` 属性
+
+然后在 `mixin` 下方有这么两行语句
 
 ```js
-new Vue({
-    router,
-    render:(h)=> h(App)
-}).$mount(root)
+ Object.defineProperty(Vue.prototype, '$router', {
+    get: function get () { return this._routerRoot._router }
+  });
+  
+Object.defineProperty(Vue.prototype, '$route', {
+  get: function get () { return this._routerRoot._route }
+});
 ```
 
-这个 `router` 就是 `vue-router` 的实例
+可以看到 `$route/$router` 定义在 Vue 原型中，实际上指向的是当前组件的 `this._routerRoot` 属性中
 
 ## $router实现响应机制
 
@@ -652,25 +654,27 @@ beforeRouteLeave (to, from, next) {
 
 12. 用创建好的实例调用 `beforeRouteEnter` 守卫中传给 `next` 的回调函数。
 
-# 总结
+## 总结
 
 - 先实例一个 `router`，这个  `router` 包含了我们平时使用的 `$route` 和 `$router` 两个属性
 
 - 在项目初始化传入这个 `router` 实例 `new Vue({router})`，这样就可以 `this.$options.router` 访问这个 `router` 实例
 
-- 使用 `vue-minxin` 给所有 vue 混入 `beforeCreate` 钩子，`beforeCreate` 钩子中需要做的几件事情：
+- 使用 `vue-minxin` 给所有 vue 混入 `beforeCreate` 钩子，在 `beforeCreate` 钩子中主要有两个关键步骤：
 
-  - 代理 `$router` 和 `$route` 属性到上面说的 `router` 实例中，这样就可以在组件通过 `this` 访问这两个属性
+   - 给每个组件添加 `_routerRoot` 属性
+   
+   - 使用 `Vue.util.defineReactive` 给当前的 `_route($route)` 添加响应机制
+ 
+- 全局注册 `RouterView` 和 `RouterLink` 两个组件
 
-  - 使用 `Vue.util.defineReactive` 监听当前路由信息（`this._router.history.current`）的变化 
+- 之后就根 `data` 属性的响应式机制同理：当渲染这两个组件的时候，就会访问 `$router` 信息，然后收集当前 `render Watcher`，这里就完成了响应式收集部分
 
-  - 全局注册 `RouterView` 和 `RouterLink`，当渲染这两个组件的时候，就会访问 `$router` 信息，然后收集当前 `render Watcher`
+注意一下 `$router`, `_routerRoot`， `_router` 的关系
 
-  注意一下 `$router`, `_routerRoot`， `_router` 的关系
+- `$router => this._routerRoot._router`
 
-  `$router => this._routerRoot._router`
-
-  `this._routerRoot = this` == `$router => this._router`
+- `this._routerRoot = this`
 
 [从vue-router看前端路由的两种实现](https://zhuanlan.zhihu.com/p/27588422)
 
