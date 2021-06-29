@@ -152,7 +152,7 @@ function resetStoreVM (store, state, hot) {
 
 `getters`则是借助vue的计算属性`computed`实现数据实时监听
 
-**那么 `getters` 和 `state` 是如何建立依赖逻辑的呢，** 我们再看这段代码逻辑：
+我们先看这段代码逻辑：
 
 ```js
 var computed = {};
@@ -179,6 +179,29 @@ function partial (fn, arg) {
   }
 }
 ```
+
+首先 `wrappedGetters` 是通过下面代码定义的
+
+```js
+  function registerGetter (store, type, rawGetter, local) {
+    if (store._wrappedGetters[type]) {
+      {
+        console.error(("[vuex] duplicate getter key: " + type));
+      }
+      return
+    }
+    store._wrappedGetters[type] = function wrappedGetter (store) {
+      return rawGetter(
+        local.state, // local state
+        local.getters, // local getters
+        store.state, // root state
+        store.getters // root getters
+      )
+    };
+  }
+```
+
+上面的第三个参数 `rawGetter` 就是我们 Vuex 定义的 `getter`
 
 从上面的代理可以看到定义了一个 `computed` 对象，然后使用 `forEachValue` 遍历 `wrappedGetters` 给 `computed` 赋值
  
