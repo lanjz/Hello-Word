@@ -1,11 +1,12 @@
-
 # PAAS应用
 
 PAAS 应用的主要特点是页面是根据配置动态生成的
 
-浏览器打开 [PAAS 应用](https://webapp.mypaas.com.cn/b2c/yk_qmyx/test/?tenant_code=yajuleadmin_test)时，先是发出 `meta` 请求获取到元数据，这个元数据包含了当前应用的一些配置信息,比如菜单栏、路由、每个页面展示哪些组件等，应用将根据这些配置进行显示
+### 运行过程
 
-要实现动态渲染页面（组件），依靠就是的 VUE 提供的 `render` 方法
+浏览器打开 [PAAS 应用](https://webapp.mypaas.com.cn/b2c/yk_qmyx/test/?tenant_code=yajuleadmin_test)时，先是发出 `https://.....meta` 请求获取到元数据，这个元数据包含了当前应用的一些配置信息,比如菜单栏、路由、每个页面展示哪些组件等，整个应用就根据这些内容来动态渲染的
+
+要实现动态渲染页面（组件），依靠的就是 VUE 提供的 `render` 方法
 
 ## render
 
@@ -22,21 +23,23 @@ PAAS 应用的主要特点是页面是根据配置动态生成的
 
   Vue 选项中的 `render` 函数若存在，则Vue构造函数不会从 `template` 选项或通过 `el` 选项指定的挂载元素中提取出的 `HTML` 模板编译渲染函数。
   
-**简单来说`render`中的参数`createElement方法`就是创建VNode的方法**
+**简单来说 `render` 中的参数 `createElement方法` 就是创建VNode的方法**
 
 我们来简单例子演示一下 `render` 方法的使用
+
+**模板形式**
 
 ```javascript
 import components1 from './components1.vue'
 Vue.component('components-1', components1)
-```
 
-```html
 // components1.vue
 <h1>components-1</h1>
 ```
 
-接下来使用使用 `render()` 方法实现上面的 `components1.vue`
+**render形式**
+
+使用 `render()` 方法实现上面的 `components1.vue`
 
 ```javascript
 Vue.component('components-2', {
@@ -79,7 +82,7 @@ Vue.component('components-2', {
   Vue.component('components-1', components1)
   ```
   
-上面例子中是 `el` 元素还是 Vue 模板Vue 解析它们的时候都会通过一系列的方法转换成 `render` 函数，这个 `render` 方法的作用是生成 `VNode`
+Vue 会将上面例子的组件使用一系列的方法转换成 `render` 函数，这个 `render` 方法的作用是生成 `VNode`
 
 这也是为什么官网介绍 `render` 时有这么一句话 **render 比模板更接近编译器** 的原因
 
@@ -89,7 +92,7 @@ Vue.component('components-2', {
 
 `createElement`接收参数如下：
 
-- `tag`: {String | Object | Function}表示一个 HTML 标签名、组件选项对象，或者
+- `tag`: {String | Object | Function}表示一个 HTML 标签名、组件选项对象
 
 - `data`: 可选参数，表示 `VNode` 的数据，完整的数据对象如下
 
@@ -150,7 +153,7 @@ Vue.component('components-2', {
 
 - `children`：{String | Array} 表示子节点
 
-这里着重了解一下 `createComponent` 第一个参数 `tag` ， `tag` 可有的类型以及对应的内部处理大致如下
+这里着重了解一下 `createComponent` 第一个参数 `tag` ， `tag` 可以有的类型以及对应的内部处理大致如下
 
 - 如果是 `String` 类型
 
@@ -160,7 +163,7 @@ Vue.component('components-2', {
 
 -  如果是 `tag `一个 Component 类型，则直接调用 `createComponent` 创建一个组件类型的 `VNode` 节点
 
-- 其它类型先略过
+- 其它值暂不讨论
 
 例子：
 
@@ -182,8 +185,7 @@ render: function (createElement) {
 }
 ```
 
-上文的 `createElement` 方法，表示创建一个 `id=app` 的 `div`，这个 `div` 内部有一个节点 `this.message`, `this.message`
-在这里表示是一个文本节点
+上文的 `createElement` 方法，表示创建一个 `id=app` 的 `div`，这个 `div` 内部有一个节点 `this.message`, `this.message` 在这里表示是一个文本节点
 
 对 `render` 方法有了一些了解之后，接下来我们开始正入正题
 
@@ -194,8 +196,7 @@ render: function (createElement) {
 ```javascript
 <template>
     <div id="app">
-        <keep-alive :exclude="exclude"
-                    :include="include">
+        <keep-alive :exclude="exclude" :include="include">
             <router-view class="router-view"></router-view>
         </keep-alive>
     </div>
@@ -464,7 +465,7 @@ export {
 
 ```
 
-也是使用的`Vue.component(component.name, component)`注册的组件
+也是使用的 `Vue.component(component.name, component)` 注册的组件
 
 **注册业务组件**
 
