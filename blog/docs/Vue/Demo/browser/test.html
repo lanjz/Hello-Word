@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <script>
+/*    window.process = {
+      env: {}
+    }*/
+  </script>
   <script src="vue.js"></script>
   <script src="vue-router.js"></script>
+  <script src="vuex.js"></script>
 </head>
 <body>
   <div id="app">
@@ -28,7 +34,8 @@
 
 // 1. 定义 (路由) 组件。
 // 可以从其他文件 import 进来
-const Index = { template: '<div>Index</div>' }
+
+  const Index = { template: '<div>Index</div>' }
 const Foo = { template: '<div>foo</div>' }
 const Bar = { template: '<div>bar</div>' }
 const BarA = { template: '<div>BarA</div>' }
@@ -59,9 +66,22 @@ const router = new VueRouter({
   router
 }).$mount('#app') */
 
+  const storeData =  {
+    state: {
+      count: 0
+    },
+    getters: {
+      getG (state) {
+        return state.count+'name'
+      }
+    }
+  }
+  Vue.use(Vuex)
+  const store =  new Vuex.Store(storeData)
 // 现在，应用已经启动了！
   var app = new Vue({
     router,
+    store,
     el: '#app',
     data: {
       arr: [0],
@@ -79,6 +99,7 @@ const router = new VueRouter({
       }
     },
     mounted(){
+      console.log(this)
       this.arr.push(1)
       const arr2 = []
       const arr3 = []

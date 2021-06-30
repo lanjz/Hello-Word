@@ -48,7 +48,6 @@
         }
       },
       render: function render (_, ref) {
-        debugger
         var props = ref.props;
         var children = ref.children;
         var parent = ref.parent;
@@ -1104,7 +1103,6 @@
             if (this$1.replace) {
               router.replace(location, noop);
             } else {
-              debugger
               router.push(location, noop);
             }
           }
@@ -1240,7 +1238,6 @@
   
       Vue.mixin({
         beforeCreate: function beforeCreate () {
-          debugger
           if (isDef(this.$options.router)) {
             this._routerRoot = this;
             this._router = this.$options.router;
@@ -2793,7 +2790,6 @@
   
   
     var VueRouter = function VueRouter (options) {
-        debugger
       if ( options === void 0 ) options = {};
   
       this.app = null;

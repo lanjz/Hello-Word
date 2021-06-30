@@ -150,9 +150,73 @@ function resetStoreVM (store, state, hot) {
 
 ## getter实现
 
-`getters`则是借助vue的计算属性`computed`实现数据实时监听
+**`getters` 则是借助 Vue 的计算属性 `computed` 来实现的**
 
-我们先看这段代码逻辑：
+先回顾一下 `getters` 的用法: `{ key: fn }`
+
+然后先看这段代码逻辑：
+
+```js
+var computed = {};
+forEachValue(wrappedGetters, function (fn, key) {
+  // use computed to leverage its lazy-caching mechanism
+  // direct inline function use will lead to closure preserving oldVm.
+  // using partial to return function with only arguments preserved in closure environment.
+  computed[key] = partial(fn, store);
+  Object.defineProperty(store.getters, key, {
+    get: function () { return store._vm[key]; },
+    enumerable: true // for local getters
+  });
+});
+```
+
+上面的作用就是遍历 `wrappedGetters` 生成一个 `compunted` 的格式，先看下 `wrappedGetters` 怎么来的
+
+下面是跟 `wrappedGetters` 有关系的代码：
+
+```js
+  function registerGetter (store, type, rawGetter, local) {
+    if (store._wrappedGetters[type]) {
+      {
+        console.error(("[vuex] duplicate getter key: " + type));
+      }
+      return
+    }
+    store._wrappedGetters[type] = function wrappedGetter (store) {
+      return rawGetter(
+        local.state, // local state
+        local.getters, // local getters
+        store.state, // root state
+        store.getters // root getters
+      )
+    };
+  }
+
+  module.forEachGetter(function (getter, key) {
+    var namespacedType = namespace + key;
+    registerGetter(store, namespacedType, getter, local);
+  });
+  Module.prototype.forEachGetter = function forEachGetter (fn) {
+    if (this._rawModule.getters) {
+      forEachValue(this._rawModule.getters, fn);
+    }
+  };
+  function forEachValue (obj, fn) {
+    Object.keys(obj).forEach(function (key) { return fn(obj[key], key); });
+  }
+```
+
+代码分析：
+
+1. 首先 `Module` 原型上定义了一个 `forEachGetter` 方法，它接受一个参数 `fn`，函数主体中的 `this._rawModule.getters` 就是我们在 Vuex 定义的 `getters`
+
+2. 然后看 `module.forEachGetter` 的调用，此时传入了一个函数 `fn`，`forEachGetter` 内部执行 `forEachValue` 遍历我们的 `this._rawModule.getters(getters)`，对于每一个 `getters` 项都会执行传入的 `fn` 函数，执行 `fn` 时传入两个参数：第一个是 `getters` 对应的计算函数；第二参数对应 `getters` 的 `key`
+
+3. 回到这个 `fn` 方法本身，重点就是执行 `registerGetter(store, namespacedType, getter, local);`，它的功能就是重新打包了 `getters`，仍是已 `{key: fn}` 的格式将当前 `getters` 方法保存到 `store._wrappedGetters` 对象中。只是这时的 `getters-key` 加了命名空间， `getters-计算方法` 重新打包后注入了 `local.state`、`local.getters`、`store.state`、`store.getters` 四个参数，我们在使用 `getters` 可以访问到的四个参数就是从这里来的
+
+### 创建 computed
+
+上面明白了 `wrappedGetters` 的由来，回到创建 `computed`
 
 ```js
 var computed = {};
@@ -180,34 +244,11 @@ function partial (fn, arg) {
 }
 ```
 
-首先 `wrappedGetters` 是通过下面代码定义的
+根据代码可以看到也是使用 `forEachValue` 遍历 `wrappedGetters` 给 `computed` 赋值的，`forEachValue` 的作用就是遍历 `wrappedGetters`，然后执行传入的函数参数
 
-```js
-  function registerGetter (store, type, rawGetter, local) {
-    if (store._wrappedGetters[type]) {
-      {
-        console.error(("[vuex] duplicate getter key: " + type));
-      }
-      return
-    }
-    store._wrappedGetters[type] = function wrappedGetter (store) {
-      return rawGetter(
-        local.state, // local state
-        local.getters, // local getters
-        store.state, // root state
-        store.getters // root getters
-      )
-    };
-  }
-```
+执行参数函数时第一个参数 `fn` 就是每个 `getter` 的计算函数，第二个参数就是 `getter` 的 `key`，内部就是通过 `computed[key] = partial(fn, store)` 给 `computed` 添加属性，通过 `partial(fn, store)` 再次打包 `getter` 的计算函数，并把 `store` 参数传入，也就是对应上文 `wrappedGetter` 中的 `store` 参数
 
-上面的第三个参数 `rawGetter` 就是我们 Vuex 定义的 `getter`
-
-从上面的代理可以看到定义了一个 `computed` 对象，然后使用 `forEachValue` 遍历 `wrappedGetters` 给 `computed` 赋值
- 
- `forEachValue`第二个参数函数的每第一个参数 `fn` 就是每个 `getter` 的计算函数，第二个参数就是 `getter` 的 `key`
-
-内部 `partial(fn, store)`，也就是执行`getter` 的计算函数，并把 `store` 参数传入，这样 `getter` 方法就访问到 `state`, `getters` 等属性
+然后使用 `Object.defineProperty` 将 `store.getters` 属性的访问代理到 `store._vm` 中
 
 然后在实例 Vue 时，将上面的 `computed` 传入使用
 
@@ -220,5 +261,11 @@ function partial (fn, arg) {
   });
 ```
 
-所以当根据 `key` 访问 `store.getters` 的某一个 `getter` 的时候，实际上就是访问了 `store._vm[key]`，`store._vm` 就是 Vue 实例，然后就会从 `computed[key]` 计算函数，也就是上文说的 `partial(fn, store)`
+总的来说 Vue 中的 `computed` 包含了我们的 `getters`
+ 
+当我们直接使用  `store._vm[nameapce+key]` 访问 `getters` 时，会从`store._vm[nameapce+key]` 找，`store._vm` 就是 Vue 实例，也是会从 `computed[nameapce+key]` 中去找
+
+所以当我们通过 `store.getters[nameapce+key]` 去找 `getters` 时，之后由上
+
+
 
