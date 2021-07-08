@@ -176,6 +176,7 @@ function createSetter(shallow = false) {
 源码定义：
 
 ```js
+ const convert = (val) => isObject(val) ? reactive(val) : val;
  function ref(value) {
     return createRef(value);
   }
@@ -207,7 +208,9 @@ class RefImpl {
 }
 ```
 
-当调用 `ref` 实际是生成了一个 `RefImpl` 实例，并且对外定义了 `value` 属性，当 `set` 和 `get` 时，分别也会调用对应用 `trigger` 发布事件和 `track` 收集事件
+当调用 `ref` 实际是生成了一个 `RefImpl` 实例，并且对外定义了 `value` 属性，并定义了存储描述符，当 `set` 和 `get` 时，分别也会调用对应用 `trigger` 发布事件和 `track` 收集事件
+
+并且如果使用的目标是对象的话，还会调用 `reactive(val)` 给这个对象添加响应劫持
 
 ### unref
 
@@ -274,16 +277,20 @@ function toRefs(object) {
 
 ## 总结
 
-`refs` 本质:
+`ref` 本质是声明了一个类，这个类对外暴露了一个 `value` 属性指向当前 `ref` 目标，并给这个 `value` 属性设置了 `get` 和 `set` 描述符
 
-- `ref` 底层的本质其实还是 `reactive` 
+跟 `reactive` 里面给对象设置 `proxy` 代理一样，类的 `get/set` 方法也定义了收集事件和派发事件的操作
+
+如果 `ref` 目标是对象的话还会使用 `reactive` 处理这个对象
   
-  `ref(xx) -> reactive({value:xx})`
-  
-使用 `ref` 注意点:
+**使用 `ref` 注意点:**
 
 - 在Vue中使用 `ref` 的值不用通过 `value` 获取
   
 - 在JS中使用 `ref` 的值必须通过 `value` 获取
+
+**为什么一定要使用 `value` 访问目标？**
+
+因为需要通过对象的描述符来添加响应式的功能
 
 换汤不换药～
