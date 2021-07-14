@@ -411,9 +411,9 @@ obj.toString() // "function(){}"
 
 ### 基本类型调用toString方法
 
-为什么基本类型会有一些对象方法呢?
+为什么某些基本类型会有一些对象方法呢?
 
-因为当原始数据类型（boolean，Number、String）在调用方法时，JS 将会创建对象，以便调用方法属性，而在使用完毕后将会销毁该对象
+因为当原始数据类型（boolean、String）在调用方法时，JS 将会创建对象，以便调用方法属性，而在使用完毕后将会销毁该对象
 
 这里着重讲了解一下数字类型调用 `toString` 方法的奇怪的地方,比如粟子：
 
@@ -421,7 +421,7 @@ obj.toString() // "function(){}"
 var a = 1
 a.toString() // '1'
 1.toString() // 报错
-1..toString() // 1
+1..toString() // '1'
 1...toString() // 报错
 ```
 
