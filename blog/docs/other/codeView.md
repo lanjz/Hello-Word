@@ -234,7 +234,7 @@ export const getLoadExcel = (url, params, type) => {
 
 ### 问题
 
-```
+```vue
 <template>
   <div class="page-warp relative" :class="{'page-warp-bg': !!reportSrc}">
     <canvas canvas-id="shareCanvas" class="shareCanvas" :style="{width: cWid, height: cHei}" v-if="!reportSrc"></canvas>
@@ -475,4 +475,461 @@ export default {
         }
       })
     }
+```
+
+**问题**
+
+- 请求结果封装处理
+
+### 代码
+
+```js
+// 新增 | 编辑 | 调配
+handleAction (type, id, row) {
+  console.log(row, 'row')
+  this.operationId = id;
+
+  switch (type) {
+  case 'receipt':
+    orderApi.orderDetail({
+      id: row.orderId
+    }).then(res => {
+      if (+res.code === 0) {
+        this.paymentVisible = true
+        this.$nextTick(() => {
+          this.$refs.paymentBox.open({
+            id: row.orderId,
+            type: res.data.type,
+            comId: res.data.comId,
+            businessType: res.data.businessType,
+            orderSn: res.data.sn,
+          })
+        })
+      } else {
+        this.$message.error(res.msg)
+      }
+    })
+    break
+  case 'collection':
+    this.collectionVisible = true
+    this.$nextTick(() => {
+      this.$refs.collectionBox.open(row)
+    })
+    break
+  case 'telephone':
+    apiOrder.orderDetail({
+      formId: 1000,
+      id: row.orderId
+    }).then(res => {
+      let mobile = res.code == 0 && res.data.mobile || ''
+      if ($('#reasonid').val() === '108') {
+        // $('#show-tel').val(mobile)
+        $('#tel').val(mobile)
+      }
+    })
+    console.log('telephone')
+    break
+  case 'distribute':
+    this.openChange()
+    break
+  }
+},
+```
+
+### 代码
+
+```js
+filterArray(row) {
+      const { status, inStockStatus, orderBusinessType, offlinePay} = row;
+      let newArr = [];
+      let list = this.pageButtons.filter(item => item.fieldName !== 'delFile');
+      const viewBtn = list.filter(item => item.fieldName === 'view');
+      newArr.push(...viewBtn)
+      
+      // status 5/待退款  打款和打款失败出现
+      // status 7/打款确认 出现打款确认按钮
+      // status -4 -1 0 2/车务审批  出现修改按钮
+      // status 0 状态未提交可以驳回
+      if (Number(status) === 0) {
+        const delBtn = list.filter(item => item.fieldName === 'revocation');
+        newArr.push(...delBtn)
+      }
+
+      /**
+         * 租车 临时
+         */
+      if(Number(orderBusinessType) === 1){
+        const editRange = [0, -1, 1, 2, 3, 4, 8, 9, 11, 12, 13, 14, 16];
+        if (editRange.includes(status)) {
+          const editBtn = list.filter(item => item.fieldName === 'approve');
+          newArr.push(...editBtn)
+        }
+      } else {
+        //0未提交 -1驳回 2车务审核 3项目负责人审核 8财务审核 14续保专员 11车务收车 13催收专员 -4打款失败 17整备审核 18总部财务审核 19 车务上传整备照片
+        const editRange = [0, -1, 2, 3, 8, 11, 12, 13, 14, 17, 18, 19];
+        if (editRange.includes(status)) {
+          const editBtn = list.filter(item => item.fieldName === 'approve');
+          newArr.push(...editBtn)
+        }
+      }
+
+      // let flag = false
+      // if(Number(status) === 2 && this.$store.state.loginData.positionId === 1000){ //车务审核&&当前登录为车务
+      //   flag = true
+      // } else if(Number(status) === 16 && this.$store.state.loginData.positionId === 1002){ //销售审核&&当前登录为销售
+      //   flag = true
+      // } else if(Number(status) === 3 && this.$store.state.loginData.positionId === 1063){ // 租车负责人审核&&当前登录为租车负责人
+      //   flag = true
+      // } else if(Number(status) === 8 && this.$store.state.loginData.positionId == 1003) { //财务审核&&当前登录为财务
+      //   flag = true
+      // }
+      // if(flag){
+      //   const editBtn = list.filter(item => item.fieldName === 'approve');
+      //   newArr.push(...editBtn)
+      // }
+
+      // （4 车务复核违章）确认违章费  租车
+      if(Number(status) === 4 && orderBusinessType === 1) {
+        const Btn = list.filter(item => item.fieldName === 'comfirm');
+        newArr.push(...Btn)
+      }
+
+      // 审批通过  是否打款
+      if (Number(status) === 7 && orderBusinessType === 1) {
+        const comfirmBtn = list.filter(item => item.fieldName === 'payComfirm');
+        newArr.push(...comfirmBtn)
+      }
+
+      // 待退款||打款失败  打款/打款失败
+      if (Number(status) === 5 || Number(status) === -4 && orderBusinessType === 1) {
+        const payBtn = this.pageButtons.filter(item => item.fieldName === 'remit');
+        const payFailBtn = this.pageButtons.filter(item => item.fieldName === 'paymentFail');
+        newArr.push(...payBtn);
+        newArr.push(...payFailBtn);
+      }
+
+      // 车务审核时入库  或者 未入库 一直展示
+      if (Number(status) >= 3 && inStockStatus === 0 && orderBusinessType === 1 ) {
+        const checkedIn = list.filter(item => item.fieldName === 'vehicleIn');
+        newArr.push(...checkedIn)
+      }
+
+      // 购车： 提交之后 且 未入库 一直展示
+      if ( Number(status) > 0 && inStockStatus === 0 && orderBusinessType === 0 ) {
+        const checkedIn = list.filter(item => item.fieldName === 'vehicleIn');
+        newArr.push(...checkedIn)
+      }
+      newArr.push(...list.filter(item => item.fieldName === 'modifyModuleData'));
+      if(orderBusinessType === 0){ 
+        newArr.push(...list.filter(item => item.fieldName === 'calcProfit'))
+      }
+
+      if(status == 15 || status == 5){
+        if(offlinePay == 0){
+          newArr.push(...list.filter(item => item.fieldName === 'applyPayback'))
+        }
+      }
+
+      // if(status == -4){
+      //   const payBtn = this.pageButtons.filter(item => item.fieldName === 'remit');
+      //   const payFailBtn = this.pageButtons.filter(item => item.fieldName === 'paymentFail');
+      //   newArr.push(...payBtn);
+      //   newArr.push(...payFailBtn);
+      // }
+
+      return newArr;
+    },
+```
+
+**问题**
+
+- `if/else`
+
+### 代码 
+
+```html
+    <ul v-if="approveList.length > 0">
+      <li 
+        v-for="(item,index) in approveList" 
+        :key="index" 
+        :class="item.status"
+        :id="`${action}-${item.id}`">
+        <div class="step">{{item.sequence}}</div>
+        <h2>{{item.name}}</h2>
+        <div class="step-info">
+          <p>审核职位：{{item.handleName}}</p>
+          <p>审批时间：{{item.auditTime}}</p>
+          <p>审批人：{{item.staffName}}</p>
+          <!---.....-->
+        </div>
+      </li>
+    </ul>
+```
+
+**问题**
+
+- `key`
+
+### 代码
+
+```vue
+<template>
+  <div class="area-wrap"></div>
+</template>
+
+<script>
+export default {
+  data(){
+    return {
+      activeName: 'south',
+      areaList: [
+        {
+          'id': '1',
+          'name': '华南区',
+          'alias': 'south',
+          'children': [
+            {
+              'id': '101',
+              'name': '广东',
+              'children': [
+                { 'id': '10101', 'name': '深圳福田总部' },
+                { 'id': '10102', 'name': '广州分部' },
+                { 'id': '10103', 'name': '珠海某分部' },
+                { 'id': '10104', 'name': '汕头分部' },
+                { 'id': '10105', 'name': '佛山某分部' },
+                { 'id': '10106', 'name': '韶关分某部' },
+                { 'id': '10107', 'name': '湛江分部' },
+                { 'id': '10108', 'name': '肇庆分部' },
+                { 'id': '10109', 'name': '江门某分部' },
+                { 'id': '10110', 'name': '茂名分部' },
+                { 'id': '10111', 'name': '惠州分部' },
+                { 'id': '10112', 'name': '梅州分部' },
+                { 'id': '10113', 'name': '汕尾分某部' },
+                { 'id': '10114', 'name': '河源分部' },
+                { 'id': '10115', 'name': '阳江分部' }
+              ]
+            },
+            {
+              'id': '102',
+              'name': '广西',
+              'children': [
+                { 'id': '10201', 'name': '南宁分部' },
+                { 'id': '10202', 'name': '柳州某分部' },
+                { 'id': '10203', 'name': '桂林分部' },
+                { 'id': '10204', 'name': '百色分部' },
+                { 'id': '10205', 'name': '北海某分部' }
+              ]
+            },
+            {
+              'id': '103',
+              'name': '海南',
+              'children': [
+                { 'id': '10301', 'name': '海南某分部' },
+                { 'id': '10302', 'name': '三亚某分部' }
+              ]
+            },
+          ]
+        },
+        {
+          'id': '2',
+          'name': '华中区',
+          'alias': 'center',
+          'children': [
+            {
+              'id': '201',
+              'name': '湖北',
+              'children': []
+            },
+            {
+              'id': '202',
+              'name': '湖南',
+              'children': [
+                { 'id': '20201', 'name': '长沙城市' },
+                { 'id': '20202', 'name': '岳阳城市' },
+                { 'id': '20203', 'name': '衡阳城市' },
+                { 'id': '20204', 'name': '郴州城市' },
+                { 'id': '20205', 'name': '永州城市' }
+              ]
+            }
+          ]
+        },
+        {
+          'id': '3',
+          'name': '华东区',
+          'alias': 'east',
+          'children': []
+        },
+        {
+          'id': '4',
+          'name': '华北区',
+          'alias': 'north',
+          'children': []
+        },
+        {
+          'id': '5',
+          'name': '西南区',
+          'alias': 'westSouth',
+          'children': []
+        },
+        {
+          'id': '6',
+          'name': '西北区',
+          'alias': 'westNorth',
+          'children': []
+        },
+        {
+          'id': '7',
+          'name': '港澳台',
+          'alias': 'oversea',
+          'children': []
+        },
+      ],
+      areaItems: [],
+      tabIdx: 0, // tab切换记录
+      idx: 0, // 操作记录
+      currentActive: '', // 当前选中
+    }
+  },
+  computed: {
+    filterAreaList(){
+      let arr = []
+      this.areaList.map(item => {
+        if(item.children && item.children.length){
+          item.children.map((it, idx) => {
+            if(it.children.length < 1) item.children.splice(idx, 1)
+          })
+          arr[arr.length] = item
+        }
+      })
+      return arr
+    }
+  },
+}
+</script>
+
+```
+
+**问题**
+
+- 无用 `data`
+
+### 代码
+
+```js
+    dialogVisible: {
+      handler(newVal){
+        if(newVal){
+
+          this.$nextTick(() => {
+
+            if(this.steps){
+              this.active = `#${this.steps[0].name}`
+              this.steps.map(item => {
+                this[`distance_${item.name}`] = 
+                  document.querySelector(`#${item.name}`) && document.querySelector(`#${item.name}`).offsetTop
+              })
+            }
+
+            document.querySelector(`#dialog-middle-${this.flag}-${this.action}`) &&
+            document.querySelector(`#dialog-middle-${this.flag}-${this.action}`).addEventListener('scroll', this.scroll)
+
+            document.querySelector(`#dialog-middle-x-${this.flag}-${this.action}`) &&
+            document.querySelector(`#dialog-middle-x-${this.flag}-${this.action}`).addEventListener('scroll', this.scrollX, true)
+          })
+        }else{
+          setTimeout(() => {
+            this.steps && this.clickStep(`#${this.steps[0].name}`)
+          }, 500)
+
+          window.removeEventListener('scroll', this.scroll) // 关闭弹窗清除（移除）滚轮滚动事件
+          window.removeEventListener('scroll', this.scrollX) // 关闭弹窗清除（移除）滚轮滚动事件
+        }
+      },
+      deep: true
+    }
+```
+
+### 代码
+
+```vue
+<div class="header-info">
+          <p>
+            <span class="info-l">订单编号：</span>
+            <span>{{ruleForm.orderSn || '-'}}</span>
+          </p>
+          <!--           <p>
+            <span class="info-l">合同编号：</span>
+            <span>{{ruleForm.orderContractNo || '-'}}</span>
+          </p>-->
+          <p>
+            <span class="info-l">城市：</span>
+            <span>{{ruleForm.orderComName || '-'}}</span>
+          </p>
+          <p>
+            <span class="info-l">订单状态：</span>
+            <span>{{ruleForm.orderStatusName || '-'}}</span>
+          </p>
+          <p>
+            <span class="info-l">申请时间：</span>
+            <span>{{ruleForm.orderApplyDate || '-'}}</span>
+          </p>
+          <p>
+            <span class="info-l">交车时间：</span>
+            <span>{{ruleForm.orderHandoverDate || '-'}}</span>
+          </p>
+          <p>
+            <span class="info-l">业务类型：</span>
+            <span>{{ruleForm.orderBusinessType === 0 ? '卖车' : '租车'}}</span>
+          </p>
+          <p>
+            <span class="info-l">销售人员：</span>
+            <span>{{ruleForm.orderSalesManagesName || '-'}}</span>
+          </p>
+          <p>
+            <span class="info-l">购车人：</span>
+            <span>{{`${ruleForm.orderName}-${ruleForm.orderMobile}`}}</span>
+          </p>
+          <p>
+            <span class="info-l">赠送会员合计：</span>
+            <span>{{`${ruleForm.orderGiveMember}个月` || '-'}}</span>
+          </p>
+          <p>
+            <span class="info-l">赠送备注：</span>
+            <span>{{ruleForm.orderGiveMemberRemarks || '-'}}</span>
+          </p>
+          <!-- <div v-if="checkDst"> -->
+            <p v-if="checkDst">
+              <span class="info-l">月供：</span>
+              <span>{{ruleForm.orderMonthlyPayment || '-'}}</span>
+            </p>
+            <p v-if="checkDst">
+              <span class="info-l">租期：</span>
+              <span>{{ruleForm.orderTenancy || '-'}}</span>
+            </p>
+            <p v-if="checkDst">
+              <span class="info-l">保证金：</span>
+              <span>{{ruleForm.orderDeposit}}</span>
+            </p>
+            <p v-if="checkDst">
+              <span class="info-l">起租日：</span>
+              <span>{{ruleForm.orderStartDate || '-'}}</span>
+            </p>
+            <p v-if="checkDst">
+              <span class="info-l">到期日：</span>
+              <span>{{ruleForm.orderEndDate || '-'}}</span>
+            </p>
+            <p v-if="checkDst">
+              <span class="info-l">还款日：</span>
+              <span>{{ruleForm.orderPaymentDay || '-'}}</span>
+            </p>
+            <p v-if="checkDst">
+              <span class="info-l">已缴期数：</span>
+              <span>{{ruleForm.orderPaymentTenancy}}</span>
+            </p>
+            <p v-if="checkDst">
+              <span class="info-l">剩余租金：</span>
+              <span>{{ruleForm.orderSurplusRent}}</span>
+            </p>
+          <!-- </div> -->
+        </div>
 ```
