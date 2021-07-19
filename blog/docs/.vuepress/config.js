@@ -43,11 +43,12 @@ module.exports = {
       {
         text: 'Node',
         items: [
-          { text: '基础', link: '/Node/基础/' },
-          { text: 'API', link: '/Node/Api/' },
-          { text: 'yarn&npm', link: '/Node/Package/' },
-          { text: 'Webpack', link: '/Node/Webpack/' },
-          { text: 'Vite', link: '/Node/Vite/' },
+          {text: '基础', link: '/Node/基础/'},
+          {text: 'API', link: '/Node/Api/'},
+          {text: 'yarn&npm', link: '/Node/Package/'},
+          {text: 'Webpack', link: '/Node/Webpack/'},
+          {text: 'Vite', link: '/Node/Vite/'},
+          {text: 'SQL', link: '/Node/数据库/'},
           /*  {
              text: 'Webpack',
              items: [
