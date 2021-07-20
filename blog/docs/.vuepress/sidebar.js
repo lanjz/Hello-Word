@@ -23,22 +23,23 @@ module.exports = {
     '/JavaScript/对象创建模式',
     '/JavaScript/JS面象对象',
     '/JavaScript/正则',
+    '/JavaScript/事件',
     '/JavaScript/吱不吱',
     '/JavaScript/代码实现',
-   /*  {
-      title: 'Group 1',
-      collapsable: false,
-      children: [
-        '/'
-      ]
-    },
-    {
-      title: 'Group 2',
-      children: [ 
-          '/guide/',
-          '/page-a/',
+    /*  {
+       title: 'Group 1',
+       collapsable: false,
+       children: [
+         '/'
        ]
-    }, */
+     },
+     {
+       title: 'Group 2',
+       children: [
+           '/guide/',
+           '/page-a/',
+        ]
+     }, */
   ],
   '/ES6/': [
     '/ES6/函数的扩展',
