@@ -267,5 +267,11 @@ function partial (fn, arg) {
 
 所以当我们通过 `store.getters[nameapce+key]` 去找 `getters` 时，之后由上
 
+## Q&A
 
+**为什么 MUTATION 只能是同步的？**
+
+1. 为了 devtool 快照可以更正确得记录状态的变化
+
+2. 异步操作是成功还是失败是不可预测的，会产生副作用
 
