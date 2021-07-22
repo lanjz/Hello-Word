@@ -209,3 +209,80 @@ Symbol.keyFor(s1) // "foo"
 let s2 = Symbol("foo");
 Symbol.keyFor(s2) // undefined
 ```
+
+## 实现Symbol
+
+### 第一版
+
+```js
+// 第一版
+(function() {
+    var root = this;
+
+    var SymbolPolyfill = function Symbol(description) {
+
+        // 实现特性：Symbol 函数前不能使用 new 命令
+        if (this instanceof SymbolPolyfill) throw new TypeError('Symbol is not a constructor');
+
+        // 实现特性：如果 Symbol 的参数是一个对象，就会调用该对象的 toString 方法，将其转为字符串，然后才生成一个 Symbol 值。
+        var descString = description === undefined ? undefined : String(description)
+
+        var symbol = Object.create(null)
+
+        Object.defineProperties(symbol, {
+            '__Description__': {
+                value: descString,
+                writable: false,
+                enumerable: false,
+                configurable: false
+            }
+        });
+
+        // 实现特性，因为调用该方法，返回的是一个新对象，两个对象之间，只要引用不同，就不会相同
+        return symbol;
+    }
+
+    root.SymbolPolyfill = SymbolPolyfill;
+})();
+
+```
+
+### 第二版
+
+**使用 typeof，结果为 "symbol"**
+
+利用 ES5，我们并不能修改 typeof 操作符的结果，所以这个无法实现
+
+**Symbol 函数可以接受一个字符串作为参数，表示对 Symbol 实例的描述。主要是为了在控制台显示，或者转为字符串时，比较容易区分**
+
+当我们打印一个原生 Symbol 值的时候：
+
+`console.log(Symbol('1')); // Symbol(1)`
+
+可是我们模拟实现的时候返回的却是一个对象，所以这个也是无法实现的，当然你修改 console.log 这个方法是另讲
+
+**Symbol 值可以显式转为字符串**
+
+```js
+var sym = Symbol('My symbol');
+
+console.log(String(sym)); // 'Symbol(My symbol)'
+console.log(sym.toString()); // 'Symbol(My symbol)'
+```
+
+当调用 String 方法的时候，如果该对象有 toString 方法，就会调用该 toString 方法，所以我们只要给返回的对象添加一个 toString 方法，即可实现这两个效果
+
+```js
+// 第二版
+
+// 前面面代码相同 ……
+
+var symbol = Object.create({
+    toString: function() {
+        return 'Symbol(' + this.__Description__ + ')';
+    },
+});
+
+```
+
+[ES6 系列之模拟实现 Symbol 类型](https://juejin.cn/post/6844903619544760328#heading-3)
