@@ -6,26 +6,52 @@
 </head>
 <body>
 <script>
-  var s = 'abcb'
+  let dp = [
+    [true, false, true, true],
+    [true, true, true, true],
+    [true, true, true, true],
+    [true, true, true, true],
+  ]
+  var s = 'abcd'
   var partition = function () {
     let result = []
     let tem = []
     let walk = (n) => {
+      if(n === s.length) {
+        result.push([...tem])
+        return
+      }
       for (let i = n; i < s.length; i++) {
-        tem.push(s[i])
-        if(i === s.length - 1) {
-          result.push([...tem])
-        } else {
-          walk(i + 1)
+        if(!dp[n][i]) {
+          continue
         }
+        tem.push(s.substring(n, i + 1))
+        walk(i + 1)
         tem.pop()
       }
     }
     walk(0)
     return result
   };
-  console.log(partition())
+  console.log('组合', partition())
 
+  var partition = function () {
+    let result = []
+    let tem = []
+    let walk = (n) => {
+      if(n === s.length) {
+        result.push(tem.join(''))
+        return
+      }
+      tem.push(s[n])
+      walk(n + 1)
+      tem.pop()
+      walk(n + 1)
+    }
+    walk(0)
+    return result
+  };
+  console.log('子集', partition())
 </script>
 </body>
 </html>
