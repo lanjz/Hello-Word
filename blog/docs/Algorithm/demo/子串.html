@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script>
+  var s = 'abcb'
+  var partition = function () {
+    let result = []
+    let tem = []
+    let walk = (n) => {
+      for (let i = n; i < s.length; i++) {
+        tem.push(s[i])
+        if(i === s.length - 1) {
+          result.push([...tem])
+        } else {
+          walk(i + 1)
+        }
+        tem.pop()
+      }
+    }
+    walk(0)
+    return result
+  };
+  console.log(partition())
+
+</script>
+</body>
+</html>
