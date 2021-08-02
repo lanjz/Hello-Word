@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+  /**
+   * @param {number[]} nums
+   * @param {number} k
+   * @return {number}
+   */
+  var findKthLargest = function(nums, k) {
+    if(nums.length === k){
+      return findMax(nums)
+    }
+    let min = nums[0]
+    let l = []
+    let r = []
+    for(let i=1; i<nums.length;i++){
+      if(nums[i]<=min){
+        l.push(nums[i])
+      } else {
+        r.push(nums[i])
+      }
+    }
+    if(r.length === k-1){
+      return min
+    }
+    if(r.length>=k){
+      return findKthLargest(r, k)
+    } else {
+      return findKthLargest(l, k-r.length)
+    }
+  };
+  function findMax(data){
+    let max = data.reduce((total, cur2) => {
+      return Math.max(total, cur2)
+    }, 0)
+    return max
+  }
+
+  console.log(findKthLargest([3,2,1,5,6,4],
+    2))
+</script>
+</html>
