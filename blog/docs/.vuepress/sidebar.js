@@ -128,6 +128,8 @@ module.exports = {
     '/Algorithm/时间&空间复杂度',
     '/Algorithm/简单排序',
     '/Algorithm/动态规划',
+    '/Algorithm/回文串',
+    '/Algorithm/树',
     '/Algorithm/剑指offer二',
     '/Algorithm/小题',
     '/Algorithm/字节前端',

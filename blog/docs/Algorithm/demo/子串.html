@@ -52,6 +52,59 @@
     return result
   };
   console.log('子集', partition())
+  var removeDuplicateLetters = function (s) {
+    let map = {}
+    let stack = []
+    for (let i = 0; i < s.length; i++) {
+      map[s[i]] = i
+    }
+    for (let i = 0; i < s.length; i++) {
+      let v = s[i]
+      if(stack.indexOf(s[i]) > -1) continue
+      while (stack.length && stack[stack.length - 1] > v && map[stack[stack.length - 1]] > i) {
+        stack.pop()
+      }
+      stack.push(s[i])
+    }
+    return stack.join('')
+  }
+  removeDuplicateLetters('bcabc')
+
+  var isSubsequence = function (s, t) {
+    let i = 0, j = 0
+    while (i < s.length && j < t.length) {
+      if(i === s.length) {
+        return true
+      }
+      if(s[i] === t[j]) {
+        j++
+        i++
+      } else {
+        j++
+      }
+    }
+    return false
+  };
+  isSubsequence("abc", "ahbgdc")
+  var removeKdigits = function (num, k) {
+    num = num + ''
+    let stack = []
+    for (let i of num) {
+      while (k && stack.length && stack[stack.length - 1] > i) {
+        stack.pop()
+        k--
+      }
+      stack.push(i)
+    }
+    for (; k > 0; --k) {
+      stack.pop();
+    }
+    while (stack[0] == '0') {
+      stack.shift()
+    }
+    return stack.join('') || '0'
+  };
+  removeKdigits('10221', 2)
 </script>
 </body>
 </html>
