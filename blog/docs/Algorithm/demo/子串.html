@@ -105,6 +105,19 @@
     return stack.join('') || '0'
   };
   removeKdigits('10221', 2)
+
+  function zc(s) {
+    let result = []
+    for (let i = 0; i < s.length; i++) {
+      for (let j = i; j >= 0; j--) {
+        result.push(s.substring(j, i + 1))
+      }
+    }
+    return result
+
+  }
+
+  console.log('-', zc('abcd'))
 </script>
 </body>
 </html>

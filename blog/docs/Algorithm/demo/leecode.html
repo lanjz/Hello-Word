@@ -58,15 +58,32 @@
         if(i-j === 1){
           map[j][i] = s[i]===s[j] ? 2: 1
         } else if(s[i] === s[j]){
-          map[j][i] =  map[j+1][i-1]+2
+          map[j][i] = map[j + 1][i - 1] + 2
         } else {
-          map[j][i] =  Math.max(map[j+1][i], map[j][i-1])
+          map[j][i] = Math.max(map[j + 1][i], map[j][i - 1])
         }
 
       }
     }
-    return map[0][s.length-1]
+    return map[0][s.length - 1]
   };
   console.log(longestPalindromeSubseq('bbbab'))
+  var isSubsequence = function (s, t) {
+    let tl = t.length
+    let sl = s.length
+    while (tl) {
+      if(!sl) {
+        return true
+      }
+      if(s[sl] === t[tl]) {
+        sl--
+        tl--
+      } else {
+        tl--
+      }
+    }
+    return false
+  };
+  isSubsequence("b", "c")
 </script>
 </html>
