@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+  var permute1 = function(nums) {
+    let tem = []
+    let walk = (n) => {
+      if(n === 3){ // 结果条件：长度到了，出结果
+        return
+      }
+      for(let i = 0; i<nums.length;i++){
+        tem.push(nums[i]) // 前序遍历，所以先保存值
+        walk(n+1) // 深度优先，所以递归访问下一个
+      }
+    }
+    walk(0)
+    return tem
+  };
+  console.log(permute1([1,2,3]))
+
+  var permute = function(nums) {
+    let result = []
+    let tem = []
+    let len = nums.length
+    let walk = () => {
+      if(tem.length === len){ // 长度到了，出结果
+        result.push(tem.join())
+        return
+      }
+      for(let i = 0; i<nums.length;i++){
+        if(tem.indexOf(nums[i])>-1){  // 如果已经存在同一个值则路过
+          continue
+        }
+        tem.push(nums[i]) // 前序遍历，所以先保存值
+        walk() // 深度优先，所以递归访问下一个
+        tem.pop() // 回溯，移出最后一个值，表示回到上一层节点
+      }
+    }
+    walk()
+    return result
+  };
+  console.log(permute([1,2,3]))
+  var permuteUnique = function(nums) {
+    let result = []
+    let tem = []
+    let map = []
+    nums.sort((a, b) => a - b);
+    let walk = (n) => {
+      if(n === nums.length){
+        result.push([...tem])
+        return
+      }
+      for(let i = 0; i<nums.length;i++){
+        if((nums[i] === nums[i - 1] && map[i - 1]) || map[i]) continue;
+        if(map[i]){
+          continue
+        }
+        map[i] = true
+        tem.push(nums[i])
+        walk(n+1)
+        tem.pop()
+        map[i] = false
+      }
+    }
+    walk(0)
+    return result
+  };
+  console.log(permuteUnique([1,1,2]))
+</script>
+</html>
