@@ -25,6 +25,7 @@ module.exports = {
     '/JavaScript/正则',
     '/JavaScript/事件',
     '/JavaScript/吱不吱',
+    '/JavaScript/吱不吱二',
     '/JavaScript/代码实现',
     /*  {
        title: 'Group 1',

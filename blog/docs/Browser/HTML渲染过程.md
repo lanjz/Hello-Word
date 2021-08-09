@@ -290,7 +290,7 @@ css3硬件加速的坑:
 
 ### dom树节点和渲染树节点一一对应吗
 
-![](./static/browser_14.jpg)
+![](./static/browser_14.png)
 
 根据之前上图的渲染图未所以发现 dom 树节点和渲染树节点并不是一一对应的，比如 `display:node` 的元素将不会出现在渲染树中
 

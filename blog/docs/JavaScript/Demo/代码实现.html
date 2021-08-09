@@ -9,6 +9,7 @@
 </body>
 <script>
   /*防抖*/
+
   function de(fn, delay) {
     let time = null
     return () => {
@@ -110,7 +111,7 @@
       [sym]: 'key是个symbol',
       symbol: sym
     }
-    ob.self = ob
+    // ob.self = ob
     this.ob = ob
   }
 
@@ -158,5 +159,165 @@
   let newObj = deepCopy(oldObj)
   newObj.__proto__ = oldObj.__proto__
   console.log('new', newObj)
+  /*实现instanceOf*/
+  console.log('----------------------实现instanceOf------------------------')
+
+  function isInstanceOf(obj, parent) {
+    while (obj.__proto__) {
+      if(obj.__proto__ === parent.prototype) {
+        return true
+      }
+      obj = obj.__proto__
+    }
+    return false
+  }
+
+  console.log(isInstanceOf)
+  /*实现call、apply、bind*/
+  console.log('---------------实现call、apply、bind------------------------')
+
+  function myCall(fn, obj, ...arg) {
+    obj.fn = fn
+    return obj.fn(...arg)
+  }
+
+  function showAge(name) {
+    console.log(arguments)
+    console.log(name + this.age)
+  }
+
+  function myBind(fn, obj, ...arg1) {
+
+    return (...arg2) => {
+      obj.doFn = fn
+      return obj.doFn(...arg1, ...arg2)
+    }
+  }
+
+  var my = myBind(showAge, {age: 100}, 1, 2, 3)
+  my('aaa')
+
+  /*实现JSON.stringify()*/
+  console.log('...........实现JSON.stringify()............')
+
+  function myStringify(obj) {
+    let weak = new WeakSet()
+    let walk = (data) => {
+      if(typeof data !== 'object') {
+        return data
+      }
+      // 实现特性 5
+      if(weak.has(data)) {
+        throw new Error('出现了循环了')
+        return
+      }
+      weak.add(data)
+      let type = Object.prototype.toString.call(data)
+      if(type !== '[object Array]' && type !== '[object Object]') { // 简单实现特性 2
+        return data.toString()
+      }
+      let tem = []
+      // Object.keys 会自动过滤的 symbol 的key，实现特性5
+      Object.keys(data).forEach(item => {
+        let getTypeOf = typeof data[item]
+        if(getTypeOf === 'symbol' || getTypeOf === 'function' || getTypeOf === undefined) return // 实现特性 4
+        if(type === '[object Array]') {
+          tem.push(walk(data[item]))
+        } else if(type === '[object Object]') {
+          tem.push(`${item}:` + walk(data[item]))
+        }
+      })
+      if(type === '[object Array]') {
+        return `[${tem.join()}]`
+      } else if(type === '[object Object]') {
+        return `{${tem.join()}}`
+      }
+
+    }
+    return walk(obj)
+  }
+
+  let testMyStringify = {
+    a: new Number(1234),
+    b: 'ac',
+    arr: [1, 2, 3, 4],
+  }
+  // testMyStringify.self = testMyStringify
+  console.log('myStringify({})', myStringify(testMyStringify))
+  console.log('myStringify({})', JSON.stringify(testMyStringify))
+
+  /*实现Promise*/
+  function _promise(fn) {
+    this.doResolve = null
+    this.doReject = null
+    this.sonResolve = null // then 返回的 promise
+    let _this = this
+    setTimeout(() => {
+      fn(this._resolve.bind(_this), this._reject.bind(_this))
+    })
+  }
+
+  _promise.prototype._resolve = function (data) {
+    if(!this.doResolve) return
+    let res = this.doResolve(data)
+    this.sonResolve(res)
+  }
+  _promise.prototype._reject = function (data) {
+    if(!this.doReject) return
+    let res = this.doReject(data)
+  }
+  _promise.prototype.then = function (data) {
+    this.doResolve = data
+    return new _promise(resolve => {
+      this.sonResolve = resolve
+    })
+  }
+  _promise.prototype.catch = function (data) {
+    this.doReject = data
+  }
+  let pro = new _promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve('哈哈')
+    }, 2000)
+  })
+  pro.then(res => {
+    console.log('第一个then', res)
+    return '自定义Promise', res
+  })
+    .then(res => {
+      console.log('第二个then', res)
+    })
+  /*模板引擎实现*/
+  console.log('----------模板引擎实现 TODO-------------')
+
+  function render(template, data) {
+    let isBegin = false
+    let stack = []
+    let tem = ''
+    let result = ''
+    let i = 1
+    for (let i of template) {
+      if(i === '{') {
+        stack.push(i)
+        if(stack.length > 2) {
+          result += stack.shift()
+        }
+      } else if(i === '}') {
+
+      }
+      if(template[i] === '{' && template[i - 1] === '{') {
+        result += tem
+        tem = ''
+        isBegin = true
+      } else if(template[i] === '}' && template[i + 1] === '}') {
+
+      } else if(isBegin) {
+        tem += template[i]
+      } else {
+        result += template[i]
+      }
+    }
+    return result; // 如果模板没有模板字符串直接返回
+  }
 </script>
 </html>
