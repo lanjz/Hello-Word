@@ -155,6 +155,7 @@ module.exports = {
     '/Node/基础/基础使用',
     '/Node/基础/Node模块',
     '/Node/基础/守护服务',
+    '/Node/基础/吱不吱',
   ],
   '/Node/Api/': [
     '/Node/Api/Buffer',
