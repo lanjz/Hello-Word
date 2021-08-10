@@ -291,33 +291,51 @@
   console.log('----------模板引擎实现 TODO-------------')
 
   function render(template, data) {
-    let isBegin = false
-    let stack = []
+    let left = 0
+    let right = 0
     let tem = ''
     let result = ''
-    let i = 1
     for (let i of template) {
       if(i === '{') {
-        stack.push(i)
-        if(stack.length > 2) {
-          result += stack.shift()
+        if(left === 2){
+          result += '{'
+        } else {
+          left++
         }
       } else if(i === '}') {
-
-      }
-      if(template[i] === '{' && template[i - 1] === '{') {
-        result += tem
-        tem = ''
-        isBegin = true
-      } else if(template[i] === '}' && template[i + 1] === '}') {
-
-      } else if(isBegin) {
-        tem += template[i]
+        right++
+        if(left === 2&&right === 2 && tem){
+          result+=(data[tem]||undefined)
+          left = 0
+          right = 0
+          tem = ''
+        } else if(left !==2){
+          while (left){
+            result+='{'
+            left--
+          }
+          if(tem){
+            result +=tem
+            tem=''
+          }
+          while (right){
+            result+='}'
+            right--
+          }
+        }
+      } else if(left === 2){
+        tem+=i
       } else {
-        result += template[i]
+        result += i
       }
     }
     return result; // 如果模板没有模板字符串直接返回
   }
+  let temp = '<div>}}{}{{{name}}}dfkjlksfjlsf{}}{{age}}</div>'
+  let obj = {
+    name: 'lanjz',
+    age: 19
+  }
+  console.log(render(temp, obj))
 </script>
 </html>
