@@ -124,6 +124,7 @@ module.exports = {
   ],
   '/NA/': [
     '/NA/微信小程序',
+    '/NA/uniapp',
   ],
   '/Algorithm/': [
     '/Algorithm/时间&空间复杂度',
