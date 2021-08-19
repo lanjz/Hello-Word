@@ -5,20 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="./react.js"></script>
-<!--    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>-->
-<!--    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>-->
-    <script src="./react-deom.js"></script>
+    <script src="./react-dom.js"></script>
     <script src="like_button.js"></script>
 </head>
 <body>
-    <div id="like_button_container"></div>
+<div id="root"></div>
 </body>
-<script>
-    // ... 你粘贴的入门代码 ...
+<script src="https://cdn.bootcss.com/babel-standalone/6.24.0/babel.js"></script>
+<script type="text/babel">
+    window.onload = function () {
+        class App extends React.Component {
+            render() {
+                return (
+                    <div className="game">
+                        <div className="game-board">
+                            game-board
+                        </div>
+                        <div className="game-info">
+                            game-info
+                        </div>
+                    </div>
+                );
+            }
+        }
 
-const domContainer = document.querySelector('#like_button_container');
-const element = <h1>Hello</h1>
-ReactDOM.render(e(element), domContainer);
+        ReactDOM.render(<App/>, document.getElementById('root'));
+    }
+
 
 </script>
 

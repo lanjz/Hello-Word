@@ -1,83 +1,60 @@
 # Fiber
 
-源码定义：
+Fiber 是 React 的最小工作单元，在 React 的世界中，一切都可以是组件
 
 ```js
-function FiberNode(tag, pendingProps, key, mode) {
-  // Instance
-  this.tag = tag;
-  this.key = key;
-  this.elementType = null;
-  this.type = null;
-  this.stateNode = null; // Fiber
+// 源码定义：
+function FiberNode(
+  tag: WorkTag,
+  pendingProps: mixed,
+  key: null | string,
+  mode: TypeOfMode,
+) {
 
-  this.return = null;
-  this.child = null;
-  this.sibling = null;
+  // Fiber元素的静态属性相关
+  this.tag = tag;
+  this.key = key; // fiber的key
+  this.elementType = null;
+  this.type = null; // fiber对应的DOM元素的标签类型，div、p...
+  this.stateNode = null; // fiber的实例，类组件场景下，是组件的类，HostComponent场景，是dom元素
+
+  // Fiber 链表相关
+  this.return = null; // 指向父级fiber
+  this.child = null; // 指向子fiber
+  this.sibling = null; // 同级兄弟fiber
   this.index = 0;
-  this.ref = null;
+
+  this.ref = null; // ref相关
+
+  // Fiber更新相关
   this.pendingProps = pendingProps;
   this.memoizedProps = null;
-  this.updateQueue = null;
-  this.memoizedState = null;
+  this.updateQueue = null; // 存储update的链表
+  this.memoizedState = null; // 类组件存储fiber的状态，函数组件存储hooks链表
   this.dependencies = null;
-  this.mode = mode; // Effects
 
-  this.effectTag = NoEffect;
+  this.mode = mode;
+
+  // Effects
+  // flags原为effectTag，表示当前这个fiber节点变化的类型：增、删、改
+  this.flags = NoFlags;
   this.nextEffect = null;
+
+  // effect链相关，也就是那些需要更新的fiber节点
   this.firstEffect = null;
   this.lastEffect = null;
-  this.expirationTime = NoWork;
-  this.childExpirationTime = NoWork;
+
+  this.lanes = NoLanes; // 该fiber中的优先级，它可以判断当前节点是否需要更新
+  this.childLanes = NoLanes;// 子树中的优先级，它可以判断当前节点的子树是否需要更新
+
+  /*
+  * 可以看成是workInProgress（或current）树中的和它一样的节点，
+  * 可以通过这个字段是否为null判断当前这个fiber处在更新还是创建过程
+  * */
   this.alternate = null;
 
-  {
-    // Note: The following is done to avoid a v8 performance cliff.
-    //
-    // Initializing the fields below to smis and later updating them with
-    // double values will cause Fibers to end up having separate shapes.
-    // This behavior/bug has something to do with Object.preventExtension().
-    // Fortunately this only impacts DEV builds.
-    // Unfortunately it makes React unusably slow for some applications.
-    // To work around this, initialize the fields below with doubles.
-    //
-    // Learn more about this here:
-    // https://github.com/facebook/react/issues/14365
-    // https://bugs.chromium.org/p/v8/issues/detail?id=8538
-    this.actualDuration = Number.NaN;
-    this.actualStartTime = Number.NaN;
-    this.selfBaseDuration = Number.NaN;
-    this.treeBaseDuration = Number.NaN; // It's okay to replace the initial doubles with smis after initialization.
-    // This won't trigger the performance cliff mentioned above,
-    // and it simplifies other profiler code (including DevTools).
-
-    this.actualDuration = 0;
-    this.actualStartTime = -1;
-    this.selfBaseDuration = 0;
-    this.treeBaseDuration = 0;
-  } // This is normally DEV-only except www when it adds listeners.
-  // TODO: remove the User Timing integration in favor of Root Events.
-
-
-  {
-    this._debugID = debugCounter++;
-    this._debugIsCurrentlyTiming = false;
-  }
-
-  {
-    this._debugSource = null;
-    this._debugOwner = null;
-    this._debugNeedsRemount = false;
-    this._debugHookTypes = null;
-
-    if (!hasBadMapPolyfill && typeof Object.preventExtensions === 'function') {
-      Object.preventExtensions(this);
-    }
-  }
 }
 ```
-
-## Fiber的含义和作用
 
 1. 每一个 `ReactElement` 对应一个 `Fiber` 对象
 
@@ -108,6 +85,9 @@ function FiberNode(tag, pendingProps, key, mode) {
 
 - `List` 有三个子节点，但是它的 `child` 只是指向第一个子节点 `Span1`, 然后 `Span1` 的 `sibling` 属性指向兄弟节点
 
+## Fiber 更新
 
+
+React要完成一次更新分为两个阶段： `render` 阶段和 `commit` 阶段，两个阶段的工作可分别概括为新 fiber 树的构建和更新最终效果的应用
 
 

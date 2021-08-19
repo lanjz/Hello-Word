@@ -727,6 +727,7 @@
 
 
   var ReactElement = function (type, key, ref, self, source, owner, props) {
+    debugger
     var element = {
       // This tag allows us to uniquely identify this as a React Element
       $$typeof: REACT_ELEMENT_TYPE,
@@ -1918,6 +1919,7 @@
     }
   }
   function createElementWithValidation(type, props, children) {
+    debugger
     var validType = isValidElementType(type); // We warn in this case but don't throw. We expect the element creation to
     // succeed and there will likely be errors in render.
 
