@@ -1,6 +1,55 @@
 # Fiber
 
-Fiber 是 React 的最小工作单元，在 React 的世界中，一切都可以是组件
+Fiber 是 React 的最小工作单元，在理解 Fiber 之前，先总结一下与 Fiber 与另外两个元素 ReactElement、DOM 对象之间的关系
+
+- ReactElement 对象: 所有采用jsx语法书写的节点, 都会被编译器转换, 最终会以 `React.createElement(...)` 的方式, 创建出来一个与之对应的 `ReactElement `对象
+
+- fiber 对象: fiber对象是通过 `ReactElement对象` 进行创建的, 多个 fiber对象 构成了一棵 fiber树, fiber树 是构造DOM树的数据模型, fiber树 的任何改动, 最后都体现到 DOM 树
+
+- DOM 对象: 文档对象模型
+
+eg:
+
+```js
+
+class App extends React.Component {
+  render() {
+    return (
+      <div className="app">
+        <header>header</header>
+        <Content />
+        <footer>footer</footer>
+      </div>
+    );
+  }
+}
+
+class Content extends React.Component {
+  render() {
+    return (
+      <React.Fragment>
+        <p>1</p>
+        <p>2</p>
+        <p>3</p>
+      </React.Fragment>
+    );
+  }
+}
+
+export default App;
+```
+
+上面 JSX 代码到 DOM 节点的转换过程:
+
+![](./images/f.png)
+
+小结：
+
+- 平时书写的 JSX, 也就是 `ReactElement对象`
+
+- `fiber 树`是通过 `ReactElement` 生成的, 如果脱离了 `ReactElement` , `fiber树`也无从谈起. 所以是 `ReactElement树` (不是严格的树结构, 为了方便也称为树)驱动 `fiber树`.
+
+- `fiber树` 是 DOM 树的数据模型, `fiber树` 驱动 DOM 树
 
 ```js
 // 源码定义：
@@ -91,3 +140,4 @@ function FiberNode(
 React要完成一次更新分为两个阶段： `render` 阶段和 `commit` 阶段，两个阶段的工作可分别概括为新 fiber 树的构建和更新最终效果的应用
 
 
+https://zhuanlan.zhihu.com/p/98295862

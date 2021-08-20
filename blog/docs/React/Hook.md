@@ -1,6 +1,296 @@
 # Hook
 
-Hook 是 React16 引入的新特性，Hook是一个特殊的函数可以在函数组件中绑定`state`和生命周期方法，使得我们可以不用 Class 也可以使用 React。
+Hook 是 React16 引入的新特性， 是 React 团队在 React 组件开发实践中，逐渐认知到的一个改进点，这背后其实涉及对类组件和函数组件两种组件形式的思考和侧重。
+
+## 类组件函数组件
+
+### 类组件
+
+所谓类组件，就是基于 ES6 Class 这种写法，通过继承 `React.Component` 得来的 React 组件。以下是一个类组件：
+
+```js
+class DemoClass extends React.Component {
+  state = {
+    text: ""
+  };
+  componentDidMount() {
+    //...
+  }
+  changeText = (newText) => {
+    this.setState({
+      text: newText
+    });
+  };
+
+  render() {
+    return (
+      <div className="demoClass">
+        <p>{this.state.text}</p>
+        <button onClick={this.changeText}>修改</button>
+      </div>
+    );
+  }
+}
+```
+
+可以看出，React 类组件内部预置了相当多的“现成的东西”等着我们去调度/定制，`state` 和生命周期就是这些“现成东西”中的典型。要想得到这些东西，难度也不大，只需要继承一个 `React.Component` 即可。
+当然，这也是类组件的一个不便，它太繁杂了，对于解决许多问题来说，编写一个类组件实在是一个过于复杂的姿势。复杂的姿势必然带来高昂的理解成本，这也是我们所不想看到的。除此之外，由于开发者编写的逻辑在封装后是和组件粘在一起的，这就使得类组件内部的逻辑难以实现拆分和复用
+
+### 函数组件
+
+函数组件就是以函数的形态存在的 React 组件。早期并没有 React-Hooks，函数组件内部无法定义和维护 state，因此它还有一个别名叫“无状态组件”。以下是一个函数组件：
+
+```js
+function DemoFunction(props) {
+  const { text } = props
+  return (
+    <div className="demoFunction">
+      <p>{`函数组件接收的内容：[${text}]`}</p>
+    </div>
+  );
+}
+```
+
+相比于类组件，函数组件肉眼可见的特质自然包括轻量、灵活、易于组织和维护、较低的学习成本等。
+
+通过对比，从形态上可以对两种组件做区分，它们之间的区别如下：
+
+- 类组件需要继承` class`，函数组件不需要；
+
+- 类组件可以访问生命周期方法，函数组件不能；
+
+- 类组件中可以获取到实例化后的 `this`，并基于这个 `this` 做各种各样的事情，而函数组件不可以；
+
+- 类组件中可以定义并维护状态 （state），而函数组件不可以；
+
+所以在 React-Hooks 出现之前，类组件的能力边界明显强于函数组件。
+
+组件本身的定位就是函数，一个输入数据、输出 UI 的函数。作为开发者，我们编写的是声明式的代码，而 React 框架的主要工作，就是及时地把声明式的代码转换为命令式的 DOM 操作，把数据层面的描述映射到用户可见的 UI 变化中去。但函数组件比起类组件少了很多东西，比如生命周期、对 state 的管理等。这就给函数组件的使用带来了非常多的局限性，导致我们并不能使用函数这种形式，写出一个真正的全功能的组件。而React-Hooks 的出现，就是为了帮助函数组件补齐这些（相对于类组件来说）缺失的能力。
+
+React-Hooks 是一套能够使函数组件更强大、更灵活的“钩子”。
+
+## Q&A
+
+### 为什么 useState 要使用数组而不是对象
+
+useState 的用法：
+
+```js
+const [count, setCount] = useState(0)
+```
+
+**数组的解构赋值**
+
+```js
+const foo = [1, 2, 3];
+const [one, two, three] = foo;
+console.log(one);	// 1
+console.log(two);	// 2
+console.log(three);	// 3
+```
+
+**对象的解构赋值**
+
+```js
+const user = {
+  id: 888,
+  name: "xiaoxin"
+};
+const { id, name } = user;
+console.log(id);	// 888
+console.log(name);	// "xiaoxin"
+```
+
+看完这两个例子，答案应该就出来了：
+
+- 如果 useState 返回的是数组，那么使用者可以对数组中的元素命名，代码看起来也比较干净
+
+- 如果 useState 返回的是对象，在解构对象的时候必须要和 `useState` 内部实现返回的对象同名，想要使用多次的话，必须得设置别名才能使用返回值
+
+下面来看看如果 useState 返回对象的情况：
+
+```js
+// 第一次使用
+const { state, setState } = useState(false);
+// 第二次使用
+const { state: counter, setState: setCounter } = useState(0) 
+
+```
+
+这里可以看到，返回对象的使用方式还是挺麻烦的，更何况实际项目中会使用的更频繁。  
+总结：`useState` 返回的是 `array` 而不是 `object` 的原因就是为了降低使用的复杂度，返回数组的话可以直接根据顺序解构，而返回对象的话要想使用多次就需要定义别名了
+
+### React Hooks 解决了哪些问题
+
+React Hooks 主要解决了以下问题：
+
+（1）在组件之间复用状态逻辑很难
+
+React 没有提供将可复用性行为“附加”到组件的途径（例如，把组件连接到 `store` ）解决此类问题可以使用` render` `props` 和 高阶组件。但是这类方案需要重新组织组件结构，这可能会很麻烦，并且会使代码难以理解。由 `providers`，`consumers`，高阶组件，`render` `props` 等其他抽象层组成的组件会形成“嵌套地狱”。尽管可以在 DevTools 过滤掉它们，但这说明了一个更深层次的问题：React 需要为共享状态逻辑提供更好的原生途径。
+
+可以使用 Hook 从组件中提取状态逻辑，使得这些逻辑可以单独测试并复用。Hook 使我们在无需修改组件结构的情况下复用状态逻辑。 这使得在组件间或社区内共享 Hook 变得更便捷。
+
+**复杂组件变得难以理解**
+
+在组件中，每个生命周期常常包含一些不相关的逻辑。例如，组件常常在 `componentDidMount` 和 `componentDidUpdate` 中获取数据。但是，同一个 `componentDidMount` 中可能也包含很多其它的逻辑，如设置事件监听，而之后需在 `componentWillUnmount` 中清除。相互关联且需要对照修改的代码被进行了拆分，而完全不相关的代码却在同一个方法中组合在一起。
+
+为了解决这个问题，Hook 将组件中相互关联的部分拆分成更小的函数（比如设置订阅或请求数据），而并非强制按照生命周期划分。你还可以使用 `reducer` 来管理组件的内部状态，使其更加可预测。
+
+**难以理解的 class**
+
+除了代码复用和代码管理会遇到困难外，class 是学习 React 的一大屏障。我们必须去理解 JavaScript 中 `this` 的工作方式，这与其他语言存在巨大差异。还不能忘记绑定事件处理器。没有稳定的语法提案，这些代码非常冗余。
+ 
+ 从概念上讲，React 组件一直更像是函数。而 Hook 则拥抱了函数，同时也没有牺牲 React 的精神原则。Hook 提供了问题的解决方案，无需学习复杂的函数式或响应式编程技术
+ 
+### useEffect 与 useLayoutEffect 的区别
+
+**共同点**
+
+- 运用效果： `useEffect` 与 `useLayoutEffect` 两者都是用于处理副作用，这些副作用包括改变 DOM、设置订阅、操作定时器等。在函数组件内部操作副作用是不被允许的，所以需要使用这两个函数去处理。
+
+- 使用方式：` useEffect` 与 `useLayoutEffect` 两者底层的函数签名是完全一致的，都是调用的 `mountEffectImpl` 方法，在使用上也没什么差异，基本可以直接替换。
+
+**不同点**
+
+使用场景： `useEffect` 在 React 的渲染过程中是被异步调用的，用于绝大多数场景；而 `useLayoutEffect` 会在所有的 DOM 变更之后同步调用，主要用于处理 DOM 操作、调整样式、避免页面闪烁等问题。也正因为是同步处理，所以需要避免在 `useLayoutEffect` 做计算量较大的耗时任务从而造成阻塞。
+
+使用效果： `useEffect` 是按照顺序执行代码的，改变屏幕像素之后执行（先渲染，后改变DOM），当改变屏幕内容时可能会产生闪烁；`useLayoutEffect` 是改变屏幕像素之前就执行了（会推迟页面显示的事件，先改变DOM后渲染），不会产生闪烁。`useLayoutEffect` 总是比 `useEffect` 先执行。
+
+
+在未来的趋势上，两个 API 是会长期共存的，暂时没有删减合并的计划，需要开发者根据场景去自行选择。React 团队的建议非常实用，如果实在分不清，先用 `useEffect`，一般问题不大；如果页面有异常，再直接替换为 `useLayoutEffect` 即可
+ 
+### React Hooks在平时开发中需要注意的问题和原因
+
+**不要在循环，条件或嵌套函数中调用Hook，必须始终在 React函数的顶层使用Hook**
+
+这是因为 React 需要利用调用顺序来正确更新相应的状态，以及调用相应的钩子函数。一旦在循环或条件分支语句中调用 Hook，就容易导致调用顺序的不一致性，从而产生难以预料到的后果
+
+**使用useState时候，使用push，pop，splice等直接更改数组对象的坑**
+
+使用push直接更改数组无法获取到新值，应该采用析构方式，但是在class里面不会有这个问题。代码示例：
+
+```js
+function Indicatorfilter() {
+  let [num,setNums] = useState([0,1,2,3])
+  const test = () => {
+    // 这里坑是直接采用push去更新num
+    // setNums(num)是无法更新num的
+    // 必须使用num = [...num ,1]
+    num.push(1)
+    // num = [...num ,1]
+    setNums(num)
+  }
+return (
+    <div className='filter'>
+      <div onClick={test}>测试</div>
+        <div>
+          {num.map((item,index) => (
+              <div key={index}>{item}</div>
+          ))}
+      </div>
+    </div>
+  )
+}
+
+class Indicatorfilter extends React.Component<any,any>{
+  constructor(props:any){
+      super(props)
+      this.state = {
+          nums:[1,2,3]
+      }
+      this.test = this.test.bind(this)
+  }
+
+  test(){
+      // class采用同样的方式是没有问题的
+      this.state.nums.push(1)
+      this.setState({
+          nums: this.state.nums
+      })
+  }
+
+  render(){
+      let {nums} = this.state
+      return(
+          <div>
+              <div onClick={this.test}>测试</div>
+                  <div>
+                      {nums.map((item:any,index:number) => (
+                          <div key={index}>{item}</div>
+                      ))}
+                  </div>
+          </div>
+
+      )
+  }
+}
+
+```
+
+ 
+### React Hooks 和生命周期的关系？
+ 
+函数组件 的本质是函数，没有 `state` 的概念的，因此不存在生命周期一说，仅仅是一个 `render` 函数而已。但是引入 Hooks 之后就变得不同了，它能让组件在不使用 `class` 的情况下拥有 `state`，所以就有了生命周期的概念，所谓的生命周期其实就是 `useState`、 `useEffect()` 和 `useLayoutEffect()`
+ 
+即：Hooks 组件（使用了Hooks的函数组件）有生命周期，而函数组件（未使用Hooks的函数组件）是没有生命周期的
+ 
+下面是具体的 class 与 Hooks 的生命周期对应关系：
+
+**constructor**
+
+函数组件不需要构造函数，可以通过调用 **useState 来初始化 state** 
+
+`const [num, UpdateNum] = useState(0)`
+
+**[getDerivedStateFromProps](https://zh-hans.reactjs.org/docs/react-component.html#static-getderivedstatefromprops)**
+
+一般情况下，我们不需要使用它，可以在渲染过程中更新 `state`，以达到实现 `getDerivedStateFromProps` 的目的
+
+```js
+function ScrollView({row}) {
+  let [isScrollingDown, setIsScrollingDown] = useState(false);
+  let [prevRow, setPrevRow] = useState(null);
+  if (row !== prevRow) {
+    // Row 自上次渲染以来发生过改变。更新 isScrollingDown。
+    setIsScrollingDown(prevRow !== null && row > prevRow);
+    setPrevRow(row);
+  }
+  return `Scrolling down: ${isScrollingDown}`;
+}
+```
+
+
+
+**shouldComponentUpdate**
+
+`shouldComponentUpdate(nextProps, nextState)`
+
+根据 `shouldComponentUpdate()` 的返回值，判断 React 组件的输出是否受当前 `state` 或 `props` 更改的影响。默认行为是 `state` 每次发生变化组件都会重新渲染
+
+可以用 **React.memo** 包裹一个组件来对它的 `props` 进行浅比较
+
+```js
+const Button = React.memo((props) => {  // 具体的组件});
+```
+
+注意：`React.memo 等效于` `PureComponent`，它只浅比较 `props`
+
+**componentWillUnmount**
+
+相当于 `useEffect` 里面返回的 `cleanup` 函数
+
+```js
+// componentDidMount/componentWillUnmount
+useEffect(()=>{
+  // 需要在 componentDidMount 执行的内容
+  return function cleanup() {
+    // 需要在 componentWillUnmount 执行的内容      
+  }
+}, [])
+```
+
+**componentDidCatch and getDerivedStateFromError：目前还没有这些方法的 Hook 等价写法**
+ 
 
 ## State Hook
 
@@ -459,5 +749,8 @@ export default App;
 
   - 在自定义 Hook 中调用其他 Hook 
 
+https://juejin.cn/post/6940942549305524238#heading-22
+
+https://github.com/7kms/react-illustration-series
 
 [什么时候使用 useMemo 和 useCallback](https://jancat.github.io/post/2019/translation-usememo-and-usecallback/)
