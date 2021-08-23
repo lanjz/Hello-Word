@@ -1,4 +1,12 @@
-# Web Worker
+# 各种Worker
+
+- Web Worker
+
+- Share Worker
+
+- Service Worker
+
+## Web Worker
 
 JavaScript 语言采用的是单线程模型，也就是说，所有任务只能在一个线程上完成，一次只能做一件事。前面的任务没做完，后面的任务只能等着。随着电脑计算能力的增强，尤其是多核 CPU 的出现，单线程带来很大的不便，无法充分发挥计算机的计算能力。
 
@@ -14,7 +22,7 @@ Web Worker 有以下几个使用注意点：
 
 - DOM 限制
 
-- Worker 线程所在的全局对象，与主线程不一样，无法读取主线程所在网页的 DOM 对象，也无法使用`document`、`window`、`parent`这些对象。但是，Worker 线程可以`navigator`对象和`location`对象
+   Worker 线程所在的全局对象，与主线程不一样，无法读取主线程所在网页的 DOM 对象，也无法使用`document`、`window`、`parent`这些对象。但是，Worker 线程可以`navigator`对象和`location`对象
 
 - 脚本限制
 
@@ -24,7 +32,7 @@ Web Worker 有以下几个使用注意点：
 
   Worker 线程无法读取本地文件，即不能打开本机的文件系统（file://），它所加载的脚本，必须来自网络
 
-## 基本用法
+### 基本用法
 
 在浏览器原生提供`Worker()`构造函数，用来供主线程生成 Worker 线程。
 
@@ -56,7 +64,7 @@ var myWorker = new Worker(jsUrl, options)
 
 - `Worker.terminate()`：立即终止 Worker 线程
 
-## 例子
+### 例子
 
 创建一个`worker.js`文件
 
@@ -126,7 +134,7 @@ self.addEventListener('message', function (e) {
 
 通过例子可以看到无论在前端脚本中还是`worker`线程，都是使用`postmessage`发送消息，使用`onmessage`接收消息
 
-## 错误监听
+### 错误监听
 
 主线程可以监听 Worker 是否发生错误。如果发生错误，Worker 会触发主线程的error事件
 
@@ -144,7 +152,7 @@ worker.addEventListener('error', function (event) {
 
 ```
 
-## 关闭 Worker
+### 关闭 Worker
 
 使用完毕，为了节省系统资源，必须关闭 Worker
 
@@ -152,7 +160,7 @@ worker.addEventListener('error', function (event) {
 
 - Worker 线程: `self.close()`
 
-## 传递的数据
+### 传递的数据
 
 前面说过，主线程与 Worker 之间的通信内容，可以是文本，也可以是对象。需要注意的是，这种通信是拷贝关系，即是传值而不是传址，
 Worker 对通信内容的修改，不会影响到主线程。事实上，浏览器内部的运行机制是，先将通信内容串行化，然后把串行化后的字符串发给 Worker，
@@ -190,7 +198,7 @@ worker.postMessage(arrayBuffer, [arrayBuffer]);
 var ab = new ArrayBuffer(1);
 worker.postMessage(ab, [ab]);
 ```
-## 同页面的 Web Worker
+### 同页面的 Web Worker
 
 通常情况下，Worker 载入的是一个单独的 JavaScript 脚本文件，但是也可以载入与主线程在同一个网页的代码。
 
@@ -221,7 +229,7 @@ worker.onmessage = function (e) {
 
 完整例子如下：
 
-```js
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -273,4 +281,156 @@ worker.onmessage = function (e) {
 </html>
 ```
 
+## ShareWorker
 
+SharedWorker 接口代表一种特定类型的 worker，可以从几个浏览上下文中访问，例如几个窗口、iframe 或其他 worker，使用 ShareWorker 可以让我们多个页面同时控制一个脚本，这个脚本运行在独立的进程中，我们可以借用 ShareWorker 实现页面之间的通信和数据共享
+
+**使用的页面和 worker.js 必需是同源的**
+
+### 使用
+
+```js
+// worker.js
+var clients = [];
+onconnect = function(e) {
+    var port = e.ports[0];
+    clients.push(port);
+    port.addEventListener('message', function(e) {
+        for (var i = 0; i < clients.length; i++) {
+            var eElement = clients[i];
+            eElement.postMessage(e.data)
+        }
+    });
+    port.start();
+}
+```
+
+```html
+<!--page1.html-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<button>发送</button>
+<div></div>
+<body>
+<script>
+    let testData = 0
+    // 这段代码是必须的，打开页面后注册SharedWorker，显示指定worker.port.start()方法建立与worker间的连接
+    if (typeof Worker === "undefined") {
+        alert('当前浏览器不支持webworker')
+    } else {
+        let worker = new SharedWorker('worker.js?type=1')
+        worker.port.addEventListener('message', (e) => {
+            console.log('来自worker的数据：', e.data)
+            document.querySelector('div').innerText = e.data
+        }, false)
+        worker.port.start()
+        window.worker = worker
+    }
+    // 获取和发送消息都是调用postMessage方法，我这里约定的是传递'get'表示获取数据。
+    document.querySelector('button').onclick = function() {
+        window.worker.port.postMessage(testData++)
+    }
+</script>
+</body>
+
+</html>
+```
+
+```html
+<!--page2.html-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<button>发送</button>
+<div></div>
+<body>
+<script>
+    let testData = 10000
+    // 这段代码是必须的，打开页面后注册SharedWorker，显示指定worker.port.start()方法建立与worker间的连接
+    if (typeof Worker === "undefined") {
+        alert('当前浏览器不支持webworker')
+    } else {
+        let worker = new SharedWorker('worker.js?type=1')
+        worker.port.addEventListener('message', (e) => {
+            console.log('来自worker的数据：', e.data)
+            document.querySelector('div').innerText = e.data
+        }, false)
+        worker.port.start()
+        window.worker = worker
+    }
+    // 获取和发送消息都是调用postMessage方法，我这里约定的是传递'get'表示获取数据。
+    document.querySelector('button').onclick = function() {
+        window.worker.port.postMessage(testData--)
+    }
+</script>
+</body>
+
+</html>
+```
+
+无论哪个页面触发了发送按钮，两个页面都将收到通信
+
+
+
+## Service Worker
+
+Service Worker 是运行在浏览器背后的独立线程，一般可以用来实现缓存功能。使用 Service Worker的话，传输协议必须为 HTTPS。因为 Service Worker 中涉及到请求拦截，所以必须使用 HTTPS 协议来保障安全
+
+Service Worker 实现缓存功能一般分为三个步骤：首先需要先注册 Service Worker，然后监听到 install 事件以后就可以缓存需要的文件，那么在下次用户访问的时候就可以通过拦截请求的方式查询是否存在缓存，存在缓存的话就可以直接读取缓存文件，否则就去请求数据。以下是这个步骤的实现:
+
+```js
+// index.js
+if (navigator.serviceWorker) {
+  navigator.serviceWorker
+    .register('sw.js')
+    .then(function(registration) {
+      console.log('service worker 注册成功')
+    })
+    .catch(function(err) {
+      console.log('servcie worker 注册失败')
+    })
+}
+// sw.js
+// 监听 `install` 事件，回调中缓存所需文件
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open('my-cache').then(function(cache) {
+      return cache.addAll(['./index.html', './index.js'])
+    })
+  )
+})
+// 拦截所有请求事件
+// 如果缓存中已经有请求的数据就直接用缓存，否则去请求数据
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(function(response) {
+      if (response) {
+        return response
+      }
+      console.log('fetch source')
+    })
+  )
+})
+
+```
+
+打开页面，可以在开发者工具中的 Application 看到 Service Worker 已经启动了：
+
+![](./static/w_1.png)
+
+在 Cache 中也可以发现所需的文件已被缓存：
+
+![](./static/w_2.png)

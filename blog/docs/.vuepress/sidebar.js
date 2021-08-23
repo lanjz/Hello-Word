@@ -186,9 +186,9 @@ module.exports = {
   '/HTML5/': [
     '/HTML5/HTML5新特性',
     '/HTML5/SVG',
-    '/HTML5/WebWorker',
-    '/HTML5/ShareWorker',
+    '/HTML5/Worker',
     '/HTML5/Preload和Prefetch',
     '/HTML5/IntersectionObserver',
+    '/HTML5/requestIdleCallback和requestAnimationFrame',
   ]
 }
