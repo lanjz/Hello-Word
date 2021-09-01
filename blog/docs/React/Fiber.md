@@ -2,7 +2,9 @@
 
 Fiber 就是 React 16 实现的一套新的更新机制，让 React 的更新过程变得可控，避免了之前采用递归需要一气呵成影响性能的做法
 
-## React 颈
+## React 瓶颈
+
+**React 的核心思想：** 内存中维护一颗虚拟DOM树，数据变化时（setState），自动更新虚拟 DOM，得到一颗新树，然后 Diff 新老虚拟 DOM 树，找到有变化的部分，得到一个 Change(Patch)，将这个 Patch 加入队列，最终批量更新这些 Patch 到 DOM 中
 
 React 追求的是 “快速响应”，那么，“快速响应“的制约因素都有什么呢？
 
@@ -18,7 +20,7 @@ React 追求的是 “快速响应”，那么，“快速响应“的制约因�
 
 Vue3.0 提出动静结合的 DOM diff 思想，动静结合的 DOM diff 其实是在预编译阶段进行了优化。之所以能够做到预编译优化，是因为 Vue core 可以静态分析 template，在解析模版时，整个 parse 的过程是利用正则表达式顺序解析模板，当解析到开始标签、闭合标签和文本的时候都会分别执行对应的回调函数，来达到构造 AST 树的目的。
 
-借助预编译过程，Vue 可以做到的预编译优化就很强大了。比如在预编译时标记出模版中可能变化的组件节点，再次进行渲染前 diff 时就可以跳过“永远不会变化的节点”，而只需要对比“可能会变化的动态节点”。这也就是动静结合的 DOM diff 将 diff 成本与模版大小正相关优化到与动态节点正相关的理论依据。
+借助静态编译过程，Vue 可以做很多优化。比如在预编译时标记出模版中的动态节点和静态节点，再次进行渲染前 diff 时就可以跳过“永远不会变化的节点”，而只需要对比“可能会变化的动态节点”。从而提高了 diff 和组件更新的效率
 
 **React**
 
@@ -62,17 +64,78 @@ React.createElement(
 
 - Template 模板是一种非常有约束的语言，你只能以某种方式去编写模板。
 
-:::error
-以上部分需要进一步核实
+### React 15 架构
+
+React15架构可以分为两层：
+
+Reconciler（协调器）—— React 会自顶向下通过递归，遍历新数据生成新的 Virtual DOM，然后通过 Diff 算法，找到需要变更的元素(Patch)，放到更新队列里面去
+
+Renderer（渲染器）—— 遍历更新队列，通过调用宿主环境的API，实际更新渲染对应元素。宿主环境，比如 DOM、Native、WebGL 等。
+
+在React15及以前，Reconciler 采用递归的方式创建虚拟DOM，递归过程是不能中断的。如果组件树的层级很深，递归会占用线程很多时间，递归更新时间超过了16ms，用户交互就会卡顿。
+
+为了解决这个问题，React16将递归的无法中断的更新重构为异步的可中断更新，由于曾经用于递归的虚拟DOM数据结构已经无法满足需要。于是，全新的Fiber架构应运而生。 
+
+
+
+### React 16 架构
+
+为了解决同步更新长时间占用线程导致页面卡顿的问题，也为了探索运行时优化的更多可能，React开始重构并一直持续至今。重构的目标是实现Concurrent Mode（并发模式）。
+
+从v15到v16，React团队花了两年时间将源码架构中的 Stack Reconciler 重构为 Fiber Reconciler
+
+React16架构可以分为三层：
+
+Scheduler（调度器）—— 调度任务的优先级，高优任务优先进入Reconciler
+
+Reconciler（协调器）—— 负责找出变化的组件：更新工作从递归变成了可以中断的循环过程Reconciler内部采用了Fiber的架构
+
+Renderer（渲染器）—— 负责将变化的组件渲染到页面上
+
+
+### React 17 优化
+
+React16的 expirationTimes模型 只能区分是否 `>=expirationTimes` 决定节点是否更新。React17的 lanes模型 可以选定一个更新区间，并且动态的向区间中增减优先级，可以处理更细粒度的更新
+
+:::tip
+Lane用二进制位表示任务的优先级，方便优先级的计算（位运算），不同优先级占用不同位置的“赛道”，而且存在批的概念，优先级越低，“赛道”越多。高优先级打断低优先级，新建的任务需要赋予什么优先级等问题都是Lane所要解决的问题
 :::
 
-Fiber 是 React 的最小工作单元，在理解 Fiber 之前，先总结一下与 Fiber 与另外两个元素 ReactElement、DOM 对象之间的关系
+Concurrent Mode的目的是实现一套可中断/恢复的更新机制。其由两部分组成：
 
-- ReactElement 对象: 所有采用jsx语法书写的节点, 都会被编译器转换, 最终会以 `React.createElement(...)` 的方式, 创建出来一个与之对应的 `ReactElement `对象
+- 一套协程架构：Fiber Reconciler
 
-- fiber 对象: fiber对象是通过 `ReactElement对象` 进行创建的, 多个 fiber对象 构成了一棵 fiber树, fiber树 是构造DOM树的数据模型, fiber树 的任何改动, 最后都体现到 DOM 树
+- 基于协程架构的启发式更新算法：控制协程架构工作方式的算法
 
-- DOM 对象: 文档对象模型
+为了解决之前提到解决方案遇到的问题，提出了以下几个目标：
+
+- 暂停工作，稍后再回来。
+
+- 为不同类型的工作分配优先权。
+
+- 重用以前完成的工作。
+
+- 如果不再需要，则中止工作。
+
+为了做到这些，我们首先需要一种方法将任务分解为单元。从某种意义上说，这就是 Fiber，Fiber 代表一种工作单元
+
+但是仅仅是分解为单元也无法做到中断任务，因为函数调用栈就是这样，每个函数为一个工作，每个工作被称为堆栈帧，它会一直工作，直到堆栈为空，无法中断
+
+所以我们需要一种增量渲染的调度，那么就需要重新实现一个堆栈帧的调度，这个堆栈帧可以按照自己的调度算法执行他们。另外由于这些堆栈是可以自己控制的，所以可以加入并发或者错误边界等功能。
+
+因此 Fiber 就是重新实现的堆栈帧，本质上 Fiber 也可以理解为是一个虚拟的堆栈帧，将可中断的任务拆分成多个子任务，通过按照优先级来自由调度子任务，分段更新，从而将之前的同步渲染改为异步渲染
+
+所以我们可以说 Fiber 是一种数据结构(堆栈帧)，也可以说是一种解决可中断的调用任务的一种解决方案，它的特性就是时间分片(time slicing)和暂停(supense)。
+
+## 什么是 Fiber
+
+Fiber 是 React 的最小工作单元，在理解 Fiber 之前，先梳理一下 Fiber 与 `ReactElement`、 DOM 对象之间的关系
+
+- ReactElement 对象: 所有采用 jsx 语法书写的节点, 都会被编译器转换, 最终会以 `React.createElement(...)` 的方式创建出来一个与之对应的 `ReactElement `对象
+
+- fiber 对象: fiber 对象是通过 `ReactElement对象` 进行创建的, 多个 `fiber对象` 构成了一棵 `fiber树`, `fiber树` 是构造 DOM 树的数据模型, `fiber树` 的任何改动, 最后都体现到 DOM 树
+
+- DOM 对象: 最终要呈现的目标也就是文档对象模型
 
 eg:
 
@@ -221,95 +284,27 @@ Virtual Dom 是对 渲染的 Dom 结构的对象表示，Fiber是对Virtual DOM�
 
 ## Fiber 更新
 
-React渲染页面的两个阶段
+**Fiber 是如何工作的**
 
-- 调度阶段（reconciliation）：在这个阶段 React 会更新数据生成新的 Virtual DOM，然后通过Diff算法，快速找出需要更新的元素，放到更新队列中去，得到新的更新队列
+当执行 `ReactDOM.render()` 和 `setState` 时更新步骤如下：
 
-- 渲染阶段（commit）：这个阶段 React 会遍历更新队列，将其所有的变更一次性更新到DOM上。
+1. 将创建的更新加入任务队列，等待调度
 
-### React 的核心思想
+2. 在 `requestIdleCallback` 空闲时执行任务
 
-内存中维护一颗虚拟DOM树，数据变化时（setState），自动更新虚拟 DOM，得到一颗新树，然后 Diff 新老虚拟 DOM 树，找到有变化的部分，得到一个 Change(Patch)，将这个 Patch 加入队列，最终批量更新这些 Patch 到 DOM 中
+3. 从根节点开始遍历 Fiber Node，并且构建 WokeInProgress Tree
 
-### React 15 架构
+4. 生成 effectList。
 
-React15架构可以分为两层：
-
-Reconciler（协调器）—— React 会自顶向下通过递归，遍历新数据生成新的 Virtual DOM，然后通过 Diff 算法，找到需要变更的元素(Patch)，放到更新队列里面去
-
-Renderer（渲染器）—— 遍历更新队列，通过调用宿主环境的API，实际更新渲染对应元素。宿主环境，比如 DOM、Native、WebGL 等。
-
-在React15及以前，Reconciler采用递归的方式创建虚拟DOM，递归过程是不能中断的。如果组件树的层级很深，递归会占用线程很多时间，递归更新时间超过了16ms，用户交互就会卡顿。
-
-为了解决这个问题，React16将递归的无法中断的更新重构为异步的可中断更新，由于曾经用于递归的虚拟DOM数据结构已经无法满足需要。于是，全新的Fiber架构应运而生。 
-
-### React 16 架构
-
-为了解决同步更新长时间占用线程导致页面卡顿的问题，也为了探索运行时优化的更多可能，React开始重构并一直持续至今。重构的目标是实现Concurrent Mode（并发模式）。
-
-从v15到v16，React团队花了两年时间将源码架构中的Stack Reconciler重构为Fiber Reconciler
-
-React16架构可以分为三层：
-
-Scheduler（调度器）—— 调度任务的优先级，高优任务优先进入Reconciler；
-Reconciler（协调器）—— 负责找出变化的组件：更新工作从递归变成了可以中断的循环过程。Reconciler内部采用了Fiber的架构；
-Renderer（渲染器）—— 负责将变化的组件渲染到页面上。
-
-### React 17 优化
-
-React16的expirationTimes模型只能区分是否>=expirationTimes决定节点是否更新。React17的lanes模型可以选定一个更新区间，并且动态的向区间中增减优先级，可以处理更细粒度的更新
-
-:::tip
-Lane用二进制位表示任务的优先级，方便优先级的计算（位运算），不同优先级占用不同位置的“赛道”，而且存在批的概念，优先级越低，“赛道”越多。高优先级打断低优先级，新建的任务需要赋予什么优先级等问题都是Lane所要解决的问题
-:::
-
-Concurrent Mode的目的是实现一套可中断/恢复的更新机制。其由两部分组成：
-
-- 一套协程架构：Fiber Reconciler
-
-- 基于协程架构的启发式更新算法：控制协程架构工作方式的算法
-
-为了解决之前提到解决方案遇到的问题，提出了以下几个目标：
-
-- 暂停工作，稍后再回来。
-
-- 为不同类型的工作分配优先权。
-
-- 重用以前完成的工作。
-
-- 如果不再需要，则中止工作。
-
-为了做到这些，我们首先需要一种方法将任务分解为单元。从某种意义上说，这就是 Fiber，Fiber 代表一种工作单元
-
-但是仅仅是分解为单元也无法做到中断任务，因为函数调用栈就是这样，每个函数为一个工作，每个工作被称为堆栈帧，它会一直工作，直到堆栈为空，无法中断
-
-所以我们需要一种增量渲染的调度，那么就需要重新实现一个堆栈帧的调度，这个堆栈帧可以按照自己的调度算法执行他们。另外由于这些堆栈是可以自己控制的，所以可以加入并发或者错误边界等功能。
-
-因此 Fiber 就是重新实现的堆栈帧，本质上 Fiber 也可以理解为是一个虚拟的堆栈帧，将可中断的任务拆分成多个子任务，通过按照优先级来自由调度子任务，分段更新，从而将之前的同步渲染改为异步渲染
-
-所以我们可以说 Fiber 是一种数据结构(堆栈帧)，也可以说是一种解决可中断的调用任务的一种解决方案，它的特性就是时间分片(time slicing)和暂停(supense)。
-
-### Fiber 是如何工作的
-
-- ReactDOM.render() 和 setState 的时候开始创建更新。
-
-- 将创建的更新加入任务队列，等待调度。
-
-- 在 requestIdleCallback 空闲时执行任务。
-
-- 从根节点开始遍历 Fiber Node，并且构建 WokeInProgress Tree。
-
-- 生成 effectList。
-
-- 根据 EffectList 更新 DOM。
+5. 根据 EffectList 更新 DOM
 
 下面是一个详细的执行过程图：
 
 ![](./images/f_4.jpeg)
 
-1. 第一部分从 ReactDOM.render() 方法开始，把接收的 React Element 转换为 Fiber 节点，并为其设置优先级，创建 Update，加入到更新队列，这部分主要是做一些初始数据的准备。
+1. 第一部分从 `ReactDOM.render()` 方法开始，把接收的 React Element 转换为 Fiber 节点，并为其设置优先级，创建 Update，加入到更新队列，这部分主要是做一些初始数据的准备。
 
-2. 第二部分主要是三个函数：scheduleWork、requestWork、performWork，即安排工作、申请工作、正式工作三部曲，React 16 新增的异步调用的功能则在这部分实现，这部分就是 Schedule 阶段，前面介绍的 Cooperative Scheduling 就是在这个阶段，只有在这个解决获取到可执行的时间片，第三部分才会继续执行。具体是如何调度的，后面文章再介绍，这是 React 调度的关键过程。
+2. 第二部分主要是三个函数：scheduleWork、requestWork、performWork，即安排工作、申请工作、正式工作三部曲，React 16 新增的异步调用的功能则在这部分实现，这部分就是 Schedule 阶段，在这个获取到可执行的时间片，第三部分才会继续执行。具体是如何调度的，后面文章再介绍，这是 React 调度的关键过程。
 
 3. 第三部分是一个大循环，遍历所有的 Fiber 节点，通过 Diff 算法计算所有更新工作，产出 EffectList 给到 commit 阶段使用，这部分的核心是 beginWork 函数，这部分基本就是 Fiber Reconciler ，包括 reconciliation 和 commit 阶段。
 
@@ -318,7 +313,30 @@ Concurrent Mode的目的是实现一套可中断/恢复的更新机制。其由�
 FIber Node，承载了非常关键的上下文信息，可以说是贯彻整个创建和更新的流程，下来分组列了一些重要的 Fiber 字段
 
 ```js
-{  ...  // 跟当前Fiber相关本地状态（比如浏览器环境就是DOM节点）  stateNode: any,    // 单链表树结构  return: Fiber | null,// 指向他在Fiber节点树中的`parent`，用来在处理完这个节点之后向上返回  child: Fiber | null,// 指向自己的第一个子节点  sibling: Fiber | null,  // 指向自己的兄弟结构，兄弟节点的return指向同一个父节点  // 更新相关  pendingProps: any,  // 新的变动带来的新的props  memoizedProps: any,  // 上一次渲染完成之后的props  updateQueue: UpdateQueue<any> | null,  // 该Fiber对应的组件产生的Update会存放在这个队列里面  memoizedState: any, // 上一次渲染的时候的state  // Scheduler 相关  expirationTime: ExpirationTime,  // 代表任务在未来的哪个时间点应该被完成，不包括他的子树产生的任务  // 快速确定子树中是否有不在等待的变化  childExpirationTime: ExpirationTime, // 在Fiber树更新的过程中，每个Fiber都会有一个跟其对应的Fiber  // 我们称他为`current <==> workInProgress`  // 在渲染完成之后他们会交换位置  alternate: Fiber | null,  // Effect 相关的  effectTag: SideEffectTag, // 用来记录Side Effect  nextEffect: Fiber | null, // 单链表用来快速查找下一个side effect  firstEffect: Fiber | null,  // 子树中第一个side effect  lastEffect: Fiber | null, // 子树中最后一个side effect  ....};
+{  ... 
+ // 跟当前Fiber相关本地状态（比如浏览器环境就是DOM节点） 
+ stateNode: any,    // 单链表树结构
+ return: Fiber | null,// 指向他在Fiber节点树中的`parent`，用来在处理完这个节点之后向上返回 
+ child: Fiber | null,// 指向自己的第一个子节点
+ sibling: Fiber | null,  // 指向自己的兄弟结构，兄弟节点的return指向同一个父节点  
+ // 更新相关 
+ pendingProps: any,  // 新的变动带来的新的props
+ memoizedProps: any,  // 上一次渲染完成之后的props
+ updateQueue: UpdateQueue<any> | null,  // 该Fiber对应的组件产生的Update会存放在这个队列里面 
+  memoizedState: any, // 上一次渲染的时候的state 
+ // Scheduler 相关
+ expirationTime: ExpirationTime,  // 代表任务在未来的哪个时间点应该被完成，不包括他的子树产生的任务  // 快速确定子树中是否有不在等待的变化
+ childExpirationTime: ExpirationTime, 
+// 在Fiber树更新的过程中，每个Fiber都会有一个跟其对应的Fiber 
+// 我们称他为`current <==> workInProgress`
+// 在渲染完成之后他们会交换位置 
+// alternate: Fiber | null,  
+// Effect 相关的 
+ effectTag: SideEffectTag, // 用来记录Side Effect 
+  nextEffect: Fiber | null, // 单链表用来快速查找下一个side effect
+  firstEffect: Fiber | null,  // 子树中第一个side effect  
+  lastEffect: Fiber | null, // 子树中最后一个side effect 
+ ....};
 ```
 
 ### Fiber Reconciler
@@ -339,14 +357,19 @@ reconcile 过程分为2个阶段（phase）：
 
 render 阶段可以理解为就是 Diff 的过程，得出 Change(Effect List)，会执行声明如下的声明周期方法：
 
-[UNSAFE_]componentWillMount（弃用）
-[UNSAFE_]componentWillReceiveProps（弃用）
-getDerivedStateFromProps
-shouldComponentUpdate
-[UNSAFE_]componentWillUpdate（弃用）
-render
+- [UNSAFE_]componentWillMount（弃用） 
 
-由于 reconciliation 阶段是可中断的，一旦中断之后恢复的时候又会重新执行，所以很可能 reconciliation 阶段的生命周期方法会被多次调用，所以在 reconciliation 阶段的生命周期的方法是不稳定的，我想这也是 React 为什么要废弃 componentWillMount 和 componentWillReceiveProps方法而改为静态方法 getDerivedStateFromProps 的原因吧。
+- [UNSAFE_]componentWillReceiveProps（弃用） 
+
+- getDerivedStateFromProps  
+
+- shouldComponentUpdate  
+
+- [UNSAFE_]componentWillUpdate（弃用） 
+
+- render
+
+由于 reconciliation 阶段是可中断的，一旦中断之后恢复的时候又会重新执行，所以很可能 reconciliation 阶段的生命周期方法会被多次调用，所以在 reconciliation 阶段的生命周期的方法是不稳定的，我想这也是 React 为什么要废弃 `componentWillMount` 和 `componentWillReceiveProps` 方法而改为静态方法 `getDerivedStateFromProps` 的原因吧。
 
 ### commit 阶段
 
@@ -393,10 +416,4 @@ WorkInProgress Tree 构造完毕，得到的就是新的 Fiber Tree，然后喜�
 
 创建 WorkInProgress Tree 的过程也是一个 Diff 的过程，Diff 完成之后会生成一个 Effect List，这个 Effect List 就是最终 Commit 阶段用来处理副作用的阶段
 
-## 总结
-
-本开始想一篇文章把 Fiber 讲透的，但是写着写着发现确实太多了，想写详细，估计要写几万字，所以我这篇文章的目的仅仅是在没有涉及到源码的情况下梳理了大致 React 的工作流程，对于细节，比如如何调度异步任务、如何去做 Diff 等等细节将以小节的方式一个个的结合源码进行分析。
-
-
-
-https://zhuanlan.zhihu.com/p/98295862
+[深入理解 React Fiber](https://zhuanlan.zhihu.com/p/98295862)
