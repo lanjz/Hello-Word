@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+  function walk(str) {
+    let left = 0
+    let right = 0
+    let dot = 0
+    for (let n = 0; n < str.length; n++) {
+      let i = str[n]
+      if(i === '{') {
+        left++
+      } else if(i === '}') {
+        right++
+      } else if(i === '.') {
+        dot++
+      }
+      if((left + dot) < right) {
+        return false
+      }
+    }
+    left = 0
+    right = 0
+    dot = 0
+    for (let n = str.length - 1; n >= 0; n--) {
+      let i = str[n]
+      if(i === '{') {
+        left++
+      } else if(i === '}') {
+        right++
+      } else if(i === '.') {
+        dot++
+      }
+      if((right + dot) < left) {
+        return false
+      }
+    }
+    return (left + right + dot) % 2 === 0
+  }
+
+  console.log(walk)
+</script>
+</html>
