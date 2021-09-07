@@ -6,7 +6,7 @@
 
 **一个块格式化上下文由以下之一创建：**
 
-- `display: flow-root`
+- `display: flow-root` 或表格布局或者弹性布局
 
 - 内联块 (元素具有 `display: inline-block`)
 

@@ -69,6 +69,7 @@ module.exports = {
     '/CSS/BFC和IFC',
     '/CSS/适配iponeX',
     '/CSS/样式实现',
+    '/CSS/Image',
   ],
   '/Browser/': [
     '/Browser/浏览器中的进程与线程',
