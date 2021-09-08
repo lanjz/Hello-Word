@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+
+  function deepCopy(obj) {
+    let typeMap = new WeakSet()
+    let walk = (tar) => {
+      if(typeof tar !== 'object') {
+        return tar
+      }
+      if(typeMap.has(tar)) {
+        return tar
+      }
+      typeMap.add(tar)
+      let tem = {}
+      let type = Object.prototype.toString.call(tar)
+      const Constructor = tar.constructor
+      if(Constructor === Date) {
+        return new Constructor(tar.getTime())
+      }
+      if(type === '[object Function]') {
+        return tar
+      } else if(type === '[object Array]') {
+        tem = []
+      }
+      Object.keys(tar).forEach(key => {
+        tem[key] = walk(tar[key])
+      })
+      return tem
+    }
+    return walk(obj)
+  }
+</script>
+</html>
