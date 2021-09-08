@@ -51,7 +51,7 @@ module.exports = {
     '/ES6/Map和WeakMap',
     '/ES6/Promise',
     '/ES6/Iterator',
-    '/ES6/Generater',
+    '/ES6/Generator',
     '/ES6/async函数',
     '/ES6/Proxy',
     '/ES6/Class',
