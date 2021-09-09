@@ -9,6 +9,16 @@ JavaScript 模块加载类型
 
 Node 模块管理是使用的 CommonJS 规范
 
+**require 的模块加载机制**
+
+1. 计算模块的绝对路径
+
+2. 如果缓存中有该模块，则从缓存中取出该模块 
+
+3. 按优先级依次寻找并编译执行模块，将模块推入缓存（require.cache）中
+
+4. 输出模块的 exports 属性
+
 ## 模块引入
 
 在 Node 引入模块时，需要经过三个步骤：
@@ -18,8 +28,6 @@ Node 模块管理是使用的 CommonJS 规范
 2. 文件定位
 
 3. 编译执行
-
-
 
 :::tip
 1. node 对引入过的模块都会缓存处理，下次再引用相同模块将会从缓存中直接获取，这种缓存是基于文件路径定位的，这表示即使两个相同的文件，但它们位于不同的路径下，也会缓存维持两份
@@ -127,6 +135,32 @@ console.log(global.a) // 10
 this.a = 10
 console.log(module.exports) // { a: 10 }
 ```
+
+## CommonJS 模块的循环加载
+
+CommonJS 模块的重要特性是加载时执行，即脚本代码在 `require` 的时候，就会全部执行。一旦出现某个模块被"循环加载"，就只输出已经执行的部分，还未执行的部分不会输出
+
+```js
+// a.js
+exports.done = false;
+var b = require('./b.js');
+console.log('在 a.js 之中，b.done = %j', b.done);
+exports.done = true;
+console.log('a.js 执行完毕');
+
+// b.js
+exports.done = false;
+var a = require('./a.js');
+console.log('在 b.js 之中，a.done = %j', a.done);
+exports.done = true;
+console.log('b.js 执行完毕');
+```
+
+上面代码之中，`a.js` 脚本先输出一个 `done` 变量，然后加载另一个脚本文件 `b.js` 。注意，此时 `a.js` 代码就停在这里，等待 `b.js` 执行完毕，再往下执行
+
+`b.js` 执行到第二行，就会去加载 `a.js` ，这时，就发生了“循环加载”。系统会去 `a.js` 模块对应对象的 `exports` 属性取值，可是此时 `a.js` 只执行了 `exports.done = false`，所以从 `a.js` 只输入一个变量 `done` ，值为 `false`
+
+然后，`b.js` 接着往下执行，等到全部执行完毕，再把执行权交还给 `a.js` 。于是，`a.js` 接着往下执行，直到执行完毕
 
 ## 思考
 
