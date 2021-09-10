@@ -37,5 +37,15 @@
     }
     return walk(obj)
   }
+
+  window.onerror = function () {
+    console.log('生成了错误')
+  }
+  try {
+    console.log('try')
+    throw new Error('try里抛出错误')
+  } catch (e) {
+    console.log('e', e)
+  }
 </script>
 </html>
