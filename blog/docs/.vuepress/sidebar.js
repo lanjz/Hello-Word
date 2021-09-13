@@ -151,8 +151,7 @@ module.exports = {
     '/network/TCP',
     '/network/keep-alive',
     '/network/WebSocket',
-    '/network/网络层的优化',
-    '/network/性能指标',
+    '/network/网络层的优化'
   ],
   '/Node/基础/': [
     '/Node/基础/认识Node',

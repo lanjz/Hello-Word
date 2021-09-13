@@ -8,11 +8,47 @@
 
 </body>
 <script>
-  function repeat(data){
-    data = data.flat(Infinity).sort((a, b) => a-b)
-    return [...new Set(data)]
+  /*  function repeat(data){
+      data = data.flat(Infinity).sort((a, b) => a-b)
+      return [...new Set(data)]
+    }
+    console.log(repeat([ [1, 2, 2], [3, 4, 5, 5], [6, 7, 8, 9, [11, 12, [12, 13, [14] ] ] ], 10]))*/
+
+  function firstMissingPositive(nums) {
+    let j = 0
+    while (j < nums.length) {
+      if(nums[j] === undefined || nums[j] < 0 || nums[j] === nums[nums[j]]) {
+        j++
+      } else {
+        let tem = nums[nums[j]]
+        nums[nums[j]] = nums[j]
+        nums[j] = tem
+      }
+    }
+    return nums
   }
-  console.log(repeat([ [1, 2, 2], [3, 4, 5, 5], [6, 7, 8, 9, [11, 12, [12, 13, [14] ] ] ], 10]))
+
+  console.log(firstMissingPositive([3, 1, -1, 0, -2, 2, 6, 4]))
+
+  function myInterval(fn, timer) {
+    let timeOut = null
+    let action = () => {
+      timeOut = setTimeout(() => {
+        fn()
+        action()
+      }, timer)
+    }
+    action()
+    return function () {
+      clearTimeout(timeOut)
+    }
+  }
+
+  function con() {
+    console.log(Date.now())
+  }
+
+  console.log('myInterval', myInterval(con, 1000))
 </script>
 </html>
 
