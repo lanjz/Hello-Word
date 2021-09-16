@@ -48,6 +48,7 @@ module.exports = {
           {text: 'yarn&npm', link: '/Node/Package/'},
           {text: 'Webpack', link: '/Node/Webpack/'},
           {text: 'Vite', link: '/Node/Vite/'},
+          {text: 'esbuild', link: '/Node/ESBuild/'},
           {text: 'SQL', link: '/Node/数据库/'},
           /*  {
              text: 'Webpack',
