@@ -1,6 +1,8 @@
 # ReactDOM.render
 
-`ReactDOM.render` 用于初次渲染时将 React 应用挂载在 DOM 元素上
+`ReactDOM.render(element, container[, callback])`
+
+eg:
 
 ```js
 const root = document.createElement('div')
@@ -12,37 +14,63 @@ const App = (<h2>Hello World!</h2>)
 render(App, root)
 ```
 
+在提供的 `container` 里渲染一个 React 元素，并返回对该组件的引用（或者针对无状态组件返回 `null`）
+
+如果 React 元素之前已经在 `container` 里渲染过，这将会对其执行更新操作，并仅会在必要时改变 DOM 以映射最新的 React 元素
+
+如果提供了可选的回调函数，该回调将在组件被渲染或更新之后被执行
+
+::: warning
+`ReactDOM.render()` 会控制你传入容器节点里的内容。当首次调用时，容器节点里的所有 DOM 元素都会被替换，后续的调用则会使用 React 的 DOM 差分算法（DOM diffing algorithm）进行高效的更新。
+
+`ReactDOM.render()` 不会修改容器节点（只会修改容器的子节点）。可以在不覆盖现有子节点的情况下，将组件插入已有的 DOM 节点中。
+
+`ReactDOM.render()` 目前会返回对根组件 ReactComponent 实例的引用。 但是，目前应该避免使用返回的引用，因为它是历史遗留下来的内容，而且在未来版本的 React 中，组件渲染在某些情况下可能会是异步的。 如果你真的需要获得对根组件 ReactComponent 实例的引用，那么推荐为根元素添加 `callback ref`。
+
+使用 `ReactDOM.render()` 对服务端渲染容器进行 hydrate 操作的方式已经被废弃，并且会在 React 17 被移除。作为替代，请使用 `hydrate()`。
+:::
+
+`ReactDOM.render` 用于初次渲染时将 React 应用挂载在 DOM 元素上
+
+对于 React 项目，平时会以 jsx 的格式进行开发，但是 jsx 并不是标准的格式，所以需要 label 进行转议，以上面 eg 代码为例，最终会转换成以下形式的代码：
+
+```js
+const root = document.createElement("div");
+root.id = "app";
+document.body.appendChild(root);
+const App = /*#__PURE__*/ React.createElement("h2", null, "Hello World!");
+render(App, root);
+```
+
+jsx 编写的组件会转议成 `React.createElement` 的形式，所以 React 最终是通过 `React.createElement` 来创建一个 `reactElement` 
+
+在现在的 React 中 `reactElement` 也被称为是 `fiber 树`，`fiber树` 是 DOM 树的数据模型
+
+## 源码跟踪
+
 `ReactDom.render` 的源码定义：
 
 ```js
 function render(element, container, callback) {
-  if (!isValidContainer(container)) {
-    {
-      throw Error( "Target container is not a DOM element." );
-    }
-  }
-
-  {
-    var isModernRoot = isContainerMarkedAsRoot(container) && container._reactRootContainer === undefined;
-
-    if (isModernRoot) {
-      error('You are calling ReactDOM.render() on a container that was previously ' + 'passed to ReactDOM.createRoot(). This is not supported. ' + 'Did you mean to call root.render(element)?');
-    }
-  }
-
+  // 忽略部分代码
   return legacyRenderSubtreeIntoContainer(null, element, container, false, callback);
 }
 ```
 
-实际上执行的 `legacyRenderSubtreeIntoContainer(null, element, container, false, callback)` 方法
+执行 `ReactDOM.render` 返回的  `legacyRenderSubtreeIntoContainer` 方法函数调用的结果，该方法传入五个参数：
+
+- `null`: `parentComponent`
+
+- `element`：`ReactDOM.render` 的第一个参数，React 元素也就是一个 `ReactElement`
+
+- `container` ： `ReactDOM.render` 的第二个参数，挂载 React 元素的一个 element容器
+
+- `false`： `forceHydrate` 服务端渲染用的，可以忽略
+
+- `callback`：`ReactDOM.render` 的第三个参数，一个回调函数
 
 ```js
 function legacyRenderSubtreeIntoContainer(parentComponent, children, container, forceHydrate, callback) {
-  {
-    topLevelUpdateWarnings(container);
-    warnOnInvalidCallback$1(callback === undefined ? null : callback, 'render');
-  } // TODO: Without `any` type, Flow says "Property cannot be accessed on any
-  // member of intersection type." Whyyyyyy.
 
   var root = container._reactRootContainer;
   var fiberRoot;
