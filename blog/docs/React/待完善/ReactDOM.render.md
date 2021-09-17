@@ -1,5 +1,7 @@
 # ReactDOM.render
 
+https://segmentfault.com/a/1190000021883117
+
 `ReactDOM.render(element, container[, callback])`
 
 eg:
