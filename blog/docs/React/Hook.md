@@ -292,7 +292,7 @@ useEffect(()=>{
 **componentDidCatch and getDerivedStateFromError：目前还没有这些方法的 Hook 等价写法**
  
 
-## State Hook
+## useState
 
 使用官方的例子： 
 
@@ -302,7 +302,6 @@ import React, { useState } from 'react';
 function Example() {
   // 声明一个叫 "count" 的 state 变量
   const [count, setCount] = useState(0);
-
   return (
     <div>
       <p>You clicked {count} times</p>
@@ -322,8 +321,74 @@ function Example() {
 
 - 使用 `setCount` 方法进行修改这个 `count` 的值
 
-我们单从代码角度去分析这个 `useState` 方法，我们给这个方法传入一个参数 `0` ，这个方法返回当前 `state` 以及更新 `state` 的函数,
-例子中我们使用了 `[count, setCount]` 去接收它们
+:::tip
+更新state变量的方法，并不会像this.setState一样，合并state。而是替换state变量
+:::
+
+### 手写useState
+
+```js
+let lastState
+function useState(initState) {
+    lastState = lastState || initState;
+    function setState(newState) {
+        lastState = newState
+        render()
+    }
+    return [lastState,setState]
+}
+function App(){
+    const [count, setCount] = useState(0);
+    return (
+        <div>
+            {count}
+            <button
+                onClick={() => {
+                    setCount(count + 1);
+                }}
+            >
+                增加
+            </button>
+        </div>
+    );
+}
+// 新增方法
+function render(){
+    ReactDOM.render(
+        <App />,
+        document.getElementById('root')
+    );
+}
+render()
+```
+
+如代码所示，我们自己创建了一个 `useState` 方法
+
+- 如果是第一次使用，则取 `initState` 的值，否则就取上一次的值 `laststate`
+
+- 内部创建了一个 `setState` 方法，该方法用于更新 `state` 的值和触发 `render` 更新
+
+- 最后返回一个 `lastSate` 属性和 `setState` 方法
+
+这里只是用了一个useState，要是我们使用了很多个呢？难道要声明很多个全局变量吗？这显然是不行的，所以，我们可以设计一个全局数组来保存这些 `state`
+
+```js
+let lastState = []
+let stateIndex = 0
+function useState(initState) {
+    lastState[stateIndex] = lastState[stateIndex] || initState;
+    const currentIndex = stateIndex
+    function setState(newState) {
+        lastState[currentIndex] = newState
+        render()
+    }
+    return [lastState[stateIndex++],setState]
+}
+```
+
+这里的 `currentIndex` 是利用了闭包的思想，将某个 `state` 相应的 `index` 记录下来了
+
+https://cloud.tencent.com/developer/article/1784501?from=article.detail.1843869
 
 ## Effect Hook
 

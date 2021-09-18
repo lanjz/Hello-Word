@@ -1,7 +1,5 @@
 # ReactDOM.render
 
-https://segmentfault.com/a/1190000021883117
-
 `ReactDOM.render(element, container[, callback])`
 
 eg:
@@ -238,21 +236,28 @@ function createFiberRoot(containerInfo, tag, hydrate, hydrationCallbacks) {
 
 ![](./images/render_2.png)
 
-### 小总结
+### 小结
 
-函数体内主要做以下两件事情：
+- root = container._reactRootContainer = ReactDOMBlockingRoot
 
-`legacyCreateRootFromDOMContainer(container,false,)` 创建 `FilberRoot` 并保存到 `container._reactRootContainer` 属性中
+- root._internalRoot = fiberRootNode
 
-- `FilberRoot` 包含了一些可以将虚拟 `dom` 变成 `dom` 树挂载到根节点上的方法
+root 对象（container._reactRootContainer）上有一个 `_internalRoot` 属性，这个 `_internalRoot` 也就是一个 FiberRootNode 对象，其中包含一个 `current` 属性，`current` 对象是一个 Fiber节点，不仅如此，它还是当前 Fiber 树的头部节点
 
-然后执行 `unbatchedUpdates()` 方法，这个方法是执行执行回调即 `updateContainer(children, fiberRoot, parentComponent, callback)`，`updateContainer()` 的作用是更新 `container`
+所以在执行 `unbatchedUpdates()` 之前 `render` 主要是 **完成 Fiber 树中基本实体的创建** 其中
+
+- fiberRoot 的关联对象是真实 DOM 的容器节点
+
+- rootFiber 则作为虚拟 DOM 的根节点存在
+
+接下来，`fiberRoot` 将和 `ReactDOM.render` 方法的其他入参一起，被传入 `updateContainer` 方法，从而形成一个回调。这个回调，正是接下来要调用的 `unbatchedUpdates` 方法的入参
 
 ### unbatchedUpdates
 
 ```js
 function unbatchedUpdates(fn, a) {
  var prevExecutionContext = executionContext;
+ // 这里是对上下文的处理，不用关注
  // 去除executionContext上的BatchedContext
  executionContext &= ~BatchedContext;
  // 往executionContext上添加LegacyUnbatchedContext
@@ -261,9 +266,10 @@ function unbatchedUpdates(fn, a) {
  try {
    return fn(a);
  } finally {
+    // finally 逻辑里是对回调队列的处理，此处不用太关注
    executionContext = prevExecutionContext;
    if (executionContext === NoContext) {
-      / 刷新同步任务队列
+      // 刷新同步任务队列
      flushSyncCallbackQueue();
    }
  }
@@ -296,15 +302,7 @@ function updateContainer(element, container, parentComponent, callback) {
   var current$1 = container.current;
   // 计算新开始的时间
   var currentTime = requestCurrentTimeForUpdate();
-
-  {
-    // $FlowExpectedError - jest isn't a global, and isn't recognized outside of tests
-    if ('undefined' !== typeof jest) {
-      warnIfUnmockedScheduler(current$1);
-      warnIfNotScopedWithMatchingAct(current$1);
-    }
-  }
-
+ // 创建优先级
   var suspenseConfig = requestCurrentSuspenseConfig();
   // 计算过期时间
   var expirationTime = computeExpirationForFiber(currentTime, current$1, suspenseConfig);
@@ -322,13 +320,14 @@ function updateContainer(element, container, parentComponent, callback) {
       didWarnAboutNestedUpdates = true;
     }
   }
-  // 创建更新的时间节点
+  // 结合 suspenseConfig（优先级）信息，创建 update 对象，一个 update 对象意味着一个更新
   var update = createUpdate(expirationTime, suspenseConfig); // Caution: React DevTools currently depends on this property
-  // being called "element".
 
+  // update 的 payload 对应的是一个 React 元素
   update.payload = {
     element: element
   };
+// 处理 callback，这个 callback 其实就是我们调用 ReactDOM.render 时传入的 callback
   callback = callback === undefined ? null : callback;
 
   if (callback !== null) {
@@ -340,6 +339,7 @@ function updateContainer(element, container, parentComponent, callback) {
 
     update.callback = callback;
   }
+ // 将 update 入队
   // 一整个React应用中，会有多次更新，而这多次更新均在更新队列中
   enqueueUpdate(current$1, update);
   //进行任务调度
@@ -351,49 +351,25 @@ function updateContainer(element, container, parentComponent, callback) {
 }
 ```
 
-此时传进来的参数如下：
+`updateContainer` 函数最关键的事情可以总结为三件：
 
-- `element`：要渲染的组件（App）
+1. 创建当前 Fiber 节点的 suspenseConfig（优先级）
 
-- `container`: 当前的 `root Fiber`
+2. 结合 suspenseConfig（优先级），创建当前 Fiber 节点的 `update` 对象，并将其入队
 
-- `parentComponent`: `null`
+3. 调度当前节点（rootFiber）。
 
-- `callback`: `null`
+`scheduleUpdateOnFiber` 函数的任务是调度当前节点的更新。在这个函数中，会处理一系列与优先级、打断操作相关的逻辑。但是在 `ReactDOM.render` 发起的首次渲染链路中，这些意义都不大，因为这个渲染过程其实是同步的
 
-函数主要做的事情：
+具体的更新过程另外放个章节研究
 
-1. `var currentTime = requestCurrentTimeForUpdate()` 获取当前的时间，这个时间是以 V8 引擎上最大31位整数 1073741823 为根据的
+## 总结
 
-2. `requestCurrentSuspenseConfig()` 先略，紧接着通过 `var expirationTime = computeExpirationForFiber(currentTime, current$1, suspenseConfig)` 获取过期时间
+**ReactDOM.render** 做的事情核心就做两件事件
 
-  `suspenseConfig` 的作用是每到过期时间，就更新 `container`
+1. 创建 FiberNode
 
-  `current$1` 是 `container.current` 也是上一步执行 `createFiberRoot()` 方法创建的，它表示一个 `Fiber`
+2. 发布调试任务，更新更新
 
-4. `var update = createUpdate(expirationTime, suspenseConfig)`: 创建更新的时间节点
-
-5. `enqueueUpdate(current$1, update); scheduleWork(current$1, expirationTime);` 进行任务调度，先略
-
-6. 最后返回过期时间 `expirationTime`
-
-之后回到 `legacyRenderSubtreeIntoContainer()` 函数执行最后的 `getPublicRootInstance(fiberRoot)` 方法
-
-   ```js
-   // 获取root实例
-   function getPublicRootInstance(container) {
-     var containerFiber = container.current;
-
-     if (!containerFiber.child) {
-       return null;
-     }
-
-     switch (containerFiber.child.tag) {
-       case HostComponent:
-         return getPublicInstance(containerFiber.child.stateNode);
-
-       default:
-         return containerFiber.child.stateNode;
-     }
-   }
-   ```
+> [深入react-ReactDOM.render](https://segmentfault.com/a/1190000021883117)  
+> [深入理解ReactDOM.render 是如何串联渲染链路的全过程](https://cloud.tencent.com/developer/article/1843869)

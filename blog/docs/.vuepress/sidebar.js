@@ -109,6 +109,7 @@ module.exports = {
     '/Vue3/预渲染',
   ],
   '/React/': [
+    '/React/ReactDOM.render',
     '/React/Fiber',
     '/React/时间切片',
     '/React/高阶组件',
