@@ -369,7 +369,7 @@ function updateContainer(element, container, parentComponent, callback) {
 
 1. 创建 FiberNode
 
-2. 发布调试任务，更新更新
+2. 发布调度任务，进行更新
 
 > [深入react-ReactDOM.render](https://segmentfault.com/a/1190000021883117)  
 > [深入理解ReactDOM.render 是如何串联渲染链路的全过程](https://cloud.tencent.com/developer/article/1843869)

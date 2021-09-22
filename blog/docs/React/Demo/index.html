@@ -14,12 +14,25 @@
 <script src="https://cdn.bootcss.com/babel-standalone/6.24.0/babel.js"></script>
 <script type="text/babel">
     window.onload = function () {
-      React.useState()
         class App extends React.Component {
+            constructor(props) {
+                super(props);
+                // 不要在这里调用 this.setState()
+                this.state = {list: [1, 2, 3]};
+                this.update = this.update.bind(this)
+            }
+
+            update() {
+                this.setState({
+                    list: [1, 2]
+                })
+            }
+
             render() {
                 return (
                     <div className="game">
-                        <div className="game-board">
+                        {this.state.list.map(it => <span>{it}</span>)}
+                        <div className="game-board" onClick={this.update}>
                             game-board
                         </div>
                         <div className="game-info">
