@@ -113,6 +113,7 @@ module.exports = {
     '/React/ReactDOM.render',
     '/React/Fiber',
     '/React/时间切片',
+    '/React/Diff',
     '/React/高阶组件',
     '/React/React16新特性',
     '/React/Hook',

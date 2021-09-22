@@ -70,9 +70,9 @@ React diff算法策略：
 
 React 以前的 Diff 算法就是基于树的，现在则整体的数据结构从树改为了链表结构，链表的每一个节点是 Fiber
 
-React16 的 diff 策略采用从链表头部开始比较的算法，是层次遍历，算法是建立在一个节点的插入、删除、移动等操作都是在节点树的同一层级中进行的
+React16 的 diff 策略采用从链表头部开始比较的算法，是层次遍历，算法是建立在一个节点的插入、删除、移动等操作且这些都是在节点树的同一层级中进行的
 
-对于 Diff， 新老节点的对比，我们以新节点为标准，然后来构建整个 currentInWorkProgress，对于新的 children 会有四种情况
+对于新老节点的对比，我们以新节点为基础来构建整个 currentInWorkProgress，对于新的 children 会有四种情况
 
 - TextNode(包含字符串和数字)
 
@@ -82,9 +82,36 @@ React16 的 diff 策略采用从链表头部开始比较的算法，是层次遍
 
 - 可迭代的 children，跟数组的处理方式差不多
 
+## reconcileChildFibers
+
+`reconcileChildFibers(returnFiber, currentFirstChild, newChild, expirationTime)` 是 diff 开始的位置，参数如下：
+
+- returnFiber：是即将 Diff 的这层的父节点
+
+- currentFirstChild：是当前层的第一个 Fiber 节点
+
+- newChildren：即将更新的 vdom 节点(可能是 TextNode、可能是 ReactElement，可能是数组)，不是 Fiber 节点
+
+- expirationTime：过期时间（这里不讨论这个）
+
+这里只考虑 `REACT_ELEMENT` 类型的情况，执行过程大致分两种：
+
+1. 如果新节点是对象
+
+   1. 如果新旧节点
+
+2. 如果新节点是文本类型
+
+   1. 如果 `旧节点!==null`，复用当前这个旧节点，且删除旧节点兄弟节点，最后返回这个节点
+   
+   2. 如果 `旧节点===null`，删除旧节点及兄弟节点，并通过 `createFiberFromText` 创建新节点后返回
+
+3. 如果是新节点是数据类型，则执行 `reconcileChildrenArray`
+
+
 ## children diff
 
-子节点的 diff 逻辑主要在 `reconcileChildrenArray(returnFiber, currentFirstChild, newChildren, expirationTime)` 方法，参数表示：
+子节点的 diff 逻辑主要在 `reconcileChildrenArray(returnFiber, currentFirstChild, newChildren, expirationTime)` 方法中，参数表示如下：
 
 - returnFiber：当前子节点对象的父节点
 
@@ -96,12 +123,12 @@ React16 的 diff 策略采用从链表头部开始比较的算法，是层次遍
 
 `reconcileChildrenArray` 对子节点的 diff 主要是通过四步进行处理
 
-**一、颜色对新旧相同位置(index)进行比较**
+**一、首先对新旧相同位置(index)进行比较**
 
 ```js
   for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
-   // 一次遍历是对新旧节点相关位置的比较
-   // // nextOldFiber 保存下一次遍历要对比的旧节点
+   // 每一次的循环都是对相同位置的新旧节点进行比较
+   // nextOldFiber 保存下一次遍历要对比的旧节点
     if (oldFiber.index > newIdx) {  
       nextOldFiber = oldFiber;
       oldFiber = null;
@@ -134,7 +161,33 @@ React16 的 diff 策略采用从链表头部开始比较的算法，是层次遍
   }
 ```
 
-**新节点已经遍历完毕**
+遍历新节点，对比相同位置（索引index）的新旧节点，重点在于 `updateSlot(returnFiber, oldFiber, newChildren[newIdx], expirationTime)` 的处理，这个方法执行的流程大致为：
+
+1. 尝试获取当前旧节点的 `key`
+   
+   `var key = oldFiber !== null ? oldFiber.key : null`
+   
+2. 如果新节点是字符串或者数字，那么说明新节点是文本节点，此时根据上一步 `key` 是否为 `null` 做不同的处理
+   
+   1. 如果 `key!==null` 说明旧节点之前不是文本节点，那么说明新旧节点不同无法利用，则返回 `null`
+    
+   2. 如果 `key===null`，则通过 `updateTextNode(returnFiber, oldFiber, '' + newChild, expirationTime)` 更新文本
+
+3. 如果新节点是对象，也会根据上一步新旧节点的 `key` 是否相同做不同的处理
+   
+   1. 如果 `newChild.key === key` （这里只考虑正常的 ReactElement 元素）此时执行 `updateElement(returnFiber, _matchedFiber, newChild, expirationTime)` 进行节点的复用
+    
+   2. 如果 `key` 不同则返回 `null`
+
+所以 `updateSlot` 的结果要么为 `null`，要么为可复用的结果
+
+1. 如果新旧都为 `null`，直接退出当前循环 
+
+2. 移除旧节点
+
+3. 使用 `newFiber` 生成链
+
+**经过上一步的遍历后，如果新节点已经遍历完毕，对剩余新节点执行添加操作**
 
 ```js
 if (newIdx === newChildren.length) {
@@ -231,4 +284,3 @@ function deleteRemainingChildren(returnFiber, currentFirstChild) {
 
 4. 如果遍历完之后 `mapRemainingChildren` 还有剩余的旧节点，则遍历他们进行移除
 
-https://cloud.tencent.com/developer/article/1477707

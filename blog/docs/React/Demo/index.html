@@ -31,7 +31,7 @@
             render() {
                 return (
                     <div className="game">
-                        {this.state.list.map(it => <span>{it}</span>)}
+                        {this.state.list.map(it => <span>{it} <a>abc</a> </span>)}
                         <div className="game-board" onClick={this.update}>
                             game-board
                         </div>
