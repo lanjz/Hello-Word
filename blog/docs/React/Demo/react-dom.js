@@ -13943,7 +13943,6 @@
     }
 
     function reconcileChildrenArray(returnFiber, currentFirstChild, newChildren, expirationTime) {
-      debugger
       // This algorithm can't optimize by searching from both ends since we
       // don't have backpointers on fibers. I'm trying to see how far we can get
       // with that model. If it ends up not being worth the tradeoffs, we can
@@ -14898,6 +14897,7 @@
   }
 
   function renderWithHooks(current, workInProgress, Component, props, secondArg, nextRenderExpirationTime) {
+    debugger
     renderExpirationTime = nextRenderExpirationTime;
     currentlyRenderingFiber$1 = workInProgress;
 
@@ -24959,7 +24959,6 @@
     return legacyRenderSubtreeIntoContainer(null, element, container, true, callback);
   }
   function render(element, container, callback) {
-    debugger
     if (!isValidContainer(container)) {
       {
         throw Error( "Target container is not a DOM element." );

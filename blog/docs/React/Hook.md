@@ -2,7 +2,7 @@
 
 Hook 是 React16 引入的新特性， 是 React 团队在 React 组件开发实践中，逐渐认知到的一个改进点，这背后其实涉及对类组件和函数组件两种组件形式的思考和侧重。
 
-## 类组件函数组件
+## 类组件VS函数组件
 
 ### 类组件
 
@@ -33,7 +33,7 @@ class DemoClass extends React.Component {
 }
 ```
 
-可以看出，React 类组件内部预置了相当多的“现成的东西”等着我们去调度/定制，`state` 和生命周期就是这些“现成东西”中的典型。要想得到这些东西，难度也不大，只需要继承一个 `React.Component` 即可。
+可以看出，React 类组件内部预置了相当多的“现成的东西”等着我们去调度/定制，`state` 和生命周期就是这些“现成东西”中的典型。要想得到这些东西，难度也不大，只需要继承一个 `React.Component` 即可。  
 当然，这也是类组件的一个不便，它太繁杂了，对于解决许多问题来说，编写一个类组件实在是一个过于复杂的姿势。复杂的姿势必然带来高昂的理解成本，这也是我们所不想看到的。除此之外，由于开发者编写的逻辑在封装后是和组件粘在一起的，这就使得类组件内部的逻辑难以实现拆分和复用
 
 ### 函数组件
@@ -55,17 +55,18 @@ function DemoFunction(props) {
 
 通过对比，从形态上可以对两种组件做区分，它们之间的区别如下：
 
-- 类组件需要继承` class`，函数组件不需要；
+- 类组件需要继承` class`，函数组件不需要
 
-- 类组件可以访问生命周期方法，函数组件不能；
+- 类组件可以访问生命周期方法，函数组件不能
 
-- 类组件中可以获取到实例化后的 `this`，并基于这个 `this` 做各种各样的事情，而函数组件不可以；
+- 类组件中可以获取到实例化后的 `this`，并基于这个 `this` 做各种各样的事情，而函数组件不可以
 
-- 类组件中可以定义并维护状态 （state），而函数组件不可以；
+- 类组件中可以定义并维护状态 （state），而函数组件不可以
 
-所以在 React-Hooks 出现之前，类组件的能力边界明显强于函数组件。
+所以在 React-Hooks 出现之前，类组件的能力边界明显强于函数组件
 
-组件本身的定位就是函数，一个输入数据、输出 UI 的函数。作为开发者，我们编写的是声明式的代码，而 React 框架的主要工作，就是及时地把声明式的代码转换为命令式的 DOM 操作，把数据层面的描述映射到用户可见的 UI 变化中去。但函数组件比起类组件少了很多东西，比如生命周期、对 state 的管理等。这就给函数组件的使用带来了非常多的局限性，导致我们并不能使用函数这种形式，写出一个真正的全功能的组件。而React-Hooks 的出现，就是为了帮助函数组件补齐这些（相对于类组件来说）缺失的能力。
+组件本身的定位就是函数，一个输入数据、输出 UI 的函数。作为开发者，我们编写的是声明式的代码，而 React 框架的主要工作，就是及时地把声明式的代码转换为命令式的 DOM 操作，把数据层面的描述映射到用户可见的 UI 变化中去。  
+但函数组件比起类组件少了很多东西，比如生命周期、对 `state` 的管理等。这就给函数组件的使用带来了非常多的局限性，导致我们并不能使用函数这种形式，写出一个真正的全功能的组件。而 React-Hooks 的出现，就是为了帮助函数组件补齐这些（相对于类组件来说）缺失的能力。
 
 React-Hooks 是一套能够使函数组件更强大、更灵活的“钩子”。
 
@@ -313,7 +314,7 @@ function Example() {
 }
 ```
 
-上面使用Hook `const [count, setCount] = useState(0);` 包含以下信息：
+上面使用Hook例子 `const [count, setCount] = useState(0)` 包含以下信息：
 
 - 声明一个叫 `count` 的 `state` 变量
 
@@ -322,7 +323,7 @@ function Example() {
 - 使用 `setCount` 方法进行修改这个 `count` 的值
 
 :::tip
-更新state变量的方法，并不会像this.setState一样，合并state。而是替换state变量
+更新 `state` 变量的方法，并不会像 `this.setState` 一样，合并 `state` 。而是替换 `state` 变量
 :::
 
 ### 手写useState
@@ -370,7 +371,7 @@ render()
 
 - 最后返回一个 `lastSate` 属性和 `setState` 方法
 
-这里只是用了一个useState，要是我们使用了很多个呢？难道要声明很多个全局变量吗？这显然是不行的，所以，我们可以设计一个全局数组来保存这些 `state`
+这里只是用了一个 `useState`，要是我们使用了很多个呢？难道要声明很多个全局变量吗？这显然是不行的，所以，我们可以设计一个全局数组来保存这些 `state`
 
 ```js
 let lastState = []
@@ -388,7 +389,208 @@ function useState(initState) {
 
 这里的 `currentIndex` 是利用了闭包的思想，将某个 `state` 相应的 `index` 记录下来了
 
+### 源码解析
+
+```js
+ // useState
+  function useState(initialState) {
+    var dispatcher = resolveDispatcher();
+    return dispatcher.useState(initialState);
+  }
+  function resolveDispatcher() {
+    var dispatcher = ReactCurrentDispatcher.current;
+    return dispatcher;
+  }
+  /**
+   * Keeps track of the current dispatcher.
+   */
+  var ReactCurrentDispatcher = {
+    /**
+     * @internal
+     * @type {ReactComponent}
+     */
+    current: null
+  };
+```
+
+从上面代码发现 `userSata(initialState)` = `ReactCurrentDispatcher.current.userSata(initialState)`，`ReactCurrentDispatcher.current` 一开始为 `null`，所以接下来就是找找 `ReactCurrentDispatcher.current` 是什么东西
+
+看下执行到 `useState` 方法时的执行栈
+
+![](./images/useState_1.png)
+
+于是在 `renderWithHooks` 方法发现了这么几行代码 
+
+```js
+    {
+      if (current !== null && current.memoizedState !== null) {
+       // 更新渲染
+        ReactCurrentDispatcher.current = HooksDispatcherOnUpdateInDEV;
+      } else if (hookTypesDev !== null) {
+       // 忽略
+        ReactCurrentDispatcher.current = HooksDispatcherOnMountWithHookTypesInDEV;
+      } else {
+        // 首次渲染
+        ReactCurrentDispatcher.current = HooksDispatcherOnMountInDEV;
+      }
+    }
+```
+
+先看首次渲染时做的事情，所以 `current=null`，先看 `HooksDispatcherOnMountInDEV`， 它的定义如下：
+
+```js
+    HooksDispatcherOnMountInDEV = {
+      readContext: function (context, observedBits) {
+       // ...
+      },
+      useCallback: function (callback, deps) {
+       // ...
+      },
+      useContext: function (context, observedBits) {
+       // ...
+      },
+      useEffect: function (create, deps) {
+        // ...
+      },
+      useImperativeHandle: function (ref, create, deps) {
+       // ...
+      },
+      useLayoutEffect: function (create, deps) {
+       // ...
+      },
+      useMemo: function (create, deps) {
+       // ...
+      },
+      useReducer: function (reducer, initialArg, init) {
+        // ...
+      },
+      useRef: function (initialValue) {
+        // ...
+      },
+      useState: function (initialState) {
+        currentHookNameInDev = 'useState';
+        mountHookTypesDev();
+        var prevDispatcher = ReactCurrentDispatcher.current;
+        ReactCurrentDispatcher.current = InvalidNestedHooksDispatcherOnMountInDEV;
+        try {
+          return mountState(initialState);
+        } finally {
+          ReactCurrentDispatcher.current = prevDispatcher;
+        }
+      },
+      useDebugValue: function (value, formatterFn) {
+           // ...
+      },
+      useResponder: function (responder, props) {
+           // ...
+      },
+      useDeferredValue: function (value, config) {
+           // ...
+      },
+      useTransition: function (config) {
+        // ...
+      }
+    };
+```
+
+原来我们使用 `Hook Api` 都在 `HooksDispatcherOnMountInDEV` 对象里， 先看下 `useState` 方法，重点看下 `mountState`
+
+```js
+  function mountState(initialState) {
+    var hook = mountWorkInProgressHook();
+    if (typeof initialState === 'function') {
+      initialState = initialState();
+    }
+    hook.memoizedState = hook.baseState = initialState;
+    var queue = hook.queue = { // 更新队列
+      pending: null, // 待更新
+      dispatch: null, // 更新函数
+      lastRenderedReducer: basicStateReducer, // 当更新 state 时会通过这个方法最新的state
+      lastRenderedState: initialState, // 最后一次的state
+    };
+    // dispatchAction负责更新 state 的函数
+    var dispatch = queue.dispatch = dispatchAction.bind(null, currentlyRenderingFiber$1, queue);
+    return [hook.memoizedState, dispatch];
+  }
+```
+
+`mountWorkInProgressHook` 方法定义如下：
+
+```js
+  function mountWorkInProgressHook() {
+    var hook = {
+      memoizedState: null,// 不同的hook保存的不同值， useState保存的是state； useEffect保存的是effect对象
+      baseState: null, // 最新的值
+      baseQueue: null, // 最新的队列
+      queue: null, // 待更新队列
+      next: null, // 指向下一个hook对象
+    };
+   
+    // react hooks的数据结构是链表的方式
+    if (workInProgressHook === null) {
+      // 函数内的第一个hooks就会走到这里
+      currentlyRenderingFiber$1.memoizedState = workInProgressHook = hook;
+    } else {
+      // 接下来每个hook都会被添加到链接到未尾
+      workInProgressHook = workInProgressHook.next = hook;
+    }
+
+    return workInProgressHook;
+  }
+```
+
+每次执行一个 hooks 函数都会调用这个方法来创建一个 hook 对象，更新 `queue` 属性，所以这个 hook 对象里保存了这个 hook 所对应的 `state` 数据、新的队列和指向下一个 hook 的对象指针
+
+然后判断 `initialState` 是否 `function`，是的话执行得到 `state` 数据。接着把 `state` 赋值给了 `memoizedState` 、 `baseState`和 `queue.lastRenderedState`。
+
+`queue` 对象是个更新队列，最近创建更新 `state` 的函数 `dispatch` 
+
+此时回到 `renderWithHooks` 方法，赋值了 `ReactCurrentDispatcher.current` 对象后，下面会执行 `var children = Component(props, secondArg)`， 这个 `Component` 就是我们的函数组件，执行的过程中会执行 `useState()` 方法
+
+#### 更新阶段
+
+ `var dispatch = queue.dispatch = dispatchAction.bind(null, currentlyRenderingFiber$1, queue);`
+
+- `currentlyRenderingFiber$1`: 表示当前的 fiber 链（链头）
+
+- `queue`: `mountState` 申明的更新队列
+
+- `action`: 这个就是我们传进来的参数
+
+`dispatchAction` 有一些和 fiber`相关的逻辑。但在这里关于 hooks 的就是会创建一个 `update` 对象然后添加到 `queue` 链表上面，然后会判断当前是否处于渲染阶段，不是的话就会去获取上一个 `state` 和当前的 `state` 进行浅对比，相等就会 `return` 不会执行更新，不相等就会执行 `scheduleUpdateOnFiber` 进行更新
+
 https://cloud.tencent.com/developer/article/1784501?from=article.detail.1843869
+
+来看个例子，看看为什么不能在条件语句中申明 hook
+
+```js
+import React, { useState, useEffect, useRef } from 'react';
+const App = () => {
+ const [name, setName] = useState('Damon');
+ const [age, setAge] = useState(23);
+  if (age !== 23) {
+    const Ref = useRef(null);
+  }
+ 
+  useEffect(() => {
+   console.log(name, age);
+  }, []);
+ 
+  return (
+   <div>
+     <span>{name}</span>
+     <span>{age}</span>
+    </div>
+  )
+}
+export default App;
+```
+
+当这个App组件被渲染的时候，`workInProgressHook.memoizedState` 中会以链表的形式来保存这些 hook
+
+![](./images/useState_2.png)
+
+如果在条件语句中申明 hook，那么在更新阶段链表结构会被破坏，Fiber树上缓存的 hooks信息就会和当前的 `workInProgressHook` 不一致，不一致的情况下读取数据可能就会出现异常
 
 ## Effect Hook
 

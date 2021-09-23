@@ -14,6 +14,18 @@
 <script src="https://cdn.bootcss.com/babel-standalone/6.24.0/babel.js"></script>
 <script type="text/babel">
     window.onload = function () {
+        function App() {
+            let [name, setName] = React.useState('lan')
+            return (<div>{name}</div>)
+        }
+
+        ReactDOM.render(<App/>, document.getElementById('root'));
+    }
+
+
+</script>
+<!--<script type="text/babel">
+    window.onload = function () {
         class App extends React.Component {
             constructor(props) {
                 super(props);
@@ -47,6 +59,6 @@
     }
 
 
-</script>
+</script>-->
 
 </html>
