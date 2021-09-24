@@ -493,7 +493,11 @@ function useState(initState) {
     };
 ```
 
-原来我们使用 `Hook Api` 都在 `HooksDispatcherOnMountInDEV` 对象里， 先看下 `useState` 方法，重点看下 `mountState`
+原来我们使用 `Hook Api` 都在 `HooksDispatcherOnMountInDEV` 对象里
+
+此时回到 `renderWithHooks` 方法，赋值了 `ReactCurrentDispatcher.current` 对象后，下面会执行 `var children = Component(props, secondArg)`， 这个 `Component` 就是我们的函数组件，执行的过程中会执行 `useState()` 方法
+
+ `useState` 方法中，重点看下 `mountState`
 
 ```js
   function mountState(initialState) {
@@ -545,10 +549,6 @@ function useState(initState) {
 
 `queue` 对象是个更新队列，最近创建更新 `state` 的函数 `dispatch` 
 
-此时回到 `renderWithHooks` 方法，赋值了 `ReactCurrentDispatcher.current` 对象后，下面会执行 `var children = Component(props, secondArg)`， 这个 `Component` 就是我们的函数组件，执行的过程中会执行 `useState()` 方法
-
-#### 更新阶段
-
  `var dispatch = queue.dispatch = dispatchAction.bind(null, currentlyRenderingFiber$1, queue);`
 
 - `currentlyRenderingFiber$1`: 表示当前的 fiber 链（链头）
@@ -558,6 +558,18 @@ function useState(initState) {
 - `action`: 这个就是我们传进来的参数
 
 `dispatchAction` 有一些和 fiber`相关的逻辑。但在这里关于 hooks 的就是会创建一个 `update` 对象然后添加到 `queue` 链表上面，然后会判断当前是否处于渲染阶段，不是的话就会去获取上一个 `state` 和当前的 `state` 进行浅对比，相等就会 `return` 不会执行更新，不相等就会执行 `scheduleUpdateOnFiber` 进行更新
+
+
+
+#### 更新阶段
+
+上面讲了初始阶段 react 会给 `ReactCurrentDispatcher.current` 赋值 `HooksDispatcherOnMount`，更新阶段赋值 `HooksDispatcherOnUpdate`。在更新阶段实际上调用的是 `updateState`
+
+```js
+  function updateState(initialState) {
+    return updateReducer(basicStateReducer);
+  }
+```
 
 https://cloud.tencent.com/developer/article/1784501?from=article.detail.1843869
 
