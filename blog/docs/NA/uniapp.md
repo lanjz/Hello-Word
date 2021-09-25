@@ -1,6 +1,6 @@
 # uni-app
 
-uniapp 像是一个大集成，集成了 
+uniapp 像是一个大集成
 
 ## 优化方案
 
