@@ -428,7 +428,7 @@ function useState(initState) {
 }
 ```
 
-`HooksDispatcherOnUpdateInDEV`、`HooksDispatcherOnMountWithHookTypesInDEV`、 `HooksDispatcherOnMountInDEV` 是长得差不多的对象，以 `HooksDispatcherOnMountInDEV` 为：
+`HooksDispatcherOnUpdateInDEV`、`HooksDispatcherOnMountWithHookTypesInDEV`、 `HooksDispatcherOnMountInDEV` 是长得差不多的对象，以 `HooksDispatcherOnMountInDEV` 为例：
 
 ```js
     HooksDispatcherOnMountInDEV = {
@@ -452,39 +452,40 @@ function useState(initState) {
 三个对象的 `key` 是一样的，不同的是具体方法的实现，比如 `HooksDispatcherOnMountInDEV.useState` 内容为：
 
 ```js
+useState: function (initialState) {
+  currentHookNameInDev = 'useState';
+  mountHookTypesDev();
+  var prevDispatcher = ReactCurrentDispatcher.current;
+  ReactCurrentDispatcher.current = InvalidNestedHooksDispatcherOnMountInDEV;
+  
+  try {
+    return mountState(initialState);
+  } finally {
+    ReactCurrentDispatcher.current = prevDispatcher;
+  }
+}
+```
+
+`HooksDispatcherOnMountWithHookTypesInDEV.useState`
+```js
+  useState: function (initialState) {
     currentHookNameInDev = 'useState';
-    mountHookTypesDev();
+    warnInvalidHookAccess();
+    updateHookTypesDev();
     var prevDispatcher = ReactCurrentDispatcher.current;
-    ReactCurrentDispatcher.current = InvalidNestedHooksDispatcherOnMountInDEV;
+    ReactCurrentDispatcher.current = InvalidNestedHooksDispatcherOnUpdateInDEV;
+
     try {
-      return mountState(initialState);
+      return updateState(initialState);
     } finally {
       ReactCurrentDispatcher.current = prevDispatcher;
     }
-```
-
-`InvalidNestedHooksDispatcherOnUpdateInDEV.useState`
-```js
-      useState: function (initialState) {
-        currentHookNameInDev = 'useState';
-        warnInvalidHookAccess();
-        updateHookTypesDev();
-        var prevDispatcher = ReactCurrentDispatcher.current;
-        ReactCurrentDispatcher.current = InvalidNestedHooksDispatcherOnUpdateInDEV;
-
-        try {
-          return updateState(initialState);
-        } finally {
-          ReactCurrentDispatcher.current = prevDispatcher;
-        }
-      }
+  }
 ```
 
 #### 首次渲染
 
-先看首次渲染时做的事情，所以 `current=null`，先看 `HooksDispatcherOnMountInDEV`， 它的定义如下：
-
-在执行 `renderWithHooks(current, workInProgress, Component, props, secondArg, nextRenderExpirationTime)` 方法时，首次渲染时 `current=null` 做的事情， `ReactCurrentDispatcher.current` 将赋值 `HooksDispatcherOnMountInDEV`，之后会执行 `var children = Component(props, secondArg)`， 这个 `Component` 就是我们的函数组件，在执行函数组件的过程中将会执行 `useState()` 方法，此时的 `useState()` 定义为：
+先看首次渲染时做的事情。在执行 `renderWithHooks(current, workInProgress, Component, props, secondArg, nextRenderExpirationTime)` 方法时，首次渲染时 `current=null` 做的事情， `ReactCurrentDispatcher.current` 将赋值 `HooksDispatcherOnMountInDEV`，之后会执行 `var children = Component(props, secondArg)`， 这个 `Component` 就是我们的函数组件，在执行函数组件的过程中将会执行 `useState()` 方法，此时的 `useState()` 执行代码为：
 
 ```js
   function mountState(initialState) {
@@ -529,34 +530,28 @@ function useState(initState) {
   }
 ```
 
-每次执行一个 `mountState` 函数的事情：
+每次 `useState` 都会执行一个 `mountState` 函数，做以下事情：
 
 1. 都会调用 `mountWorkInProgressHook` 方法来创建一个 hook 对象
 
 2. 如果首次创建 hook 则将当前 hook 对象保存到 `currentlyRenderingFiber$1.memoizedState` 中，`currentlyRenderingFiber$1` 代表即将更新的 Fiber 节点；如果非首次创建 hook，则保存到上一 hook的 `next` 属性中，**这样多个 hook 就形成了一个链表的结构**
 
-3. 觉得 hook 对象保存 `initialState` (hook 的值) 到 `hook.memoizedState = hook.baseState = initialState`
+3. 同时 hook 对象保存 `initialState` (useState 的值) 到 `hook.memoizedState = hook.baseState = initialState`
 
-4. 更新 `hook.queue` 属性
+4. 给 `hook.queue` 赋值
 
     ```js
     var queue = hook.queue = { // 更新队列
       pending: null, // 待更新
       dispatch: null, // 更新函数
       lastRenderedReducer: basicStateReducer, // 当更新 state 时会通过这个方法得到最新的state
-      lastRenderedState: initialState, // 最后一次的state
+      lastRenderedState: initialState, // 最后一次的保存的state（不是正在更新的 state）
     }
     ```
 
 最后创建更新 `state` 的函数 `dispatch` 
 
  `var dispatch = queue.dispatch = dispatchAction.bind(null, currentlyRenderingFiber$1, queue);`
-
-- `currentlyRenderingFiber$1`: 表示当前的 fiber 链（链头）
-
-- `queue`: `mountState` 申明的更新队列
-
-- `action`: 这个就是我们传进来的参数
 
 `dispatchAction` 有一些和 `fiber` 相关的逻辑。但在这里关于 hooks 的就是会创建一个 `update` 对象然后添加到 `queue` 链表上面，然后会判断当前是否处于渲染阶段，不是的话就会去获取上一个 `state` 和当前的 `state` 进行浅对比，相等就会 `return` 不会执行更新，不相等就会执行 `scheduleUpdateOnFiber` 进行更新
 
@@ -595,23 +590,34 @@ setData('second')
 setData('third')
 ```
 
-在第一次setData后， hooks的结构如下图：
+在第一次 `setData` 后， hooks 的结构如下图：
 
 ![](./images/queue_1.png)
 
-在第二次setData后， hooks的结构如下图：
+在第二次 `setData` 后， hooks的结构如下图：
 
 ![](./images/queue_2.png)
 
-在第三次setData后， hooks的结构如下图：
+在第三次 `setData` 后， hooks的结构如下图：
 
 ![](./images/queue_3.png)
 
-https://juejin.cn/post/6844903799119675406
+然后将新的状态和旧的状态进行对比，相同则退出重渲染，不同则执行 `scheduleWork(fiber, expirationTime)` 开启重渲染任务
 
-这方法会以最新的数据生成一个 `upldate` 对象，并保存到 `queue.pending` 属性中，之后当前函数组重新更新时，又再执行`renderWithHooks` 方法
+```js
+const lastRenderedReducer = queue.lastRenderedReducer
+// ...省略
+var currentState = queue.lastRenderedState; // 取之前的 state
+var eagerState = lastRenderedReducer(currentState, action) // 取当前要更新的 state
+update.eagerState = eagerState;
+if (is(eagerState, currentState)) {
+  return;
+}
+// ...省略
+scheduleWork(fiber, expirationTime);
+```
 
-上面讲了初始阶段 react 会给 `ReactCurrentDispatcher.current` 赋值 `HooksDispatcherOnMount`，更新阶段赋值 `HooksDispatcherOnUpdate`。在更新阶段 `useState` 实际上调用的是 `updateState`
+重渲染时  `ReactCurrentDispatcher.current` 将等于 `HooksDispatcherOnMountWithHookTypesInDEV`，更新阶段赋值 `HooksDispatcherOnMountWithHookTypesInDEV.useState` 实际上调用的是 `updateState`
 
 ```js
   function updateState(initialState) {
@@ -623,7 +629,6 @@ https://juejin.cn/post/6844903799119675406
   function updateReducer(reducer, initialArg, init) {
   //这里是获取当前的hooks，每一次函数更新的时候都会执行到hook，这个方法会保证每次更新状态不丢失
     var hook = updateWorkInProgressHook();
-  //拿到更新队列
     var queue = hook.queue;
   // 调用lastRenderedReducer可获取到state
     queue.lastRenderedReducer = reducer;
