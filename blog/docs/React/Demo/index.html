@@ -16,7 +16,14 @@
     window.onload = function () {
         function App() {
             let [name, setName] = React.useState('lan')
-            return (<div>{name}</div>)
+            let [age, setAge] = React.useState(1)
+
+            function update() {
+                setName(name + 1)
+                setName(name + 12)
+            }
+
+            return (<div onClick={update}>{name}-{age}</div>)
         }
 
         ReactDOM.render(<App/>, document.getElementById('root'));
