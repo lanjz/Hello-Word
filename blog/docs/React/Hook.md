@@ -661,45 +661,15 @@ scheduleWork(fiber, expirationTime);
       var update = first;
       do {
         if (updateExpirationTime < renderExpirationTime) {
-          var clone = {
-            expirationTime: update.expirationTime,
-            suspenseConfig: update.suspenseConfig,
-            action: update.action,
-            eagerReducer: update.eagerReducer,
-            eagerState: update.eagerState,
-            next: null
-          };
-
-          if (newBaseQueueLast === null) {
-            newBaseQueueFirst = newBaseQueueLast = clone;
-            newBaseState = newState;
-          } else {
-            newBaseQueueLast = newBaseQueueLast.next = clone;
-          } 
-          if (updateExpirationTime > currentlyRenderingFiber$1.expirationTime) {
-            currentlyRenderingFiber$1.expirationTime = updateExpirationTime;
-            markUnprocessedUpdateTime(updateExpirationTime);
-          }
+          // 忽略 ...
         } else {
-          if (newBaseQueueLast !== null) {
-            var _clone = {
-              expirationTime: Sync,
-              // This update is going to be committed so we never want uncommit it.
-              suspenseConfig: update.suspenseConfig,
-              action: update.action,
-              eagerReducer: update.eagerReducer,
-              eagerState: update.eagerState,
-              next: null
-            };
-            newBaseQueueLast = newBaseQueueLast.next = _clone;
-          } 
-          markRenderEventTimeAndConfig(updateExpirationTime, update.suspenseConfig); // Process this update.
-
+          // 忽略 ...
+          // 处理更新
           if (update.eagerReducer === reducer) {
-            // If this update was processed eagerly, and its reducer matches the
-            // current reducer, we can use the eagerly computed state.
+           // 如果更新被提前处理了且reducer跟当前reducer匹配，可以复用eagerState
             newState = update.eagerState;
           } else {
+            // 循环调用reducer
             var action = update.action;
             newState = reducer(newState, action);
           }
@@ -712,10 +682,8 @@ scheduleWork(fiber, expirationTime);
         newBaseState = newState;
       } else {
         newBaseQueueLast.next = newBaseQueueFirst;
-      } // Mark that the fiber performed work, but only if the new state is
-      // different from the current state.
-
-
+      }
+       // 只有在前后state变了才会标记
       if (!objectIs(newState, hook.memoizedState)) {
         markWorkInProgressReceivedUpdate();
       }
@@ -1199,5 +1167,7 @@ https://juejin.cn/post/6940942549305524238#heading-22
 https://github.com/7kms/react-illustration-series
 
 [什么时候使用 useMemo 和 useCallback](https://jancat.github.io/post/2019/translation-usememo-and-usecallback/)
+
+[useState源码浅析](https://juejin.cn/post/6844903799119675406)
 
 https://developer.aliyun.com/article/784027
