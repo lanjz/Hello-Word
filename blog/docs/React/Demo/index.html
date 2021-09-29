@@ -15,15 +15,21 @@
 <script type="text/babel">
     window.onload = function () {
         function App() {
-            let [name, setName] = React.useState('lan')
+            const t = React.useRef(null);
             let [age, setAge] = React.useState(1)
+            clearTimeout(t.current)
+            t.current = setInterval(() => {
+                console.log(new Date())
+            }, 2000)
 
             function update() {
-                setName(name + 1)
-                setName(name + 12)
+                setAge(age + 1)
+                if(age === 3) {
+                    clearTimeout(t.current)
+                }
             }
 
-            return (<div onClick={update}>{name}-{age}</div>)
+            return (<div onClick={update}>当前：{age}</div>)
         }
 
         ReactDOM.render(<App/>, document.getElementById('root'));

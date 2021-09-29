@@ -14897,7 +14897,6 @@
   }
 
   function renderWithHooks(current, workInProgress, Component, props, secondArg, nextRenderExpirationTime) {
-    debugger
     renderExpirationTime = nextRenderExpirationTime;
     currentlyRenderingFiber$1 = workInProgress;
 
@@ -15370,7 +15369,6 @@
   }
 
   function updateState(initialState) {
-    debugger
     return updateReducer(basicStateReducer);
   }
 
@@ -15702,7 +15700,6 @@
   }
 
   function dispatchAction(fiber, queue, action) {
-    debugger
     {
       if (typeof arguments[3] === 'function') {
         error("State updates from the useState() and useReducer() Hooks don't support the " + 'second callback argument. To execute a side effect after ' + 'rendering, declare it in the hllComponent body with useEffect().');

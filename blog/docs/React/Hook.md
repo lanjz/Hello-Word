@@ -72,6 +72,38 @@ React-Hooks 是一套能够使函数组件更强大、更灵活的“钩子”�
 
 ## Q&A
 
+
+### 为什么不能在条件语句中申明 hook
+
+```js
+import React, { useState, useEffect, useRef } from 'react';
+const App = () => {
+ const [name, setName] = useState('Damon');
+ const [age, setAge] = useState(23);
+  if (age !== 23) {
+    const Ref = useRef(null);
+  }
+ 
+  useEffect(() => {
+   console.log(name, age);
+  }, []);
+ 
+  return (
+   <div>
+     <span>{name}</span>
+     <span>{age}</span>
+    </div>
+  )
+}
+export default App;
+```
+
+当这个App组件被渲染的时候，`workInProgressHook.memoizedState` 中会以链表的形式来保存这些 hook
+
+![](./images/useState_2.png)
+
+如果在条件语句中申明 hook，那么在更新阶段链表结构会被破坏，Fiber树上缓存的 hooks信息就会和当前的 `workInProgressHook` 不一致，不一致的情况下读取数据可能就会出现异常
+
 ### 为什么 useState 要使用数组而不是对象
 
 useState 的用法：
@@ -767,60 +799,27 @@ workInProgressHook={
 
 ![](./images/hook.jpeg)
 
-### QA
-
-**为什么不能在条件语句中申明 hook**
-
-```js
-import React, { useState, useEffect, useRef } from 'react';
-const App = () => {
- const [name, setName] = useState('Damon');
- const [age, setAge] = useState(23);
-  if (age !== 23) {
-    const Ref = useRef(null);
-  }
- 
-  useEffect(() => {
-   console.log(name, age);
-  }, []);
- 
-  return (
-   <div>
-     <span>{name}</span>
-     <span>{age}</span>
-    </div>
-  )
-}
-export default App;
-```
-
-当这个App组件被渲染的时候，`workInProgressHook.memoizedState` 中会以链表的形式来保存这些 hook
-
-![](./images/useState_2.png)
-
-如果在条件语句中申明 hook，那么在更新阶段链表结构会被破坏，Fiber树上缓存的 hooks信息就会和当前的 `workInProgressHook` 不一致，不一致的情况下读取数据可能就会出现异常
-
 > [react hooks源码分析：useState](https://cloud.tencent.com/developer/article/1784501?from=article.detail.1843869)  
 > [reactHook之useState的源码解析](https://yolkpie.net/2021/02/24/reactHook%E4%B9%8BuseState%E7%9A%84%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/)  
 
-## Effect Hook
+## useEffect
 
-Effect Hook 可以让你在函数组件中执行副作用操作
+useEffect 可以让你在函数组件中执行副作用操作
 
-> 数据获取，设置订阅以及手动更改 React 组件中的 DOM 都属于副作用
+:::tip
+数据获取，设置订阅以及手动更改 React 组件中的 DOM 都属于副作用
+:::
 
 官方例子：
 
 ```js
 import React, { useState, useEffect } from 'react';
-
 function Example() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     document.title = `You clicked ${count} times`;
   });
-
   return (
     <div>
       <p>You clicked {count} times</p>
@@ -841,9 +840,9 @@ function Example() {
 从这里可以看出，`useEffect` 的作用相当同时定义了 `componentDidMount` 和 `conponetDidUpdate` 两个生命周期函数，例子中我们点击按钮增加计数
 的同时，页面的 `title` 也会发生变化，说明每次都会执行 `useEffect` 中的方法
 
-### 清除Effect
+### 清除 Effect
 
-即希望有 `componentWillUnMount` 的功能，在Hook中的实现方式是在 `useEffect` 方法中添置一个 `return function(){}`
+如果希望有 `componentWillUnMount` 的功能，在Hook中的实现方式是在 `useEffect` 方法中添置一个 `return function(){}`
 
 ```js
 useEffect(function () {
@@ -857,8 +856,7 @@ useEffect(function () {
 
 ### 只在特定条件下执行 effectHook
 
-在某些情况下，每次渲染后都执行清理或者执行 `effect` 可能会导致性能问题, 在 class 组件中，我们可以使用 `componentDidMount` 方法定义组件在
-渲染完成时要做的事情，使用 `componentDidUpdate` 方法控制组件更新时要做的事情
+在某些情况下，每次渲染后都执行清理或者执行 `effect` 可能会导致性能问题, 在 class 组件中，我们可以使用 `componentDidUpdate` 方法控制组件更新时要做的事情
 
 ```js
 componentDidUpdate(prevProps, prevState) {
@@ -894,6 +892,231 @@ useEffect(() => {
   document.title = `You clicked ${props.count} times`;
 }, []) // 只在组件渲染时执行一次
 ```
+
+## useEffect 源码简析
+
+### 首次渲染
+
+根据之前 `userState` 的解读，先看下 `HooksDispatcherOnMountInDEV.useEffect()` 方法的内容
+
+```js
+useEffect: function (create, deps) {
+    currentHookNameInDev = 'useEffect';
+    mountHookTypesDev();
+    checkDepsAreArrayDev(deps);
+    return mountEffect(create, deps);
+}
+```
+
+`mountEffect(create, deps)` 实际上执行的是 `mountEffectImpl` 方法
+
+```js
+  function mountEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
+    var hook = mountWorkInProgressHook(); // 也是会调用 `mountWorkInProgressHook` 方法来创建一个 hook 对象并保存到 `workInProgressHook` 中
+    var nextDeps = deps === undefined ? null : deps;
+    currentlyRenderingFiber$1.effectTag |= fiberEffectTag;
+    hook.memoizedState = pushEffect(HasEffect | hookEffectTag, create, undefined, nextDeps);
+  }
+```
+
+重点在 `pushEffect(HasEffect | hookEffectTag, create, undefined, nextDeps)`
+
+```js
+  function pushEffect(tag, create, destroy, deps) {
+    var effect = {
+      tag: tag,
+      create: create, // useEffect 的第一个参数
+      destroy: destroy, // 此时为null
+      deps: deps, // useEffect 的第二个参数
+      // Circular
+      next: null,
+    };
+    var componentUpdateQueue = currentlyRenderingFiber$1.updateQueue;
+
+    if (componentUpdateQueue === null) { // 如果是第一次执行 useEffect
+      componentUpdateQueue = createFunctionComponentUpdateQueue(); // 创建函数组件更新队列
+      currentlyRenderingFiber$1.updateQueue = componentUpdateQueue;
+      componentUpdateQueue.lastEffect = effect.next = effect; // 链式保存
+    } else { // 如果不是第一次执行 useEffect
+      var lastEffect = componentUpdateQueue.lastEffect; // 获取上一个的 effect
+
+      if (lastEffect === null) {
+        componentUpdateQueue.lastEffect = effect.next = effect; // 当做第一次处理
+      } else {
+       // 链式保存
+        var firstEffect = lastEffect.next; 
+        lastEffect.next = effect;
+        effect.next = firstEffect;
+        componentUpdateQueue.lastEffect = effect;
+      }
+    }
+    return effect;
+  }
+```
+
+`pushEffect` 的作用其实就是以链的形式保存 `effect` ，直接通过一个例子来看下保存的结构
+
+```js
+function App() {
+    let [name, setName] = React.useState('lan')
+    function update() {
+        setName(name + 1)
+        setName(name + 12)
+    }
+    React.useEffect(() => { // useEffect-1
+        console.log('A')
+    }, [name])
+    React.useEffect(() => { // useEffect-2
+        console.log('B')
+    }, [])
+    return (<div onClick={update}>{name}-{age}</div>)
+}
+```
+
+当前执行 useEffect-1 时：
+
+```js
+updateQueue.lastEffect = {
+  create: ƒ ()
+  deps: ['lan']
+  destroy: undefined
+  next: {
+      create: ƒ ()
+      deps: ['lan']
+      destroy: undefined
+      next: // 还是 useEffect-1 的 effect
+  }
+}
+```
+
+当前执行 useEffect-2 时：
+
+```js
+updateQueue.lastEffect = {
+    create: ƒ ()
+    deps: []
+    destroy: undefined
+    next: {
+         create: ƒ ()
+         deps: ['lan']
+         destroy: undefined
+         next: {
+             create: ƒ ()
+             deps: ['lan']
+             destroy: undefined
+             next: // 还是 useEffect-2 的 effect
+         }
+    }
+}
+```
+
+### 组件更新
+
+先看下 `InvalidNestedHooksDispatcherOnUpdateInDEV.useEffect => updateEffect() => updateEffectImpl()` 方法的内容
+
+```js
+  function updateEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
+    var hook = updateWorkInProgressHook(); // 当前正在处理的 Hook
+    //  获取依赖
+    var nextDeps = deps === undefined ? null : deps;
+    var destroy = undefined;
+
+    if (currentHook !== null) {
+      var prevEffect = currentHook.memoizedState;
+      destroy = prevEffect.destroy;
+
+      if (nextDeps !== null) {
+        var prevDeps = prevEffect.deps;
+
+        if (areHookInputsEqual(nextDeps, prevDeps)) { // 前后依赖的值没有变化
+           // 依赖项没变化的时候，componentUpdateQueue增加一个tag为NoHookEffect= 0 的effect
+          pushEffect(hookEffectTag, create, destroy, nextDeps); 
+          return;
+        }
+      }
+    }
+    // 跟首次加载组件一样处理
+    currentlyRenderingFiber$1.effectTag |= fiberEffectTag;
+    hook.memoizedState = pushEffect(HasEffect | hookEffectTag, create, destroy, nextDeps); // 更新 effect
+  }
+```
+
+更新阶段做的事情就是更新一个 `effect`，**如果新旧的依赖是一样的时候，会更新了 `effect` 的 `tag`，标识这个 `effect` 是不用更新的**
+
+### commit阶段
+
+在React 执行更新阶段会执行 `commitPassiveHookEffects` 方法，执行栈如下：
+
+![](./images/effect_1.png)
+
+```js
+  function commitPassiveHookEffects(finishedWork) {
+    if ((finishedWork.effectTag & Passive) !== NoEffect) {
+      switch (finishedWork.tag) {
+        case FunctionComponent:
+        case ForwardRef:
+        case SimpleMemoComponent:
+        case Block:
+        {
+          commitHookEffectListUnmount(Passive$1 | HasEffect, finishedWork);
+          commitHookEffectListMount(Passive$1 | HasEffect, finishedWork);
+          break;
+        }
+      }
+    }
+  }
+```
+
+```js
+  function commitHookEffectListUnmount(tag, finishedWork) {
+    var updateQueue = finishedWork.updateQueue;
+    var lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
+    // 遍历卸载组时的回调用，有回调则执行
+    if (lastEffect !== null) {
+      var firstEffect = lastEffect.next;
+      var effect = firstEffect;
+
+      do {
+        if ((effect.tag & tag) === tag) {
+          var destroy = effect.destroy;
+          effect.destroy = undefined;
+          if (destroy !== undefined) {
+            destroy();
+          }
+        }
+        effect = effect.next;
+      } while (effect !== firstEffect);
+    }
+  }
+
+  function commitHookEffectListMount(tag, finishedWork) {
+    var updateQueue = finishedWork.updateQueue;
+    var lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
+     
+    if (lastEffect !== null) {
+      var firstEffect = lastEffect.next;
+      var effect = firstEffect;
+      // 遍历 effect，执行 useEffect 方法
+      do {
+        if ((effect.tag & tag) === tag) { // 这里通过 effect.tag 判断是否要记录 useEffect 方法
+          // Mount
+          var create = effect.create;
+          effect.destroy = create();
+        }
+
+        effect = effect.next;
+      } while (effect !== firstEffect);
+    }
+  }
+```
+
+`commitHookEffectListUnmount` 和 `commitHookEffectListMount` 两个方法就是遍历组件依次执行卸载时 `effect` 的回调和 `effect` 方法
+
+### 小结
+
+`useEffect` 大概过程是函数组件在挂载阶段会执行 `MountEffect`，维护 `hook`的链表，同时专门维护一个 `effect` 的链表。
+在组件更新阶段，会执行 `UpdateEffect`，判断 `deps` 有没有更新，如果依赖项更新了，就执行 `useEffect` 里操作，没有就给这个 `effect` 标记一下`NoHookEffect`，跳过执行，去下一个 `useEffect`
+
 
 ## useMemo
 
@@ -953,11 +1176,58 @@ function App() {
 
 如果我们改为：`const abc = useMemo(() => doSomething(), [count])`,那么只在 `count` 改变时，`doSomething` 才会执行
 
+## useMemo 源码简析
+
+### 首次渲染阶段
+
+`useMemo() =>HooksDispatcherOnMountInDEV.useMemo() => mountMemo()`
+
+```js
+  function mountMemo(nextCreate, deps) {
+    var hook = mountWorkInProgressHook(); // 创建 hook对象
+    var nextDeps = deps === undefined ? null : deps;
+    var nextValue = nextCreate(); // 得到回调结果
+    hook.memoizedState = [nextValue, nextDeps]; // 保存值和依赖
+    return nextValue;
+  }
+```
+
+```js
+  function updateMemo(nextCreate, deps) {
+    var hook = updateWorkInProgressHook(); // 获取正在处理的 hook
+    var nextDeps = deps === undefined ? null : deps; // 获取 依赖
+    var prevState = hook.memoizedState; // 获取之前值 
+    if (prevState !== null) { // 有旧依赖
+      if (nextDeps !== null) { // 有新依赖
+        var prevDeps = prevState[1]; 
+        if (areHookInputsEqual(nextDeps, prevDeps)) { // 如果相等
+          return prevState[0]; // 返回之前值
+        }
+      }
+    }
+    var nextValue = nextCreate(); // 重新执行函数获取结果
+    hook.memoizedState = [nextValue, nextDeps]; // 保存
+    return nextValue;
+  }
+```
+
+### 小结
+
+`useMemo` 的实现比较简单，首次渲染时得到 `useMemo` 回调 的计算结果只在到 `hook.memoizedState` 中，之后更新组件，根据依赖是否发生变化来判断是否要重新执行 `useMemo` 回调还是反正之前计算的结果
+
+### 更新阶段 
+
+`useMemo() =>HooksDispatcherOnUpdateInDEV.useMemo() => updateMemo()`
+
 ## useCallback
 
 由于React的更新机制是当组件的 `state` 更新时，当前组件以及子组件都会重新渲染，即使这些子组件的 `props` 没有更新也会渲染。`React.memo`
-的作用就是包装子组件，这样只有当依赖的 `props` 更新的时候才会去重新渲染子组件, 如果 `props` 包含 `useState` 或 `useContext` 的 Hook, 
-当 `context` 发生变化时，它仍会重新渲染
+的作用就是包装子组件，这样只有当依赖的 `props` 更新的时候才会去重新渲染子组件
+
+:::tip
+如果 `props` 包含 `useState` 或 `useContext` 的 Hook, 当 `context` 发生变化时，它仍会重新渲染
+:::
+
 
 ```js
 const ChildrenComponent = memo(({ cab }) => {
@@ -982,10 +1252,15 @@ function App() {
 ```
 
 上面例子中 `ChildrenComponent` 每次都会重新渲染，是 `memo` 不起作用嘛？并不是，当子组件用 `memo` 包装之后，这个子组件只有在 `props`
-更新之后才会渲染，而上面 `const callBack = () => setCount(100)` ，在当前组件更新后都会重新赋值一个方法，赋值后地址就变了，那么
-子组件自然会被重新渲染
+更新之后才会渲染，而上面 `const callBack = () => setCount(100)` ，在当前组件更新后都会重新赋值一个方法，赋值后地址就变了，所以导致子组件自然会被重新渲染
 
-使用 `useCallback` 解决这个问题：
+这些可以使用 `useCallback` 解决这个问题
+
+`useCallback` 返回一个 `memoized` 回调函数。把内联回调函数及依赖项数组作为参数传入 `useCallback`，它将返回该回调函数的 `memoized` 版本，该回调函数仅在某个依赖项改变时才会更新
+
+:::tip
+`useCallback(fn, deps)` 相当于 `useMemo(() => fn, deps)`
+:::
 
 ```js
 const ChildrenComponent = memo(({ cab }) => {
@@ -1010,10 +1285,59 @@ function App() {
 
 把内联回调函数及依赖项数组作为参数传入 `useCallback`，它将返回该回调函数的 `memoized` 版本，该回调函数仅在某个依赖项改变时才会更新
 
-## useMemo和useCallback的区别
+## useCallback 源码简析
 
-`useMemo` 和 `useCallback` 接收的参数都是一样，都是在其依赖项发生变化后才执行，都是返回缓存的值，区别在于 `useMemo`  返回的是函数运行的结果，
-`useCallback` 返回的是函数
+### 首次渲染
+
+`useCallback() => HooksDispatcherOnMountInDEV.useCallback() => mountCallback(callback, deps)`
+
+```js
+  function mountCallback(callback, deps) {
+    var hook = mountWorkInProgressHook(); // 创建 hook
+    var nextDeps = deps === undefined ? null : deps;
+    hook.memoizedState = [callback, nextDeps]; // 保存 callback和 nextDeps
+    return callback; // 返回 callback
+  }
+```
+
+### 更新时
+
+`useCallback() => HooksDispatcherOnUpdateInDEV.useCallback() => updateCallback(callback, deps)`
+
+```js
+  function updateCallback(callback, deps) {
+    var hook = updateWorkInProgressHook(); 
+    var nextDeps = deps === undefined ? null : deps;
+    var prevState = hook.memoizedState;
+
+    if (prevState !== null) {
+      if (nextDeps !== null) {
+        var prevDeps = prevState[1];
+        // 如果相等则直接返回 之前的 callback
+        if (areHookInputsEqual(nextDeps, prevDeps)) {
+          return prevState[0];
+        }
+      }
+    }
+
+    hook.memoizedState = [callback, nextDeps];
+    return callback;
+  }
+```
+
+### 小结
+
+`updateCallback` 跟 `useMemo` 的过程差不多，多了新旧依赖的判断，如果没变化则直接返回之前的回调引用，这样使用 `memo` 的子组件的 `props` 就总是发生变化了
+
+### useMemo和useCallback的区别
+
+`useMemo` 和 `useCallback` 接收的参数都是一样，如果依赖项没有发生变化就返回之前的值。区别在于：
+ 
+- `useMemo`  返回的是函数运行的结果，防止重复计算，多用了有昂贵的计算成本时使用
+
+- `useCallback` 返回的是该函数，多用于需要将该回调传递给子组件使用
+
+但是不能滥用 `useMemo` 和 `useCallback`, 因为每个抽象(和性能优化)都是有代价的，比如使用 `useMemo` 和 `useCallback` 本身造成的代码直观程序及第二个依赖至少产生了额外的内存需要 
 
 [什么时候使用 useMemo 和 useCallback](https://jancat.github.io/post/2019/translation-usememo-and-usecallback/)
 
