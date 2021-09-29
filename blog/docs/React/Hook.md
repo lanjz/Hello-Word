@@ -1407,6 +1407,39 @@ function Test() {
 }
 ```
 
+## useRef 源码分析
+
+### 首次渲染
+
+`useRef() => HooksDispatcherOnMountInDEV.useRef() => mountRef()`
+
+```js
+  function mountRef(initialValue) {
+    var hook = mountWorkInProgressHook(); // 创建 hook 对象
+    var ref = { // 创建 ref
+      current: initialValue
+    };
+
+    {
+      Object.seal(ref); // 冻结该对象
+    }
+
+    hook.memoizedState = ref; // 保存到 memoizedState
+    return ref; // 返回对象
+  }
+```
+
+### 更新阶段
+
+`useRef() => HooksDispatcherOnUpdateInDEV.useRef() => updateRef()`
+
+```js
+  function updateRef(initialValue) {
+    var hook = updateWorkInProgressHook();
+    return hook.memoizedState; // 不用重新赋值，直接返回之前的 ref
+  }
+```
+
 ## useLayoutEffect
 
 作用与 `useEffect` 相同类似，可以使用它来读取 DOM 布局并同步触发重渲染。
