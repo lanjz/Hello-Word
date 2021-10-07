@@ -1440,10 +1440,11 @@ function Test() {
   }
 ```
 
+`useRef` 的实现比较简单，首次渲染的创建 `{ current: initialValue }` 保存到 `memoizedState` 中，之后读取的都是这个对象
+
 ## useLayoutEffect
 
-作用与 `useEffect` 相同类似，可以使用它来读取 DOM 布局并同步触发重渲染。
-在浏览器执行绘制之前，`useLayoutEffect` 内部的更新计划将被同步刷新
+作用与 `useEffect` 相同类似，可以使用它来读取 DOM 布局并同步触发重渲染。 在浏览器执行绘制之前，`useLayoutEffect` 内部的更新计划将被同步刷新
 
 **`useLayoutEffect`和`useEffect`**的区别
 
