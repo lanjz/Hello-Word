@@ -70,261 +70,6 @@ function DemoFunction(props) {
 
 React-Hooks 是一套能够使函数组件更强大、更灵活的“钩子”。
 
-## Q&A
-
-
-### 为什么不能在条件语句中申明 hook
-
-```js
-import React, { useState, useEffect, useRef } from 'react';
-const App = () => {
- const [name, setName] = useState('Damon');
- const [age, setAge] = useState(23);
-  if (age !== 23) {
-    const Ref = useRef(null);
-  }
- 
-  useEffect(() => {
-   console.log(name, age);
-  }, []);
- 
-  return (
-   <div>
-     <span>{name}</span>
-     <span>{age}</span>
-    </div>
-  )
-}
-export default App;
-```
-
-当这个App组件被渲染的时候，`workInProgressHook.memoizedState` 中会以链表的形式来保存这些 hook
-
-![](./images/useState_2.png)
-
-如果在条件语句中申明 hook，那么在更新阶段链表结构会被破坏，Fiber树上缓存的 hooks信息就会和当前的 `workInProgressHook` 不一致，不一致的情况下读取数据可能就会出现异常
-
-### 为什么 useState 要使用数组而不是对象
-
-useState 的用法：
-
-```js
-const [count, setCount] = useState(0)
-```
-
-**数组的解构赋值**
-
-```js
-const foo = [1, 2, 3];
-const [one, two, three] = foo;
-console.log(one);	// 1
-console.log(two);	// 2
-console.log(three);	// 3
-```
-
-**对象的解构赋值**
-
-```js
-const user = {
-  id: 888,
-  name: "xiaoxin"
-};
-const { id, name } = user;
-console.log(id);	// 888
-console.log(name);	// "xiaoxin"
-```
-
-看完这两个例子，答案应该就出来了：
-
-- 如果 useState 返回的是数组，那么使用者可以对数组中的元素命名，代码看起来也比较干净
-
-- 如果 useState 返回的是对象，在解构对象的时候必须要和 `useState` 内部实现返回的对象同名，想要使用多次的话，必须得设置别名才能使用返回值
-
-下面来看看如果 useState 返回对象的情况：
-
-```js
-// 第一次使用
-const { state, setState } = useState(false);
-// 第二次使用
-const { state: counter, setState: setCounter } = useState(0) 
-
-```
-
-这里可以看到，返回对象的使用方式还是挺麻烦的，更何况实际项目中会使用的更频繁。  
-总结：`useState` 返回的是 `array` 而不是 `object` 的原因就是为了降低使用的复杂度，返回数组的话可以直接根据顺序解构，而返回对象的话要想使用多次就需要定义别名了
-
-### React Hooks 解决了哪些问题
-
-React Hooks 主要解决了以下问题：
-
-**在组件之间复用状态逻辑很难**
-
-React 没有提供将可复用性行为“附加”到组件的途径（例如，把组件连接到 `store` ）解决此类问题可以使用` render` `props` 和 高阶组件。但是这类方案需要重新组织组件结构，这可能会很麻烦，并且会使代码难以理解。由 `providers`，`consumers`，高阶组件，`render` `props` 等其他抽象层组成的组件会形成“嵌套地狱”。尽管可以在 DevTools 过滤掉它们，但这说明了一个更深层次的问题：React 需要为共享状态逻辑提供更好的原生途径。
-
-可以使用 Hook 从组件中提取状态逻辑，使得这些逻辑可以单独测试并复用。Hook 使我们在无需修改组件结构的情况下复用状态逻辑。 这使得在组件间或社区内共享 Hook 变得更便捷。
-
-**复杂组件变得难以理解**
-
-在组件中，每个生命周期常常包含一些不相关的逻辑。例如，组件常常在 `componentDidMount` 和 `componentDidUpdate` 中获取数据。但是，同一个 `componentDidMount` 中可能也包含很多其它的逻辑，如设置事件监听，而之后需在 `componentWillUnmount` 中清除。相互关联且需要对照修改的代码被进行了拆分，而完全不相关的代码却在同一个方法中组合在一起。
-
-为了解决这个问题，Hook 将组件中相互关联的部分拆分成更小的函数（比如设置订阅或请求数据），而并非强制按照生命周期划分。你还可以使用 `reducer` 来管理组件的内部状态，使其更加可预测。
-
-**难以理解的 class**
-
-除了代码复用和代码管理会遇到困难外，class 是学习 React 的一大屏障。我们必须去理解 JavaScript 中 `this` 的工作方式，这与其他语言存在巨大差异。还不能忘记绑定事件处理器。没有稳定的语法提案，这些代码非常冗余。
- 
- 从概念上讲，React 组件一直更像是函数。而 Hook 则拥抱了函数，同时也没有牺牲 React 的精神原则。Hook 提供了问题的解决方案，无需学习复杂的函数式或响应式编程技术
- 
-### useEffect 与 useLayoutEffect 的区别
-
-**共同点**
-
-- 运用效果： `useEffect` 与 `useLayoutEffect` 两者都是用于处理副作用，这些副作用包括改变 DOM、设置订阅、操作定时器等。在函数组件内部操作副作用是不被允许的，所以需要使用这两个函数去处理。
-
-- 使用方式：` useEffect` 与 `useLayoutEffect` 两者底层的函数签名是完全一致的，都是调用的 `mountEffectImpl` 方法，在使用上也没什么差异，基本可以直接替换。
-
-**不同点**
-
-使用场景： `useEffect` 在 React 的渲染过程中是被异步调用的，用于绝大多数场景；而 `useLayoutEffect` 会在所有的 DOM 变更之后同步调用，主要用于处理 DOM 操作、调整样式、避免页面闪烁等问题。也正因为是同步处理，所以需要避免在 `useLayoutEffect` 做计算量较大的耗时任务从而造成阻塞。
-
-使用效果： `useEffect` 是按照顺序执行代码的，改变屏幕像素之后执行（先渲染，后改变DOM），当改变屏幕内容时可能会产生闪烁；`useLayoutEffect` 是改变屏幕像素之前就执行了（会推迟页面显示的事件，先改变DOM后渲染），不会产生闪烁。`useLayoutEffect` 总是比 `useEffect` 先执行。
-
-
-在未来的趋势上，两个 API 是会长期共存的，暂时没有删减合并的计划，需要开发者根据场景去自行选择。React 团队的建议非常实用，如果实在分不清，先用 `useEffect`，一般问题不大；如果页面有异常，再直接替换为 `useLayoutEffect` 即可
- 
-### React Hooks在平时开发中需要注意的问题和原因
-
-**不要在循环，条件或嵌套函数中调用Hook，必须始终在 React函数的顶层使用Hook**
-
-这是因为 React 需要利用调用顺序来正确更新相应的状态，以及调用相应的钩子函数。一旦在循环或条件分支语句中调用 Hook，就容易导致调用顺序的不一致性，从而产生难以预料到的后果
-
-**使用useState时候，使用push，pop，splice等直接更改数组对象的坑**
-
-使用push直接更改数组无法获取到新值，应该采用析构方式，但是在class里面不会有这个问题。代码示例：
-
-```js
-function Indicatorfilter() {
-  let [num,setNums] = useState([0,1,2,3])
-  const test = () => {
-    // 这里坑是直接采用push去更新num
-    // setNums(num)是无法更新num的
-    // 必须使用num = [...num ,1]
-    num.push(1)
-    // num = [...num ,1]
-    setNums(num)
-  }
-return (
-    <div className='filter'>
-      <div onClick={test}>测试</div>
-        <div>
-          {num.map((item,index) => (
-              <div key={index}>{item}</div>
-          ))}
-      </div>
-    </div>
-  )
-}
-
-class Indicatorfilter extends React.Component<any,any>{
-  constructor(props:any){
-      super(props)
-      this.state = {
-          nums:[1,2,3]
-      }
-      this.test = this.test.bind(this)
-  }
-
-  test(){
-      // class采用同样的方式是没有问题的
-      this.state.nums.push(1)
-      this.setState({
-          nums: this.state.nums
-      })
-  }
-
-  render(){
-      let {nums} = this.state
-      return(
-          <div>
-              <div onClick={this.test}>测试</div>
-                  <div>
-                      {nums.map((item:any,index:number) => (
-                          <div key={index}>{item}</div>
-                      ))}
-                  </div>
-          </div>
-
-      )
-  }
-}
-
-```
-
- 
-### React Hooks 和生命周期的关系？
- 
-函数组件 的本质是函数，没有 `state` 的概念的，因此不存在生命周期一说，仅仅是一个 `render` 函数而已。但是引入 Hooks 之后就变得不同了，它能让组件在不使用 `class` 的情况下拥有 `state`，所以就有了生命周期的概念，所谓的生命周期其实就是 `useState`、 `useEffect()` 和 `useLayoutEffect()`
- 
-即：Hooks 组件（使用了Hooks的函数组件）有生命周期，而函数组件（未使用Hooks的函数组件）是没有生命周期的
- 
-下面是具体的 class 与 Hooks 的生命周期对应关系：
-
-**constructor**
-
-函数组件不需要构造函数，可以通过调用 **useState 来初始化 state** 
-
-`const [num, UpdateNum] = useState(0)`
-
-**[getDerivedStateFromProps](https://zh-hans.reactjs.org/docs/react-component.html#static-getderivedstatefromprops)**
-
-一般情况下，我们不需要使用它，可以在渲染过程中更新 `state`，以达到实现 `getDerivedStateFromProps` 的目的
-
-```js
-function ScrollView({row}) {
-  let [isScrollingDown, setIsScrollingDown] = useState(false);
-  let [prevRow, setPrevRow] = useState(null);
-  if (row !== prevRow) {
-    // Row 自上次渲染以来发生过改变。更新 isScrollingDown。
-    setIsScrollingDown(prevRow !== null && row > prevRow);
-    setPrevRow(row);
-  }
-  return `Scrolling down: ${isScrollingDown}`;
-}
-```
-
-
-
-**shouldComponentUpdate**
-
-`shouldComponentUpdate(nextProps, nextState)`
-
-根据 `shouldComponentUpdate()` 的返回值，判断 React 组件的输出是否受当前 `state` 或 `props` 更改的影响。默认行为是 `state` 每次发生变化组件都会重新渲染
-
-可以用 **React.memo** 包裹一个组件来对它的 `props` 进行浅比较
-
-```js
-const Button = React.memo((props) => {  // 具体的组件});
-```
-
-注意：`React.memo 等效于` `PureComponent`，它只浅比较 `props`
-
-**componentWillUnmount**
-
-相当于 `useEffect` 里面返回的 `cleanup` 函数
-
-```js
-// componentDidMount/componentWillUnmount
-useEffect(()=>{
-  // 需要在 componentDidMount 执行的内容
-  return function cleanup() {
-    // 需要在 componentWillUnmount 执行的内容      
-  }
-}, [])
-```
-
-**componentDidCatch and getDerivedStateFromError：目前还没有这些方法的 Hook 等价写法**
- 
-
 ## useState
 
 使用官方的例子： 
@@ -432,7 +177,7 @@ const fiberNode = {
     memoizedState: { // hooks
         baseState: xxx, // 初始化 initialState， 每次 dispatch 之后的newState
         memoizedState: xxx, // 上次更新完之后的最终值
-        queue: { // 缓存的更新队列，
+        queue: { // 更新队列，
             lastRenderedReducer: basicStateReducer(state, action),
             lastRenderedState: xxx, // 上次state的值
             pending: null // 存放即将更新的newState信息
@@ -893,22 +638,19 @@ useEffect(() => {
 }, []) // 只在组件渲染时执行一次
 ```
 
-## useEffect 源码简析
+## useEffect/useLayoutEffect 源码简析
+
+这两个 hook 的源码基本是十分相似的，所以放一起分析
 
 ### 首次渲染
 
-根据之前 `userState` 的解读，先看下 `HooksDispatcherOnMountInDEV.useEffect()` 方法的内容
+根据之前 `useState` 的解读，当我们执行 `useEffect`，会经过以下方法： `useEffect(create, deps) => mountEffect(create, deps) => mountEffectImpl(Update | Passive, Passive$1, create, deps)`
 
-```js
-useEffect: function (create, deps) {
-    currentHookNameInDev = 'useEffect';
-    mountHookTypesDev();
-    checkDepsAreArrayDev(deps);
-    return mountEffect(create, deps);
-}
-```
+当我们执行 `useLayoutEffect` 时，会经过以下方法： `useLayoutEffect(create, deps) => mountLayoutEffect(create, deps) => mountEffectImpl(Update, Layout, create, deps)`
 
-`mountEffect(create, deps)` 实际上执行的是 `mountEffectImpl` 方法
+可以发现都会执行 `mountEffectImpl` 方法，只是前两个参数不同，这两个不周的参数是用于区别是 `useEffect` 还是 `useLayoutEffect`
+
+`mountEffectImpl` 方法
 
 ```js
   function mountEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
@@ -924,7 +666,7 @@ useEffect: function (create, deps) {
 ```js
   function pushEffect(tag, create, destroy, deps) {
     var effect = {
-      tag: tag,
+      tag: tag, // 区别 HOOK
       create: create, // useEffect 的第一个参数
       destroy: destroy, // 此时为null
       deps: deps, // useEffect 的第二个参数
@@ -939,7 +681,6 @@ useEffect: function (create, deps) {
       componentUpdateQueue.lastEffect = effect.next = effect; // 链式保存
     } else { // 如果不是第一次执行 useEffect
       var lastEffect = componentUpdateQueue.lastEffect; // 获取上一个的 effect
-
       if (lastEffect === null) {
         componentUpdateQueue.lastEffect = effect.next = effect; // 当做第一次处理
       } else {
@@ -998,21 +739,27 @@ updateQueue.lastEffect = {
     destroy: undefined
     next: {
          create: ƒ ()
-         deps: ['lan']
+         deps: []
          destroy: undefined
          next: {
              create: ƒ ()
              deps: ['lan']
              destroy: undefined
-             next: // 还是 useEffect-2 的 effect
+             next: // useEffect-2 的 effect
          }
     }
 }
 ```
 
+`Fiber.updateQueue.lastEffect` 为最后一个 `Effect，lastEffect.next` 为第一个 `Effect`
+
 ### 组件更新
 
-先看下 `InvalidNestedHooksDispatcherOnUpdateInDEV.useEffect => updateEffect() => updateEffectImpl()` 方法的内容
+先看下 `useEffect`: `HooksDispatcherOnUpdateInDEV.useEffect(create, deps) => updateEffect(create, deps) => updateEffectImpl(Update | Passive, Passive$1, create, deps)`
+
+对于 `useLayoutEffect`: `HooksDispatcherOnUpdateInDEV.useLayoutEffect(create, deps) => updateLayoutEffect(create, deps) => updateEffectImpl(Update, Layout, create, deps)`
+
+跟首次渲染时类型都是执行同一个 `updateEffectImpl`，同时使用 `tag` 进行两者的区分
 
 ```js
   function updateEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
@@ -1043,11 +790,65 @@ updateQueue.lastEffect = {
 
 更新阶段做的事情就是更新一个 `effect`，**如果新旧的依赖是一样的时候，会更新了 `effect` 的 `tag`，标识这个 `effect` 是不用更新的**
 
+到目前为 `useEffect` 和 `useLayoutEffect` 看不出区别
+
 ### commit阶段
 
-在React 执行更新阶段会执行 `commitPassiveHookEffects` 方法，执行栈如下：
+当 workInProgressFiber 树构建完成，进入 `commit` 阶段后，首先会执行 `commitBeforeMutationEffects` 函数
 
-![](./images/effect_1.png)
+```js
+function commitBeforeMutationEffects() {
+  // 省略无关代码...
+  while (nextEffect !== null) {
+    const flags = nextEffect.flags;
+    // 当flags包含Passive时表示有调用useEffect
+    if ((flags & Passive) !== NoFlags) {
+      if (!rootDoesHavePassiveEffects) {
+        // 将全局标识赋值为true，一个异步调度就会处理所有的useEffect，避免发起多个
+        rootDoesHavePassiveEffects = true;
+        // 通过调度器发起一个异步调度
+        scheduleCallback(NormalSchedulerPriority, () => {
+          // 处理useEffect
+          flushPassiveEffects();
+          return null;
+        });
+      }
+    }
+    // 遍历有副作用的Fiber节点
+    nextEffect = nextEffect.nextEffect;
+  }
+}
+```
+
+`commitBeforeMutationEffects` 方法的核心就是通过 `scheduleCallback` 发一起异步任务来处理 `userEffect
+
+`flushPassiveEffects` 函数内部会调用 `flushPassiveEffectsImpl` 函数，在这里会执行回调函数和销毁函数，因为是异步调度的，已经是渲染结束后了
+
+之后会执行 `commitLayoutEffects` 函数时做的处理的
+
+```js
+  function commitLayoutEffects(root, committedExpirationTime) {
+    while (nextEffect !== null) {
+      setCurrentFiber(nextEffect);
+      var effectTag = nextEffect.effectTag;
+      if (effectTag & (Update | Callback)) { 
+        recordEffect();
+        var current = nextEffect.alternate;
+        commitLifeCycles(root, current, nextEffect); // 这里面会执行 useLayoutEffect
+      }
+
+      if (effectTag & Ref) {
+        recordEffect();
+        commitAttachRef(nextEffect);
+      }
+
+      resetCurrentFiber();
+      nextEffect = nextEffect.nextEffect;
+    }
+  }
+```
+
+此时的是同步执行的 `commitLifeCycles` 也就是同步执行 `useLayoutEffect`，之后在页面视图更新后执行上文中的 `scheduleCallback` 异步任务会执行 `commitPassiveHookEffects` 方法，执行栈如下：
 
 ```js
   function commitPassiveHookEffects(finishedWork) {
@@ -1112,11 +913,86 @@ updateQueue.lastEffect = {
 
 `commitHookEffectListUnmount` 和 `commitHookEffectListMount` 两个方法就是遍历组件依次执行卸载时 `effect` 的回调和 `effect` 方法
 
+https://www.qiyuandi.com/zhanzhang/zonghe/13075.html
+
 ### 小结
 
 `useEffect` 大概过程是函数组件在挂载阶段会执行 `MountEffect`，维护 `hook`的链表，同时专门维护一个 `effect` 的链表。
 在组件更新阶段，会执行 `UpdateEffect`，判断 `deps` 有没有更新，如果依赖项更新了，就执行 `useEffect` 里操作，没有就给这个 `effect` 标记一下`NoHookEffect`，跳过执行，去下一个 `useEffect`
 
+## useLayoutEffect
+
+官方解释：作用与 `useEffect` 相同类似，可以使用它来读取 DOM 布局并同步触发重渲染。 在浏览器执行绘制之前，`useLayoutEffect` 内部的更新计划将被同步刷新（不是很明白）
+
+**`useLayoutEffect`和`useEffect`** 的区别
+
+为了理解与 `useEffect` 的区别，我们先了解一下 React 组件的更新过程:
+
+1. 初始化,变更 `state` 或者 `props` 时都会触发组件更新
+
+2. 当前组件就会调用 `render` 函数
+
+3. React 会执行 `useLayoutEffect`，直到该函数逻辑执行完毕
+
+4. 虚拟`dom元素`真实地更新到屏幕上
+
+5. 执行 `useEffect` 表示更新完毕
+
+可以看到 `useEffect` 是在Dom完成渲染之后执行，`useLayoutEffect` 则在Dom最终渲染前执行
+
+## useLayoutEffect 源码简析
+
+### 初始渲染阶段
+
+`useLayoutEffect(create, deps) => HooksDispatcherOnMountInDEV.useLayoutEffect(create, deps) => mountLayoutEffect(create, deps) => mountEffectImpl(Update, Layout, create, deps)`
+
+```js
+  function mountEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
+    var hook = mountWorkInProgressHook();
+    var nextDeps = deps === undefined ? null : deps;
+    currentlyRenderingFiber$1.effectTag |= fiberEffectTag;
+    hook.memoizedState = pushEffect(HasEffect | hookEffectTag, create, undefined, nextDeps);
+  }
+```
+
+### 更新阶段
+
+`useLayoutEffect(create, deps) => HooksDispatcherOnUpdateInDEV.updateLayoutEffect(create, deps) => updateEffectImpl(create, deps) => mountEffectImpl(Update, Layout, create, deps)`
+
+```js
+  function updateEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
+    var hook = updateWorkInProgressHook();
+    var nextDeps = deps === undefined ? null : deps;
+    var destroy = undefined;
+
+    if (currentHook !== null) {
+      var prevEffect = currentHook.memoizedState;
+      destroy = prevEffect.destroy;
+
+      if (nextDeps !== null) {
+        var prevDeps = prevEffect.deps;
+
+        if (areHookInputsEqual(nextDeps, prevDeps)) {
+          pushEffect(hookEffectTag, create, destroy, nextDeps);
+          return;
+        }
+      }
+    }
+
+    currentlyRenderingFiber$1.effectTag |= fiberEffectTag;
+    hook.memoizedState = pushEffect(HasEffect | hookEffectTag, create, destroy, nextDeps);
+  }
+```
+
+### 区别
+
+`mountEffect` 和 `mountLayoutEffect` 内部都是调用了 `mountEffectImpl`，区别只是flags的标识不同，用于区分是 `useEffect` 还是 `useLayoutEffect`
+
+这么一看貌似跟 `useEffect` 没有区别
+
+useEffect和useLayoutEffect，对它们的处理最终都落在处理fiber.updateQueue上，对前者来说，循环updateQueue时只处理包含useEffect这类tag的effect，对后者来说，只处理包含useLayoutEffect这类tag的effect，它们的处理过程都是先执行前一次更新时effect的销毁函数（destroy），再执行新effect的创建函数（create）。
+
+以上是它们的处理过程在微观上的共性，宏观上的区别主要体现在执行时机上。useEffect是在beforeMutation或layout阶段异步调度，然后在本次的更新应用到屏幕上之后再执行，而useLayoutEffect是在layout阶段同步执行的。下面先分析useEffect的处理过程
 
 ## useMemo
 
@@ -1442,26 +1318,6 @@ function Test() {
 
 `useRef` 的实现比较简单，首次渲染的创建 `{ current: initialValue }` 保存到 `memoizedState` 中，之后读取的都是这个对象
 
-## useLayoutEffect
-
-作用与 `useEffect` 相同类似，可以使用它来读取 DOM 布局并同步触发重渲染。 在浏览器执行绘制之前，`useLayoutEffect` 内部的更新计划将被同步刷新
-
-**`useLayoutEffect`和`useEffect`**的区别
-
-在区分之前，我们先了解React 组件的更新过程:
-
-1. 初始化,变更`state` 或者 `props` 时都会触发组件更新
-
-2. 当前组件就会调用 `render` 函数
-
-3. React 会执行 `useLayoutEffect`，直到该函数逻辑执行完毕
-
-4. 虚拟`dom元素`真实地更新到屏幕上
-
-5. 执行 `useEffect` 表示更新完毕
-
-可以看到 `useEffect` 是在Dom完成渲染之后执行，`useLayoutEffect` 则在Dom最终渲染前执行
-
 ## useImperativeHandle
 
 `useImperativeHandle(ref, createHandle, [deps])`
@@ -1530,7 +1386,7 @@ export default App;
 
 - 组合更新时，自定义 Hook中的`effect`的执行规则也是一样的，我们可以利用这种做 hook 通信
 
-  ```
+  ```js
   // 自定义hook
   import { useState, useEffect } from 'react';
   
@@ -1584,6 +1440,260 @@ export default App;
   - 不要在循环，条件或嵌套函数中调用 Hook， 确保总是在你的 React 函数的最顶层调用他们。
 
   - 在自定义 Hook 中调用其他 Hook 
+  
+## Q&A
+
+### 为什么不能在条件语句中申明 hook
+
+```js
+import React, { useState, useEffect, useRef } from 'react';
+const App = () => {
+ const [name, setName] = useState('Damon');
+ const [age, setAge] = useState(23);
+  if (age !== 23) {
+    const Ref = useRef(null);
+  }
+ 
+  useEffect(() => {
+   console.log(name, age);
+  }, []);
+ 
+  return (
+   <div>
+     <span>{name}</span>
+     <span>{age}</span>
+    </div>
+  )
+}
+export default App;
+```
+
+当这个App组件被渲染的时候，`workInProgressHook.memoizedState` 中会以链表的形式来保存这些 hook
+
+![](./images/useState_2.png)
+
+如果在条件语句中申明 hook，那么在更新阶段链表结构会被破坏，Fiber树上缓存的 hooks信息就会和当前的 `workInProgressHook` 不一致，不一致的情况下读取数据可能就会出现异常
+
+### 为什么 useState 要使用数组而不是对象
+
+useState 的用法：
+
+```js
+const [count, setCount] = useState(0)
+```
+
+**数组的解构赋值**
+
+```js
+const foo = [1, 2, 3];
+const [one, two, three] = foo;
+console.log(one);	// 1
+console.log(two);	// 2
+console.log(three);	// 3
+```
+
+**对象的解构赋值**
+
+```js
+const user = {
+  id: 888,
+  name: "xiaoxin"
+};
+const { id, name } = user;
+console.log(id);	// 888
+console.log(name);	// "xiaoxin"
+```
+
+看完这两个例子，答案应该就出来了：
+
+- 如果 useState 返回的是数组，那么使用者可以对数组中的元素命名，代码看起来也比较干净
+
+- 如果 useState 返回的是对象，在解构对象的时候必须要和 `useState` 内部实现返回的对象同名，想要使用多次的话，必须得设置别名才能使用返回值
+
+下面来看看如果 useState 返回对象的情况：
+
+```js
+// 第一次使用
+const { state, setState } = useState(false);
+// 第二次使用
+const { state: counter, setState: setCounter } = useState(0) 
+
+```
+
+这里可以看到，返回对象的使用方式还是挺麻烦的，更何况实际项目中会使用的更频繁。  
+总结：`useState` 返回的是 `array` 而不是 `object` 的原因就是为了降低使用的复杂度，返回数组的话可以直接根据顺序解构，而返回对象的话要想使用多次就需要定义别名了
+
+### React Hooks 解决了哪些问题
+
+React Hooks 主要解决了以下问题：
+
+**在组件之间复用状态逻辑很难**
+
+React 没有提供将可复用性行为“附加”到组件的途径（例如，把组件连接到 `store` ）解决此类问题可以使用` render` `props` 和 高阶组件。但是这类方案需要重新组织组件结构，这可能会很麻烦，并且会使代码难以理解。由 `providers`，`consumers`，高阶组件，`render` `props` 等其他抽象层组成的组件会形成“嵌套地狱”。尽管可以在 DevTools 过滤掉它们，但这说明了一个更深层次的问题：React 需要为共享状态逻辑提供更好的原生途径。
+
+可以使用 Hook 从组件中提取状态逻辑，使得这些逻辑可以单独测试并复用。Hook 使我们在无需修改组件结构的情况下复用状态逻辑。 这使得在组件间或社区内共享 Hook 变得更便捷。
+
+**复杂组件变得难以理解**
+
+在组件中，每个生命周期常常包含一些不相关的逻辑。例如，组件常常在 `componentDidMount` 和 `componentDidUpdate` 中获取数据。但是，同一个 `componentDidMount` 中可能也包含很多其它的逻辑，如设置事件监听，而之后需在 `componentWillUnmount` 中清除。相互关联且需要对照修改的代码被进行了拆分，而完全不相关的代码却在同一个方法中组合在一起。
+
+为了解决这个问题，Hook 将组件中相互关联的部分拆分成更小的函数（比如设置订阅或请求数据），而并非强制按照生命周期划分。你还可以使用 `reducer` 来管理组件的内部状态，使其更加可预测。
+
+**难以理解的 class**
+
+除了代码复用和代码管理会遇到困难外，class 是学习 React 的一大屏障。我们必须去理解 JavaScript 中 `this` 的工作方式，这与其他语言存在巨大差异。还不能忘记绑定事件处理器。没有稳定的语法提案，这些代码非常冗余。
+ 
+ 从概念上讲，React 组件一直更像是函数。而 Hook 则拥抱了函数，同时也没有牺牲 React 的精神原则。Hook 提供了问题的解决方案，无需学习复杂的函数式或响应式编程技术
+ 
+### useEffect 与 useLayoutEffect 的区别
+
+**共同点**
+
+- 运用效果： `useEffect` 与 `useLayoutEffect` 两者都是用于处理副作用，这些副作用包括改变 DOM、设置订阅、操作定时器等。在函数组件内部操作副作用是不被允许的，所以需要使用这两个函数去处理。
+
+- 使用方式：` useEffect` 与 `useLayoutEffect` 两者底层的函数签名是完全一致的，都是调用的 `mountEffectImpl` 方法，在使用上也没什么差异，基本可以直接替换。
+
+**不同点**
+
+使用场景： `useEffect` 在 React 的渲染过程中是被异步调用的，用于绝大多数场景；而 `useLayoutEffect` 会在所有的 DOM 变更之后同步调用，主要用于处理 DOM 操作、调整样式、避免页面闪烁等问题。也正因为是同步处理，所以需要避免在 `useLayoutEffect` 做计算量较大的耗时任务从而造成阻塞。
+
+使用效果： `useEffect` 是按照顺序执行代码的，改变屏幕像素之后执行（先渲染，后改变DOM），当改变屏幕内容时可能会产生闪烁；`useLayoutEffect` 是改变屏幕像素之前就执行了（会推迟页面显示的事件，先改变DOM后渲染），不会产生闪烁。`useLayoutEffect` 总是比 `useEffect` 先执行。
+
+
+在未来的趋势上，两个 API 是会长期共存的，暂时没有删减合并的计划，需要开发者根据场景去自行选择。React 团队的建议非常实用，如果实在分不清，先用 `useEffect`，一般问题不大；如果页面有异常，再直接替换为 `useLayoutEffect` 即可
+ 
+### React Hooks在平时开发中需要注意的问题和原因
+
+**不要在循环，条件或嵌套函数中调用Hook，必须始终在 React函数的顶层使用Hook**
+
+这是因为 React 需要利用调用顺序来正确更新相应的状态，以及调用相应的钩子函数。一旦在循环或条件分支语句中调用 Hook，就容易导致调用顺序的不一致性，从而产生难以预料到的后果
+
+**使用useState时候，使用push，pop，splice等直接更改数组对象的坑**
+
+使用push直接更改数组无法获取到新值，应该采用析构方式，但是在class里面不会有这个问题。代码示例：
+
+```js
+function Indicatorfilter() {
+  let [num,setNums] = useState([0,1,2,3])
+  const test = () => {
+    // 这里坑是直接采用push去更新num
+    // setNums(num)是无法更新num的
+    // 必须使用num = [...num ,1]
+    num.push(1)
+    // num = [...num ,1]
+    setNums(num)
+  }
+return (
+    <div className='filter'>
+      <div onClick={test}>测试</div>
+        <div>
+          {num.map((item,index) => (
+              <div key={index}>{item}</div>
+          ))}
+      </div>
+    </div>
+  )
+}
+
+class Indicatorfilter extends React.Component<any,any>{
+  constructor(props:any){
+      super(props)
+      this.state = {
+          nums:[1,2,3]
+      }
+      this.test = this.test.bind(this)
+  }
+
+  test(){
+      // class采用同样的方式是没有问题的
+      this.state.nums.push(1)
+      this.setState({
+          nums: this.state.nums
+      })
+  }
+
+  render(){
+      let {nums} = this.state
+      return(
+          <div>
+              <div onClick={this.test}>测试</div>
+                  <div>
+                      {nums.map((item:any,index:number) => (
+                          <div key={index}>{item}</div>
+                      ))}
+                  </div>
+          </div>
+
+      )
+  }
+}
+
+```
+
+ 
+### React Hooks 和生命周期的关系？
+ 
+函数组件 的本质是函数，没有 `state` 的概念的，因此不存在生命周期一说，仅仅是一个 `render` 函数而已。但是引入 Hooks 之后就变得不同了，它能让组件在不使用 `class` 的情况下拥有 `state`，所以就有了生命周期的概念，所谓的生命周期其实就是 `useState`、 `useEffect()` 和 `useLayoutEffect()`
+ 
+即：Hooks 组件（使用了Hooks的函数组件）有生命周期，而函数组件（未使用Hooks的函数组件）是没有生命周期的
+ 
+下面是具体的 class 与 Hooks 的生命周期对应关系：
+
+**constructor**
+
+函数组件不需要构造函数，可以通过调用 **useState 来初始化 state** 
+
+`const [num, UpdateNum] = useState(0)`
+
+**[getDerivedStateFromProps](https://zh-hans.reactjs.org/docs/react-component.html#static-getderivedstatefromprops)**
+
+一般情况下，我们不需要使用它，可以在渲染过程中更新 `state`，以达到实现 `getDerivedStateFromProps` 的目的
+
+```js
+function ScrollView({row}) {
+  let [isScrollingDown, setIsScrollingDown] = useState(false);
+  let [prevRow, setPrevRow] = useState(null);
+  if (row !== prevRow) {
+    // Row 自上次渲染以来发生过改变。更新 isScrollingDown。
+    setIsScrollingDown(prevRow !== null && row > prevRow);
+    setPrevRow(row);
+  }
+  return `Scrolling down: ${isScrollingDown}`;
+}
+```
+
+
+
+**shouldComponentUpdate**
+
+`shouldComponentUpdate(nextProps, nextState)`
+
+根据 `shouldComponentUpdate()` 的返回值，判断 React 组件的输出是否受当前 `state` 或 `props` 更改的影响。默认行为是 `state` 每次发生变化组件都会重新渲染
+
+可以用 **React.memo** 包裹一个组件来对它的 `props` 进行浅比较
+
+```js
+const Button = React.memo((props) => {  // 具体的组件});
+```
+
+注意：`React.memo 等效于` `PureComponent`，它只浅比较 `props`
+
+**componentWillUnmount**
+
+相当于 `useEffect` 里面返回的 `cleanup` 函数
+
+```js
+// componentDidMount/componentWillUnmount
+useEffect(()=>{
+  // 需要在 componentDidMount 执行的内容
+  return function cleanup() {
+    // 需要在 componentWillUnmount 执行的内容      
+  }
+}, [])
+```
+
+**componentDidCatch and getDerivedStateFromError：目前还没有这些方法的 Hook 等价写法**
+ 
 
 https://juejin.cn/post/6940942549305524238#heading-22
 

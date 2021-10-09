@@ -15,18 +15,23 @@
 <script type="text/babel">
     window.onload = function () {
         function App() {
-/*            const t = React.useRef(null);
-            let [age, setAge] = React.useState(1)
-            clearTimeout(t.current)
-            t.current = setInterval(() => {
-                console.log(new Date())
-            }, 2000)*/
-            console.log('ww', this)
+            let [name, setName] = React.useState('lan1')
+
             function update() {
-                console.log('this', this)
+                // setName(name + 1)
+                setName('lan')
             }
 
-            return (<div onClick={update}>当前}</div>)
+            React.useEffect(() => { // useEffect-1
+                console.log('A', document.getElementById('spa'))
+            }, [name])
+            React.useEffect(() => { // useEffect-2
+                console.log('B')
+            }, [])
+            React.useLayoutEffect(() => { // useEffect-1
+                console.log('useLayoutEffect', document.getElementById('spa'))
+            }, [name])
+            return (<div onClick={update}>{name} {name === 'lan' && <span id="spa">显示</span>}</div>)
         }
 
         ReactDOM.render(<App/>, document.getElementById('root'));
