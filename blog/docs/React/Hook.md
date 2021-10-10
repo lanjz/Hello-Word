@@ -638,6 +638,10 @@ useEffect(() => {
 }, []) // 只在组件渲染时执行一次
 ```
 
+## useLayoutEffect
+
+官方解释：作用与 `useEffect` 相同类似，可以使用它来读取 DOM 布局并同步触发重渲染。 在浏览器执行绘制之前，`useLayoutEffect` 内部的更新计划将被同步刷新（不是很明白）
+
 ## useEffect/useLayoutEffect 源码简析
 
 这两个 hook 的源码基本是十分相似的，所以放一起分析
@@ -648,7 +652,7 @@ useEffect(() => {
 
 当我们执行 `useLayoutEffect` 时，会经过以下方法： `useLayoutEffect(create, deps) => mountLayoutEffect(create, deps) => mountEffectImpl(Update, Layout, create, deps)`
 
-可以发现都会执行 `mountEffectImpl` 方法，只是前两个参数不同，这两个不周的参数是用于区别是 `useEffect` 还是 `useLayoutEffect`
+可以发现都会执行 `mountEffectImpl` 方法，只是前两个参数不同，这两个不同的参数是用于区分是 `useEffect` 还是 `useLayoutEffect`
 
 `mountEffectImpl` 方法
 
@@ -820,11 +824,11 @@ function commitBeforeMutationEffects() {
 }
 ```
 
-`commitBeforeMutationEffects` 方法的核心就是通过 `scheduleCallback` 发一起异步任务来处理 `userEffect
+`commitBeforeMutationEffects` 方法的核心就是通过 `scheduleCallback` 发一起异步任务来处理 `userEffect`
 
-`flushPassiveEffects` 函数内部会调用 `flushPassiveEffectsImpl` 函数，在这里会执行回调函数和销毁函数，因为是异步调度的，已经是渲染结束后了
+`flushPassiveEffects` 函数内部会调用 `flushPassiveEffectsImpl` 函数，在这里会执行回调函数和销毁函数，因为是异步调度的，所以是在页面渲染结束后执行的
 
-之后会执行 `commitLayoutEffects` 函数时做的处理的
+之后还会执行 `commitLayoutEffects` 函数
 
 ```js
   function commitLayoutEffects(root, committedExpirationTime) {
@@ -848,7 +852,8 @@ function commitBeforeMutationEffects() {
   }
 ```
 
-此时的是同步执行的 `commitLifeCycles` 也就是同步执行 `useLayoutEffect`，之后在页面视图更新后执行上文中的 `scheduleCallback` 异步任务会执行 `commitPassiveHookEffects` 方法，执行栈如下：
+`commitLayoutEffects` 函数中会同步执行的 `commitLifeCycles(root, current, nextEffect)` 也就是同步执行 `useLayoutEffect Hook` ，从这里就至少可以知道 `useLayoutEffect` 是先于 `useEffect` 执行的  
+之后当页面视图更新后执行上文中的 `scheduleCallback` 方法中异步任务，这个任务会执行 `commitPassiveHookEffects` 方法
 
 ```js
   function commitPassiveHookEffects(finishedWork) {
@@ -913,86 +918,96 @@ function commitBeforeMutationEffects() {
 
 `commitHookEffectListUnmount` 和 `commitHookEffectListMount` 两个方法就是遍历组件依次执行卸载时 `effect` 的回调和 `effect` 方法
 
-https://www.qiyuandi.com/zhanzhang/zonghe/13075.html
+**useLayoutEffect 的销毁时机**
+
+`useLayoutEffect` 销毁函数的执行在 Mutation 阶段，Mutation 阶段会执行 `commitMutationEffects` 函数，函数内部会对 `flags` 包含 Update 的 Fiber 节点再执行 `commitWork` 函数
+
+```js
+function commitWork(current: Fiber | null, finishedWork: Fiber): void {
+  switch (finishedWork.tag) {
+    case FunctionComponent:
+    case ForwardRef:
+    case MemoComponent:
+    case SimpleMemoComponent:
+    case Block: {
+      // 执行useLayoutEffect的销毁函数
+      commitHookEffectListUnmount(HookLayout | HookHasEffect, finishedWork);
+      return;
+    }
+  }
+}
+```
+
+[useEffect和useLayoutEffect源码浅析](https://www.qiyuandi.com/zhanzhang/zonghe/13075.html)
 
 ### 小结
 
-`useEffect` 大概过程是函数组件在挂载阶段会执行 `MountEffect`，维护 `hook`的链表，同时专门维护一个 `effect` 的链表。
-在组件更新阶段，会执行 `UpdateEffect`，判断 `deps` 有没有更新，如果依赖项更新了，就执行 `useEffect` 里操作，没有就给这个 `effect` 标记一下`NoHookEffect`，跳过执行，去下一个 `useEffect`
+`useEffect` 和 `useLayoutEffect` 的函数本身在 `Mount` 和 `Update` 时调用的都是相同的函数，仅参数不同，最大的区别在于 `useEffect` 是异步执行，`useLayoutEffect` 是同步执行
 
-## useLayoutEffect
+`useEffect` 和 `useLayoutEffect` 所使用的 Effect 对象储存在函数组件的 Fiber 节点的 `updateQueue` 中，它是一个单向环形链表，`updateQueue.lastEffect` 为最后的 Effect 对象，`lastEffect.next` 为第一个 Effect 对象，同时为了维护函数组件的 Hooks 链表，Effect 对象也同时被添加到了 Fiber 节点的 `memorizedState` 属性中
 
-官方解释：作用与 `useEffect` 相同类似，可以使用它来读取 DOM 布局并同步触发重渲染。 在浏览器执行绘制之前，`useLayoutEffect` 内部的更新计划将被同步刷新（不是很明白）
+Effect 对象通过 `tag` 字段区分是 `useEffect` 还是 `useLayoutEffect`
+
+在Fiber树的 render 阶段存储 Hook
+
+在 commit 阶段，先通过 `commitBeforeMutationEffects` 函数发起异步调度，然后同步执行 `useLayoutEffect`，最后在视图更新后再执行 `useEffect`
 
 **`useLayoutEffect`和`useEffect`** 的区别
 
-为了理解与 `useEffect` 的区别，我们先了解一下 React 组件的更新过程:
+通过 React 的更新过程来理解一下两者的区别
 
-1. 初始化,变更 `state` 或者 `props` 时都会触发组件更新
+1. react 在 diff 后，会进入到 commit 阶段，准备把虚拟 DOM 发生的变化映射到真实 DOM 上
 
-2. 当前组件就会调用 `render` 函数
+2. 在 commit 阶段的前期，会调用一些生命周期方法，对于类组件来说，需要触发组件的 `getSnapshotBeforeUpdate` 生命周期，对于函数组件，此时会调度 `useEffect` 的 `create destroy` 函数
 
-3. React 会执行 `useLayoutEffect`，直到该函数逻辑执行完毕
+3. 注意是调度，不是执行。在这个阶段，会把使用了 `useEffect` 组件产生的生命周期函数入列到 React 自己维护的调度队列中，给予一个普通的优先级，让这些生命周期函数异步执行
 
-4. 虚拟`dom元素`真实地更新到屏幕上
+   ```js
+   // 可以近似的认为，React 做了这样一步，实际流程中要复杂的多
+    setTimeout(() => {
+    const preDestory = element.destroy;
+    if (!preDestory) prevDestroy();
+    const destroy = create();
+    element.destroy= destroy;
+    }, 0);
+   ```
+   
+4. 随后，就到了 React 把虚拟 DOM 设置到真实 DOM 上的阶段，这个阶段主要调用的函数是 `commitWork`，`commitWork` 函数会针对不同的 fiber 节点调用不同的 DOM 的修改方法，比如文本节点和元素节点的修改方法是不一样的
 
-5. 执行 `useEffect` 表示更新完毕
+5. `commitWork` 如果遇到了类组件的 fiber 节点，不会做任何操作，会直接 `return`，进行收尾工作，然后去处理下一个节点，这点很容易理解，类组件的 fiber 节点没有对应的真实 DOM 结构，所以就没有相关操作
 
-可以看到 `useEffect` 是在Dom完成渲染之后执行，`useLayoutEffect` 则在Dom最终渲染前执行
+6. 但在有了 hooks 以后，函数组件在这个阶段，会同步调用上一次渲染时 `useLayoutEffect(create, deps) create` 函数返回的 `destroy` 函数
 
-## useLayoutEffect 源码简析
+7. 注意一个节点在 `commitWork` 后，这个时候，我们已经把发生的变化映射到真实 DOM 上了
 
-### 初始渲染阶段
+8. **但由于 JS 线程和浏览器渲染线程是互斥的，因为 JS 虚拟机还在运行，即使内存中的真实 DOM 已经变化，浏览器也没有立刻渲染到屏幕上**
 
-`useLayoutEffect(create, deps) => HooksDispatcherOnMountInDEV.useLayoutEffect(create, deps) => mountLayoutEffect(create, deps) => mountEffectImpl(Update, Layout, create, deps)`
+9. 此时会进行收尾工作，同步执行对应的生命周期方法，我们说的 `componentDidMount`，`componentDidUpdate` 以及 `useLayoutEffect(create, deps)` 的 `create` 函数都是在这个阶段被同步执行
 
-```js
-  function mountEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
-    var hook = mountWorkInProgressHook();
-    var nextDeps = deps === undefined ? null : deps;
-    currentlyRenderingFiber$1.effectTag |= fiberEffectTag;
-    hook.memoizedState = pushEffect(HasEffect | hookEffectTag, create, undefined, nextDeps);
-  }
-```
+10. 对于 react 来说，commit 阶段是不可打断的，会一次性把所有需要 commit 的节点全部 commit 完，至此 react 更新完毕，JS 停止执行
 
-### 更新阶段
+11. 浏览器把发生变化的 DOM 渲染到屏幕上，到此为止 react 仅用一次回流、重绘的代价，就把所有需要更新的 DOM 节点全部更新完成
 
-`useLayoutEffect(create, deps) => HooksDispatcherOnUpdateInDEV.updateLayoutEffect(create, deps) => updateEffectImpl(create, deps) => mountEffectImpl(Update, Layout, create, deps)`
+12. 浏览器渲染完成后，浏览器通知 react 自己处于空闲阶段，react 开始执行自己调度队列中的任务，此时才开始执行 `useEffect(create, deps)` 的产生的函数
 
-```js
-  function updateEffectImpl(fiberEffectTag, hookEffectTag, create, deps) {
-    var hook = updateWorkInProgressHook();
-    var nextDeps = deps === undefined ? null : deps;
-    var destroy = undefined;
+**简单来说就是调用时机不同**
 
-    if (currentHook !== null) {
-      var prevEffect = currentHook.memoizedState;
-      destroy = prevEffect.destroy;
+- `useLayoutEffect` 和原来 `componentDidMount` & `componentDidUpdate`一致
 
-      if (nextDeps !== null) {
-        var prevDeps = prevEffect.deps;
+- 在 `react` 完成DOM更新操作后马上同步调用的 `useLayoutEffect` 代码，会阻塞页面渲染
 
-        if (areHookInputsEqual(nextDeps, prevDeps)) {
-          pushEffect(hookEffectTag, create, destroy, nextDeps);
-          return;
-        }
-      }
-    }
+- 而 `useEffect` 是会在整个页面渲染完才会调用的代码
 
-    currentlyRenderingFiber$1.effectTag |= fiberEffectTag;
-    hook.memoizedState = pushEffect(HasEffect | hookEffectTag, create, destroy, nextDeps);
-  }
-```
+**useEffect 和 useLayoutEffect 哪一个与 componentWillUnmount 的是等价的？**
 
-### 区别
+`useLayoutEffect` 的 `detroy` 函数的调用位置、时机与 `componentWillUnmount` 一致，且都是同步调用。`useEffect` 的 `detroy` 函数从调用时机上来看，更像是 `componentDidUnmount`
 
-`mountEffect` 和 `mountLayoutEffect` 内部都是调用了 `mountEffectImpl`，区别只是flags的标识不同，用于区分是 `useEffect` 还是 `useLayoutEffect`
+**为什么建议将修改 DOM 的操作里放到 useLayoutEffect 里，而不是 useEffect**
 
-这么一看貌似跟 `useEffect` 没有区别
+可以看到在流程9/10期间，DOM 已经被修改，但但浏览器渲染线程依旧处于被阻塞阶段，所以还没有发生回流、重绘过程。由于内存中的 DOM 已经被修改，通过 `useLayoutEffect` 可以拿到最新的 DOM 节点，并且在此时对 DOM 进行样式上的修改，假设修改了元素的 `height`，这些修改会在步骤 11 和 react 做出的更改一起被一次性渲染到屏幕上，依旧只有一次回流、重绘的代价。  
+如果放在 `useEffect` 里，`useEffect` 的函数会在组件渲染到屏幕之后执行，此时对 DOM 进行修改，会触发浏览器再次进行回流、重绘，增加了性能上的损耗
 
-useEffect和useLayoutEffect，对它们的处理最终都落在处理fiber.updateQueue上，对前者来说，循环updateQueue时只处理包含useEffect这类tag的effect，对后者来说，只处理包含useLayoutEffect这类tag的effect，它们的处理过程都是先执行前一次更新时effect的销毁函数（destroy），再执行新effect的创建函数（create）。
-
-以上是它们的处理过程在微观上的共性，宏观上的区别主要体现在执行时机上。useEffect是在beforeMutation或layout阶段异步调度，然后在本次的更新应用到屏幕上之后再执行，而useLayoutEffect是在layout阶段同步执行的。下面先分析useEffect的处理过程
+> [深入理解 React useLayoutEffect 和 useEffect 的执行时机](https://juejin.cn/post/6844904183666049032)
 
 ## useMemo
 
@@ -1215,7 +1230,7 @@ function App() {
 
 但是不能滥用 `useMemo` 和 `useCallback`, 因为每个抽象(和性能优化)都是有代价的，比如使用 `useMemo` 和 `useCallback` 本身造成的代码直观程序及第二个依赖至少产生了额外的内存需要 
 
-[什么时候使用 useMemo 和 useCallback](https://jancat.github.io/post/2019/translation-usememo-and-usecallback/)
+>[什么时候使用 useMemo 和 useCallback](https://jancat.github.io/post/2019/translation-usememo-and-usecallback/)
 
 ## useRef
 
@@ -1695,14 +1710,7 @@ useEffect(()=>{
 **componentDidCatch and getDerivedStateFromError：目前还没有这些方法的 Hook 等价写法**
  
 
-https://juejin.cn/post/6940942549305524238#heading-22
-
-https://github.com/7kms/react-illustration-series
-
-[什么时候使用 useMemo 和 useCallback](https://jancat.github.io/post/2019/translation-usememo-and-usecallback/)
-
-[useState源码浅析](https://juejin.cn/post/6844903799119675406)
-
-https://developer.aliyun.com/article/784027
-
-https://segmentfault.com/a/1190000039087645
+>[React 面试题](https://juejin.cn/post/6940942549305524238#heading-22)  
+>[图解 React 源码系列](https://github.com/7kms/react-illustration-series)  
+>[什么时候使用 useMemo 和 useCallback](https://jancat.github.io/post/2019/translation-usememo-and-usecallback/)  
+>[useState源码浅析](https://juejin.cn/post/6844903799119675406)

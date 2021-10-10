@@ -15,23 +15,18 @@
 <script type="text/babel">
     window.onload = function () {
         function App() {
-            let [name, setName] = React.useState('lan1')
+          const [state, setState] = React.useState("hello world")
 
-            function update() {
-                // setName(name + 1)
-                setName('lan')
+          React.useLayoutEffect(() => {
+            let i = 0;
+            while(i <= 1000000000) {
+              i++;
             }
-
-            React.useEffect(() => { // useEffect-1
-                console.log('A', document.getElementById('spa'))
-            }, [name])
-            React.useEffect(() => { // useEffect-2
-                console.log('B')
-            }, [])
-            React.useLayoutEffect(() => { // useEffect-1
-                console.log('useLayoutEffect', document.getElementById('spa'))
-            }, [name])
-            return (<div onClick={update}>{name} {name === 'lan' && <span id="spa">显示</span>}</div>)
+            setState("world hello");
+          }, [])
+          return (
+            <div>{state}</div>
+          )
         }
 
         ReactDOM.render(<App/>, document.getElementById('root'));

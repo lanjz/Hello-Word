@@ -20640,7 +20640,6 @@
   }
 
   function commitWork(current, finishedWork) {
-
     switch (finishedWork.tag) {
       case FunctionComponent:
       case ForwardRef:
@@ -22815,7 +22814,6 @@
   }
 
   function commitBeforeMutationEffects() {
-    debugger
     while (nextEffect !== null) {
       var effectTag = nextEffect.effectTag;
 
@@ -22929,7 +22927,6 @@
   }
 
   function commitLayoutEffects(root, committedExpirationTime) {
-    debugger
     // TODO: Should probably move the bulk of this function to commitWork.
     while (nextEffect !== null) {
       setCurrentFiber(nextEffect);
