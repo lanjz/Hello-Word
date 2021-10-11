@@ -80,5 +80,10 @@ CSS3中新添加了很多选择器，解决了很多之前需要用javascript才
 
 - 渐变
 
+### em，rem，vw
 
+- vw：根据窗口大小分成100份为基础进行布局
 
+- rem：根据 HTML `font-size` 值进行相对转换
+
+- em: 根据父级 `font-size` 值进行相对转换

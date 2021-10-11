@@ -830,6 +830,14 @@ square instanceof Polygon // true
 
 > JavaScript中的`class` 仍然是基于原型的
 
+:::tip
+`function a(){}`  
+a.constructor === Function  
+Function.prototype === 函数对象 // ƒ () { [native code] }  
+Function.constructor === Function  
+Function.prototype.constructor === Function
+:::
+
 ### 获取原型链
 
 `Object`提供了`getPrototypeOf()`来获取原型链，`Object.getPrototypeOf()`方法与`__proto__`作用一样，都是指向该对象的构造函数的`protype`属性
