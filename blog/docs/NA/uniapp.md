@@ -111,7 +111,7 @@ uni-app 像是一个大集成，根据打包的平台命令执行不同的打包
 
 - uni-app 的 App端，Android 基础引擎约 9M ，App 还提供了扩展模块，比如地图、蓝牙等，打包时如不需要这些模块，可以裁剪掉，以缩小发行包；体积在 manifest.json-App 模块权限里可以选择
 
-- App端支持如果选择纯nvue项目 （manifest里设置app-plus下的renderer:"native"），包体积可以进一步减少2M左右
+- App端支持如果选择纯 nvue 项目 （manifest里设置app-plus下的renderer:"native"），包体积可以进一步减少2M左右
 
 - App端在 HBuilderX 2.7 后，App 端下掉了 非v3 的编译模式，包体积下降了3M
 
