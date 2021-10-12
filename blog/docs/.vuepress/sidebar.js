@@ -120,6 +120,7 @@ module.exports = {
     '/React/性能优化',
     '/React/React高级指引',
     '/React/服务端渲染',
+    '/React/吱不吱',
   ],
   '/qiankun/': [
     '/qiankun/微前端',

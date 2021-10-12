@@ -352,7 +352,7 @@ function deleteRemainingChildren(returnFiber, currentFirstChild) {
   return resultingFirstChild;
 ```
 
-1. 这一步首先是通过 `mapRemainingChildren` 遍历旧节点，觉得 `{key: fiber}` 的 `map` 结果
+1. 这一步首先是通过 `mapRemainingChildren` 遍历旧节点，得到 `{key: fiber}` 的 `map` 结果
 
 2. 遍历剩余新节点执行 `updateFromMap`， `updateFromMap` 的有以下几种情况 
 
