@@ -12,11 +12,13 @@
     .b {
       height: 300px;
       background: gray;
+      margin-top: 10px;
     }
 
     .c {
       height: 300px;
       background: blue;
+      margin-top: 10px;
     }
   </style>
   <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.2.0-beta.7/vue.cjs.js"></script>
@@ -59,19 +61,19 @@
     document.body.appendChild(newEl)
   }
 
-  window.onload = function () {
-    setTimeout(() => {
-      function walk() {
-        getData()
-          .then(res => {
-            addEl(res)
-          })
+  /*  window.onload = function () {
+      setTimeout(() => {
+        function walk() {
+          getData()
+            .then(res => {
+              addEl(res)
+            })
 
-      }
+        }
 
-      walk()
-    })
-  }
+        walk()
+      })
+    }*/
   document.getElementById('btn').addEventListener('click', function () {
     addEl2(600000000)
   })
