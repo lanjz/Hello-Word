@@ -73,7 +73,6 @@ module.exports = {
   ],
   '/Browser/': [
     '/Browser/浏览器中的进程与线程',
-    '/Browser/浏览器渲染HTML的工作原理',
     '/Browser/HTML渲染过程',
   ],
   '/Vue/': [
@@ -158,6 +157,7 @@ module.exports = {
   ],
   '/Node/基础/': [
     '/Node/基础/认识Node',
+    '/Node/基础/进程和线程',
     '/Node/基础/事件循环',
     '/Node/基础/基础使用',
     '/Node/基础/Node模块',
