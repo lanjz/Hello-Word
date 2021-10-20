@@ -5,4 +5,4 @@ const hot = require('./src/hot/webpack.config')
 const shaking = require('./src/shaking/webpack.config')
 const scopeHoisting = require('./src/scopeHoisting/webpack.config')
 
-module.exports = scopeHoisting
+module.exports = splitConfig
