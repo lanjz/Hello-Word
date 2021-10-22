@@ -13,16 +13,16 @@ module.exports = {
     },
 
     plugins: [
-        new ModuleFederationPlugin({
+/*        new ModuleFederationPlugin({
             name: "app2",
             filename: "remoteEntry.js",
             remotes: {
                 app1: "app1@http://localhost:3001/remoteEntry.js",
             },
-            /*            exposes: {
+            /!*            exposes: {
                             "./Button": "./src/Button",
-                        },*/
-            /*            shared: {
+                        },*!/
+            /!*            shared: {
                             ...deps,
                             react: {
                                 singleton: true,
@@ -30,8 +30,8 @@ module.exports = {
                             "react-dom": {
                                 singleton: true,
                             },
-                        },*/
-        }),
+                        },*!/
+        }),*/
         new webpack.HotModuleReplacementPlugin(),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({

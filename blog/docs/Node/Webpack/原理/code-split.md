@@ -1,15 +1,12 @@
-# code-split
+# Code-Split
 
-在 webpack 启动的项目中，使用 `import()` 方法就可以实现动态加载模块，被动态加载的模块会被 webpack 分割成独立文件
+在 Webpack 启动的项目中，使用 `import()` 方法就可以实现动态加载模块，被动态加载的模块会被 Webpack 分割成独立文件
 
-通过一个动态加载的粟子来看下 webpack 打包后的文件是如何处理分割后模块的
-
-源文件：
+通过一个粟子来看下 Webpack 打包后的文件是如何处理分割后模块的
 
 ```js
 // index.js
 console.log('AAAAAAAAAAAAA')
-
 import('./modules/utils')
   .then(({ MB }) => {
     console.log('MB', MB)
@@ -24,256 +21,39 @@ export function MB(){
 }
 ```
 
-打包后在 `dist` 文件下生成两个JS文件:
+打包后在 `dist` 文件下生成两个JS文件: `index.bundle.js` 和 `src_modules_utils_js.bundle.js`
 
-- `index.bundle.js`
+## bundle 内容简析
 
-- `src_modules_utils_js.bundle.js`
+`index.bundle.js` 大致内容为各种各样的 `__webpack_require__` 属性和方法：
 
 ```js
-// index.bundle.js
-/*! 下面中的代码为方便阅读稍手动做了点格式化 */
-/*! For license information please see index.bundle.js.LICENSE.txt */
 (() => {
     var __webpack_modules__ = {}, __webpack_module_cache__ = {}, inProgress, dataWebpackPrefix;
-    /**
-     * 获取模块的 export
-     * @params {String} e: 模块
-     * */
-    function __webpack_require__(e) {
-        // 如果已经获取过，则直接拿出来使用
-        if (__webpack_module_cache__[e]) return __webpack_module_cache__[e].exports;
-        var r = __webpack_module_cache__[e] = {
-            exports: {}
-        };
-        return __webpack_modules__[e](r, r.exports, __webpack_require__), r.exports;
-    }
+    function __webpack_require__(moduleId) {}
     __webpack_require__.m = __webpack_modules__
-    /**
-     * 将模块中的方法映射到 e(r.exports)中
-     * @params {Object} exports
-     * @params {Object} r: 模块内 导出的方法
-     * */
-    __webpack_require__.d = (e, r) => {
-        for (var _ in r) __webpack_require__.o(r, _) && !__webpack_require__.o(e, _) && Object.defineProperty(e, _, {
-            enumerable: !0,
-            get: r[_]
-        });
-    }
+    __webpack_require__.d = (exports, definition) => {  }
     __webpack_require__.f = {}
-    __webpack_require__.e = e => {
-        // __webpack_require__.f 保存着要加载的模块，遍历这些模块分别获取模块
-        return Promise.all(Object.keys(__webpack_require__.f)
-          .reduce(((r, _) => {
-              // 这里会执行 __webpack_require__.f.j
-              // 真正获取某模块的方法 e=>模块名 r => 当前Promise[]
-              return __webpack_require__.f[_](e, r), r
-          }), []))
-    }
-    __webpack_require__.u = e => e + ".bundle.js"
-    __webpack_require__.g = function() {
-        if ("object" == typeof globalThis) return globalThis;
-        try {
-            return this || new Function("return this")();
-        } catch (e) {
-            if ("object" == typeof window) return window;
-        }
-    }()
-    __webpack_require__.o = (e, r) => Object.prototype.hasOwnProperty.call(e, r)
-    inProgress = {}
-    dataWebpackPrefix = "mind-map:"
-    /**
-     * @params {String} e : 模块路径
-     * @params {Function} r
-     * @params {String} _ : "chunk-" + 模块
-     * */
-    __webpack_require__.l = (e, r, _) => {
-        if (inProgress[e]){ // 如果 inProgress[e] 已存在，将当前函数添加到 inProgress[e] 队列中
-            inProgress[e].push(r)
-        } else {
-            var a, t;
-            if (void 0 !== _) {
-                for (var i = document.getElementsByTagName("script"), o = 0; o < i.length; o++) {
-                    // 判断当前要加载模块是否已经存在于 dom中
-                    var c = i[o];
-                    if (c.getAttribute("src") == e || c.getAttribute("data-webpack") == dataWebpackPrefix + _) {
-                        // 如果存在刚保存到变量a
-                        a = c;
-                        break;
-                    }
-                }
-            }
-            /* a || (t = !0, (a = document.createElement("script")).charset = "utf-8", a.timeout = 120,
-            __webpack_require__.nc && a.setAttribute("nonce", __webpack_require__.nc), a.setAttribute("data-webpack", dataWebpackPrefix + _),
-            a.src = e), inProgress[e] = [ r ];*/
-            // 将上面的注释的源代码转换了下，方便阅读
-            if(!a){
-                // 动态创建 script 标签加载模块
-                t = !0 // t = true
-                a = document.createElement("script")
-                a.charset = "utf-8"
-                a.timeout = 120
-                __webpack_require__.nc && a.setAttribute("nonce", __webpack_require__.nc)
-                a.setAttribute("data-webpack", dataWebpackPrefix + _) // 标记 data-webpack 属性
-                a.src = e
-            }
-            inProgress[e] = [ r ] // inProgress创建对象的队列
-            // n的作用就是当模块加载成功或者失败或者超时要做的事情
-            // 当成功时，r=a.onload方法，_=成功的事件信息，取出inProgress中保存的回调一一执行 t.forEach((e => e(_))，此时 _ 为成功后事件信息
-            // 当失败时，r=a.onerror，_=失败的事件信息，取出inProgress中保存的回调一一执行 t.forEach((e => e(_))，此时 _ 为失败后事件信息
-            // 当超时时，_ 为 {type: "timeout",target: a}
-            var n = (r, _) => {
-                a.onerror = a.onload = null, clearTimeout(u);
-                var t = inProgress[e];
-                if (delete inProgress[e], a.parentNode && a.parentNode.removeChild(a), t && t.forEach((e => e(_))), 
-                r) return r(_);
-            }, u = setTimeout(n.bind(null, void 0, {
-                type: "timeout",
-                target: a
-            }), 12e4);
-            // 将动态创建script 标签 添加添加DOM,开始下载模块，并定义对应的 onerror 和 onload 方法
-            a.onerror = n.bind(null, a.onerror), a.onload = n.bind(null, a.onload), t && document.head.appendChild(a);
-        }
-    }
-    __webpack_require__.r = e => {
-        "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {
-            value: "Module"
-        })
-        Object.defineProperty(e, "__esModule", {
-            value: !0
-        });
-    }
-    (() => {
-        var e;
-        // importScripts 返回的undefined，暂不确定表示什么
-        __webpack_require__.g.importScripts && (e = __webpack_require__.g.location + "");
-        var r = __webpack_require__.g.document;
-        // currentScript 表示当前执行脚本的信息，获取脚本的路径并赋值给 e
-        // 当前例子 e=http://localhost:63342/Hello-Word/mind-map-js/dist/index.bundle.js
-        if (!e && r && (r.currentScript && (e = r.currentScript.src), !e)) {
-            // 如果没上一步获取不到，则通过获取 script 标签来获取脚本路径
-            var _ = r.getElementsByTagName("script");
-            _.length && (e = _[_.length - 1].src);
-        }
-        if (!e) throw new Error("Automatic publicPath is not supported in this browser");
-        // 获取脚本所在目录 __webpack_require__.p = e = http://localhost:63342/Hello-Word/mind-map-js/dist/
-        e = e.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/"), __webpack_require__.p = e;
-    })();
-    (() => {
-        var e = {
-            index: 0
-        };
-        /**
-         * @params {String} r: 模块名，当前例子为 "src_modules_utils_js"
-         * @params {Array<Promise>>} _: 异步数组
-         * */
-        // 参数 r 表示要获取的模块名
-        __webpack_require__.f.j = (r, _) => {
-            // 等同于Object.prototype.hasOwnProperty.call(e, r)，判断 r(key) 是否包含在 e 中(是否之前获取过)
-            var a = __webpack_require__.o(e, r) ? e[r] : void 0;
-            if (0 !== a) {
-                if (a) {
-                    _.push(a[2]); // 如果a有值，则将 a[2] 保存到 _中，a[2]的意思下面的else分支会介绍到
-                } else {
-                    var t = new Promise(((_, t) => {
-                        // Promise 构造函数是同步的，这里面 “_” 表示 `resolve`, “t” 表示 `reject`
-                        // 将 `resolve` 和 `reject`，保存到 e[r]和变量a中
-                        a = e[r] = [ _, t ];
-                    }));
-                    // 将上文返回的Promise 一方面添加添加到 a[2]中，另一方面添加到 _ 中
-                    _.push(a[2] = t);  // a[0] => Promise.resolve   a[1] => Promise.reject  a[2] => Promise
-                    // 获取这个模块的完整的路径，这里返回 // http://localhost:63342/Hello-Word/mind-map-js/dist/src_modules_utils_js.bundle.js
-                    var i = __webpack_require__.p + __webpack_require__.u(r), o = new Error;
-                    // 加载模块i，加载完成后执行第二个函数参数
-                    __webpack_require__.l(i, (_ => {
-                        // 如果模块加载成功，执行这个回调时e[r]为0，所以 if 块中的代码只有失败的时候才能会执行
-                        debugger
-                        if (__webpack_require__.o(e, r) && (0 !== (a = e[r]) && (e[r] = void 0), a)) {
-                            var t = _ && ("load" === _.type ? "missing" : _.type), i = _ && _.target && _.target.src;
-                            o.message = "Loading chunk " + r + " failed.\n(" + t + ": " + i + ")"
-                            o.name = "ChunkLoadError"
-                            o.type = t
-                            o.request = i, a[1](o);
-                        }
-                    }), "chunk-" + r);
-                }
-            }
-        };
-        // 保存 self.webpackChunkmind_map 原生 push 方法
-        var r = self.webpackChunkmind_map = self.webpackChunkmind_map || [], _ = r.push.bind(r);
-        /**
-         * 重写 push 方法
-         * 这个 push方法 是要加载的模块（src_modules_utils_js）下载成功后，模块（src_modules_utils_js）内触发的
-         * @params {Array} r: 成功下载模块后返回的内容
-         * */
-        r.push = r => {
-            for (var a, t, [i, o, c] = r, n = 0, u = []; n < i.length; n++) {
-                // 下载成功后，将e中保存 resolve 保存到 u 中，并将 e[t] 重置为0
-                t = i[n] // t表示模块名
-                // e 是否包含这个 t 这个属性，
-                __webpack_require__.o(e, t) && e[t] && u.push(e[t][0])
-                e[t] = 0;
-            }
-            // o： { 模块： 添加模块的方法}
-            // 将这个模块及对应的方法 保存到  __webpack_require__.m 中
-            for (a in o) __webpack_require__.o(o, a) && (__webpack_require__.m[a] = o[a]);
-            for (c && c(__webpack_require__), _(r); u.length; ) u.shift()(); // 取出 resolve 并执行
-        };
-    })()
-    console.log('AAAAAAAAAAAAA');
-    __webpack_require__.e("src_modules_utils_js") // 获取模块
-      .then(__webpack_require__.bind(__webpack_require__, "./src/modules/utils.js"))
-      .then(function (_ref) {
-          var MB = _ref.MB;
-          console.log('MB', MB);
-      })
-      .catch(function (error) {
-            return 'An error occurred while loading theS hllComponent';
-        });
-    //# sourceURL=webpack://mind-map/./src/index.js?
+    __webpack_require__.e = chunkId => {}
+    __webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+    _webpack_require__.l = (url, done, key, chunkId) => {}
+    btn.addEventListener('click', function (){
+        __webpack_require__.e(/*! import() */ "src_output_modules_utils_js").then(__webpack_require__.bind(__webpack_require__, "./src/output/modules/utils.js"))
+            .then(({MB}) => {
+                console.log('MB', MB)
+            })
+            .catch((error) => 'An error occurred while loading theS hllComponent');
+    })
 })();
 ```
 
-```js
-// 分离的模块
-/*! For license information please see src_modules_utils_js.bundle.js.LICENSE.txt */
-(self.webpackChunkmind_map = self.webpackChunkmind_map || []).push([ [ "src_modules_utils_js" ], {
-    "./src/modules/utils.js": (__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-        "use strict";
-        // eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"MA\": () => /* binding */ MA,\n/* harmony export */   \"MB\": () => /* binding */ MB\n/* harmony export */ });\nfunction MA() {\n  console.log('执行MA');\n}\nfunction MB() {\n  console.log('执行MB');\n}\n\n//# sourceURL=webpack://mind-map/./src/modules/utils.js?");
-        __webpack_require__.r(__webpack_exports__)
-        __webpack_require__.d(__webpack_exports__, {
-            MA: () => MA,
-            MB: () => MB
-        });
-        function MA() {console.log('执行MA');}
-        function MB() {console.log('执行MB');}
-    }
-} ]);
-```
+先大概认识一下几个比较重要的属性和方法：
 
-### bundle代码分析
-
-首先要知道打包出来的文件代码都使用自执行函数形成一个单独的块级作用域
-
-```js
-(function(){
-  var name = 'lan'
-})();
-(function(){
-  var name = 'jz'
-})();
-```
-
-上面的两个 `name` 仅限于自己所在块级作用域中有效
-
-之后看下打包出来的入口文件中两个重要包含的属性和方法：
-
-**__webpack_require__**
+### **__webpack_require__**
 
 实现模块化的核心方法，作用就是返回模块导出的方法（`exports`），首先会尝试从 `__webpack_module_cache__` 中获取，如果 `__webpack_module_cache__` 中不存在，则通过执行 `__webpack_modules__[e](r, r.exports, __webpack_require__)` 获取 `exports`  
 
-**__webpack_modules__**
+### **__webpack_modules__**
 
 当分离的文件下载完成后，模块中的要执行的内容将保存到 `__webpack_modules__` 对象中，所以先根据打包的例子（`src_modules_utils_js.bundle.js`）分析下其内容
 
@@ -303,50 +83,402 @@ export function MB(){
   重点看下第二行执行的方法 `__webpack_require__.d` ，`__webpack_require__.d` 的作用将当前文件中的导出的方法映射到当前参数 `__webpack_exports__` 中
 
   也就是上文 `__webpack_require__` 介绍中执行 `__webpack_modules__[e]` 的作用
-
-- `__webpack_require__e("模块名")`: 获模块导出的所有方法和属性
-
-- `__webpack_require__.o(e, r)`:  `(e, r) => Object.prototype.hasOwnProperty.call(e, r)`，判断是否包含属性 `r`
-
-- `__webpack_require__.g`: 当前运行的全局环境，当前例子指向 `window`
-
-- `__webpack_require__.p`: 当前运行的JS模块所在目录
-
-- `__webpack_require__.u`: 返回模块的完成文件名 `__webpack_require__.u('abc')` 返回 `abc.bundle.js`
-
-- `__webpack_require__.l(模块名，加载后回调，当前模块的一个标记)`：动态创建 `script` 下载模块
-
-### 执行bundler过程分析
-
-- 执行主文件方法 `console.log('AAAAAAAAAAAAA')`
-
-- 调用 `__webpack_require__.e("src_modules_utils_js")` 获取 "src_modules_utils_js" 模块内容
-
-    ```js
-      __webpack_require__.e = e => {
-        // __webpack_require__.f 保存着要加载的模块，遍历这些模块分别获取模块
-        return Promise.all(Object.keys(__webpack_require__.f)
-          .reduce(((r, _) => {
-              // 真正获取某模块的方法 e=>模块名 r => 当前Promise[]
-              return __webpack_require__.f[_](e, r), r
-          }), []))
-       }
-    ```
-
-  - 调用 `__webpack_require__.f[_]` 获取模块,这里实际执行的是 `__webpack_require__.f.j`
   
-  - 执行 `__webpack_require__.l` 动态创建 `script` 下载模块，下完成将做两件事情：
-  
-    1. 下载的模块内将执行 `self.webpackChunkmind_map.push()` 方法，`push` 执行时，将下载的模块要主要代码主容保存到 `__webpack_require__.m` 对象中
-    
-    2. 执行  `__webpack_require__.e("src_modules_utils_js")` 的 `resove()`
-    
-- 执行第一个 `then` 回调 `__webpack_require__.bind(__webpack_require__, "./src/modules/utils.js")`
+### **__webpack_module__**
 
-- 执行 `__webpack_require__(e)` 方法时，因为是首将加载这个模块，所以会执行 `__webpack_modules__[e](r, r.exports, __webpack_require__)` 方法，将下载的模块中的方法和属性保存到 `r.exports` 中返回
+`__webpack_module__` 是一个对象，`key` 为模块ID， `value` 为函数，这个函数就是执行模块内容的方法.eg:
 
-- 执行第一个 `then` 回调，在回调中执行我们依赖分离模块的代码
+```js
+// ./index.js 文件的内容如下
+console.log('lanjz')
+
+// 该文件打包后结果将保存到
+__webpack_modules__['./index.js'] = () => {eval('console.log(lanjz)')}
+```
+
+### **__webpack_require__.m**
+
+源代码定义为 `__webpack_require__.m = __webpack_module__`，所以指向 `__webpack_module__` 
+
+### **__webpack_module_cache__**
+
+`__webpack_module_cache__` 也是一个对象，`key` 为模块ID，`value` 保存对应模块的 `export` 内容. eg:
+
+```js
+__webpack_module_cache__['./index.js'] = {
+  id: './index.js',
+  loaded: true, // 标识这个模块是否已加载 
+  exports: {}, // 模块的导出内容 
+}
+```
+
+### **__webpack_require__.c**
+
+源代码定义为 `__webpack_require__.c = __webpack_module_cache__`，所以指向 `__webpack_module_cache__`
+
+### **__webpack_require__.f.j**
+
+`__webpack_require__.f.j(chunkId, promises)` 是加载模块前的准备工作，处理模块加载或安装失败的回调
+
+```js
+__webpack_require__.f.j = (chunkId, promises) => {
+		// installedChunkData 是一个标识，标识当前这个模块是否已经安装
+        // __webpack_require__.o(e, r)等同于Object.prototype.hasOwnProperty.call(e, r)
+		var installedChunkData = __webpack_require__.o(installedChunks, chunkId) ? installedChunks[chunkId] : undefined;
+        // 0 表示已经安装了
+		if(installedChunkData !== 0) {
+			// 如果当前有 installedChunkData 表示当前正在获取中，那之返回之前的 promise，installedChunkData下面的 else 分支会介绍
+			if(installedChunkData) {
+				promises.push(installedChunkData[2]);
+			} else {
+			    // 这是判断 chunk 类型的，比如 federation 的 Chunk，就不会进入该杂质
+				if(true) {
+					// 创建一个 installedChunkData 保存到 installedChunks[chunkId] 中
+                    // installedChunkData[0] = promise回调的 resolve方法
+                    // installedChunkData[1] = promise回调的 reject方法
+                    // installedChunkData[2] = promise
+					var promise = new Promise((resolve, reject) => {
+						installedChunkData = installedChunks[chunkId] = [resolve, reject];
+					});
+					promises.push(installedChunkData[2] = promise);
+
+					// 接接完整的模块地址
+					var url = __webpack_require__.p + __webpack_require__.u(chunkId);
+					// create error before stack unwound to get useful stacktrace later
+					var error = new Error();
+                    // 创建加载后的回调，这里更像是处理加载模块失败的处理
+					var loadingEnded = (event) => {
+                        // 当前模块是 installedChunks 中的模块
+						if(__webpack_require__.o(installedChunks, chunkId)) {
+                            // 获取当前模块对应的安装信息
+							installedChunkData = installedChunks[chunkId];
+                            // 如果非 0 将原始内容赋值初始状态
+							if(installedChunkData !== 0) installedChunks[chunkId] = undefined;
+							// 如果值为 [resove, reject, promise]，说明当前的模块没有被正常加载，那么执行错误
+							if(installedChunkData) {
+								var errorType = event && (event.type === 'load' ? 'missing' : event.type);
+								var realSrc = event && event.target && event.target.src;
+								error.message = 'Loading chunk ' + chunkId + ' failed.\n(' + errorType + ': ' + realSrc + ')';
+								error.name = 'ChunkLoadError';
+								error.type = errorType;
+								error.request = realSrc;
+								// installedChunkData[1] = reject
+								installedChunkData[1](error);
+							}
+						}
+					};
+                    // 创建 script 加载模块内容
+					__webpack_require__.l(url, loadingEnded, "chunk-" + chunkId, chunkId);
+				} else installedChunks[chunkId] = 0; // 
+			}
+		}
+};
+```
+
+函数体有个直接 `if(true)` 条件，这个 `if` 是判断 chunk 类型的，当 Webpack 包含了 `federation` 配置时，共享的 Chunk 和外链的 Chunk 将不进入当前条件分支而是直接执行 `installedChunks[chunkId] = 0`，至于 `federation` 的 Chunk 怎么处理这里先不分析
+
+这里要注意 `loadingEnded` 方法，根据代码内容可以发现主要是处理模块加载失败或安装失败的情况，那么成功的回调在哪处理的呢？ 成功的回调在 `__webpack_require__.l` 方法会处理
+
+### **__webpack_require__e(chunkId)和__webpack_require__.f**
+
+```js
+__webpack_require__.e = (chunkId) => {
+	return Promise.all(Object.keys(__webpack_require__.f).reduce((promises, key) => {
+		__webpack_require__.f[key](chunkId, promises);
+		return promises;
+	}, []));
+};
+```
+
+`__webpack_require__.f` 是一个对象，这个对象包含的属性都是跟获取模块内容的方法，比如上文的 `__webpack_require__.f`，除了 `f` 属性外还有 `remote`、`consume` 属性，都是获取模块的方法，大致区别：  
+
+- `f` 是获取当前项目打包的模块
+
+- `remote` 和 `consume` 这两个方法跟 `federation Chunk` 有关系
+
+`__webpack_require__.e` 是执行 `__webpack_require__.f` 的地方了，虽然这里看上去是会使用 `f`、`remote`、`consume` 都去获取 Chunk，但是这个方法里面会根据当前 Chunk 类型，不是自己支持的类型直接 `return`，所以只会执行其中的一种
+
+总之 `__webpack_require__e(chunkId)` 和 `__webpack_require__.f` 的作用就是发起模块获取
+
+### **__webpack_require__.l**
+
+上文中的 `__webpack_require__.f.j` 方法 最后会调用  `__webpack_require__.l(url, loadingEnded, "chunk-" + chunkId, chunkId)` 方法下载模块 
+
+```js
+/* webpack/runtime/load script */
+(() => {
+    // 保存下载成功后的回调
+	var inProgress = {};
+	var dataWebpackPrefix = "base:";
+	// loadScript function to load a script via script tag
+	__webpack_require__.l = (url, done, key, chunkId) => {
+        // 如果已经包含模块下载，则添加一个回调，这里情况可能是针对不同的地方同一时间调用了相同的模块，那就是需要收集多个回调
+		if(inProgress[url]) { inProgress[url].push(done); return; }
+		var script, needAttach;
+        
+		if(key !== undefined) {
+            // 判断是已经存在相同的 script 标签 
+			var scripts = document.getElementsByTagName("script");
+			for(var i = 0; i < scripts.length; i++) {
+				var s = scripts[i];
+				if(s.getAttribute("src") == url || s.getAttribute("data-webpack") == dataWebpackPrefix + key) { script = s; break; }
+			}
+		}
+		// 动态创建 scripts 标签
+		if(!script) {
+			needAttach = true;
+			script = document.createElement('script');
+	
+			script.charset = 'utf-8';
+			script.timeout = 120;
+			if (__webpack_require__.nc) {
+				script.setAttribute("nonce", __webpack_require__.nc);
+			}
+			script.setAttribute("data-webpack", dataWebpackPrefix + key);
+			script.src = url;
+		}
+        // 添加回调
+		inProgress[url] = [done];
+        // 创建模块下载成功的回调
+		var onScriptComplete = (prev, event) => {
+			// avoid mem leaks in IE.
+			script.onerror = script.onload = null;
+			clearTimeout(timeout);
+			var doneFns = inProgress[url];
+			delete inProgress[url];
+			script.parentNode && script.parentNode.removeChild(script); // 除移当前动态创建的 script 标签
+			doneFns && doneFns.forEach((fn) => (fn(event)));
+			if(prev) return prev(event);
+		}
+		;
+        // 处理起时的情况
+		var timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
+		script.onerror = onScriptComplete.bind(null, script.onerror);
+		script.onload = onScriptComplete.bind(null, script.onload);
+		needAttach && document.head.appendChild(script); // 添加到 DOM
+	};
+})();
+```
+
+`onScriptComplete` 就是处理上文中 `__webpack_require__.f.j` 设置的回调中
+
+### webpackJsonpCallback()
+
+`webpackJsonpCallback` 是一个挂载到全局变量(window、global、self) 上的全局方法，用于保存模块的 `chunk` 内容。这个方法执行时，会把 `chunk` 内部包含的模块及模块的执行方法收集到 `__webpack_modules__` 中
+
+## 模块加载过程分析
+
+首先粟子中的主文件编译后的代码变成以下样子：
+
+```js
+const btn = document.createElement('button')
+btn.innerText = '按钮'
+btn.addEventListener('click', function (){
+	__webpack_require__.e(/*! import() */ "src_output_modules_utils_js").then(__webpack_require__.bind(__webpack_require__, /*! ./modules/utils */ "./src/output/modules/utils.js"))
+		.then(({MB}) => {
+			console.log('MB', MB)
+		})
+		.catch((error) => 'An error occurred while loading theS hllComponent');
+})
+document.body.appendChild(btn)
+```
+
+接下来通过 [模块下载]、[模块加载完成]、[模块加载完成之后] 三个阶段来分析按需加载的过程
+
+### 模块下载
+
+当点击按钮的时候将调用 `__webpack_require__.e("src_modules_utils_js")` 获取 `src_modules_utils_js` 模块  
+通过断点此时 `__webpack_require__.e` 返回 `trackBlockingPromise(require.e(chunkId))` 结果，根据代码 `trackBlockingPromise` 返回的是一个 promise，`trackBlockingPromise` 的参数传是的 `require.e(chunkId)`，也就是 `__webpack_require__.e` 方法的结果  
+(这里有点不明白为什么 `_webpack_require__.e` 执行时不是直接执行 `_webpack_require__.e` 呢？)
+
+```js
+  __webpack_require__.e = e => {
+    return Promise.all(Object.keys(__webpack_require__.f)
+      .reduce(((promises, key) => {
+          // 真正获取某模块的方法 e=>模块名 r => 当前Promise[]
+          __webpack_require__.f[key](chunkId, promises);
+          return promises
+      }), []))
+   }
+```
+
+`__webpack_require__.e` 返回的是一个 promisesAll (数组{promise}`)
+
+`__webpack_require__.e` 遍历后会使用 `__webpack_require__.f.j(chunkId, promises)` 方法获取 `src_modules_utils_js` 模块
+
+`__webpack_require__.f.j` 再通过调用 `__webpack_require__.l` 动态创建 `script` 加载模块，同时创建当前下载任务的 `promise` 保存到 `promises` 中
+
+到这里 `__webpack_require__.e(/*! import() */ "src_output_modules_utils_js").then()` 工作就做完了，之后就是模块下载完成的执行 `then` 中的回调，然后就是待上面的 `promises` 的结果
+
+### 模块加载完成
+
+粟子中的模块 `src_output_modules_utils_js` 加载完成后，得到的内容为：
+
+```js
+(self["webpackChunkbase"] = self["webpackChunkbase"] || []).push([["src_output_modules_utils_js"],{
+ "./src/output/modules/utils.js": ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+    eval("__webpack_require__.r(__webpack_exports__); __webpack_require__.d(__webpack_exports__, {default: () => (__WEBPACK_DEFAULT_EXPORT__) }); const __WEBPACK_DEFAULT_EXPORT__ = ({\r\n\tMB: function (){\r\n\t\tconsole.log('MB')\r\n\t}\r\n});\n\n");
+     })
+}]);
+
+// 格式一下代码
+(self["webpackChunkbase"] = self["webpackChunkbase"] || []).push(
+    [
+        ["src_output_modules_utils_js"],
+        {
+         "./src/output/modules/utils.js": ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {})
+        }
+    ]
+);
+```
+
+模块加载后就会直接执行 `self["webpackChunkbase"] || []).push` 方法，这里的 `push` 不是简单的原生 `Array.push`， Webpack 做了 `webpackChunkbase.push` 做了额外的处理
+
+```js
+// 如果已经存在 self["webpackChunkbase"] 则直接取，否则创建新数据
+var chunkLoadingGlobal = self["webpackChunkbase"] = self["webpackChunkbase"] || [];
+chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0)); // 这个是啥意思？
+// chunkLoadingGlobal.push 执行的 webpackJsonpCallback 方法
+chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal))
+```
+
+第一行就是针对如果当前项目应用了多套 Webpack 打包的输出，那么 `self["webpackChunkbase"]` 就可能已经存了    
+第二行中 `bind` 的参数是 0 ，表示当前是第一个 Webpack 打包环境，如果当前应用的是第二个 Webpack 打包环境，那么参数为 第一个打包环境  
+第三行重写 `push` 方法  
+有点绕，重点是子模块加后实在的 `push` 为 `webpackJsonpCallback` 方法
+
+
+```js
+// parentChunkLoadingFunction 父级环境
+// data 为子模块加后的 push 的数据
+var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
+    // chunkIds 是模块名 moreModules 是模块信息 {模块名：模块内容}
+    var [chunkIds, moreModules, runtime] = data;
+    // 添加 "moreModules" 到 modules object,
+    var moduleId, chunkId, i = 0;
+    // 遍历模块信息，将模块保存到 `__webpack_require__.m` 对象中，_webpack_require__.m 就是 `__webpack_module__`
+    for(moduleId in moreModules) {
+        if(__webpack_require__.o(moreModules, moduleId)) {
+            __webpack_require__.m[moduleId] = moreModules[moduleId];
+        }
+    }
+    if(runtime) runtime(__webpack_require__);
+    if(parentChunkLoadingFunction) parentChunkLoadingFunction(data); // 如果有父环境，则止父环境也保存当前的模块，这样就可以复用了
+    for(;i < chunkIds.length; i++) {
+        chunkId = chunkIds[i];
+        // installedChunks 保存各个模块加后的 promise 回调
+        if(__webpack_require__.o(installedChunks, chunkId) && installedChunks[chunkId]) {
+            installedChunks[chunkId][0](); // 执行 resolve()
+        }
+        installedChunks[chunkIds[i]] = 0; // 当前模块标志为已加载
+    }
+}  
+```
+
+上面方法重点在于两个地方：
+
+1. 遍历 `moreModules`，将当前下载到的模块内容保存到 `__webpack_module__` 中
+
+2. 看到执行的 `installedChunks`，每个模块发起下载任务后都保存 `pending` 状态的 Promise 到 `installedChunks`，这里另载完成后就就会执行 `promise.resolve()` 执行回调
+
+之后就是进入子模块加载成功后的阶段
+
+### 模块加载完成之后
+
+模块加载成功，模块内容保存到了 `__webpack_module__` 中，如果执行当前模块的任务状态 `resolve`. 然后就是执行 `__webpack_require__.e(/*! import() */ "src_output_modules_utils_js").then()` 的调回了. `then` 回调执行 `__webpack_require__.bind(__webpack_require__, "./src/output/modules/utils.js")`
+
+`then` 方法执行的是 `__webpack_require__` 方法
+
+```js
+// 保存模块的 exports
+var __webpack_module_cache__ = {};
+function __webpack_require__(moduleId) {
+	// 如果缓存中存在当前模块的结果，直接返回
+	var cachedModule = __webpack_module_cache__[moduleId];
+	if (cachedModule !== undefined) {
+		if (cachedModule.error !== undefined) throw cachedModule.error;
+		return cachedModule.exports;
+	}
+	// 创建新的模块信息到缓存中
+	var module = __webpack_module_cache__[moduleId] = {
+		id: moduleId,
+		loaded: false,
+		exports: {}
+	};
+
+	// Execute the module function
+	try {
+        // 执行模块方法，这里的 factory 传的就是下载后的模块内容了
+		var execOptions = { id: moduleId, module: module, factory: __webpack_modules__[moduleId], require: __webpack_require__ };
+		__webpack_require__.i.forEach(function(handler) { handler(execOptions); });
+		module = execOptions.module;
+        // 这里执行模块的代码内容
+		execOptions.factory.call(module.exports, module, module.exports, execOptions.require);
+	} catch(e) {
+		module.error = e;
+		throw e;
+	}
+	// 标记模块加载完成
+	module.loaded = true;
+	// Return the exports of the module
+	return module.exports;
+}
+```
+
+创建一个新的模块信息并保存到 `__webpack_module_cache__` 对象中，之后就执行 `execOptions.factory.call(module.exports, module, module.exports, execOptions.require)` 回顾一下 `src_output_modules_utils_js` 加载完成后内容为：
+
+```js
+(self["webpackChunkbase"] = self["webpackChunkbase"] || []).push([["src_output_modules_utils_js"],{
+ "./src/output/modules/utils.js": ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+    eval("__webpack_require__.r(__webpack_exports__); __webpack_require__.d(__webpack_exports__, {default: () => (__WEBPACK_DEFAULT_EXPORT__) }); const __WEBPACK_DEFAULT_EXPORT__ = ({\r\n\tMB: function (){\r\n\t\tconsole.log('MB')\r\n\t}\r\n});\n\n");
+     })
+}]);
+
+// 格式一下代码
+(self["webpackChunkbase"] = self["webpackChunkbase"] || []).push(
+    [
+        ["src_output_modules_utils_js"],
+        {
+         "./src/output/modules/utils.js": ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {})
+        }
+    ]
+);
+```
+
+`factory` 就是对应就是执行 `((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {})` 方法，执行代码为：
+
+```js
+__webpack_require__.r(__webpack_exports__) // 定义属性信息，忽略
+__webpack_require__.d(__webpack_exports__, {default: () => (__WEBPACK_DEFAULT_EXPORT__) })
+const __WEBPACK_DEFAULT_EXPORT__ = {MB: function (){console.log('MB')}}
+```
+
+```js
+__webpack_require__.d = (exports, definition) => {
+	for(var key in definition) {
+		if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+			Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+		}
+	}
+}
+```
+
+上面的代码就是将 `modeule.exports` 作为参数传入子模块的执行内容中，子模块执行过程中会通过 `__webpack_require__.d` 方法将当前模块导出的 `exports` 对象保存到 `modeule.exports` 中，最后就返回 `modeule.exports` 
+
+返回后就是回到入口JS 文件中，执行最后的 `then` 回调 `console.log('MB', MB)`
+
+```js
+btn.addEventListener('click', function (){
+	__webpack_require__.e(/*! import() */ "src_output_modules_utils_js").then(__webpack_require__.bind(__webpack_require__, "./src/output/modules/utils.js"))
+		.then(({MB}) => {
+			console.log('MB', MB)
+		})
+		.catch((error) => 'An error occurred while loading theS hllComponent');
+})
+```
+
   
+
 ## Prefetch/Preload modules
 
 `Prefetch` 和 `Preload` 的区别
@@ -409,9 +541,9 @@ document.body.onclick = function (){
 
 使用 `Prefetch` 主要是对 `index.html` 添加 `link` 标签，跟分割模块的逻辑没啥影响
 
-### Demo
+## 手写模块化加载
 
-上面的分析反复看到过自己都有点懵，所以写个简单的 demo 方便理解 webpack 的模块化原理
+写个简单的 Demo 方便理解 Webpack 的模块化原理
 
 ```js
 (function (){
@@ -462,7 +594,9 @@ function JSonP(){
 }
 ``` 
 
-**关于子模块加载的思考：**
+## Q&A
+
+**当项目存在多个主模块**
 
 从上文分析我们知道当子模块加载后会执行一个全局的方法 `(self.webpackChunkmind_map = self.webpackChunkmind_map || []).push()`，将当前模块内容保存到主模块 `webpack_module_cache` 中。
 
@@ -493,7 +627,20 @@ function JSonP(){
 
 ## 总结
 
-webpack 实现自己实现了一个 `_webpack_reuqire_` 来模拟 `import` 的导入，并定义了一个全局属性`__webpack_modules__` 来保存模块
+webpack 实现自己实现了一个 `_webpack_reuqire_` 来模拟 `import` 的导入，并定义了一个全局属性`__webpack_modules__` 来保存模块内容
 
-使用动态创建 `script` 标签的方式来加载模块，被加载的模块在加载运行时，会添加到 `__webpack_modules__` 属性中，之后再获取模块内的方法和属性存到到 `export` 属性供调用者使用
+加载模块时使用动态创建 `script` 标签的方式来加载模块，被加载的模块在加载运行时，会添加到 `__webpack_modules__` 对于中，之后再执行模块内容的方法保存模块的 `exports` 导出结果。大致过程为：
+
+- Webpack 打包后的文件定义了一个 `__webpack_modules__` 对象，用于存储模块的执行内容。`key` 值对应模块的 `id`， `value` 对应模块的模块内容
+
+- Webpack 打包后的文件定义了一个 `_webpack_module_cache__` 是一个对象，用于缓存模块的 `export` 导出结果。`key` 值对应模块的 `id`，`value` 对应模块的输出
+
+- Webpack 还提供了一个 `__webpack_require__` 对象，可用于获取模块的输出。源代码中的 `import xx from 'xxx'`,最终会被转化为 `__webpack_require__.[xx](...)` 的形式
+
+- 对于每一个抽离出来的模块 Webpack 会把这个模块打包为一个含自执行方法的 JS 文件。当加载这个 JS 文件的时候会执行模块对应的相关代码，将对内保存到 `__webpack_modules__` 对象中
+
+- 之后会执行模块的代码内容，输出 `exports` 导出结果同时保存到 `__webpack_module_cache__`
+
+
+
 

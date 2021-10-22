@@ -1,4 +1,4 @@
-# tree-shaking
+# Tree-Shaking
 
 Tree-shaking 的本质是消除无用的 js 模块。javascript 绝大多数情况需要通过网络进行加载，然后执行，加载的文件越小，整体执行时间越短。
 
