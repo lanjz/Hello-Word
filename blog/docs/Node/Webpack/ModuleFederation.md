@@ -88,7 +88,7 @@ __webpack_require__.e = (chunkId) => {
 }
 ```
 
-通过上文的分析可以知道此时加的是 共享模块 所以这里执行 `__webpack_require__.f.consumes` 方法
+通过上文的分析可以知道此时加载的是 共享模块 所以这里执行 `__webpack_require__.f.consumes` 方法
 
 ```js
 // 保存模块的加载的状态
