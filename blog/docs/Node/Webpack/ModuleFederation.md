@@ -645,7 +645,7 @@ module federation 在初始化 `shareScope` 时，会比较 `host` 应用和 `re
 综上，如果 host 应用和 remote 应用共享依赖的版本可以兼容，可将 `singleton` 配置为 `ture`；如果共享依赖版本不兼容，需要将 `singleton` 配置为 `false`
 
 ### 多个应用(超过 2 个) 是否可共用一个 shareScope ？
-
+ 
 假设有这么一个场景， 三个应用 - app1、app2、app3， app2 是 app1 的 remote 应用， app3 是 app2 的 remote 应用， 那么他们是否可共用一个 shareScope ？
 
 答案是肯定的。
