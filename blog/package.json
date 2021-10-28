@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "cross-env": "^7.0.2",
+    "highlight.js": "^11.3.1",
+    "marked": "^3.0.8",
     "svg-mind-js": "^1.0.1"
   }
 }
