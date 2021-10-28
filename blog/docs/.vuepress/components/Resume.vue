@@ -1,8 +1,8 @@
 <template>
-  <div class="code-mirror markdown-layout">
+  <div class="full-page code-mirror markdown-layout">
     <div class="" :class="{'hideSplit': editMode !== 3}">
       <div class="flex relative" v-if="isEdit">
-        <img src="../assets/imgs/IMG_0804的副本.JPG" alt="" class="avatar">
+        <!--        <img src="../assets/imgs/IMG_0804的副本.JPG" alt="" class="avatar">-->
         <div class="flex-1">
           <textarea class="markdown-edit-box box-shadow-inset" v-model="markDownValueLeft"></textarea>
         </div>
@@ -12,12 +12,11 @@
       </div>
       <div class="md-body-layout edit-layout relative">
         <div class="markdown-operate-layout">
-          <div class="icon-layout" @click="toggleEdit" :class="{'act': isEdit}"><i class="iconfont icon-bianji2"></i>
-          </div>
+          <div class="icon-layout" @click="toggleEdit" :class="{'act': isEdit}">隐藏</div>
         </div>
-        <!--<div class="markdown-style left">
+        <div class="markdown-style left">
           <div class="markdown-content-style" v-html="leftMarkdownHTML"></div>
-        </div>-->
+        </div>
         <div class="markdown-style flex-1">
           <div class="markdown-content-style" v-html="markdownHTML"></div>
         </div>
@@ -113,6 +112,24 @@
   }
 </script>
 <style scoped>
+  .flex {
+    display: flex;
+  }
+
+  .flex-1 {
+    flex: 1;
+  }
+
+  .full-page {
+    position: fixed;
+    z-index: 999;
+    width: 100%;
+    left: 0;
+    top: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   .avatar {
     width: 100px;
     right: 20px;
@@ -190,7 +207,7 @@
     bottom: 0;
   }
 
-  .code-mirror .markdown-layout .markdown-edit-box {
+  .code-mirror.markdown-layout .markdown-edit-box {
     width: 100%;
     min-height: 500px;
     height: 100%;
@@ -203,14 +220,14 @@
     font-size: 14px;
   }
 
-  .code-mirror .markdown-layout .md-body-layout {
+  .code-mirror.markdown-layout .md-body-layout {
     overflow: auto;
     background: #fff;
     padding: 0;
     box-shadow: 0 0 4px 1px #e7eaef inset;
   }
 
-  .code-mirror .markdown-layout .markdown-operate-layout {
+  .code-mirror.markdown-layout .markdown-operate-layout {
     display: none;
     position: absolute;
     z-index: 2;
@@ -220,21 +237,22 @@
 
   }
 
-  .code-mirror .markdown-layout .icon-layout {
+  .code-mirror.markdown-layout .icon-layout {
     display: inline-block;
     background: rgba(0, 0, 0, 0.7);
     padding: 3px 5px;
     cursor: pointer;
     border-radius: 3px;
     text-align: center;
+
   }
 
-  .code-mirror .markdown-layout .icon-layout.act {
+  .code-mirror.markdown-layout .icon-layout.act {
     background: rgba(57, 141, 238, 0.7);
   }
 </style>
 
-<style lang="less">
+<style scoped>
   a {
     color: inherit;
     text-decoration: none;
