@@ -1,58 +1,36 @@
 <template>
-  <div @scroll="scroll" style="height: 500px; overflow: auto">
-    <div :style="{height: h+'px'}">
-      <div :style="{transform: `translateY(${top}px)`}">
-        <div :style="{transform: `translateY(${inY}px)`}">
-          <div v-for="item in list" :key="item.id" class="item">
-            {{item.label}}
-          </div>
-        </div>
-      </div>
-    </div>
+  <div>
+    <div style="height: 50px"></div>
+    <VirtualScroll :data="listSource" :height="500" :render="virtualItem"></VirtualScroll>
   </div>
 
 </template>
 
 <script>
-  let listSource = []
-  for (let i = 0; i < 5000; i++) {
+  import VirtualScroll from './virtualScroll.vue'
+  import virtualItem from './virtualItem.vue'
+
+  let listNumber = 5000
+  let listSource = [] // 数据模拟
+  for (let i = 0; i < listNumber; i++) {
     listSource.push({
       label: 'label：' + i,
-      id: i
+      id: i,
+      name: 'Name:' + i,
+      content: 'contentcontentcontentcontentcontentcontentcontent'
     })
   }
-
-  let list = listSource.slice(0, 30)
-  let h = 150 * 5000
-  let bottom = h - 30 * 150
   export default {
     data() {
       return {
-        list,
-        h,
-        top: 0,
-        bottom,
-        inY: 0
+        listSource,
+        virtualItem
       }
     },
-    methods: {
-      scroll(e) {
-        /*
-                if(this.isDo) return
-                this.isDo = true
-                setTimeout(() => {
-                  this.isDo = false
-                }, 10)
-        */
-
-        let {scrollTop} = e.target
-        let ind = Math.floor(scrollTop / 150)
-        this.inY = -Math.floor(scrollTop % 150)
-        this.list = listSource.slice(ind, 30 + ind)
-        this.top = scrollTop
-        // this.bottom = bottom - scrollTop
-      }
-    }
+    components: {
+      VirtualScroll
+    },
+    methods: {}
   }
 </script>
 
