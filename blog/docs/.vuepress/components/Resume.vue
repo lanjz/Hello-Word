@@ -115,8 +115,17 @@
 .resume-page *{
   position: relative;
 }
-.resume-page{
+/*.resume-page{
   color: #000;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  background: #fff;
+  width: 100%;
+}*/
+.resume-page .sidebar{
+  display: none !important;
 }
 .resume-page .markdown-style h1:after, .resume-page .markdown-style h2:after, .resume-page .markdown-style h3:after, .resume-page .markdown-style h4:after, .resume-page .markdown-style h5:after, .resume-page .markdown-style h6:after {
   color: #d6d5d5;
@@ -339,7 +348,7 @@
   }
 
   .resume-page .markdown-style p {
-    margin: 6px auto;
+    margin: 3px auto;
     font-size: 12px;
   }
 
