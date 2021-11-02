@@ -26,6 +26,12 @@ esbuild使用golang开发，在打包的速度上非常快，vite在dev模式下
 
 - 其它等等
 
+## 语言优势
+
+JavaScript 本质上依然是一门解释型语言，JavaScript 程序每次执行都需要先由解释器一边将源码翻译成机器语言，一边调度执行；而 Go 是一种编译型语言，在编译阶段就已经将源码转译为机器码，启动时只需要直接执行这些机器码即可。也就意味着，Go 语言编写的程序比 JavaScript 少了一个动态解释的过程
+
+Go 天生具有多线程运行能力，而 JavaScript 本质上是一门单线程语言，直到引入 WebWorker 规范之后才有可能在浏览器、Node 中实现多线程操作
+
 ## 集成webpack
 
 有一个相对较新的项目叫[esbuild-loader](https://github.com/privatenumber/esbuild-loader)。由hiroki osame开发，`esbuild-loader` 是一个建立在 esbuild 之上的webpack加载器。它允许用户用自己来替换 `ts-loader` 或 `babel-loader` ，这极大地提高了构建速度
@@ -86,4 +92,5 @@ esbuild使用golang开发，在打包的速度上非常快，vite在dev模式下
 
 ```
 
-[webpack或esbuild。为什么不同时进行呢](https://juejin.cn/post/6977183266986000414)
+> [webpack或esbuild。为什么不同时进行呢](https://juejin.cn/post/6977183266986000414)  
+> [webpack 或 esbuild：为什么不是两者兼而有之？](https://xie.infoq.cn/article/d9c4ca69e0de8fecf176dfd20)

@@ -162,6 +162,48 @@ console.log('b.js 执行完毕');
 
 然后，`b.js` 接着往下执行，等到全部执行完毕，再把执行权交还给 `a.js` 。于是，`a.js` 接着往下执行，直到执行完毕
 
+### ES6的循环引用
+
+```js
+// t1.js
+export let t1Obj =  {
+  name: 'T1'
+}
+console.log(1)
+import { t2Obj } from './t2'
+console.log(2)
+console.log('在t1中执行', t2Obj)
+
+```
+
+```js
+// t2.js
+export let t2Obj =  {
+  name: 'T2'
+}
+console.log(3)
+import { t1Obj } from './t1'
+console.log(4)
+console.log('在t2中执行', t1Obj)
+```
+
+输出结果为：
+
+```
+3
+4
+在t2中执行 undefined
+1
+2
+在t1中执行 {name: 'T2'}
+```
+
+1. 首页 `import` 类似变量提升会提升到顶部
+
+2. 所以加载 `t2.js`，跟上面一样，先加载 `t1.js`，只是 `t1.js` 没有导出任何内容，所以输出 `undefined`
+
+3. 再回到 `t1.js` 中，此时 `t2.js` 已经执行完了，所以能出现 `name` 的值
+
 ## 思考
 
 **为什么Node中，`request()`加载模块是同步而非异步？**
