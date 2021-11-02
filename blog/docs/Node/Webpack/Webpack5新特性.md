@@ -276,3 +276,5 @@ new ModuleFederationPlugin({
        shared: []
 })
 ```
+
+> [webpack5 新变化与对应的优化措施](https://github.com/HolyZheng/holyZheng-blog/issues/48)
