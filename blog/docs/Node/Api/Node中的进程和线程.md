@@ -266,12 +266,6 @@ process.on('message', msg => {
 开启多进程不是为了解决高并发，主要是解决了单进程模式下 Node.js CPU 利用率不足的情况，充分利用多核 CPU 的性能
 :::
 
-## 孤儿进程和僵尸进程
-
-当父进程退出后，子进程会被 `init` 进程接管，此时它就成了孤儿进程（orphan process）。
-
-当子进程退出时，在进程表中仍保存着这个进程信息，直到父进程使用 `wait` 读取子进程退出状态才会清理进程表中的条目。如果父进程不读取，该进程就成了僵尸进程（zombie process）
-
 [Node.js 进阶之进程与线程](https://www.imooc.com/article/288006)
 
 [分享 10 道 Nodejs 进程相关面试题](https://juejin.im/post/5d082214f265da1bb564f97b)
