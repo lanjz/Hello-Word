@@ -16,9 +16,9 @@
 
 在webpack4中，为了让我们的构建速度更快，我们通常需要借助一些插件或一些额外的配置来达到目的. eg:
 
-1. `cache-loader`，针对一些耗时的工作进行缓存。比如缓存babel-loader的工作
+1. `cache-loader`，针对一些耗时的工作进行缓存。比如缓存 `babel-loader` 的工作
 
-2. terser-webpack-plugin 或 uglifyjs-webpack-plugin的cache以及parallel。（默认开启）
+2. `terser-webpack-plugin` 或 `uglifyjs-webpack-plugin` 的 cache 以及 parallel。（默认开启）
 
 比如我们会借助 `cache-loader` 去对我们构建过程中消耗性能比较大的部分进行缓存，缓存会存放到硬盘中 `node_modules/.cache/cache-loader`，缓存的读取和存储是会消耗性能的，所以只推荐用在性能开销大的地方
 
@@ -37,7 +37,7 @@ module.exports = {
 };
 ```
 
-terserPlugin 继承自 uglifyjsPlugin，我们可以开启插件的 `cache` 以及 `parallel` 特性来加快压缩。（terserPlugin是webpack推荐及内置的压缩插件，`cache` 与 `parallel` 默认为开启状态）缓存路径在 `node_modules/.cache/terser-webpack-plugin`
+terserPlugin 继承自 uglifyjsPlugin，我们可以开启插件的 `cache` 以及 `parallel` 特性来加快压缩。（ terserPlugin 是 Webpack 推荐及内置的压缩插件，`cache` 与 `parallel` 默认为开启状态）缓存路径在 `node_modules/.cache/terser-webpack-plugin`
 
 ```js
 optimization: {
@@ -51,7 +51,7 @@ optimization: {
 },
 ```
 
-到了 webpack5 ，可以通过 `cache` 特性来将 Webpack 工作缓存到硬盘中。存放的路径为 `node_modules/.cache/webpack`
+到了 Webpack5 ，可以通过 `cache` 特性来将 Webpack 工作缓存到硬盘中。存放的路径为 `node_modules/.cache/webpack`
 
 1. 开发环境默认值为 `cache.type = "memory"`
 
@@ -64,125 +64,8 @@ module.exports = {
     type: 'filesystem',
     version: 'your_version'
   }
-};
-```
-
-## 包代码体积的优化 - SplitChunks
-
-为了让我们的打出来的包体积更加小，颗粒度更加明确。我们经常会用到webpack的代码分割splitchunk以及tree shaking。在webpack5中，这两者也得到了优化与加强。比如
-
-```js
-splitChunks: {
-  chunks: 'all',
-  minSize: {
-     javascript: 30000,
-     style: 50000,
-   }
-},
-// 默认配置
-module.exports = {
-  //...
-  // https://github.com/webpack/changelog-v5#changes-to-the-configuration
-  // https://webpack.js.org/plugins/split-chunks-plugin/
-  optimization: {
-    splitChunks: {
-      chunks: 'async',  // 只对异步加载的模块进行处理
-      minSize: {
-        javascript: 30000, // 模块要大于30kb才会进行提取
-        style: 50000, // 模块要大于50kb才会进行提取
-      },
-      minRemainingSize: 0, // 代码分割后，文件size必须大于该值    （v5 新增）
-      maxSize: 0,
-      minChunks: 1,  // 被提取的模块必须被引用1次
-      maxAsyncRequests: 6, // 异步加载代码时同时进行的最大请求数不得超过6个
-      maxInitialRequests: 4, // 入口文件加载时最大同时请求数不得超过4个
-      automaticNameDelimiter: '~', // 模块文件名称前缀
-      cacheGroups: {
-     // 分组，可继承或覆盖外层配置
-        // 将来自node_modules的模块提取到一个公共文件中 （又v4的vendors改名而来）
-        defaultVendors: {                                                                      
-          test: /[\\/]node_modules[\\/]/,
-          priority: -10
-        },
-       // 其他不是node_modules中的模块，如果有被引用不少于2次，那么也提取出来
-        default: {
-          minChunks: 2,
-          priority: -20,
-          reuseExistingChunk: true
-        }
-      }
-    }
-  }
-};
-
-```
-
-## 包代码体积的优化 - Tree Shaking
-
-同时tree shaking也得到了加强，可以覆盖更到负责的场景
-
-- Nested tree-shaking
-
-- Inner-module tree-shaking
-
-## 包代码体积的优化 - Node.js Polyfills
-
-webpack5之前，webpack会自动的帮我们项目引入Node全局模块polyfill。我们可以通过node配置
-
-```js
-// false: 不提供任何方法（可能会造成bug），'empty':  引入空模块, 'mock': 引入一个mock模块，但功能很少
-module.exports = {
-  // ...
-  node: {
-    console: false,
-    global: false,
-    process: false,
-    // ...
-  }
 }
 ```
-
-但是webpack团队认为，现在大多数工具包多是为前端用途而编写的，所以不再自动引入polyfill。我们需要自行判断是否需要引入polyfill，当我们用weback5打包的时候，webpack会给我们类似如下的提示：
-
-```
-// 在项目中我使用到了 crypto 模块，webpack5会询问是否引入对应的 polyfill。
-Module not found: Error: Can't resolve 'crypto' in '/Users/xxx/Documents/private-project/webpack/ac_repair_mobile_webpack_5/node_modules/sshpk/lib/formats'
-
-BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default.
-This is no longer the case. Verify if you need these module and configure a polyfill for it.
-
-If you want to include a polyfill, you need to:
-        - add an alias 'resolve.alias: { "crypto": "crypto-browserify" }'
-        - install 'crypto-browserify'
-If you don't want to include a polyfill, you can use an empty module like this:
-        resolve.alias: { "crypto": false }
-
-```
-
-webpack5中，增加了resolve.alias配置项来告诉webpack是否需要引入对应polyfill。node配置项也做了调整
-
-```js
-module.exports = {
-  // ...
-  resolve: {
-    alias: {
-      crypto: 'crypto-browserify',
-      // ..
-    }
-  },  
-  node: {
-    // https://webpack.js.org/configuration/node/#root
-    // 只能配置这三个
-    global: false,
-    __filename: false,
-    __dirname: false,
-  }
-}
-```
-
-也就是说到了webpack5，我们需要清楚自己的项目需要引入哪些node polyfill。更加了配置的门槛，但是减少了代码的体积。
-
-webpack5中将path、crypto、http、stream、zlib、vm的node polyfill取消后
 
 ## 持久化缓存的优化
 
@@ -237,6 +120,129 @@ optimization: {
 
 ![](./static/w5_1.png)
 
+## 包代码体积的优化
+
+为了让我们的打出来的包体积更加小，颗粒度更加明确。我们经常会用到 Webpack 的代码分割 splitchunk 以及 tree shaking。在 Webpack5 中，这两者也得到了优化与加强
+
+### SplitChunks
+
+SplitChunks 配置示例：
+
+```js
+splitChunks: {
+  chunks: 'all',
+  minSize: {
+     javascript: 30000,
+     style: 50000,
+   }
+},
+// 默认配置
+module.exports = {
+  //...
+  // https://github.com/webpack/changelog-v5#changes-to-the-configuration
+  // https://webpack.js.org/plugins/split-chunks-plugin/
+  optimization: {
+    splitChunks: {
+      chunks: 'async',  // 只对异步加载的模块进行处理
+      minSize: {
+        javascript: 30000, // 模块要大于30kb才会进行提取
+        style: 50000, // 模块要大于50kb才会进行提取
+      },
+      minRemainingSize: 0, // 代码分割后，文件size必须大于该值    （v5 新增）
+      maxSize: 0,
+      minChunks: 1,  // 被提取的模块必须被引用1次
+      maxAsyncRequests: 6, // 异步加载代码时同时进行的最大请求数不得超过6个
+      maxInitialRequests: 4, // 入口文件加载时最大同时请求数不得超过4个
+      automaticNameDelimiter: '~', // 模块文件名称前缀
+      cacheGroups: {
+     // 分组，可继承或覆盖外层配置
+        // 将来自node_modules的模块提取到一个公共文件中 （又v4的vendors改名而来）
+        defaultVendors: {                                                                      
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+       // 其他不是node_modules中的模块，如果有被引用不少于2次，那么也提取出来
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
+    }
+  }
+};
+
+```
+
+### Tree Shaking
+
+同时tree shaking也得到了加强，可以覆盖更多场景
+
+- Nested tree-shaking
+
+- Inner-module tree-shaking
+
+### Node.js Polyfills
+
+webpack5之前，Webpack 会自动的帮我们项目引入 Node 全局模块 polyfill。我们可以通过 node 配置
+
+```js
+// false: 不提供任何方法（可能会造成bug），'empty':  引入空模块, 'mock': 引入一个mock模块，但功能很少
+module.exports = {
+  // ...
+  node: {
+    console: false,
+    global: false,
+    process: false,
+    // ...
+  }
+}
+```
+
+但是 Webpack 团队认为，现在大多数工具包多是为前端用途而编写的，所以不再自动引入 polyfill。我们需要自行判断是否需要引入 polyfill，当我们用Webpack5 打包的时候，Webpack会给我们类似如下的提示：
+
+```
+// 在项目中我使用到了 crypto 模块，webpack5会询问是否引入对应的 polyfill。
+Module not found: Error: Can't resolve 'crypto' in '/Users/xxx/Documents/private-project/webpack/ac_repair_mobile_webpack_5/node_modules/sshpk/lib/formats'
+
+BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need these module and configure a polyfill for it.
+
+If you want to include a polyfill, you need to:
+        - add an alias 'resolve.alias: { "crypto": "crypto-browserify" }'
+        - install 'crypto-browserify'
+If you don't want to include a polyfill, you can use an empty module like this:
+        resolve.alias: { "crypto": false }
+
+```
+
+Webpack5 中，增加了 `resolve.alias` 配置项来告诉 Webpack 是否需要引入对应 polyfill。node 配置项也做了调整
+
+```js
+module.exports = {
+  // ...
+  resolve: {
+    alias: {
+      crypto: 'crypto-browserify',
+      // ..
+    }
+  },  
+  node: {
+    // https://webpack.js.org/configuration/node/#root
+    // 只能配置这三个
+    global: false,
+    __filename: false,
+    __dirname: false,
+  }
+}
+```
+
+也就是说到了 Webpack5，我们需要清楚自己的项目需要引入哪些 node polyfill。更加了配置的门槛，但是减少了代码的体积。
+
+webpack5 中将 `path`、`crypto`、`http`、`stream`、`zlib`、`vm` 的 node polyfill取消后效果如下图：
+
+![](./static/w5_2.png)
+
 ## Module Federation
 
 模块联邦制，使 JavaScript 应用得以从另一个 JavaScript 应用中动态地加载代码 —— 同时共享依赖。项目分为Host（消费者），remote（被消费者）。功能实现主要依靠 ModuleFederationPlugin 插件
@@ -277,4 +283,4 @@ new ModuleFederationPlugin({
 })
 ```
 
-> [webpack5 新变化与对应的优化措施](https://github.com/HolyZheng/holyZheng-blog/issues/48)
+> [webpack5新特性一览](https://github.com/HolyZheng/holyZheng-blog/issues/48)
