@@ -1,1 +1,0 @@
-export const abc:number = 134
