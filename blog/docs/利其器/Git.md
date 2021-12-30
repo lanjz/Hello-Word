@@ -173,3 +173,9 @@ git reset --hard
    2. 暂存区不变
   
    3. 重置工作区
+  
+## Q&A
+
+**OpenSSL SSL_connect: Connection was reset in connection to github.com:443**
+
+1. 如果你开启了VPN，很可能是因为代理的问题，关掉VPN重试
