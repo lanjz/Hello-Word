@@ -7,8 +7,8 @@
 <script>
 // import mapSvg from './svgMap'
 import mapSvg from 'svg-mind-js'
-import meun from '../config'
-const { nav = [], sidebar = {} } = meun.themeConfig
+import menu from '../config'
+const { nav = [], sidebar = {} } = menu.themeConfig
 export default {
   methods: {
     getItemTree(data = [], prefix = ''){
@@ -71,6 +71,6 @@ export default {
 .home-page{
   min-height: 100vh;
   background: #272b2d;
-  padding-top: 2.2rem;
+  padding-top: 3.6rem;
 }
 </style>

@@ -1,14 +1,4 @@
 module.exports = {
-  // 侧边栏在 /foo/ 上
-  '/guide/': [
-    '',
-    'page-a',
-  
-  ],
-  // 侧边栏在 /bar/ 上
-  '/page-a/': [
-    '',
-  ],
   '/secure/': [
     '/secure/'
   ],

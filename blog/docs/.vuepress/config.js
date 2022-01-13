@@ -1,8 +1,7 @@
 const sidebar = require('./sidebar')
 module.exports = {
-  title: 'Hello Wold',
-  // theme: '@vuepress/blog',
-  description: 'Just playing around',
+  title: 'LLL Blog',
+  description: '前端总结与记录',
   extraWatchFiles: ['./sidebar.js'],
   port: 5000,
   base: '/lanjz/',
@@ -50,17 +49,8 @@ module.exports = {
           {text: 'Vite', link: '/Node/Vite/'},
           {text: 'esbuild', link: '/Node/ESBuild/'},
           {text: 'SQL', link: '/Node/数据库/'},
-          /*  {
-             text: 'Webpack',
-             items: [
-               { text: 'Webpack', link: '/Node/Webpack/' },
-               { text: '构建速度优化', link: '/Node/Webpack/构建速度优化', }
-             ]
-             // link: '/Node/Webpack/'
-           }, */
         ]
       },
-      // { text: '算法', link: '/' },
       {
         text: '工程化',
         items: [
@@ -86,7 +76,6 @@ module.exports = {
         ]
       },
       { text: '关于我', link: '/Im/' },
-      // { text: 'External', link: 'https://google.com' },
     ],
     sidebar
   },
