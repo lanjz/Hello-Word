@@ -91,13 +91,13 @@ HostName github.com
 User lanjz
 IdentityFile ~/.ssh/id_rsa
 # git_lab_1                                                                         
-Host git.mysoft.com.cn
-HostName git.mysoft.com.cn
+Host git.xxx.com.cn
+HostName git.xxx.com.cn
 User lanjz
 IdentityFile ~/.ssh/id_rsa_gitlab
 # 也可以配置多个git_lab_2
-Host git.myscrm.cn
-HostName git.myscrm.cn
+Host git.xxxx.cn
+HostName git.xxxx.cn
 User lanjz
 IdentityFile ~/.ssh/id_rsa_gitlab                               
 ```

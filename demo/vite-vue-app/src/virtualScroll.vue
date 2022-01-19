@@ -47,7 +47,7 @@
         }
         this.top = scrollTop
         // Math.abc(...) 是滚动到底部时，列表应该所在的偏移量
-        this.top = Math.min(scrollTop, Math.abs(scrollTop - (visibilityNum * itemHeight - 500)))
+        this.top = Math.min(scrollTop, Math.abs(scrollTop - (visibilityNum * itemHeight - 272)))
       }
     },
     mounted() {

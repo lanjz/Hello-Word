@@ -4,8 +4,6 @@ PAAS 应用的主要特点是页面是根据配置动态生成的
 
 ### 运行过程
 
-浏览器打开 [PAAS 应用](https://webapp.mypaas.com.cn/b2c/yk_qmyx/test/?tenant_code=yajuleadmin_test)时，先是发出 `https://.....meta` 请求获取到元数据，这个元数据包含了当前应用的一些配置信息,比如菜单栏、路由、每个页面展示哪些组件等，整个应用就根据这些内容来动态渲染的
-
 要实现动态渲染页面（组件），依靠的就是 VUE 提供的 `render` 方法
 
 ## render
@@ -856,19 +854,19 @@ function registerComponent(id, _ref2) {
     }
 };
 // 下面是loader处理添加的代码
-const MpComponents = require('D:/Project/p_qudao/yunke-paas/node_modules/webapp/build/MiniProgram/wxml').default;
+const MpComponents = require('D:/Project/p_qudao/xxxx-paas/node_modules/webapp/build/MiniProgram/wxml').default;
 Vue.use(MpComponents);
 
 
-registerPlugin('b2c-jssdk', require('D:/Project/p_qudao/yunke-paas/modules/b2c-jssdk').default || {})
-registerPlugin('broker-common', require('D:/Project/p_qudao/yunke-paas/modules/broker-common').default || {})
+registerPlugin('b2c-jssdk', require('D:/Project/p_qudao/xxxx-paas/modules/b2c-jssdk').default || {})
+registerPlugin('broker-common', require('D:/Project/p_qudao/xxxx-paas/modules/broker-common').default || {})
 
 
 
-registerComponent('b2c-bespeak-house', require('D:/Project/p_qudao/yunke-paas/packages/b2c-bespeak-house/src').default || {})
-registerComponent('b2c-broadcast', require('D:/Project/p_qudao/yunke-paas/packages/b2c-broadcast/src').default || {})
-registerComponent('b2c-my-listmenu', require('D:/Project/p_qudao/yunke-paas/packages/b2c-my-listmenu/src').default || {})
-registerComponent('b2c-search', require('D:/Project/p_qudao/yunke-paas/packages/b2c-search/src').default || {})
+registerComponent('b2c-bespeak-house', require('D:/Project/p_qudao/xxxx-paas/packages/b2c-bespeak-house/src').default || {})
+registerComponent('b2c-broadcast', require('D:/Project/p_qudao/xxxx-paas/packages/b2c-broadcast/src').default || {})
+registerComponent('b2c-my-listmenu', require('D:/Project/p_qudao/xxxx-paas/packages/b2c-my-listmenu/src').default || {})
+registerComponent('b2c-search', require('D:/Project/p_qudao/xxxx-paas/packages/b2c-search/src').default || {})
 
 ```
 
