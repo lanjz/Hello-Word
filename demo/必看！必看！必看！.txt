@@ -1,0 +1,24 @@
+注意：将上面 ja-netfilter 文件夹整个拷贝到指定配置位置
+注意：将上面 ja-netfilter 文件夹整个拷贝到指定配置位置
+注意：将上面 ja-netfilter 文件夹整个拷贝到指定配置位置
+注意：将上面 ja-netfilter 文件夹整个拷贝到指定配置位置
+注意：将上面 ja-netfilter 文件夹整个拷贝到指定配置位置
+注意：将上面 ja-netfilter 文件夹整个拷贝到指定配置位置
+注意：将上面 ja-netfilter 文件夹整个拷贝到指定配置位置
+注意：将上面 ja-netfilter 文件夹整个拷贝到指定配置位置
+
+本激活方法适用于 2021, 2020, 2019, 2018 全系列版本；
+
+文档更新日期：2022.1.1
+
+
+【注意】【注意】【注意】
+
+临时激活码提取：https://shimo.im/docs/kk88dYXPdQQdwjKH
+
+在用 JetBrains临时激活码登入激活时出现报错，显示key is invalid，有可能之前你使用的破解版或者其他旧版原因
+
+在以下目录，删除配置文件就可以解决
+
+C:\Users\【系统用户名】\AppData\Roaming\JetBrains\
+
