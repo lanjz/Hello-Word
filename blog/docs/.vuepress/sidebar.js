@@ -172,6 +172,7 @@ module.exports = {
     '/Node/Webpack/ModuleFederation',
     '/Node/Webpack/原理/模块热替换',
     '/Node/Webpack/构建优化方案',
+    '/Node/Webpack/优化实践之Vue-Cli',
     '/Node/Webpack/配置小记',
   ],
   '/Node/Vite/': [
