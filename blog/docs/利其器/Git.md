@@ -179,3 +179,7 @@ git reset --hard
 **OpenSSL SSL_connect: Connection was reset in connection to github.com:443**
 
 1. 如果你开启了VPN，很可能是因为代理的问题，关掉VPN重试
+
+**OpenSSL SSL_read: Connection was reset, errno 10054**
+
+git config lfs.https://github.com/lanjz/Hello-Word.git/info/lfs.locksverify false
