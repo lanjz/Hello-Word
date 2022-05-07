@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+
+<div class="my-3" style="padding: 200px; background: red" id="d"></div>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        console.log("DOM fully loaded and parsed", document.getElementById('d').offsetTop);
+    });
+    window.onload = function (){
+        console.log("DOM fully loaded and parsed", document.getElementById('d').offsetTop);
+    }
+</script>
+<!--<link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap-grid.css" rel="stylesheet">-->
+</html>
