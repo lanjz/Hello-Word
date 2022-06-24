@@ -66,7 +66,7 @@ module.exports = {
           {text: '自动化部署', link: '/工程化/自动化部署'},
           {text: '问题小计', link: '/工程化/疑难杂症'},
           {text: '性能指标', link: '/工程化/性能指标'},
-          {text: '性能分析', link: '/工程化/性能分析'},
+          {text: 'Lighthouse', link: '/工程化/Lighthouse'},
           {text: '规范', link: '/工程化/前端规范/'},
           {text: '前端规范', link: '/工程化/前端规范/前端规范'},
           {text: '项目模板', link: '/工程化/前端规范/项目模板'},
