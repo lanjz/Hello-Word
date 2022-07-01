@@ -4,139 +4,86 @@ sidebar: auto
 
 # Lighthouse
 
-lighthouse 是 Google Chrome 推出的一款开源自动化工具，它可以搜集多个现代网页性能指标，分析 Web 应用的性能并生成报告，为开发人员进行性能优化的提供了参考方向
 
-## 指标权重
-
-从 [Lighthouse Scoring Calculator](https://googlechrome.github.io/lighthouse/scorecalc/#FCP=0&SI=0&FMP=0&TTI=0&FCI=0&LCP=0&TBT=0&CLS=0&device=desktop&version=8) 可以看到 lighthouse  提供的几个性能评估指标：
-
-![](./static/lighthouse_scoring_calculator.png)
-
-Lighthouse 最新版的提供了 6 个性能指标：FCP、SI、LCP、TTI、TBT 和 CLS；权重分别是 15%，15%，25%，15%，25% 和 5%。Lighthouse 会根据权重计算得到一个分数值
-
-## 整体概览
-
-![](./static/overview.png)
-
-### 第一部分：概览
-
-这里最主要是整体的界面渲染的时候，每个时间段执行的事件顺序，通过上图我们就能知道我们每个时间段大概做了什么，鼠标放上去可以看到我们每个时间段的界面渲染情况
-
-### 第二部分：性能面板
-
-性能面板主要包括以下几部分：
-
-1. Network 这里我们可以直观的看到资源加载的顺序与时长
-
-2. Interactions 用来记录用户交互操作，比如点击鼠标、输入文字、动画等
-
-3. Timings 用来记录一些关键的时间节点在何时产生的数据信息，诸如 FP、FCP、LCP 等
-
-4. Main 是Performance工具中比较重要的部分，记录了渲染进程中主线程的执行记录，点击main可以看到某个任务执行的具体情况
-
-5. Compositor 合成线程的执行记录，用来记录html绘制阶段 (Paint)结束后的图层合成操作
-
-6. Raster 光栅化线程池，用来让 GPU 执行光栅化的任务
-
-7. GPU GPU进程主线程的执行过程记录，如 可以直观看到何时启动GPU加速
-
-**Memory 选项**
-
-在勾选后，就会显示该折线图，通过该图可以看出我们在不同的时间段的执行情况。我们可以看到页面中的内存使用的情况，比如 JS Heap(堆)，如果曲线一直在增长，则说明存在内存泄露，如果相当长的一段时间，内存曲线都是没有下降的，这里是有发生内存泄露的可能的
-
-如果Nodes和Listeners不断增加说明可能存在重复添加节点或者事件的情况。
-
-最下方就是页面的一个整体耗时概况，如果 Scripting 时间过长，则说明 js执行的逻辑太多，可以考虑优化js，如果渲染时间过长，则考虑优化渲染过程，如果空闲时间过多，则可以考虑充分利用起来，比如把一些上报操作放到页面空闲时间再上报等
-
-### 第三部分：Summary（性能摘要）
-
-它是一个用来统计在我们检测性能的时间范围内，都做了哪些事情：
-
-- Loading ：加载时间
-
-- Scripting ：js计算时间
-
-- Rendering ：渲染时间
-
-- Painting ：绘制时间
-
-- Other ：其他时间
-
-- Idle ：浏览器闲置时间
 
 ## Performance 面板
 
-从上往下看下各面板代表什么
+通过 Performance 面板 可以网站运行期间任意时间段的性能情况，录制结束后会输出类似下面图示的结果：
+
+![](./static/performance.png)
+
+介绍下从上往下看下各面板代表什么
 
 ### 整体概览
 
 ![](./static/performance-overview.png)
 
-如上图顶部区域所示，这部分展示了五个信息： FPS、CPU、NET、屏幕快照、HEAP，并且鼠标移上去也会展示出当前时刻的屏幕快照
+这里最主要是整体的界面渲染的时候，每个时间段执行的事件顺序，通过上图我们就能知道我们每个时间段大概做了什么，鼠标放上去可以看到我们每个时间段的界面渲染情况
 
-#### FPS-刷新率
+如上图顶部区域所示，这部分展示了五个信息： FPS、CPU、NET、屏幕快照、HEAP
 
-FPS(frames per second) 是页面每秒的刷新频率.  FPS 好坏衡量标准：
+- FPS-刷新率
+    
+    FPS(frames per second) 是页面每秒的刷新频率.  FPS 好坏衡量标准：
+    
+    - fps = 60: 性能极佳
+    
+    - fps < 24: 会让用户感觉到明显卡顿，因为人眼的识别主要是24帧
+    
+    **所以为了让帧率尽可能保持在 60 帧率，意味着每次执行的 JS 任务时间需要控制在 `16ms` 之内**
+    
+    :::tip
+    浏览器每帧要做的完整事情是：`JS（ 脚本执行） -> Style（样式计算） -> Layout（布局） -> Paint（重绘） -> Composite（合成）`
+    :::
+    
+    > [浏览器的 16ms 渲染帧 DOM JavaScript 异步 性能 重绘 浏览器渲染](https://harttle.land/2017/08/15/browser-render-frame.html)
+    
+    
+    ![](./static/performance-overview-fps.png)
 
-- fps = 60: 性能极佳
+    如上图所示 FPS 图表页面运行期间期间帧率的概览。 由两部分组成：
 
-- fps < 24: 会让用户感觉到明显卡顿，因为人眼的识别主要是24帧
+    - 红色条： 当出现红色条时说明帧数已经下降到影响用户体验的程度，颜色越深说明帧数越差
+    
+    - 绿色的柱体：绿色条越高，帧率越好
 
-**所以为了让帧率尽可能保持在 60 帧率，意味着每次执行的 JS 任务时间需要控制在 `16ms` 之内**
+- CPU
 
-:::tip
-浏览器每帧要做的完整事情是：`JS -> Style -> Layout -> Paint -> Composite`
-:::
+    ![](./static/performance-overview-cpu.png)
+    
+    上图中 FPS 下面的位置，即是 CPU 图表，可以看 CPU 图表被一些颜色填满，表示 CPU 正在处理某一类的任务，这些颜色对应于 “性能”工具底部摘要面板中的颜色
+    
+    - 紫色：渲染
+    
+    - 黄色：JS
+    
+    - 蓝色：加载
+    
+    - 绿色：绘制
+    
+    - 灰色：其它
+    
+    - 浅灰色：空闲
+    
+    **如果你看到了某个处理占用了大量的时间，那么这很可能就是一个性能瓶颈的线索**
 
-[浏览器的 16ms 渲染帧
-DOM JavaScript 异步 性能 重绘 浏览器渲染](https://harttle.land/2017/08/15/browser-render-frame.html)
+- NET
+    
+    ![](./static/performance-overview-net.png)
+    
+    每条横杆代表一种请求资源. 横杆越长，检索资源所需要的事件越长。每个横杆的浅色部分表示等待时间（请求资源到第一个字节下载完成时间）。
+    
+    HTML文件是蓝色、脚本是黄色、样式是紫色、媒体文件是绿色、其它资源是灰色
+    
+    这个地方只能看个大概，详细的还是直接看下面的 network 面板比较清楚
 
-
-![](./static/performance-overview-fps.png)
-
-如上图所示 FPS 图表页面运行期间期间帧率的概览。 由两部分组成：
-
-- 红色条： 当出现红色条时说明帧数已经下降到影响用户体验的程度，颜色越深说明帧数越差
-
-- 绿色的柱体：绿色条越高，帧率越好
-
-#### CPU
-
-![](./static/performance-overview-cpu.png)
-
-上图中 FPS 下面的位置，即是 CPU 图表，可以看 CPU 图表被一些颜色填满，表示 CPU 正在处理某一类的任务，这些颜色对应于 “性能”工具底部摘要面板中的颜色
-
-- 紫色：渲染
-
-- 黄色：JS
-
-- 蓝色：加载
-
-- 绿色：绘制
-
-- 灰色：其它
-
-- 浅灰色：空闲
-
-**如果你看到了某个处理占用了大量的时间，那么这很可能就是一个性能瓶颈的线索**
-
-#### NET
-
-![](./static/performance-overview-net.png)
-
-每条横杆代表一种请求资源. 横杆越长，检索资源所需要的事件越长。每个横杆的浅色部分表示等待时间（请求资源到第一个字节下载完成时间）。
-
-HTML文件是蓝色、脚本是黄色、样式是紫色、媒体文件是绿色、其它资源是灰色
-
-这个地方只能看个大概，详细的还是直接看下面的 network 面板比较清楚
-
-#### HEAP
-
-![](./static/performance-overview-heap.png)
-
-这里展示的内容使用情况，如果反复切换同一页面，图表不断上升，说明可能存在内存泄漏问题
-
-`HEAP 图表` 提供的信息与 `memory 表` 中的 `JS Heap` 相同
+- HEAP
+    
+    ![](./static/performance-overview-heap.png)
+    
+    这里展示的内容使用情况，如果反复切换同一页面，图表不断上升，说明可能存在内存泄漏问题
+    
+    `HEAP 图表` 提供的信息与 `memory 表` 中的 `JS Heap` 相同
 
 ### Network面板
 
@@ -174,7 +121,7 @@ HTML文件是蓝色、脚本是黄色、样式是紫色、媒体文件是绿色�
 
 我们点击某个时间轴下面的 `Summary` 将会出现对应的概览信息
 
-// todo
+![](./static/network-summary.png)
 
 #### Network-Timeline
 
@@ -224,6 +171,8 @@ Frame 面板不同的颜色意思为：
 
 
 ### Timings 面板
+
+如果是从 Lighthouse 跳过来的 会有 `Timings 面板`
 
 ![](./static/performance-timings.png)
 
@@ -290,95 +239,93 @@ Timings 面板标注了性能指标相关的的完成节点，点击各个节点
 
 ![](./static/main-color.png)
 
-- 紫色事件代表渲染活动
-
-- 深黄色代表脚本活动
-
-- 请求来自脚本的函数请求染成为浅绿色 ？
-
-- 来自另一个脚本的请求以米色表示 ？ 
-
-在 Flame Chart 面板上你可能看到三根垂直的线，蓝线代表 DOMContentLoaded 事件，绿线代表渲染开始的时间( time to first paint)，红线代表 load 事件 ? 
-
 [性能功能参考](https://docs.microsoft.com/zh-cn/microsoft-edge/devtools-guide-chromium/evaluate-performance/reference)
 
 #### Main 概览
 
-![](./static/performance-network-summary.png)
+点击某个具体的活动可以在底部概览区域看到更多的相关信息，如执行时间、所处文件等，通过 `Bottom-Up`、 `call-tree`、 `Event Log` 等内容可以找到具体的执行栈调用过程中子函数的调用耗时情况
 
-这里一般来说，需要着重关注的有两个：一是黄色的区域，代表脚本执行时间，另一个是紫色的渲染时间
-
-**Bottom-Up**
-
-![](./static/performance-main-bottom-up.png)
-
-在"Summary"的右侧，有一个"Bottom-Up"的页签，它的里面可以按照排序查看各个阶段占用的时间
-
-这里有两列时间数据，一是"Self Time"代表任务自身执行所消耗的时间，二是"Total Time"代表此任务及其调用的附属子任务一共消耗的时间。这两列数据各有不同的用处，可以按自己的需求决定按哪列数据作为排序字段。
-
-在Activity的右侧，部分还带有Source Map链接，点击之后可以定位到相应操作对应的代码。使用它可以比较方便地定位到具体的代码。
-
-推荐使用development版本的前端资源，如webpack-dev-server构建出来的版本，因为一般它的source map更准确一些。使用production模式带source-map的版本也行
-
-**Call Tree**
-
-"Call Tree"中的内容，在"Bottom-Up"中也能看到，无明显的区别。
-
-**Event Log**
-
-"Event Log"中的内容，是按顺序记录的事件日志，数据比较多。常见的优化级别中一般用不到它。如果是比较大型的应用，打开它可能会直接导致Chrome卡死
-
-// todo
-
-### Raster 面板
-
-// todo
+![](./static/summary-2.png)
 
 ### 内存面板
 
+打开 Chrome 控制台后，按组合键 ctrl + p(Mac 快捷键为 command + p)，输入> Show Performance Monitor，就可以打开 Performance Monitor 性能监视器。主要的监控指标包括：
+
+- CPU usage：CPU 占用率
+
+- JS head size：JS 内存使用大小
+
+- DOM Nodes：内存中挂载的 DOM 节点个数
+
+- JS event listeners：事件监听数
+
 ![](./static/performance-memory.png)
 
-// todo
+通过该图可以看出我们在不同的时间段的执行情况。我们可以看到页面中的内存使用的情况，比如 JS Heap(堆)，如果曲线一直在增长，则说明存在内存泄露，如果相当长的一段时间，内存曲线都是没有下降的，这里是有发生内存泄露的可能的
 
-### Summary
+### 底部数据面板
+
+**Summary**
 
 统计面板选择因点击选择不同的目标统计的内容不同
 
-**未选择任何目标时**
+- 未选择任何目标时
 
-![](./static/p-q-summary.png)
+    ![](./static/p-q-summary.png)
+    
+    如图选取一个 FPS 飘红比较多地方，然后得到一个信息在  `3.03 s – 4.09 s` 期间，各类事件的活动占比，可以看到主要是在执行 JS
 
-如图选取一个 FPS 飘红比较多地方，然后得到一个信息在  `3.03 s – 4.09 s` 期间，各类事件的活动占比，可以看到主要是在执行 JS
+- 选择具体目标时
+
+  ![](./static/summary-2.png)
+
+  如图选择了具体目标时，比如 Main 中的某个函数，而显示该函数及期调用子函数的执行时等信息
 
 **Bottom-Up**
 
-可以看到各个事件消耗时间排序
+此视图可以看到某些函数对性能影响最大，并能够检查这些函数的调用路径
 
-- self-time 指除去子事件这个事件本身消耗的时间
+Bottom-Up 有三个标签 `Self Time` 和 `Total Time` 以及 `Activity`
 
-- total-time 这个事件从开始到结束消耗的时间（包含子事件）
+- Self Time: 函数本身执行消耗时间
 
-- Group面板可以很清晰明了得分析按照活动、目录、域、子域、URL和Frame进行分组的前端性能。
+- Total Time: 函数本身消耗再加上在调用它的函数中消耗的总时间
+
+- Activity：至底向上展示活动的事件，类似事件冒泡的感觉，不断展开会发现最后一个就是根活动事件
+
+  ![](./static/summary-bottom-up-0.png)
+  
+  ![](./static/summary-bottom-up.png)
+
+  这里的 Group 面板非常有用。我们可以很清晰明了得分析按照活动，目录，域，子域，URL和Frame进行分组的前端性能。对于开发非常有帮助
+
+  上图的例子可以发现 Activity 展开后跟上面的 Main 某个任务是能匹配上的
 
 **Call Tree**
 
-调用栈：Main选择一个事件，可以看到整个事件的调用栈（从最顶层到最底层，而不是只有当前事件）
+Call Tree 其实跟 Bottom-Up 差不多的，只是它呈现的活动是至项向下
 
-可以通过调用树来查看各个文件调用运行的时间及占比
+![](./static/summary-call-tree.png)
+
+可以看到跟 Bottom-Up 的例子是一样的
 
 **Event Log：事件日志**
 
-展示所有阶段包括loading、javascripting、rendering、painting中各事件的耗时情况，并提供了filter输入框和按钮供你快速过滤
+展示所有阶段包括 `loading`、 `javascripting`、`rendering`、`painting` 中各事件的耗时情况，并提供了 `filter ` 输入框和按钮供你快速过滤
 
-- 多了个start time，指事件在多少毫秒开始触发的
+- `start time`： 列表示活动开始时与录制开始相对的点。 例如，上图中所选项目 175.7 ms 的开始时间意味着录制开始 175.7 毫秒后活动开始。
 
-- 右边有事件描述信息
+- `self time`: 自身活动所用时间
+
+- `total time`: 自身活动+其子活动总共执行时间
+
+![](./static/summary-event-log.png)
+
+其实这四个标签要表现的东西是差不多的，只是呈现方式不一样
 
 [网页性能工具——performance](https://zhangjiali0627.github.io/js/2020-06-20/WebPerformance.html)
 
-
-
-## 查看代码覆盖率
+### 查看代码覆盖率
 
 我们可以打开 Chrome Devtool Coverage 面板，查看当前使用资源的代码覆盖率，红色表示未使用到的代码
 
@@ -391,7 +338,53 @@ Timings 面板标注了性能指标相关的的完成节点，点击各个节点
 
 [chrome-performance页面性能分析使用教程](https://codeantenna.com/a/t5fFJzavR3)
 
+## 页面加载性能 Lighthouse
+
+![](./static/lighthouse-start.png)
+
+lighthouse 是 Google Chrome 推出的一款开源自动化工具，它可以搜集多个现代网页性能指标，分析 Web 应用的性能并生成报告，为开发人员进行性能优化的提供了参考方向
+
+点击 `Generation Report` 后就可以等待分析结果，如果下图
+
+![](./static/lighthouse-eg.png)
+
+### 指标权重
+
+从 [Lighthouse Scoring Calculator](https://googlechrome.github.io/lighthouse/scorecalc/#FCP=0&SI=0&FMP=0&TTI=0&FCI=0&LCP=0&TBT=0&CLS=0&device=desktop&version=8) 可以看到 lighthouse  提供的几个性能评估指标：
+
+![](./static/lighthouse_scoring_calculator.png)
+
+Lighthouse 最新版的提供了 6 个性能指标：FCP、SI、LCP、TTI、TBT 和 CLS；权重分别是 15%，15%，25%，15%，25% 和 5%。Lighthouse 会根据权重计算得到一个分数值
+
+### 优化建议
+
+![](./static/lighthouse-yh.png)
+
+往下移可以看到报告给了优化建议，可以作为我们优化参数方向
+
+点击 `View Original trace` 会跳转 Performance 面板，可看页面加载过程的运行情况
+
 ## 查找瓶颈
+
+### 粟子一
+
+![](./static/demo-1-1.png)
+
+页面显示的时候出现很长的一段空白，从 Performance 报告中可以发现帖刷新出现了很长的阻塞情况
+
+![](./static/demo-1-2.png)
+
+在 Frame 面板点击红色的帧，可以发现此帧阻塞了 7s 多
+
+![](./static/dem0-1-3.png)
+
+在 Main 面板查看期间的活动情况，发现有一个活动 `updateAllZIndex` 执行非常长，慢的原因基本可以确定就是这方法引起的
+
+`updateAllZIndex` 是一个重置页面绘图层级的方法，估计是遍历的时候给每个图层修改的层级时都不断得触发的绘制工作，所以修改层级的逻辑，在绘图之前就设置好各个图像的层级
+
+![](./static/demo-1-4.png)
+
+优化后缩短至了 2s 多，根据这个思路，可以继续往下优化 initNode 和 fadeInNodes 方法
 
 ### 查看 Summary
 
