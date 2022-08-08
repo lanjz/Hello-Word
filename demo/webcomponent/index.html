@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<script src="PopUpInfo.js" defer></script>
+<body>
+<h1>Pop-up info widget - web components</h1>
+<template id="my-paragraph">
+    <style>
+        p {
+            color: white;
+            background-color: #666;
+            padding: 5px;
+        }
+    </style>
+    <p>My paragraph</p>
+</template>
+<form>
+    <div>
+        <label for="cvc">Enter your CVC
+       </label>
+        <input type="text" id="cvc">
+    </div>
+</form>
+<div>------------------------------------------------------------------------</div>
+<popup-info img="img/alt.png" data-text="Your card validation code (CVC) is an extra security feature — it is the last 3 or 4 numbers on the back of your card."></popup-info>
+
+</body>
+</html>

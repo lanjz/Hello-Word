@@ -185,7 +185,7 @@ render: function (createElement) {
 
 上文的 `createElement` 方法，表示创建一个 `id=app` 的 `div`，这个 `div` 内部有一个节点 `this.message`, `this.message` 在这里表示是一个文本节点
 
-对 `render` 方法有了一些了解之后，接下来我们开始正入正题
+对 `render` 方法有了一些了解之后，接下来我们开始正入正createElement题
 
 ## PaaS应用创建
 

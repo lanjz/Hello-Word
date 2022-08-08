@@ -1,0 +1,18 @@
+<!doctype html>
+<meta charset="utf-8"><title>
+    my-custom-element demo</title>
+<script src="https://unpkg.com/vue@2"></script><script src="./dist/my-custom-element.js">
+
+</script>
+<my-custom-element id="id1"></my-custom-element>
+<script>
+    let arr = []
+    for(let i = 0; i<100; i++){
+        arr.push({
+            label: 'label' + i,
+            value: 'value' + i,
+            code: 'code' + i,
+        })
+    }
+    document.querySelector('#id1').setAttribute('listSrt','[]');
+</script>
