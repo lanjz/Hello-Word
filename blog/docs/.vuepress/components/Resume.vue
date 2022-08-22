@@ -1,33 +1,16 @@
 <template>
   <div class="code-mirror markdown-layout resume-page">
-    <div class="" :class="{'hideSplit': editMode !== 3}">
-      <div class="relative" v-if="isEdit">
-        <!--        <img src="../assets/imgs/IMG_0804的副本.JPG" alt="" class="avatar">-->
-<!--        <div class="flex-1">
-          <textarea class="markdown-edit-box box-shadow-inset" v-model="markDownValueLeft"></textarea>
-        </div>-->
-        <div class="">
-          <textarea class="markdown-edit-box box-shadow-inset" placeholder="输入MD内容" v-model="markDownValue"></textarea>
-        </div>
-      </div>
-      <div class="md-body-layout edit-layout relative" v-if="!!markdownHTML">
-        <div class="markdown-operate-layout">
-          <div class="icon-layout" @click="toggleEdit" :class="{'act': isEdit}"><i class="iconfont icon-bianji2"></i></div>
-        </div>
-<!--        <div class="markdown-style left">
-          <div class="markdown-content-style" v-html="leftMarkdownHTML"></div>
-        </div>-->
-        <div class="markdown-style flex-1">
-          <div class="markdown-content-style" v-html="markdownHTML"></div>
-        </div>
-      </div>
+    <div class="markdown-operate-layout">
+      <div class="icon-layout" @click="toggleEdit" :class="{'act': isEdit}"><i class="iconfont icon-bianji2"></i></div>
     </div>
+    <textarea class="markdown-edit-box box-shadow-inset" placeholder="输入MD内容" v-model="markDownValue" v-show="isEdit"></textarea>
+    <div class="markdown-content-style" v-html="markdownHTML"></div>
   </div>
 
 </template>
 
 <script>
-  import marked from 'marked'
+  import * as marked from 'marked'
   import hljs from 'highlight.js'
 
   const renderer = new marked.Renderer()
@@ -79,7 +62,8 @@
         if(this.isPreview) {
           clearTimeout(this.timeOut)
           this.timeOut = setTimeout(() => {
-            this.markdownHTML = DIYMarked(marked(val))
+            localStorage.setItem('markdown', val)
+            this.markdownHTML = DIYMarked(marked.parse(val))
           }, 500)
         }
       },
@@ -107,7 +91,7 @@
       }
     },
     mounted() {
-      this.markDownValue = ''
+      this.markDownValue = localStorage.getItem('markdown')|| ''
     }
   }
 </script>
@@ -115,15 +99,15 @@
 .resume-page *{
   position: relative;
 }
-/*.resume-page{
+.resume-page .page-meta{
+  display: none;
+}
+.resume-page{
   color: #000;
-  position: fixed;
   z-index: 999;
-  left: 0;
-  top: 0;
   background: #fff;
   width: 100%;
-}*/
+}
 .resume-page .sidebar{
   display: none !important;
 }
@@ -178,13 +162,6 @@
     top: 20px;
     position: absolute;
     z-index: 1;
-  }
-
-  .edit-layout{
-    position: relative;
-  }
-  .edit-layout:hover .markdown-operate-layout {
-    display: block;
   }
 
   .showCompileMarkdownBox, #codeMirror {
@@ -254,33 +231,33 @@
 
   .code-mirror.markdown-layout .markdown-edit-box {
     width: 100%;
-    min-height: 500px;
-    height: 100%;
+    height: 50%;
     overflow: auto;
     padding: 20px;
-    background: #202020;
+    background: rgba(0,0,0,.8);
     color: #919191;
     border: none;
     outline: none;
     box-sizing: border-box;
     font-size: 14px;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    bottom: 0;
   }
   .box-shadow-inset{
     /*box-shadow: 0 0 4px 1px #000 inset*/
   }
-  .code-mirror.markdown-layout .md-body-layout {
-    overflow: auto;
-    background: #fff;
-    padding: 0;
-  }
-
   .markdown-operate-layout {
-    display: none;
-    position: absolute;
+    position: fixed;
     z-index: 2;
     right: 20px;
     top: 10px;
     color: #fff;
+    opacity: 0;
+  }
+  .markdown-operate-layout:hover{
+    opacity: 1;
   }
   .code-mirror.markdown-layout .icon-layout {
     display: inline-block;
@@ -317,7 +294,7 @@
   }
   .resume-page .markdown-content-style{
     padding: 10px 20px 20px 50px;
-    min-height: 100%;
+    min-height: 100vh;
   }
   .resume-page .markdown-style.left .markdown-content-style > h1 {
     margin-top: 20px;

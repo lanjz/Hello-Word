@@ -4,11 +4,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import mapSvg from 'svg-mind-js'
-import meun from '../config'
-const { nav = [], sidebar = {} } = meun.themeConfig
-export default {
+import { sidebar } from '../nav'
+import {defineComponent} from "vue";
+export default defineComponent({
   methods: {
     getItemTree(data = [], prefix = ''){
       if(!data.length) return []
@@ -65,20 +65,18 @@ export default {
     this.initPage()
     this.initSvgTree()
   }
-}
+})
 </script>
 
 <style scope>
 .nav-svg{
   width: 100%;
   height: 100%;
-  background: #272b2d;
 }
 .in-page{
   min-height: 550px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
 }
 </style>

@@ -1,15 +1,12 @@
 <template>
-  <div class="app">
-    <div ref="home" class="container"></div>
-  </div>
+  <div ref="home" class="container"></div>
 </template>
 
-<script>
-// import mapSvg from './svgMap'
+<script lang="ts">
 import mapSvg from 'svg-mind-js'
-import menu from '../config'
-const { nav = [], sidebar = {} } = menu.themeConfig
-export default {
+import { defineComponent} from 'vue';
+import { navbar } from '../nav'
+export default defineComponent({
   methods: {
     getItemTree(data = [], prefix = ''){
       if(!data.length) return []
@@ -20,8 +17,8 @@ export default {
         const one = {
           label: item.text,
           key: `${prefix}${item.link || ''}`,
-          type: (item.items || (item.link && item.link[item.link.length - 1] === '/')) ? 'dir' : 'text',
-          children: this.getItemTree(item.items, item.link)
+          type: (item.children || (item.link && item.link[item.link.length - 1] === '/')) ? 'dir' : 'text',
+          children: this.getItemTree(item.children, item.link)
         }
         createData.push(one)
       })
@@ -56,7 +53,7 @@ export default {
 
         },
       }
-      const svgTree = this.getItemTree(nav)
+      const svgTree = this.getItemTree(navbar)
       const svg = mapSvg(svgTree,options)
       this.$refs['home'].appendChild(svg)
     }
@@ -64,13 +61,13 @@ export default {
   mounted() {
     this.initSvgTree()
   }
-}
+
+})
 </script>
 
-<style scope>
-.home-page{
-  min-height: 100vh;
-  background: #272b2d;
-  padding-top: 3.6rem;
+<style scoped>
+.container{
+  text-align: center;
+  padding: 10px;
 }
 </style>
