@@ -237,6 +237,10 @@ plugins: [
 
  `General output time took 1 min, 8.98 secs  ~ General output time took 12.18 secs` 可以发现时间缩短了 80%
 
+:::waring
+使用 HardSourceWebpackPlugin 热更新的速度会变慢
+:::
+
 [webpack构建提速-HardSourceWebpackPlugin-热重载不生效](https://juejin.cn/post/7020647510322462756)
 
 ### 多进程工作
@@ -296,7 +300,9 @@ smp:
 
 可以发现使用 esbuild-loader 首次打包的速度比 babel-loader 快了百分40，但是之后的打包后因为 babel-loader 已经有了缓存，之后的打包的时间没有存在很大的差距
 
-**要提醒的是esbuild-loader 只能编译到 es2015**
+:::warning
+要提醒的是esbuild-loader 只能编译到 es2015
+:::
 
 #### **使用esbuild-minimize-plugin替换 terser 实现 CSS压缩**
 
@@ -315,7 +321,43 @@ config.optimization
 
 可以发现使用 esbuild 后首次打包的速度快了百分50，但是二次打包后因为 terser 已经有了缓存，所以时间没有差多少。
 
-**需要额外注意的是使用 esbuild 压缩后的体积会比使用 terser 的大一点**
+:::waring
+需要额外注意的是使用 esbuild 压缩后的体积会比使用 terser 的大一点
+:::
+
+**esbuild 使用场景**
+
+- 没有使用一些自定义的 babel-plugin (如 babel-plugin-import)
+
+- 不需要兼容一些低版本浏览器（esbuild 只能将代码转成 es6）
+
+### 减少打包工作
+
+- 根据情况是否要使用 JS source map ？
+
+  - webpack 通过 devtool 设置
+
+  - vue-cli 可以通过  productionSourceMap 属性进行配置
+
+
+- 是否要启用 CSS sourceMap ？
+
+  - webpack 通过对应 css(less..)-loader 进行配置(options: { sourceMap: true, })
+
+  - vue-cli 通过  css.sourceMap属性进行配置
+
+- 生产环境是否要开启 eslint ？
+
+  - vue-cli 通过  lintOnSave属性进行配置
+  
+- 使用 更少/更小 的库
+
+- 移除不使用的代码
+
+- 使用 CDN 来引入资源
+
+   如果文件真的非常大的话，可以一试
+
 
 ## 打包输出优化
 
@@ -448,94 +490,18 @@ npm i compression-webpack-plugin@5.0.1
 
 现在把上面的所有优化做下整合：
 
-- 添加  `hard-source-webpack-plugin` Plugin
+- 如果加配了 loader 且耗时较长，可使用 cache-loader
 
-- 给项目额外配置的 Loader 添加 `cache-loader`
+- 如果项目的启动时间过长，且无法容忍，可以添加 hard-source-webpack-pulgin
 
-- 使用 `esbuild-minimize-plugin` 代替默认的 terser Plugin 进行代码压缩
+- 如果第三方模块的体积很大，且该模块的使用频率非常高，可以考虑直接  CDN 引入
 
-考虑 esbuild 只能编译到 es2015 且成熟度不如 label-loader，所以这里并没有使用 esbuild-loader 代替 label-loader
-
-并移除 SMP 来看下最终优化效果
-
-|         | 优化前                      | 优化后                       |
-| :-----: |:--------------------------:| ----------------------------:|
-| 首次打包 | 197.05s                    | 135.12s                      |
-| 重复打包 | 82.85、81.96、82.36、80.64  | 51.03、 52.31、51.03、53.65  | 
-
-跟之前相比大约节省了 37% 的构建时间
-
-即使优化后其实还是挺慢的，毕竟不是大刀阔斧得去修改 Webpack 配置，因为之所以用手脚架本身就是为了图方便，省去这块的维护成本.
-
-[构建性能](https://www.webpackjs.com/guides/build-performance/#%E5%B8%B8%E8%A7%84)
-
-scourceMap
-
-```js
-{
-    test: /\.scss$/,
-    include: [path.resolve(__dirname, 'src')],   // 限制打包范围，提高打包速度
-    exclude: /node_modules/,                     // 排除node_modules文件夹
-    use: [
-        {
-            loader: MiniCssExtractPlugin.loader,  
-            options: {
-                publicPath: '../',  //img图片路径
-            },
-        },
-        {
-            loader:'webpack-px2rem-loader',
-            options:{
-                basePx:100,
-                floatWidth:2,
-                min:1,
-            }
-        },
-        {
-            loader: 'css-loader',
-            options: {
-                sourceMap: true
-            }
-        },{
-            loader: "postcss-loader",
-            options: {
-                sourceMap: true
-            }
-        },
-        {
-            loader: "sass-loader",
-            options:{
-                sourceMap:true,
-            }
-        }
-    ]
-},
-```
-
-[技术文章摘要](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/%E5%89%8D%E7%AB%AF%E5%B7%A5%E7%A8%8B%E5%8C%96%E7%B2%BE%E8%AE%B2-%E5%AE%8C/03%20%20%E6%9E%84%E5%BB%BA%E6%8F%90%E9%80%9F%EF%BC%9A%E5%A6%82%E4%BD%95%E6%AD%A3%E7%A1%AE%E4%BD%BF%E7%94%A8%20SourceMap%EF%BC%9F.md)
-
-1.webpack4是根据代码的结构生成chunkhash，添加了空白行或注释，会引起chunkhash的变化，webpack5是根据内容生成chunkhash，改了注释或者变量不会引起chunkhash的变化，浏览器可以继续使用缓存。
-
-2.优化了对缓存的使用效率。在webpack4 中，chunkId与moduleId都是自增id。只要我们新增一个模块，那么代码中module的数量就会发生变化，从而导致moduleId发生变化，于是文件内容就发生了变化。chunkId也是如此，新增一个入口的时候，chunk数量的变化造成了chunkId的变化，导致了文件内容变化。所以对实际未改变的chunk文件不能有效利用。webpack5采用新的算法来计算确定性的chunkId和moduleId。可以有效利用缓存。在production模式下，optimization.chunkIds和optimization.moduleIds默认会设为’deterministic’。
-
-3.新增了可以将缓存写入磁盘的配置项, 在命令行终止当前构建任务，再次启动构建时，可以复用上一次写入硬盘的缓存，加快构建过程
+- 如果只考虑编译到 ES5，且想更进一步提高构建速度，可使用 esbuild-loader 代替 label-loader
 
 [swc 快在哪？](https://juejin.cn/post/7034316603890237477)
 
 [前端构建工具测评](https://guoyunhe.me/2022/01/24/front-end-build-tool-benchmark/)
 
-
-```js
-
-// module-a.js
-export default  function showName () {
-  console.log(name)
-}
-
-// app.js
-import moduleA from 'module-a.js'
-moduleA.show()
-
-```
+[构建性能](https://www.webpackjs.com/guides/build-performance/#%E5%B8%B8%E8%A7%84)
 
 [Webpack 究竟解决了什么问题？](https://zhuanlan.zhihu.com/p/267875652)
