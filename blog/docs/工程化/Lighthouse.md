@@ -382,7 +382,7 @@ Lighthouse 最新版的提供了 6 个性能指标：FCP、SI、LCP、TTI、TBT 
 
 `updateAllZIndex` 是一个重置页面绘图层级的方法，估计是遍历的时候给每个图层修改的层级时都不断得触发的绘制工作，所以修改层级的逻辑，在绘图之前就设置好各个图像的层级
 
-![](./static/demo-1-4.png)
+[comment]: <> (![]&#40;./static/demo-1-4.png&#41;)
 
 优化后缩短至了 2s 多，根据这个思路，可以继续往下优化 initNode 和 fadeInNodes 方法
 
