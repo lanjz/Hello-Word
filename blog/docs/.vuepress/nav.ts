@@ -43,35 +43,35 @@ export const navbar = [
   {
     text: '工程化',
     children: [
-      { text: '前端优化总结', link: '/工程化/前端优化总结/' },
+      { text: '前端优化总结', link: '/工程化/前端优化总结.md' },
       {text: '系统设计', link: '/工程化/系统设计/'},
-      {text: '预加载&预解析', link: '/工程化/预加载&预解析'},
-      {text: '重构代码原则', link: '/工程化/重构改善既有代码的设计'},
-      {text: '开发与调试', link: '/工程化/开发与调试技巧'},
-      {text: '组件设计', link: '/工程化/组件设计的基本原则'},
-      {text: '公共模块管理', link: '/工程化/公共模块管理'},
-      {text: '内存泄漏', link: '/工程化/内存泄漏'},
-      {text: '前端异常捕获', link: '/工程化/前端异常捕获'},
-      {text: '自动化部署', link: '/工程化/自动化部署'},
-      {text: '问题小计', link: '/工程化/疑难杂症'},
-      {text: '性能指标', link: '/工程化/性能指标'},
-      {text: 'Lighthouse', link: '/工程化/Lighthouse'},
+      {text: '预加载&预解析', link: '/工程化/预加载&预解析.md'},
+      {text: '重构代码原则', link: '/工程化/重构改善既有代码的设计.md'},
+      {text: '开发与调试', link: '/工程化/开发与调试技巧.md'},
+      {text: '组件设计', link: '/工程化/组件设计的基本原则.md'},
+      {text: '公共模块管理', link: '/工程化/公共模块管理.md'},
+      {text: '内存泄漏', link: '/工程化/内存泄漏.md'},
+      {text: '前端异常捕获', link: '/工程化/前端异常捕获.md'},
+      {text: '自动化部署', link: '/工程化/自动化部署.md'},
+      {text: '问题小计', link: '/工程化/疑难杂症.md'},
+      {text: '性能指标', link: '/工程化/性能指标.md'},
+      {text: 'Lighthouse', link: '/工程化/Lighthouse.md'},
       {text: '规范', link: '/工程化/前端规范/'},
-      {text: '前端规范', link: '/工程化/前端规范/前端规范'},
-      {text: '项目模板', link: '/工程化/前端规范/项目模板'},
+      {text: '前端规范', link: '/工程化/前端规范/前端规范.md'},
+      {text: '项目模板', link: '/工程化/前端规范/项目模板.md'},
     ]
   },
   {
     text: '利其器',
     children: [
-      { text: 'Mac', link: '/利其器/Mac' },
-      { text: 'Git', link: '/利其器/Git' },
+      { text: 'Mac', link: '/利其器/Mac.md' },
+      { text: 'Git', link: '/利其器/Git.md' },
     ]
   },
   {
     text: '小工具',
     children: [
-      { text: 'MD', link: '/online-tools/MD' },
+      { text: 'MD', link: '/online-tools/MD.md' },
     ]
   },
   { text: '关于我', link: '/Im/' },
