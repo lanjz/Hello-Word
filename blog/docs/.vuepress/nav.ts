@@ -43,7 +43,7 @@ export const navbar = [
   {
     text: '工程化',
     children: [
-      { text: '前端优化总结', link: '/工程化/前端优化总结.md' },
+      {text: '前端优化总结', link: '/工程化/前端优化总结.md' },
       {text: '系统设计', link: '/工程化/系统设计/'},
       {text: '预加载&预解析', link: '/工程化/预加载&预解析.md'},
       {text: '重构代码原则', link: '/工程化/重构改善既有代码的设计.md'},
@@ -59,6 +59,7 @@ export const navbar = [
       {text: '规范', link: '/工程化/前端规范/'},
       {text: '前端规范', link: '/工程化/前端规范/前端规范.md'},
       {text: '项目模板', link: '/工程化/前端规范/项目模板.md'},
+      {text: '埋点', link: '/工程化/埋点方案.md'},
     ]
   },
   {

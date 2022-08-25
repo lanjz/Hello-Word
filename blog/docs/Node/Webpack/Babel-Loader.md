@@ -2,6 +2,8 @@
 
 Babel 是一个通用的多功能 JavaScript 编译器，但与一般编译器不同的是它只是把同种语言的高版本规则转换为低版本规则，而不是输出另一种低级机器可识别的代码，并且在依赖不同的拓展插件下可用于不同形式的静态分析。
 
+通俗讲就是将es next(ECMScript2015，ECMScript2016，ECMScript2017等)的语法转换为向后兼容的JavaScript语法，使代码能够运行在当前的和旧版本的浏览器或其它环境中
+
 :::tip
 静态分析：指在不需要执行代码的前提下对代码进行分析以及相应处理的一个过程，主要应用于语法检查、编译、代码高亮、代码转换、优化、压缩等等
 :::
@@ -76,7 +78,24 @@ Babel 工作分为三大阶段：
   
 ### 转换（Transformation）
 
-插件应用于 Babel 的转译过程，尤其是第二个阶段 `Transformation`，如果这个阶段不使用任何插件，那么 Babel 会原样输出代码
+Transformation 会对生成的AST进行遍历，遍历过程中会调用节点中注册的 `visitor` 函数，`visitor` 函数中可以对AST节点进行增删改
+
+```js
+export default function (babel) {
+  const { types: t } = babel;
+  
+  return {
+    visitor: {
+      Identifier(path) {
+        // 对ast节点进行增删改操作
+        path.node.name = path.node.name.split('').reverse().join('');
+      }
+    }
+  };
+}
+```
+
+平时使用的 Babel 插件就是作用于这个阶段，如果这个阶段不使用任何插件，那么 Babel 会原样输出代码
 
 配置插件的方式一般是在项目根目录创建 `babel.config.js` 、 `babel.config.json` 或 `.babelrc`，具体看 [Babel-Config Files](https://www.babeljs.cn/docs/config-files)
 
