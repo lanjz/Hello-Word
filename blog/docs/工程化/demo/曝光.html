@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .target{
+            display: inline-block;
+            width: 200px;
+            height: 40px;
+            border: solid 1px red;
+            position: absolute;
+        }
+        .c8{
+            top: 1500px;
+        }
+        .c7{
+            top: 1700px;
+        }
+        .c6{
+            top: 1000px;
+        }
+        .c5{
+            left: 500px;
+        }
+        .c4{
+            left: 1000px;
+        }
+        .c3{
+            left: 1500px;
+        }
+        .c2{
+            top: 200px;
+        }
+        .red{
+            background: red;
+        }
+    </style>
+</head>
+<body>
+<div class="c1 target"></div>
+<div class="c2 target"></div>
+<div class="c3 target"></div>
+<div class="c4 target"></div>
+<div class="c5 target"></div>
+<div class="c6 target"></div>
+<div class="c7 target"></div>
+<div class="c8 target"></div>
+</body>
+<script>
+    let options = {
+        root: null,
+        rootMargin: '0px 0px 0px 0px',
+        threshold: 0.3
+    };
+
+    let callback = (entries, observer) => {
+        entries.forEach(entry => {
+            // Each entry describes an intersection change for one observed
+            // target element:
+            //   entry.boundingClientRect
+            //   entry.intersectionRatio
+            //   entry.intersectionRect
+            //   entry.isIntersecting
+            //   entry.rootBounds
+            //   entry.target
+            //   entry.time
+
+            console.log(entry, entry.intersectionRatio);
+            entry.target.innerHTML = entry.intersectionRatio
+            if(entry.intersectionRatio > .3){
+                entry.target.classList.add('red')
+            } else {
+                entry.target.classList.remove('red')
+            }
+
+        });
+    };
+
+    let observer = new IntersectionObserver(callback, options);
+
+    [].slice.call(document.querySelectorAll('.target')).forEach(el => {
+        observer.observe(el);
+    });
+
+    window.myObserver = observer;
+
+</script>
+</html>
