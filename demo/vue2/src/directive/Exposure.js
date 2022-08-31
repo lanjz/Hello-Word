@@ -83,7 +83,6 @@ export default class Exposure {
         console.log('fetch', data)
         // 上传
     }
-    // 每个商品都会会通过全局唯一的Exposure的实例来执行该add方法,将自己添加进观察者中
     add(entry) {
         this._observer && this._observer.observe(entry.el)
     }
