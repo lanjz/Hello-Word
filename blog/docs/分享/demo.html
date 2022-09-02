@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+<script>
+    const callback = entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // 曝光了
+            } else {
+                // 消失了
+            }
+        })
+
+    };
+    const options = {
+        root:null,
+        rootMargin: '0px',
+        threshold: 0.3
+    };
+    const observer = new IntersectionObserver(callback, options);
+    const ele = document.querySelector('.img');
+    observer.observe(ele);
+</script>
+</html>

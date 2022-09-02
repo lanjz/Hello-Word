@@ -3,7 +3,7 @@ import 'intersection-observer';
 
 // 可以把节流的时间调大一点，默认是100ms
 // IntersectionObserver.prototype['THROTTLE_TIMEOUT'] = 300;
-
+/*autoTracker*/
 export default class Exposure {
     constructor(validTime = 500) {
         // 当前收集的  尚未上报的数据  也就是已经进入视窗的DOM节点的数据
