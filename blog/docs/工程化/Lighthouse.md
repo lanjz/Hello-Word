@@ -81,7 +81,7 @@ sidebar: auto
     
     ![](./static/performance-overview-heap.png)
     
-    这里展示的内容使用情况，如果反复切换同一页面，图表不断上升，说明可能存在内存泄漏问题
+    这里展示的内存使用情况，如果反复切换同一页面，图表不断上升，说明可能存在内存泄漏问题
     
     `HEAP 图表` 提供的信息与 `memory 表` 中的 `JS Heap` 相同
 
