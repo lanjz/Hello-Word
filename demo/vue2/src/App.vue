@@ -5,9 +5,30 @@
       <router-link to="/about">About</router-link>
     </nav>
     <router-view/>
+    <h1 @click="log">ABC</h1>=
+    <div>{{name}}</div>
   </div>
 </template>
-
+<script>
+export default {
+  data(){
+    return {
+      name: ''
+    }
+  },
+  methods: {
+    sssssssssssssssssssss(res){
+      console.log('sssssssssssssssssssss', res)
+      this.name = res.default.a
+    },
+    log(){
+      import('./ab').then(res => {
+        this.sssssssssssssssssssss(res)
+      })
+    }
+  }
+}
+</script>
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
