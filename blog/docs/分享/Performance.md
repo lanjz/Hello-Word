@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # Performance
 
 ## 我们为什么要做前端性能优化
