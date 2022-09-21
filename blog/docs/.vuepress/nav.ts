@@ -55,7 +55,7 @@ export const navbar = [
       {text: '自动化部署', link: '/工程化/自动化部署.md'},
       {text: '问题小计', link: '/工程化/疑难杂症.md'},
       {text: '性能指标', link: '/工程化/性能指标.md'},
-      {text: 'Lighthouse', link: '/工程化/Lighthouse.md'},
+      {text: '性能定位', link: '/工程化/性能定位.md'},
       {text: '规范', link: '/工程化/前端规范/'},
       {text: '前端规范', link: '/工程化/前端规范/前端规范.md'},
       {text: '项目模板', link: '/工程化/前端规范/项目模板.md'},

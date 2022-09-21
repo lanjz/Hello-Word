@@ -135,19 +135,18 @@ HTML文件是蓝色、脚本是黄色、样式是紫色、媒体文件是绿色�
 
 然后结合 Network 里的 Timeline，可以得某个请求更多的信息
 
-Queueing: 等待队列时间
+Queueing（Q 英）: 等待队列时间
 
-Stalled: 是浏览器得到要发出这个请求的指令到请求可以发出的等待时间，一般是代理协商、以及等待可复用的TCP连接释放的时间，不包括DNS查询、建立TCP连接等时间等
+Stalled（Store）: 是浏览器得到要发出这个请求的指令到请求可以发出的等待时间（不包括DNS查询、建立TCP连接等时间等）
 
-DNS Lookup：DNS查询的时间，当本地DNS缓存没有的时候，这个时间可能是有一段长度的，但是比如你一旦在Host 中设置了 DNS，或者第二次访问，由于浏览器的DNS缓存还在，这个时间就为0了
-
-Initial connection：建立TCP连接的时间，就相当于客户端从发请求开始到 TCP 握手结束这一段，包括 DNS查询+Proxy时间+TCP握手时间
+DNS Lookup(路卡)：DNS查询的时间
 
 Request sent： 请求第一个字节发出前到最后一个字节发出后的时间，也就是上传时间
 
-Waiting(TTFB)：请求发出后，到收到响应的第一个字节所花费的时间(Time To First Byte),发送请求完毕到接收请求开始的时间;这个时间段就代表服务器处理和返回数据网络延时时间了。服务器优化的目的就是要让这个时间段尽可能短。
+Waiting(TTFB)：请求发出后，到收到响应的第一个字节所花费的时间(Time To First Byte)
 
 Content Download：收到响应的第一个字节，到接受完最后一个字节的时间，就是下载时间
+
 
 ### Performance-Frame 面板
 
