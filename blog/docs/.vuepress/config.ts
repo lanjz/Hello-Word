@@ -4,7 +4,7 @@ import { defaultTheme } from '@vuepress/theme-default'
 // import { docsearchPlugin } from '@vuepress/plugin-docsearch'
 import { registerComponentsPlugin } from '@vuepress/plugin-register-components'
 import { navbar, sidebar } from './nav'
-// import { searchPlugin } from '@vuepress/plugin-search'
+import searchPlugin from '@vuepress/plugin-search'
 // import {SearchPluginOptions} from "@vuepress/plugin-search/lib/node/searchPlugin";
 
 /*const searchPluginOptions: SearchPluginOptions = {
@@ -41,6 +41,6 @@ export default defineUserConfig({
             // 配置项
             componentsDir: path.resolve(__dirname, './components'),
         }),
-        // searchConfig,
+        searchPlugin(),
     ],
 })
