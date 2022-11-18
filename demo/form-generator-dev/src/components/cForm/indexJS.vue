@@ -95,6 +95,7 @@ export default {
   },
   computed: {
     isInline(){
+      console.log('this.$attrs', this.$attrs)
       return this.$attrs.hasOwnProperty('inline')
     }
   },

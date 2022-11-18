@@ -4,6 +4,12 @@
       :prop="column.prop"
       :label="column.label"
   >
+    <template slot="label">
+      <span>{{column.label}}</span>
+      <el-tooltip class="item" effect="dark" :content="column.tooltip" placement="top-start">
+        <i class="el-icon-question" v-if="column.tooltip"></i>
+      </el-tooltip>
+    </template>
     <template v-if="column.renderList">
       <el-col :span="c.colSpan||24" v-for="(c, ind) in column.renderList" :key="ind">
         <render

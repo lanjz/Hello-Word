@@ -46,7 +46,8 @@
 import rawDisplayer from './infra/raw-displayer'
 import configWrap from './configWrap';
 import { deepClone } from '../../utils/index'
-import renderRoot, { renderView, renderDraggableView, wrapComps, inputComps } from './utils'
+import { wrapComps, inputComps } from './component-meta'
+import renderRoot, { renderView, renderDraggableView } from './render'
 
 export default {
   name: 'nested-example',

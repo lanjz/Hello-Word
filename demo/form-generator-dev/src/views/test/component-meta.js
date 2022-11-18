@@ -1,104 +1,4 @@
-// 先渲染一个根元素
-export default function renderRoot(createElement, curMeat) {
-  return createElement(
-    'div',
-    {
-      props: {
-        className: 'group-wrap'
-      }
-    },
-    curMeat.map(item => renderView(createElement, item))
-  )
-}
-
-// 渲染被使用的提示元素
-export function renderTipView(createElement, curMeat) {
-  return createElement(
-    'div',
-    {
-      class: {
-        'preview-component-desc': true
-      }
-    },
-    [curMeat.desc]
-  )
-}
-// 渲染被 draggable 包裹的元素
-export function renderDraggableView(createElement, curMeat, vm) {
-  return [
-    createElement(
-      'draggable',
-      {
-        props: {
-          list: curMeat.childrenView
-        },
-        attrs: {
-          group: 'g1'
-        }
-      },
-      curMeat.childrenView.map(item => renderView(createElement, item, vm))
-    )
-  ]
-}
-
-function renderChildren(createElement, curMeat, vm){
-  if (curMeat.isDraggable) {
-    return renderDraggableView(createElement, curMeat, vm)
-  }
-  return curMeat.childrenView.map(item => renderView(createElement, item, vm))
-}
-function getAttrsConfig(conf = []) {
-  const res = {}
-  if (!conf) return res
-  conf.forEach(item => {
-    res[item.prop] = item.default
-  })
-  return res
-}
-export function renderView(createElement, curMeat, vm) {
-  if (typeof curMeat === 'string') return curMeat
-  const isWrap = isContainerWrap.includes(curMeat.tagName)
-  if (!curMeat.propsConfig) { // 用于保存组件的属性，默认无这个属性，根据配置项进行默认赋值
-    curMeat.propsConfig = getAttrsConfig(curMeat.__config__)
-  }
-  curMeat.props = Object.assign((curMeat.props || {}))
-  if (isWrap) {
-    // 如果是 draggable 渲染，借用 component-data 传递组件属性
-    curMeat.props['component-data'] = {
-      props: curMeat.propsConfig
-    }
-    curMeat.props.list = curMeat.childrenView
-  } else {
-    curMeat.props = Object.assign(curMeat.props, curMeat.propsConfig)
-  }
-  return createElement(
-    // 如果是可承载内容的 标签，则使用 draggable 代替
-    isWrap ? 'draggable' : curMeat.tagName,
-    {
-      props: curMeat.props,
-      style: {
-        ...(curMeat.defaultStyle||{})
-      },
-      // tag、group 只在 draggable 标签下有效
-      attrs: {
-        tag: isWrap ? curMeat.tagName: undefined, // 只在 draggable 元素下使用，要不然会出现重复 样式类
-        group: 'g1',
-        ...curMeat.propsConfig
-      },
-      class: {
-        'draggable-wrap': isWrap,
-        'el-wrap': true,
-        'is-activity': vm.activityEl === curMeat
-      },
-      nativeOn: {
-        click: (e) => vm.handleFormPreviewEl(curMeat, e)
-      }
-    },
-    (curMeat.childrenView && curMeat.childrenView.length) ? [...renderChildren(createElement, curMeat, vm), renderTipView(createElement, curMeat)] : [renderTipView(createElement, curMeat)]
-  )
-}
-
-export const isContainerWrap = ['div', 'el-row', 'el-form']
+export const isContainerWrap = ['div', 'el-row', 'el-form', 'c-form']
 export const wrapComps = [
   {
     tagName: 'div',
@@ -123,7 +23,7 @@ export const wrapComps = [
         render: 'el-slider',
         type: 'number',
         max: 24,
-        default: 0,
+        default: 0
       },
       {
         label: '布局模式',
@@ -164,7 +64,7 @@ export const wrapComps = [
       'min-height': '60px',
       background: '#fff',
       padding: '10px'
-    },
+    }
   },
   {
     tagName: 'el-col',
@@ -178,7 +78,7 @@ export const wrapComps = [
         render: 'el-slider',
         default: 12,
         max: 24,
-        min: 1,
+        min: 1
       },
       {
         label: '左侧间隔格数',
@@ -186,7 +86,7 @@ export const wrapComps = [
         type: 'number',
         default: 0,
         max: 24,
-        render: 'el-slider',
+        render: 'el-slider'
       },
       {
         label: '向右移动格数',
@@ -194,7 +94,7 @@ export const wrapComps = [
         type: 'number',
         default: 0,
         max: 24,
-        render: 'el-slider',
+        render: 'el-slider'
       },
       {
         label: '向左移动格数',
@@ -212,29 +112,44 @@ export const wrapComps = [
     }
   },
   {
-    tagName: 'el-form',
+    tagName: 'c-form',
     desc: '表单容器',
+    childrenView: [], // 如果承载子元素，需要预设此属性
     // 组件的自定义配置
     __config__: [
       {
-        label: '行内表单模式',
-        props: 'inline',
-        type: 'boolean',
-        default: false
+        label: '内联模式',
+        prop: 'inline',
+        default: false,
+        render: 'el-switch'
       },
       {
-        label: '标签的宽度',
-        props: 'label-width',
+        label: '标签宽度',
+        prop: 'label-width',
         type: 'string',
-        default: ''
+        default: '80px',
+        render: 'el-input'
       },
       {
-        label: '表单域标签的后缀',
-        props: 'label-suffix',
+        label: '标签后缀',
+        prop: 'label-suffix',
         type: 'string',
-        default: ''
-      }
-    ]
+        default: '',
+        render: 'el-input'
+      },
+      {
+        label: '自定义按钮',
+        prop: 'needSlot',
+        default: false,
+        slotName: ['按钮'],
+        render: 'el-switch'
+      },
+    ],
+    defaultStyle: {
+      'min-height': '50px',
+      background: '#fff',
+      padding: '10px'
+    }
   },
 
   {
@@ -269,72 +184,135 @@ export const wrapComps = [
           { label: 'warning', value: 'warning', render: 'el-option' },
           { label: 'danger', value: 'danger', render: 'el-option' },
           { label: 'info', value: 'info', render: 'el-option' },
-          { label: 'text', value: 'text', render: 'el-option' },
+          { label: 'text', value: 'text', render: 'el-option' }
         ]
       },
       {
         label: '朴素按钮',
         prop: 'plain',
         render: 'el-switch',
-        default: false,
+        default: false
       },
       {
         label: '圆角按钮',
         prop: 'round',
         render: 'el-switch',
-        default: false,
+        default: false
       },
       {
         label: '圆形按钮',
         prop: 'circle',
         render: 'el-switch',
-        default: false,
+        default: false
       },
       {
         label: '图标类名',
         prop: 'icon',
         render: 'el-input',
         default: ''
-      },
+      }
     ]
-  },
+  }
 ]
-
 export const inputComps = [
-
   {
     tagName: 'el-input',
     desc: '文本框',
     __config__: [
       {
-        label: '栅格间隔',
-        props: 'getter',
-        type: 'number',
-        default: 0
+        label: '类型',
+        prop: 'type',
+        default: 'text',
+        render: 'el-select',
+        child: [
+          { label: '单行文本', value: 'text', render: 'el-option' },
+          { label: '多行文本 ', value: 'textarea', render: 'el-option' }
+        ]
       },
       {
-        label: '水平排列方式',
-        props: 'justify',
-        type: 'string',
+        label: '描述',
+        prop: 'label',
+        default: '文本框',
+        render: 'el-input'
+      },
+      {
+        label: '绑定属性',
+        prop: 'model',
         default: 'start',
-        options: [
-          { label: 'start', value: 'start' },
-          { label: 'end', value: 'end' },
-          { label: 'space-around', value: 'space-around' },
-          { label: 'space-between', value: 'space-between' }
+        render: 'el-input'
+      },
+      {
+        label: '最大输入长度',
+        prop: 'maxlength',
+        render: 'el-input'
+      },
+      {
+        label: '最小输入长度',
+        prop: 'minlength',
+        render: 'el-input'
+      },
+      {
+        label: '字数统计',
+        prop: 'show-word-limit',
+        render: 'el-switch',
+        default: false,
+        tooltip: '只在 type = "text" 或 type = "textarea" 时有效'
+      },
+      {
+        label: '提示文本',
+        prop: 'placeholder',
+        render: 'el-input',
+        default: ''
+      },
+      {
+        label: '是否可清空',
+        prop: 'clearable',
+        render: 'el-switch',
+        default: true
+      },
+      {
+        label: '显示切换密码图标',
+        prop: 'show-password',
+        render: 'el-switch',
+        default: false
+      },
+      {
+        label: '尺寸',
+        prop: 'size',
+        default: 'medium',
+        render: 'el-select',
+        child: [
+          { label: 'medium', value: 'medium', render: 'el-option' },
+          { label: 'small ', value: 'small', render: 'el-option' },
+          { label: 'mini ', value: 'mini', render: 'el-option' }
         ]
       },
       {
-        label: '垂直排列方式',
-        props: 'align',
-        type: 'string',
-        default: 'top',
-        options: [
-          { label: 'top', value: 'top' },
-          { label: 'middle', value: 'middle' },
-          { label: 'bottom', value: 'bottom' }
-        ]
-      }
+        label: '头部图标',
+        prop: 'prefix-icon',
+        render: 'el-input',
+        default: ''
+      },
+      {
+        label: '尾部图标',
+        prop: 'suffix-icon',
+        render: 'el-input',
+        default: ''
+      },
+      {
+        label: '输入框行数',
+        prop: 'rows',
+        render: 'el-input',
+        default: '',
+        tooltip: '只对 type="textarea" 有效'
+      },
+      {
+        label: '自适应高度',
+        prop: 'autosize',
+        render: 'el-switch',
+        default: false,
+        tooltip: '只对 type="textarea" 有效'
+      },
     ]
-  },
+  }
 ]

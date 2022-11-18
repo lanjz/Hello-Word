@@ -37,7 +37,6 @@
 
 <script>
 import FormItem from './FormItem'
-import { EventBus } from '@/utils/help/index'
 export default {
   name: "index",
   props: {
@@ -172,12 +171,9 @@ export default {
     }
   },
   destroyed() {
-    EventBus.$off('c-form-layout-update', this.setShrinkage)
     window.addEventListener('resize', this.setShrinkage)
   },
   mounted() {
-    EventBus.$off('c-form-layout-update', this.setShrinkage)
-    EventBus.$on('c-form-layout-update', this.setShrinkage)
     if(this.column&&this.column.length){
       this.setDefaultModel(this.column)
     }
@@ -195,7 +191,7 @@ export default {
   cursor: pointer;
   display: inline-block;
   line-height: 32px;
-  color: $--color-primary;
+  color: #409EFF;
   padding: 0 10px;
   margin-left: 10px;
 }
