@@ -141,7 +141,7 @@ export const wrapComps = [
         label: '自定义按钮',
         prop: 'needSlot',
         default: false,
-        slotName: ['按钮'],
+        slotName: ['action'],
         render: 'el-switch'
       },
     ],

@@ -16,7 +16,6 @@ export default function renderRoot(createElement, curMeat) {
 const isFormEl = ['el-input']
 // 渲染被 el-form-item 包裹的元素
 export function renderElFormItemView(createElement, curMeat, vm) {
-  console.log('curMeat.label ', curMeat)
   return [
     createElement(
       'el-form-item',
@@ -106,17 +105,20 @@ export function renderView(createElement, curMeat, vm, formEd) {
     const findSlotSet = curMeat.__config__.find(item => item.prop === 'needSlot')
     if (findSlotSet) {
       findSlotSet.slotName.forEach(item => {
-        curMeat.childrenView.push({
-          tagName: 'div',
-          desc: item,
-          childrenView: [], // 如果承载子元素，需要预设此属性
-          isSlot: true,
-          defaultStyle: {
-            'min-height': '50px',
-            background: '#fff',
-            padding: '10px'
-          }
-        })
+        const isExit = curMeat.childrenView.find(it => it.desc === item && it.isSlot)
+        if (!isExit) {
+          curMeat.childrenView.push({
+            tagName: 'div',
+            desc: item,
+            childrenView: [], // 如果承载子元素，需要预设此属性
+            isSlot: true,
+            defaultStyle: {
+              'min-height': '50px',
+              background: '#fff',
+              padding: '10px'
+            }
+          })
+        }
       })
     }
   }
