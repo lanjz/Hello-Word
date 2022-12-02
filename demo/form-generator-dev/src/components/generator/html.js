@@ -379,6 +379,7 @@ function buildElUploadChild(scheme) {
  * @param {String} type 生成类型，文件或弹窗等
  */
 export function makeUpHtml(formConfig, type) {
+  debugger
   const htmlList = []
   confGlobal = formConfig
   // 判断布局是否都沾满了24个栅格，以备后续简化代码结构
