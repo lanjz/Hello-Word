@@ -1,4 +1,6 @@
+// @ts-ignore
 import { path } from '@vuepress/utils'
+// @ts-ignore
 import { defineUserConfig } from 'vuepress'
 import { defaultTheme } from '@vuepress/theme-default'
 import { searchPlugin } from '@vuepress/plugin-search'
