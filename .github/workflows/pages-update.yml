@@ -26,7 +26,7 @@ jobs:
       - name: Build
         uses: actions/setup-node@v1
         with:
-          node-version: '16.x'  #使用nodejs 16.x版本
+          node-version: '16.13.0'  #使用nodejs 16.x版本
 
       # 1、生成静态文件
       - name: Build
