@@ -1,5 +1,8 @@
 <template>
   <div class="full-wrap">
+    <el-input>
+      <div slot="prepend">Http://</div>
+    </el-input>
     <div class="el-list-wrap">
       <div v-for="(item, listIndex) in componentsList" :key="listIndex" class="component-box">
         <div class="components-class-title">
@@ -105,7 +108,7 @@ export default {
             'draggable',
             {
               props: {
-                tag: 'el-form',
+                tag: 'div',
                 list: _this.list
               },
               attrs: {

@@ -46,6 +46,17 @@ export default {
             this.$set(this.configForm, item.prop, item.default)
           })
         }
+        if (val.slot) {
+          Object.keys(val.slot).forEach(item => {
+            const res = val.slot[item]
+            this.configs.push({
+              label: res.label,
+              prop: item,
+              default: item.show,
+              render: 'el-switch'
+            })
+          })
+        }
         this.defaultFormValue = { ...this.configForm }
       }
     },

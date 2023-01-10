@@ -1,4 +1,4 @@
-export const isContainerWrap = ['div', 'el-row', 'el-form', 'c-form']
+export const isContainerWrap = ['div', 'el-row', 'el-form']
 export const wrapComps = [
   {
     tagName: 'div',
@@ -313,6 +313,12 @@ export const inputComps = [
         default: false,
         tooltip: '只对 type="textarea" 有效'
       },
-    ]
+    ],
+    slot: {
+      prefix: { label: '输入框头部内容', show: false },
+      suffix: { label: '输入框尾部内容', show: false },
+      prepend: { label: '输入框前置内容', show: false },
+      append: { label: '输入框后置内容', show: false },
+    }
   }
 ]

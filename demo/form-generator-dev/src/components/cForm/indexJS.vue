@@ -15,7 +15,7 @@
         />
       </template>
     </slot>
-    <el-form-item v-if="!hideAction" :style="{'opacity': showAction ? 1: 0}" ref="action-item" label="" class="item-shrinkage" :labelWidth="isInline ? $attrs['label-width']: '0'">
+    <el-form-item v-if="!(hideAction||true)" :style="{'opacity': showAction ? 1: 0}" ref="action-item" label="" class="item-shrinkage" :labelWidth="isInline ? $attrs['label-width']: '0'">
       <div style="text-align: right; " :style="shrinkageBtnStyle">
         <div style="display: inline-block" ref="actionBox" class="action-container">
           <slot name="action">

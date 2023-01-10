@@ -77,7 +77,6 @@ function getAttrsConfig(conf = []) {
   return res
 }
 export function renderView(createElement, curMeat, vm, formEd) {
-  debugger
   if (typeof curMeat === 'string') return curMeat
   const isWrap = isContainerWrap.includes(curMeat.tagName)
   if (!curMeat.propsConfig) { // 用于保存组件的属性，默认无这个属性，根据配置项进行默认赋值
@@ -100,7 +99,20 @@ export function renderView(createElement, curMeat, vm, formEd) {
   }
   // slots
   if (!curMeat.childrenView){
-    curMeat.childrenView = []
+    curMeat.childrenView = [
+      {
+        tagName: 'div',
+        desc: '无了无了',
+        childrenView: [], // 如果承载子元素，需要预设此属性
+        isSlot: true,
+        slot: 'prefix',
+        defaultStyle: {
+          'min-height': '50px',
+          background: '#fff',
+          padding: '10px'
+        }
+      }
+    ]
   }
   if (curMeat.propsConfig && curMeat.propsConfig.needSlot) {
     const findSlotSet = curMeat.__config__.find(item => item.prop === 'needSlot')
@@ -123,22 +135,6 @@ export function renderView(createElement, curMeat, vm, formEd) {
       })
     }
   }
-  if (curMeat.slot) {
-    Object.keys(curMeat.slot).forEach(item => {
-      const res = curMeat.slot[item]
-      if (curMeat.propsConfig[item]){
-        curMeat.childrenView.push({
-          tagName: 'div',
-          slotName: item,
-          defaultStyle: {
-            'min-height': '50px',
-            background: '#fff',
-            padding: '10px'
-          }
-        })
-      }
-    })
-  }
   return createElement(
     // 如果是可承载内容的 标签，则使用 draggable 代替
     isWrap ? 'draggable' : curMeat.tagName,
@@ -160,8 +156,7 @@ export function renderView(createElement, curMeat, vm, formEd) {
       },
       nativeOn: {
         click: (e) => vm.handleFormPreviewEl(curMeat, e)
-      },
-      slot: curMeat.slotName
+      }
     },
     (curMeat.childrenView && curMeat.childrenView.length)
       ? [...renderChildren(createElement, curMeat, vm), renderTipView(createElement, curMeat)]
