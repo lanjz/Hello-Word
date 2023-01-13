@@ -16,6 +16,11 @@
 <script>
 import CForm from '../../components/cForm/indexJS'
 
+const titleMap = {
+  default: '基本配置',
+  'el-form-item': 'formItem配置',
+  slot: '插槽'
+}
 export default {
   name: 'setConfig',
   props: {
@@ -38,18 +43,29 @@ export default {
       immediate: true,
       handler(val) {
         this.configForm = {}
-        this.configs = val.__config__ || []
-        if (val.propsConfig) {
-          this.configForm = val.propsConfig
-        } else if (this.configs.length) {
-          this.configs.forEach(item => {
-            this.$set(this.configForm, item.prop, item.default)
+        const defaultFormValue = {}
+        const { __config__ = {} } = val
+        let formConfig = []
+        const keys = Object.keys(__config__)
+        keys.forEach(i => {
+          formConfig.push(
+            {
+              label: titleMap[i],
+              prop: 'title',
+              render: 'h2',
+              class: 'form-group-title'
+            }
+          )
+          const curConfig = __config__[i] || []
+          formConfig = [...formConfig, ...curConfig]
+          curConfig.forEach(item => {
+            defaultFormValue[item.prop] = item.default
           })
-        }
+        })
         if (val.slot) {
           Object.keys(val.slot).forEach(item => {
             const res = val.slot[item]
-            this.configs.push({
+            formConfig.push({
               label: res.label,
               prop: item,
               default: item.show,
@@ -57,7 +73,9 @@ export default {
             })
           })
         }
-        this.defaultFormValue = { ...this.configForm }
+        this.configs = formConfig
+        this.configForm = val.props || defaultFormValue
+        this.defaultFormValueST = { ...defaultFormValue }
       }
     },
     configForm: {
@@ -69,7 +87,7 @@ export default {
   },
   methods: {
     reset(){
-      this.configForm = { ...this.defaultFormValue }
+      this.configForm = { ...this.defaultFormValueST }
     }
   }
 }

@@ -218,102 +218,106 @@ export const inputComps = [
   {
     tagName: 'el-input',
     desc: '文本框',
-    __config__: [
-      {
-        label: '类型',
-        prop: 'type',
-        default: 'text',
-        render: 'el-select',
-        child: [
-          { label: '单行文本', value: 'text', render: 'el-option' },
-          { label: '多行文本 ', value: 'textarea', render: 'el-option' }
-        ]
-      },
-      {
-        label: '描述',
-        prop: 'label',
-        default: '文本框',
-        render: 'el-input'
-      },
-      {
-        label: '绑定属性',
-        prop: 'model',
-        default: 'start',
-        render: 'el-input'
-      },
-      {
-        label: '最大输入长度',
-        prop: 'maxlength',
-        render: 'el-input'
-      },
-      {
-        label: '最小输入长度',
-        prop: 'minlength',
-        render: 'el-input'
-      },
-      {
-        label: '字数统计',
-        prop: 'show-word-limit',
-        render: 'el-switch',
-        default: false,
-        tooltip: '只在 type = "text" 或 type = "textarea" 时有效'
-      },
-      {
-        label: '提示文本',
-        prop: 'placeholder',
-        render: 'el-input',
-        default: ''
-      },
-      {
-        label: '是否可清空',
-        prop: 'clearable',
-        render: 'el-switch',
-        default: true
-      },
-      {
-        label: '显示切换密码图标',
-        prop: 'show-password',
-        render: 'el-switch',
-        default: false
-      },
-      {
-        label: '尺寸',
-        prop: 'size',
-        default: 'medium',
-        render: 'el-select',
-        child: [
-          { label: 'medium', value: 'medium', render: 'el-option' },
-          { label: 'small ', value: 'small', render: 'el-option' },
-          { label: 'mini ', value: 'mini', render: 'el-option' }
-        ]
-      },
-      {
-        label: '头部图标',
-        prop: 'prefix-icon',
-        render: 'el-input',
-        default: ''
-      },
-      {
-        label: '尾部图标',
-        prop: 'suffix-icon',
-        render: 'el-input',
-        default: ''
-      },
-      {
-        label: '输入框行数',
-        prop: 'rows',
-        render: 'el-input',
-        default: '',
-        tooltip: '只对 type="textarea" 有效'
-      },
-      {
-        label: '自适应高度',
-        prop: 'autosize',
-        render: 'el-switch',
-        default: false,
-        tooltip: '只对 type="textarea" 有效'
-      },
-    ],
+    __config__: {
+      default: [
+        {
+          label: '类型',
+          prop: 'type',
+          default: 'text',
+          render: 'el-select',
+          child: [
+            { label: '单行文本', value: 'text', render: 'el-option' },
+            { label: '多行文本 ', value: 'textarea', render: 'el-option' }
+          ]
+        },
+        {
+          label: '最大输入长度',
+          prop: 'maxlength',
+          render: 'el-input'
+        },
+        {
+          label: '最小输入长度',
+          prop: 'minlength',
+          render: 'el-input'
+        },
+        {
+          label: '字数统计',
+          prop: 'show-word-limit',
+          render: 'el-switch',
+          default: false,
+          tooltip: '只在 type = "text" 或 type = "textarea" 时有效'
+        },
+        {
+          label: '提示文本',
+          prop: 'placeholder',
+          render: 'el-input',
+          default: ''
+        },
+        {
+          label: '是否可清空',
+          prop: 'clearable',
+          render: 'el-switch',
+          default: true
+        },
+        {
+          label: '显示切换密码图标',
+          prop: 'show-password',
+          render: 'el-switch',
+          default: false
+        },
+        {
+          label: '尺寸',
+          prop: 'size',
+          default: 'medium',
+          render: 'el-select',
+          child: [
+            { label: 'medium', value: 'medium', render: 'el-option' },
+            { label: 'small ', value: 'small', render: 'el-option' },
+            { label: 'mini ', value: 'mini', render: 'el-option' }
+          ]
+        },
+        {
+          label: '头部图标',
+          prop: 'prefix-icon',
+          render: 'el-input',
+          default: ''
+        },
+        {
+          label: '尾部图标',
+          prop: 'suffix-icon',
+          render: 'el-input',
+          default: ''
+        },
+        {
+          label: '输入框行数',
+          prop: 'rows',
+          render: 'el-input',
+          default: '',
+          tooltip: '只对 type="textarea" 有效'
+        },
+        {
+          label: '自适应高度',
+          prop: 'autosize',
+          render: 'el-switch',
+          default: false,
+          tooltip: '只对 type="textarea" 有效'
+        }
+      ],
+      'el-form-item': [
+        {
+          label: '描述',
+          prop: 'label',
+          default: '文本框',
+          render: 'el-input'
+        },
+        {
+          label: '绑定属性',
+          prop: 'model',
+          default: 'start',
+          render: 'el-input'
+        }
+      ]
+    },
     slot: {
       prefix: { label: '输入框头部内容', show: false },
       suffix: { label: '输入框尾部内容', show: false },
