@@ -4,9 +4,9 @@ import router from './router'
 import store from './store'
 import './directive'
 
-import sensors from './utils/sa'
+// import sensors from './utils/sa'
 Vue.config.productionTip = false
-sensors.init({
+/*sensors.init({
   server_url: 'http://test-syg.datasink.sensorsdata.cn/sa?token=xxxxx&project=xxxxxx',
   is_track_single_page:true, // 单页面配置，默认开启，若页面中有锚点设计，需要将该配置删除，否则触发锚点会多触发 $pageview 事件
   use_client_time:true,
@@ -18,7 +18,7 @@ sensors.init({
     scroll_notice_map:'default'
   }
 });
-sensors.quick('autoTrack');
+sensors.quick('autoTrack');*/
 new Vue({
   router,
   store,
