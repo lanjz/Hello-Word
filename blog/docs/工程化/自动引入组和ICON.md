@@ -200,3 +200,72 @@ module.exports = {
 ```
 
 这样项目就是可以直接 vue 的 api 了
+
+## 自动引入 ElementUI 之后，如何进行进行样式覆盖
+
+[通过 SCSS 变量](https://element-plus.gitee.io/zh-CN/guide/theming.html#%E9%80%9A%E8%BF%87-scss-%E5%8F%98%E9%87%8F) 进行样式覆盖
+
+1. 新建 `element-cover.scss` 文件
+
+  ```scss
+    @forward '~element-plus/theme-chalk/src/common/var.scss' with (
+        $colors: (
+            'primary': (
+            'base': green,
+          ),
+        ),
+    );
+  ```
+  `@forward` 语句可以引入另一个模块的所有变量、mixins和函数，将它们直接作为当前模块的 API 暴露出去，而不会真的在当前模块增加代码，而添加 通过 `with` 函数可以改变模块内部变量的初始值
+
+2. 配置 vue.config.js
+
+    ```js
+    const path = require('path')
+    const { defineConfig } = require('@vue/cli-service')
+    const AutoImport = require('unplugin-auto-import/webpack')
+    const Components = require('unplugin-vue-components/webpack')
+    const ElementPlus = require('unplugin-element-plus/webpack')
+    const { ElementPlusResolver }  = require('unplugin-vue-components/resolvers')
+    
+    module.exports = defineConfig({
+      transpileDependencies: true,
+      css: {
+        loaderOptions: {
+          scss: {
+            additionalData: `@use "src/assets/styles/element-ui/element-cover.scss" as *;`,
+          },
+        },
+      },
+      configureWebpack: {
+        plugins: [
+          AutoImport({
+            // 注意要添加  importStyle 属性，表示 Element 样式引入方式
+            resolvers: [
+              ElementPlusResolver({ importStyle: "sass" }),
+            ],
+          }),
+          Components({
+            resolvers: [
+              // 注意要添加  importStyle 属性，表示 Element 样式引入方式
+              ElementPlusResolver({ importStyle: "sass" }),
+            ],
+          }),
+          ElementPlus({
+            useSource: true,
+          }),
+        ]
+      },
+    
+    })
+    ```
+   
+`css.loaderOptions.scss.additionalData` 表示通过给各个 scss 文件头部添加一条导包语句，进而实现将预置好的 scss 变量引入到每个 scss 文件的目的
+
+配置完之后项目中也不需要手动引入 `element-cover.scss` 文件
+
+也就意味着项目中所有的 scss 文件可以直接直接使用 `element-cover.scss` 中的变量，**包括 vue 文件中 `lang=scss` 中的样式**
+
+:::tip
+style-resources-loader 的配置会与上面的配置冲突，他们功能类似，所以可以不用配置 style-resources-loader
+:::
