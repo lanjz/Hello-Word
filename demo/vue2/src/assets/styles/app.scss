@@ -1,0 +1,149 @@
+body {
+    height: 100%;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-family:"Microsoft YaHei",  PingFang SC, Hiragino Sans GB, Helvetica Neue, Helvetica, SimSun, sans-serif;
+    margin: 0;
+}
+
+ul,li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+a{
+    color: $--color-primary;
+}
+a:-webkit-any-link{
+    white-space: nowrap;
+}
+.clearfix {
+    &:after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: " ";
+        clear: both;
+        height: 0;
+    }
+}
+.clear:after{
+    content: '';
+    display: block;
+    clear: both;
+}
+
+html {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+*{
+    box-sizing: border-box;
+}
+
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+a:focus,
+a:active {
+    outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+    cursor: pointer;
+    color: inherit;
+    text-decoration: none;
+}
+
+div:focus {
+    outline: none;
+}
+#app {
+    height: 100%;
+}
+
+.global-search-box{
+    padding: 10px 10px 0 10px;
+    border-bottom: solid 10px #fff;
+}
+
+.global-flex, .flex{
+    display: flex;
+    &.column-center{
+        align-items: center;
+    }
+}
+.global-flex-column{
+    display: flex;
+    flex-direction: column;
+}
+.global-full-ab{
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+}
+.global-flex-1{
+    flex-grow: 1;
+    &.h-0{
+        height: 0;
+    }
+}
+.global-shrink{
+    flex-shrink: 0;
+
+}
+.global-flex-1.scroll{
+    overflow: auto;
+    min-width: 0;
+    min-height: 0;
+}
+.global-text-ellipsis{
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}
+.global-relative{
+    position: relative;
+}
+.global-scroll{
+    overflow: auto;
+}
+.global-cursor{
+    cursor: pointer;
+    color: #0f26a8;
+}
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/* 滚动槽 */
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+    border-radius: inherit !important;
+    background-color: rgba(144, 147, 153, 0.3);
+    -webkit-transition: 0.3s background-color;
+    transition: 0.3s background-color;
+}
+
+.global-opacity-ab{
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    cursor: pointer;
+}
