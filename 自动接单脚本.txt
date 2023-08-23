@@ -1,0 +1,164 @@
+谷歌浏览器：https://www.google.cn/chrome/index.html
+
+篡改猴下载地址：https://www.tampermonkey.net/index.php?browser=chrome&ext=dhdg&locale=zh
+
+脚本代码：
+
+// ==UserScript==
+// @name         自动接单
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://v5.800best.com/baseService/transOrder/outOrderManage
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=800best.com
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+    var toastEl = null
+    var toastT = null
+    function createToast(text){
+      toastEl = document.getElementById('9999')
+      if(!toastEl){
+          var toastEl = document.createElement('div')
+          toastEl.id = '9999'
+          toastEl.style='position: fixed; top:40%; left: 45%;background: blue; color: #fff; z-index: 99999;padding:5px 20px;font-size:24px'
+          document.body.append(toastEl)
+      }
+      toastEl.innerText = text
+      toastEl.style.visibility = 'visible'
+      clearTimeout(toastT)
+     // toastT = setTimeout(()=>{
+     //   toastEl.style.visibility = 'hidden'
+     // }, 5000)
+    }
+    var timer = null
+    function checkEl(el, name){
+       if(!el){
+           console.warn(`【${name}】没有找到`)
+       }
+       return el
+    }
+    function log(info){
+        const date = new Date()
+         console.log(`%c${info}`,'color:green', date.getHours() + ':' + date.getMinutes())
+         createToast('【'+date.getHours() + ':' + date.getMinutes() +'】' + info)
+    }
+    function queryEL(){
+      var el = document.querySelector('.u-mb15') ? document.querySelector('.u-mb15').childNodes[0]: null;
+      checkEl(el, '查询按钮');
+      return el;
+    }
+    function receiveBtn(){
+       var btns = document.querySelector('.u-mb15').querySelectorAll('.ant-btn')
+       checkEl(btns, '按钮组');
+       for(let a of btns){
+           if(a.childNodes[0].textContent === '一键接揽'){
+               return a
+           }
+       }
+    }
+    function hasData(){
+       var bodyEL = document.querySelector('.ant-table-tbody')
+       checkEl(bodyEL, 'TABLE_BODY');
+       return bodyEL && bodyEL.childNodes.length
+    }
+     function checkStatus(){
+          const item = document.querySelectorAll('.ant-form-item')
+          for(let i of item){
+              const label = i.querySelector('.ant-form-item-label')
+              if(label){
+                  const text = label.querySelector('label')
+                  if(text.textContent === '订单状态'){
+                      const status = i.querySelectorAll('.ant-select-selection__choice__content')
+                      for(let a of status){
+                          if(a.textContent !== '待揽收'){
+                              alert('订单状态请设置为【待揽收】')
+                              return false
+                          }
+                      }
+                      return true
+                  }
+              }
+          }
+          return false
+      }
+    function closeModal(){
+        setTimeout(()=> {
+                const modalRoot = document.querySelectorAll('.ant-modal-root')
+                if(modalRoot && modalRoot.length){
+                    for(let i of modalRoot){
+                        var tEl = i.querySelector('.ant-modal-confirm-title')
+                        if(tEl && tEl.textContent === '一键接揽成功'){
+                            var btn = i.querySelector('.ant-btn')
+                            btn.click()
+                            log('关闭Modal')
+                            setTimeout(reWork, 2000)
+                        }
+                    }
+                }
+        }, 5000)
+    }
+    var intervalTime = null
+    function reWork(){
+      var time = 30
+      log(`${time}秒后重新查询`)
+      intervalTime = setInterval(() => {
+         log(`${--time}秒后重新查询`)
+         if(time <= 1){
+           clearInterval(intervalTime)
+           work()
+         }
+      }, 1000)
+    }
+    var work = () => {
+        try{
+            queryEL().click()
+            log('正在查询数据。。。')
+            setTimeout(() => {
+                if(hasData()){
+                    log('存在可执行的数据');
+                    const fixedEl = document.querySelector('.ant-table-fixed-left')
+                    checkEl(fixedEl, 'CHECK_BOX_1');
+                    const checked = fixedEl.querySelector('.ant-checkbox-input')
+                    checkEl(checked, 'CHECK_BOX');
+                    setTimeout(()=> {
+                      checked.click()
+                        setTimeout(()=> {
+                          log('接揽按钮触发', receiveBtn)
+                          receiveBtn().click()
+                          closeModal()
+                        })
+                    })
+                } else {
+                  log('没查询到数据')
+                  setTimeout(reWork, 2000)
+                }
+            }, 10000)
+        } catch(e){
+           clearInterval(timer)
+           alert('接单脚本出错了，找JZ更新一下')
+        }
+    }
+    if(checkStatus()){
+       work()
+    }
+
+    //timer = setInterval(work, 20*1000)
+    // Your code here...
+})();
+
+
+
+
+注意点：
+
+1. 查询订单的界面不能关，也不能切换到其它页面
+
+2. 如果需要关闭，直接刷新页面就行了，如果想打开就右键找到对应的脚本程序打开
+
+3. 每次刚开始运行的时候，先观察一下脚本有没有正常运行，主要是看下我在界面中给出提示是否正常
+
+4. 不能太依赖这个脚本，以防万一最好拿个闲置的电脑，放在旁边让他自己运行脚本，偶尔观察一下这个外挂是否正常运行
