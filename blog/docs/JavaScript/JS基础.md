@@ -22,6 +22,20 @@
 
 `null === undefined`  结果为`false`
 
+:::tip
+**为什么 `typeof null === Object` 合理嘛？**
+
+`null` 是一种基本数据类型，存储在栈区；而 `typeof null` 的结果却是 Object，而 Object 是引用数据类型，存储在堆
+
+其次根据代码 `alert (null instanceof Object)` 输出结果为 `false`, 我们可以知道 `null` 并不是 Object 的实例，两者之间存在矛盾
+
+为什么 `typeof null` 的结果是Object?
+
+简单来说，`typeof null` 的结果为 Object 的原因是一个 bug. 在 javascript 的最初版本中，使用的 32位系统，js为了性能优化，使用低位来存储变量的类型信息。
+
+在判断数据类型时，是根据机器码低位标识来判断的，而 `null` 的机器码标识为全 0 ，而对象的机器码低位标识为 000。所以 `typeof null` 的结果被误判为 Object
+:::
+
 ### boolean类型
 
 使用`Boolean()`函数，可以将任何类型转换为`boolean类型`
@@ -67,7 +81,6 @@ NaN == NaN // false
 ```
 isNaN(true) // false
 isNaN('srt') // true
-
 ``` 
 
 `isNaN()`也适用于对象，在基于对象使用时，首先会调用该对象的`valueof()`方法，然后对这个结果进行数值转换，如果不能转换，对这个`valueof()`返回的结果再调用`toString()`，再测试返回值。
