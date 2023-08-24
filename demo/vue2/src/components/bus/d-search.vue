@@ -23,7 +23,8 @@ export default {
     searchFormConfig: {
       type: Array,
       default: () => ([])
-    }
+    },
+    eventTarget: {}
   },
   data(){
     return {
@@ -40,7 +41,9 @@ export default {
       return res;
     },
     onSearch(){
-      this.EventBusST.$emit('d-table-event', 'onSearch')
+      if(this.eventTarget){
+        this.EventBusST.$emit(...this.eventTarget, this.searchForm)
+      }
     },
     resetSearch(){
       this.initSearchForm()

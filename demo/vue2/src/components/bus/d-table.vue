@@ -30,7 +30,8 @@ export default {
     }
   },
   methods: {
-    onSearch() {
+    onSearch(data) {
+      alert(JSON.stringify(data))
       this.$refs.tableRef.reFetchData();
     }
   },

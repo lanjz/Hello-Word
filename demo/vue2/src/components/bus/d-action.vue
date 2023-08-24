@@ -33,10 +33,10 @@ export default {
   },
   methods: {
     handleClick(item) {
-      this.EventBusST.$emit('d-dialog-form-event', 'open')
+      // this.EventBusST.$emit('d-dialog-form-event', 'open')
       console.log(item.eventTarget)
       if(item.eventTarget){
-        this.EventBusST.$emit(...item.eventTarget)
+        this.EventBusST.$emit(...item.eventTarget, 123)
       }
 
     },

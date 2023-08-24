@@ -162,6 +162,7 @@ export const sidebar = {
     '/Vue/SSR',
     '/Vue/共享状态思想',
     '/Vue/Paas应用',
+    '/Vue/Render',
     '/Vue/吱不吱',
   ],
   '/Vue3/': [

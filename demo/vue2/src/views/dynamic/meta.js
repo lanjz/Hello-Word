@@ -27,7 +27,8 @@ const searchMeta = {
                 { label: '无效', value: 0, render: 'el-option' },
             ],
         },
-    ]
+    ],
+    eventTarget: ['d-table-event', 'onSearch']
 };
 const actionMeta = {
     render: 'DAction',
