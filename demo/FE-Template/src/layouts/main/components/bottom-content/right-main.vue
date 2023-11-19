@@ -1,19 +1,13 @@
 <template>
 	<section class="app-main">
-		<transition
-			name="fade-transform"
-			mode="out-in"
-		>
-			<keep-alive
-				:include="includes"
-				:max="10"
-			>
-				<router-view
-					:key="key"
-					:pageId="moduleId"
-				/>
-			</keep-alive>
-		</transition>
+    <router-view
+        :key="key"
+        v-slot="{ Component }"
+    >
+      <keep-alive :include="includes" :max="10">
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
 	</section>
 </template>
 

@@ -3,13 +3,13 @@
 		v-if="isExternal"
 		:style="styleExternalIcon"
 		class="svg-external-icon svg-icon"
-		v-on="$listeners"
+		v-bind="$attrs"
 	/>
 	<svg
 		v-else
 		:class="svgClass"
 		aria-hidden="true"
-		v-on="$listeners"
+    v-bind="$attrs"
 	>
 		<use :href="iconName" />
 	</svg>

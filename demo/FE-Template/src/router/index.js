@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { appInfo } from '../utils/help'
 import { userStore } from '../stores/user'
 import routerConfig from './modules'
+
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: routerConfig
@@ -28,7 +29,7 @@ router.beforeEach(async (to, from, next) => {
   } else {
     const { err } = await userStateIns.checkLogin();
     if (!err) {
-       next(to.fullPath);
+       return next(to.fullPath);
     }
     next()
   }

@@ -7,10 +7,8 @@
       v-loading="loading"
       :height="tableHeight"
       v-bind="$attrs"
-      v-on="$listeners"
       class="c-table"
       :border="false"
-      size="medium"
       ref="tableRef"
   >
     <template v-slot:empty>

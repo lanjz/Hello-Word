@@ -2,7 +2,6 @@ import './styles/global.scss'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
-// import 'element-plus/dist/index.css'
 import { saveApp } from './utils/help'
 import comGlobal from './components/global';
 import libGlobal from './components/lib';

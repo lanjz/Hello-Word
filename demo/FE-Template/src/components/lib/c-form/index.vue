@@ -3,7 +3,6 @@
 		ref="elForm"
 		label-position="left"
 		v-bind="$attrs"
-		v-on="$listeners"
     :inline="isInline"
 		:model="model"
 		:class="['c-form', formClass]"

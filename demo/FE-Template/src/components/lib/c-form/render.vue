@@ -1,5 +1,4 @@
 <script>
-import { createApp } from 'vue'
 import { h } from 'vue'
 import { getGlobalComponent } from '@/utils/help'
 function createElement(ctx) {
@@ -21,7 +20,9 @@ function createElement(ctx) {
 		return h(
         getGlobalComponent(render),
         props,
-			child && child.map((item) => createElement({ $attrs: item , $props: ctx.$props, noVModel: true }))
+        {
+          default: () => child && child.map((item) => createElement({ $attrs: item , $props: ctx.$props, noVModel: true }))
+        }
 		);
 	}
 	return render(h, ctx.$props.form, ctx); // todo

@@ -54,11 +54,11 @@
 			</div>
 		</div>
 		<div class="right global-flex-1 scroll">
-			<FEmpty
+			<CEmpty
 				text="请先选择模块"
 				top="120"
 				v-if="!moduleForm.moduleCode && !moduleForm.parentId"
-			></FEmpty>
+			></CEmpty>
 			<template v-else>
 				<div class="panel-title">{{ isAdd ? '新增' : '编辑' }}模块</div>
 				<div class="border-box right">

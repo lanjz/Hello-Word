@@ -2,15 +2,6 @@
 	<div class="main-container">
 		<topBar></topBar>
 		<botomContent></botomContent>
-		<!-- <el-row class="content">
-      <router-view v-slot="{ Component, route }">
-        <transition name="fade" mode="out-in">
-          <keep-alive>
-            <component :is="Component" :key="route.meta.usePathKey ? route.path : undefined" />
-          </keep-alive>
-        </transition>
-      </router-view>
-    </el-row> -->
 	</div>
 </template>
 
