@@ -8,7 +8,7 @@ import { registerComponentsPlugin } from '@vuepress/plugin-register-components'
 import { navbar, sidebar } from './nav'
 export default defineUserConfig({
     lang: 'zh-CN',
-    title: 'LLL Blog',
+    title: '前端知识体系',
     description: '前端总结与记录',
     port: 5000,
     base: '/lanjz/',
