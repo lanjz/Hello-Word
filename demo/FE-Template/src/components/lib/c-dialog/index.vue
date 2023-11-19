@@ -2,7 +2,9 @@
 	<el-dialog
 		v-bind="$attrs"
 		@close="cancle"
-		:size="width"
+		:width="width"
+    class="c-dialog"
+    :model-value="$attrs.visible"
 	>
 		<div class="drawer-wrap">
 			<slot name="top"></slot>
@@ -53,7 +55,7 @@
 
 <script>
 export default {
-	name: 'c-drawer',
+	name: 'c-dialog',
 	props: {
 		fullContent: {
 			type: Boolean,
@@ -97,11 +99,11 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-::v-deep {
-	.el-dialog .el-dialog__body {
-		padding: 0;
-	}
+<style lang="scss">
+.c-dialog {
+  .el-dialog__body{
+    padding: 0;
+  }
 	.el-drawer__header {
 		border-bottom: solid 1px #e2e2e2;
 		padding: 14px 20px;
@@ -112,28 +114,28 @@ export default {
 	.el-drawer__close-btn {
 		font-size: 16px;
 	}
-}
-.drawer-wrap {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	.content {
-		margin: 20px 24px 24px 24px;
-		flex: 1;
-		padding: 0 20px;
-		overflow: auto;
-		min-height: 0;
-	}
-	.foot {
-		padding: 0 20px;
-		height: 60px;
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-		border-top: solid 1px #e2e2e2;
-		.btn:not(:last-child) {
-			//margin-right: 15px;
-		}
-	}
+
+  .drawer-wrap {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    .content {
+      flex: 1;
+      padding: 0 20px;
+      overflow: auto;
+      min-height: 0;
+    }
+    .foot {
+      padding: 0 20px;
+      height: 60px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      border-top: solid 1px #e2e2e2;
+      .btn:not(:last-child) {
+        //margin-right: 15px;
+      }
+    }
+  }
 }
 </style>

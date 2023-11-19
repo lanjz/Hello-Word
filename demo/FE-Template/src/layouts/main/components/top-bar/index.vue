@@ -2,7 +2,7 @@
 	<div class="top-bar-container">
 <!--		<logo></logo>-->
 		<div class="top-right">
-<!--			<shareCenter></shareCenter>-->
+			<tenant></tenant>
 			<user></user>
 		</div>
 	</div>
@@ -11,13 +11,13 @@
 <script>
 import logo from './logo.vue';
 import user from './user.vue';
-// import shareCenter from './share-center.vue';
+import tenant from './tenant.vue';
 export default {
 	name: 'top-bar',
 	components: {
 		logo,
 		user,
-		// shareCenter,
+		tenant,
 	},
 };
 </script>
