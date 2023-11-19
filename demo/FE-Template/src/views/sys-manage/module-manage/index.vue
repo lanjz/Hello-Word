@@ -406,19 +406,19 @@ export default {
 			cursor: pointer;
 		}
 	}
-	.data-tree {
+  ::v-deep(.data-tree) {
 		height: auto;
 		background: transparent;
 		font-size: 14px;
-		::v-deep .el-tree-node__content {
-			line-height: 36px;
-			height: 36px;
-		}
-		::v-deep .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf) {
-			font-size: 14px;
-			color: #2a323e;
-		}
-		::v-deep .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
+    .el-tree-node__content {
+      line-height: 36px;
+      height: 36px;
+    }
+    .el-tree-node__content > .el-tree-node__expand-icon:not(.is-leaf) {
+      font-size: 14px;
+      color: #2a323e;
+    }
+    .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
 			background-color: #fff !important;
 			color: $--color-primary !important;
 		}

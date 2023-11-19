@@ -256,28 +256,27 @@ $--color-primary: #296cde;
 	padding: 0 10px;
 	margin-left: 10px;
 }
+
 .c-form.el-form--inline {
 	display: flex;
 	flex-wrap: wrap;
-	::v-deep {
-		.el-form-item {
-			flex-shrink: 0;
-		}
-		.item-shrinkage {
-			border-color: transparent !important;
-			flex-grow: 1;
-			margin-bottom: 0;
-			text-align: right;
-			//min-width: 140pxd !important;
-			//margin-right: 0 !important;
-		}
+	::v-deep(.el-form-item) {
+    flex-shrink: 0;
 	}
-}
-::v-deep .action-container > div {
-	display: inline-block;
+  .item-shrinkage {
+    border-color: transparent !important;
+    flex-grow: 1;
+    margin-bottom: 0;
+    text-align: right;
+    //min-width: 140pxd !important;
+    //margin-right: 0 !important;
+  }
 }
 .action-container {
 	white-space: nowrap;
+  & > div{
+    display: inline-block;
+  }
 }
 </style>
 <style lang="scss">

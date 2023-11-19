@@ -228,13 +228,11 @@ $--color-primary: #225cee;
 		background: #ecedf0;
 	}
 }
-.list-item {
-	::v-deep {
-		.el-checkbox {
-			display: flex;
-			align-items: center;
-		}
-	}
+::v-deep(.list-item) {
+  .el-checkbox {
+    display: flex;
+    align-items: center;
+  }
 	.item-label {
 		max-width: 200px;
 	}

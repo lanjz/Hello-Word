@@ -403,14 +403,12 @@ $-form-search-el-in-lh: 35px;
 		font-weight: normal;
 		font-size: 14px;
 		height: 32px;
-		::v-deep{
-			.el-icon-arrow-up{
-				color: #141222 !important;
-				font-size: 18px !important;
-			}
-			.el-icon-arrow-up:before{
-				content: "\e78f";
-			}
+		.el-icon-arrow-up{
+			color: #141222 !important;
+			font-size: 18px !important;
+		}
+		.el-icon-arrow-up:before{
+			content: "\e78f";
 		}
 	}
 	.total-wrap{
