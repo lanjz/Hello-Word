@@ -3,12 +3,12 @@ import { path } from '@vuepress/utils'
 // @ts-ignore
 import { defineUserConfig } from 'vuepress'
 import { defaultTheme } from '@vuepress/theme-default'
-import { searchPlugin } from '@vuepress/plugin-search'
+// import { searchPlugin } from '@vuepress/plugin-search'
 import { registerComponentsPlugin } from '@vuepress/plugin-register-components'
 import { navbar, sidebar } from './nav'
 export default defineUserConfig({
     lang: 'zh-CN',
-    title: 'LLL Blog',
+    title: '前端知识体系',
     description: '前端总结与记录',
     port: 5000,
     base: '/lanjz/',
@@ -23,8 +23,8 @@ export default defineUserConfig({
             // 配置项
             componentsDir: path.resolve(__dirname, './components'),
         }),
-        searchPlugin({
+      /*  searchPlugin({
             // 配置项
-        }),
+        }),*/
     ],
 })

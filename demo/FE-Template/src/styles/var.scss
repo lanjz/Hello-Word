@@ -1,0 +1,29 @@
+//$--project-path: "@sdesign/element-plus";
+//@import "@sdesign/theme/custom/red.scss";
+//@import "@sdesign/element-plus/index.scss";
+/* 改变 icon 字体路径变量，必需 */
+:root {
+  color-scheme: light;
+  --el-color-white: #ffffff;
+  --el-color-black: #000000;
+  --el-color-primary: #05cfa7;
+  --el-color-primary-light-3: #468a7d;
+  --el-color-primary-light-5: #09f3c8;
+  --el-color-primary-light-7: #c6e2ff;
+  --el-color-primary-light-8: #d9ecff;
+  --el-color-primary-light-9: #eff8f6;
+  --el-menu-item-height: 50px;
+  --el-menu-sub-item-height: 50px;
+  --el-menu-text-color: #fff;
+  --el-border-color-lighter: rgba(34,42,66,.2);
+  --body-left: 260px;
+}
+$--font-path: '~element-plus/lib/theme-chalk/fonts';
+$--color-primary: #00f2c3;
+$--color-danger: #F56C6C;
+$--app-bg-color: #f5f6fa;
+$--color-text-secondary: #909399;
+$--color-text-primary: #666;
+:export {
+    //theme: $--sf_main;
+}
