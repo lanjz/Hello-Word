@@ -1,12 +1,17 @@
 import {
   Controller,
   Post,
+  Get,
   UseInterceptors,
   UploadedFile,
   Body,
+  Param,
+  Response,
   ParseFilePipeBuilder,
   ParseFilePipe,
-  UploadedFiles, BadRequestException,
+  StreamableFile,
+  UploadedFiles,
+  BadRequestException,
 } from '@nestjs/common';
 import * as multer from 'multer';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -96,5 +101,19 @@ export class CommonController {
       body,
       filePaths,
     };
+  }
+
+  // 获取文件流
+  @Get('/file/:name')
+  getFileStream(@Param() params, @Response() res): StreamableFile {
+    console.log("Param", params.name)
+    const filePath = path.join(process.cwd(), 'uploads', params.name)
+    console.log('file', filePath)
+    const file = fs.createReadStream(filePath);
+    res.set({
+      'Content-Type': 'application/octet-stream',
+      'Content-Disposition': `attachment; filename=${encodeURIComponent(params.name)}`,
+    });
+    return file.pipe(res);
   }
 }

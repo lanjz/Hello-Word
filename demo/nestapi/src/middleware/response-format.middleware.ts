@@ -18,6 +18,7 @@ export class ResponseFormatMiddleware implements NestMiddleware {
     console.log('res', res);
     res.send = function (body): any {
       if (Buffer.isBuffer(body)) {
+        console.log('body----')
         // 如果是 Buffer 类型的响应，则不做格式化处理
         originalSend.call(this, body);
       } else {
