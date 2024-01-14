@@ -35,3 +35,8 @@ export class TransformInterceptor<T>
     );
   }
 }
+
+/**
+* file.pipe(res) 是将文件流直接写入 HTTP 响应流中，所以不会被拦截器转换
+ * 拦截器只对经过框架提供的调用链传递的 Observable 进行转换处理
+* */
