@@ -6,11 +6,13 @@ import { AppService } from './app.service';
 import { UserModule } from './resource/user/user.module';
 import { User } from './resource/user/entities/user.entity';
 import { Article } from './resource/article/entities/article.entity';
+import { Role } from './resource/role/entities/role.entity';
 import { ArticleModule } from './resource/article/article.module';
 import { CommonController } from './resource/common/common.controller';
 import { AuthModule } from '@/resource/auth/auth.module';
 import { AuthGuard } from '@/resource/auth/auth.guard'
 import { RolesGuard } from '@/resource/auth/role.guard'
+import { RoleModule } from '@/resource/role/role.module';
 
 @Module({
   imports: [
@@ -21,13 +23,14 @@ import { RolesGuard } from '@/resource/auth/role.guard'
       username: 'root',
       password: '55555yyy',
       database: 'template',
-      entities: [User, Article],
+      entities: [User, Article, Role],
       synchronize: true,
       autoLoadEntities: true,
     }),
     UserModule,
     ArticleModule,
     AuthModule,
+    RoleModule,
   ],
   controllers: [AppController, CommonController],
   providers: [

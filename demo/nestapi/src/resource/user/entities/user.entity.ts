@@ -2,12 +2,11 @@ import {
   Entity,
   Column,
   OneToMany,
-  BeforeInsert,
-  DeleteDateColumn,
-  BeforeUpdate,
+  ManyToMany, JoinTable,
 } from 'typeorm';
-import { CommonEntity } from '../../../extends/common.entity'
+import { CommonEntity } from '@/extends/common.entity'
 import { Article } from '../../article/entities/article.entity';
+import { Role } from '../../role/entities/role.entity'
 
 @Entity()
 export class User extends CommonEntity{
@@ -17,18 +16,19 @@ export class User extends CommonEntity{
   @Column()
   password: string;
 
-  @Column({unique: true})
+  @Column({ unique: true, update: false })
   username: string;
 
   // 0-女  1-男
   @Column({ default: 1, type: 'enum', enum: [0, 1] })
   gender: number;
 
-  // @Column({ default: 'visitor', type: 'enum', enum: ['root', 'admin', 'teacher', 'visitor'] })
-  // role: string;
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable()
+  roles: Role[];
 
-  @OneToMany(() => Article, (article) => article.user)
-  articles: Article[];
+  // @OneToMany(() => Article, (article) => article.user)
+  // articles: Article[];
 
 /*  @Column({
     name: 'created_at',
