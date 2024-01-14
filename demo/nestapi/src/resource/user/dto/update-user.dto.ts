@@ -9,6 +9,6 @@ export class UpdateUserDto extends PartialType(UserDto) {
   password?: string;
   @IsIn([1, 2])
   gender?: number;
-  @IsNotEmpty()
-  isActive?: boolean;
+  // @IsNotEmpty()
+  // isActive?: number;
 }

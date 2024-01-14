@@ -25,12 +25,12 @@ export class UserController {
     return id ? this.updateData(createUserDto) : this.createData(createUserDto);
   }
   private async createData(createUserDto: UserDto): Promise<User> {
-    const existingUsername = await this.userService.findOneByUsername(
+/*    const existingUsername = await this.userService.findOneByUsername(
       createUserDto.username,
     );
     if (existingUsername) {
       HttpStatusError.fail(`${createUserDto.username}已存在`);
-    }
+    }*/
     return this.userService.save(createUserDto);
   }
 

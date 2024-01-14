@@ -50,6 +50,12 @@
 
 > 关于浮点数计算会产生舍入误差的问题，这是使用基于IEEE754数值的浮点计算的通病
 
+**工作中如何规则这种问题？**
+
+- 使用整数进行计算：将浮点数转换成整数后进行计算，最后再将结果转回浮点数
+- 使用专门的库来进行浮点计算：如 big.js 或 Decimal.js
+- 如果是用于比较，则可以将数值合理设置精度
+
 #### 数值范围
 
 - `Number.MIN_VALUE` ：最小值 
@@ -62,7 +68,7 @@
 
 `NaN`表示不是数值的类型
 
-作用: 在其它语言中，任何数值除以非数值都会导致错误，从而停止代码执行。但在ECMAScript中，任何数值除以非数值会返回`NaN`，所以不会影响其他代码执行
+作用: 在其它语言中，任何数值除以(或乘以)非数值都会导致错误，从而停止代码执行。但在ECMAScript中，任何数值除以(或乘以)非数值会返回`NaN`（非数值与数值位置调换也是相同的结果），所以不会影响其他代码执行
 
 `NaN`特点：
 
@@ -79,7 +85,7 @@ NaN == NaN // false
 例如:
 
 ```
-isNaN(true) // false
+isNaN(true) // false，因为 true 会转换成数字 1
 isNaN('srt') // true
 ``` 
 
@@ -230,6 +236,44 @@ x + '' // 等价于String(x)
 2. 如果对象没有`valueOf()`方法，则调用`toString()`方法，然后再返回数字结果
 
 3. 如果对象没有`toString()`和`valueOf()`方法，则抛出错误异常
+
+**`valueOf()`和`toString()`区别**
+
+- `valueOf()`和`toString()` 都是 JS 默认存在的方法，几乎所有的内置对象都包含这两个方法
+- `valueOf()` 当需要将一个对象转换为原始值时， JS 首先尝试调用对象的 `valueOf` 方法
+- `valueOf()` 方法返回的值通常是该对象的原始数据类型，如数字，布尔或字符串
+-  如果对象没有定义自己的 `valueOf()` 方法，则会继承原型链上的 `valueOf()` 方法
+- 如果 `valueOf()` 不存在，则会调用 `toString()` 方法
+- `toString()` 方法将对象转换为一个字符串，并返回表该对象的字符串形式
+- 大多数内置对象都对 `toString()` 进行了重写以提供更恰当的字符串表示形式
+
+```js
+// 对于数字对象（Number对象）
+let numObj = new Number(5)
+console.log(numObj.valueOf()) // 返回 5,原始值为数字类型
+console.log(numObj.toString()) // 返回 '5',字符串形式的表示
+
+// 对于日期对象（Date对象）
+let dateObj = new Date()
+console.log(dateObj.value()) // 返回时间戳
+console.log(dateObj.toString()) //返回日期时间的字符串表示形式
+
+// 对于自定义对象
+var obj = { name: 'L'}
+obj.valueOf() // obj 本身
+obj.toString() // '[object Object]'
+
+// 除了自己定义了 valueOf()或toString() 方法对默认方法进行的覆盖
+
+var obj = {
+  name: 'L',
+  valueOf: function(){
+    console.log('value')
+  }
+}
+obj.valueOf() // value
+```
+
 
 ## 类型判断
 
