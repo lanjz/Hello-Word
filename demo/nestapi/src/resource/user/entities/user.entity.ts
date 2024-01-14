@@ -19,9 +19,13 @@ export class User extends CommonEntity{
 
   @Column({unique: true})
   username: string;
+
   // 0-女  1-男
   @Column({ default: 1, type: 'enum', enum: [0, 1] })
   gender: number;
+
+  @Column({ default: 'visitor', type: 'enum', enum: ['root', 'admin', 'Teacher', 'visitor'] })
+  role: string;
 
   @OneToMany(() => Article, (article) => article.user)
   articles: Article[];
