@@ -11,8 +11,7 @@ export class RoleService {
     private readonly repository: Repository<Role>,
   ) {}
   save(createRoleDto: CreateRoleDto) {
-    const user = Object.assign(new Role(), CreateRoleDto);
-    return this.repository.save(user);
+    return this.repository.save(createRoleDto);
   }
 
   async findAll() {

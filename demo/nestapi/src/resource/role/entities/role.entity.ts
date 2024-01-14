@@ -4,7 +4,7 @@ import { User } from '../../user/entities/user.entity'
 
 @Entity()
 export class Role extends CommonEntity{
-	@Column({name: 'role_code', unique: true, update: false})
+	@Column({name: 'role_code',  unique: true, update: false})
 	roleCode: string;
 
 	@Column({name: 'role_name',  unique: true})

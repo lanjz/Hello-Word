@@ -10,6 +10,7 @@ export class RoleController {
 
   @Post()
   create(@Body() createRoleDto: CreateRoleDto) {
+    console.log('createRoleDto', createRoleDto)
     const { id } = createRoleDto;
     return id ? this.updateData(createRoleDto) : this.createData(createRoleDto);
   }
