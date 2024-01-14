@@ -7,6 +7,7 @@ import { User } from './resource/user/entities/user.entity';
 import { Article } from './resource/article/entities/article.entity';
 import { ArticleModule } from './resource/article/article.module';
 import { CommonController } from './resource/common/common.controller';
+import { AuthModule } from '@/resource/auth/auth.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CommonController } from './resource/common/common.controller';
     }),
     UserModule,
     ArticleModule,
+    AuthModule,
   ],
   controllers: [AppController, CommonController],
   providers: [AppService],
