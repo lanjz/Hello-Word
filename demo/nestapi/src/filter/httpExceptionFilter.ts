@@ -6,7 +6,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
-import { BaseResponse } from '../middleware/response-format.middleware';
+import { BaseResponse } from '../interceptor/transform.interceptor';
 
 interface MsgLog extends BaseResponse {
   error: string;

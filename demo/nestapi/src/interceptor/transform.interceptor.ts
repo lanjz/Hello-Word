@@ -7,7 +7,12 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export interface Response<T> {
+export interface BaseResponse {
+  responseCode: number;
+  message: string[];
+}
+
+export interface Response<T> extends BaseResponse {
   data: T;
 }
 
@@ -21,7 +26,11 @@ export class TransformInterceptor<T>
   ): Observable<Response<T>> {
     return next.handle().pipe(
       map((data: any) => {
-        return { data };
+        return {
+          responseCode: 1,
+          message: ['成功'],
+          data,
+        };
       }),
     );
   }
