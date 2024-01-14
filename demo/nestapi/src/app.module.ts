@@ -10,6 +10,7 @@ import { ArticleModule } from './resource/article/article.module';
 import { CommonController } from './resource/common/common.controller';
 import { AuthModule } from '@/resource/auth/auth.module';
 import { AuthGuard } from '@/resource/auth/auth.guard'
+import { RolesGuard } from '@/resource/auth/role.guard'
 
 @Module({
   imports: [
@@ -34,6 +35,10 @@ import { AuthGuard } from '@/resource/auth/auth.guard'
     {
       provide: APP_GUARD,
       useClass: AuthGuard
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
     }
   ],
 })

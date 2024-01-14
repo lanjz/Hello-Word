@@ -6,12 +6,12 @@ import { SkipAuth } from '@/resource/auth/auth.guard';
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
+	@SkipAuth()
 	@Post('login')
 	signIn(@Body() signInDto: Record<string, any>) {
 		return this.authService.signIn(signInDto.username, signInDto.password);
 	}
 
-	@SkipAuth()
 	@Get('profile')
 	getProfile(@Request() req) {
 		return req.user;

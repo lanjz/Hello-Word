@@ -3,11 +3,13 @@ import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 import { HttpStatusError } from '@/utils/httpStatus.service';
+import { Roles, Role } from '@/resource/auth/role.guard'
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
+  @Roles(Role.admin)
   findAll() {
     return this.userService.findAll();
   }
