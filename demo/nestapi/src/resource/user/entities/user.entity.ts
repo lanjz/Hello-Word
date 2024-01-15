@@ -2,7 +2,8 @@ import {
   Entity,
   Column,
   OneToMany,
-  ManyToMany, JoinTable,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { CommonEntity } from '@/extends/common.entity'
 import { Article } from '../../article/entities/article.entity';

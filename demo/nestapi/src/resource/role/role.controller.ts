@@ -2,8 +2,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { Role } from './entities/role.entity'
-import { HttpStatusError } from '@/utils/httpStatus.service'
 
 @Controller('role')
 export class RoleController {
@@ -22,8 +20,9 @@ export class RoleController {
   findAll() {
     return this.roleService.findAll();
   }
-  @Delete('delete')
-  remove(@Param('id') id: string) {
-    return this.roleService.remove(+id);
+
+  @Post('delete')
+  remove(@Body() body: Record<'id', number | number[]>) {
+    return this.roleService.remove(body.id);
   }
 }

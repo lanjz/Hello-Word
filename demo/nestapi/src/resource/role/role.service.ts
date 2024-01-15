@@ -27,7 +27,7 @@ export class RoleService {
   findOne(id: number): Promise<Role> {
     return this.repository.findOneBy({ id });
   }
-  remove(id: number) {
+  remove(id: number | number[]) {
     return this.repository.delete(id)
   }
 }
