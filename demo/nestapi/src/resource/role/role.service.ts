@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
+import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './entities/role.entity'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { Repository} from 'typeorm'
 
 @Injectable()
 export class RoleService {
@@ -10,10 +11,12 @@ export class RoleService {
     @InjectRepository(Role)
     private readonly repository: Repository<Role>,
   ) {}
-  save(createRoleDto: CreateRoleDto) {
-    return this.repository.save(createRoleDto);
+  insert(createRDto: CreateRoleDto) {
+    return this.repository.insert(createRDto);
   }
-
+  update(id: number, updateDto: UpdateRoleDto) {
+    return this.repository.update(id, updateDto);
+  }
   async findAll() {
     const [ list, total ] = await this.repository.findAndCount()
     return {

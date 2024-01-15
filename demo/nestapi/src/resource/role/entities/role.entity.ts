@@ -1,5 +1,5 @@
 import { CommonEntity } from '@/extends/common.entity';
-import { Column, Entity, ManyToMany } from 'typeorm'
+import { BeforeInsert, Column, Entity, ManyToMany } from 'typeorm'
 import { User } from '../../user/entities/user.entity'
 
 @Entity()
@@ -12,4 +12,12 @@ export class Role extends CommonEntity{
 
 	@ManyToMany(() => User, (user) => user.roles)
 	users: User[]
+
+	@BeforeInsert()
+	setBeforeInsert() {
+		console.log('this', this.id, this)
+		if (this.id) {
+			this.id = undefined;
+		}
+	}
 }

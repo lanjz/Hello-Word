@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
+import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './entities/role.entity'
 import { HttpStatusError } from '@/utils/httpStatus.service'
 
@@ -8,22 +9,14 @@ import { HttpStatusError } from '@/utils/httpStatus.service'
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
-  @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {
-    console.log('createRoleDto', createRoleDto)
-    const { id } = createRoleDto;
-    return id ? this.updateData(createRoleDto) : this.createData(createRoleDto);
+  @Post('create')
+  create(@Body() createDto: CreateRoleDto) {
+    return this.roleService.insert(createDto);
   }
-  private async createData(createUserDto: CreateRoleDto): Promise<Role> {
-    return this.roleService.save(createUserDto);
-  }
-  private async updateData(updateRoleDto: CreateRoleDto): Promise<Role> {
-    const { id } = updateRoleDto;
-    const existingUser = await this.roleService.findOne(id);
-    if (!existingUser) {
-      HttpStatusError.fail(`角色不存在`);
-    }
-    return this.roleService.save(updateRoleDto);
+  @Post('update')
+  async update(@Body() updateDto: UpdateRoleDto) {
+    const { id } = updateDto;
+    return this.roleService.update(id, updateDto);
   }
   @Get()
   findAll() {
