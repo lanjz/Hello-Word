@@ -11,7 +11,7 @@ import { Role } from '../../role/entities/role.entity'
 import { GenderEnum } from '@/utils/const'
 
 @Entity()
-export class User extends CommonEntity{
+export class UserEntity extends CommonEntity{
   @Column({name: 'alias_name'})
   aliasName: string;
 

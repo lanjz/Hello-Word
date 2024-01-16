@@ -35,7 +35,7 @@ export class UserController {
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
   }
-/*  private async createData(createUserDto: CreateUserDto): Promise<User> {
+/*  private async createData(createUserDto: CreateUserDto) {
     const existingUsername = await this.userService.findOneByUsername(
       createUserDto.username,
     );

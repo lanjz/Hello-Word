@@ -1,6 +1,6 @@
 import { CommonEntity } from '@/extends/common.entity';
 import { Column, Entity, ManyToMany } from 'typeorm'
-import { User } from '../../user/entities/user.entity'
+import { UserEntity } from '../../user/entities/user.entity'
 import { RoleEnum } from '@/utils/const'
 
 @Entity()
@@ -11,6 +11,6 @@ export class Role extends CommonEntity{
 	@Column({name: 'role_name',  unique: true})
 	roleName: string;
 
-	@ManyToMany(() => User, (user) => user.roles)
-	users: User[]
+	@ManyToMany(() => UserEntity, (user) => user.roles)
+	users: UserEntity[]
 }

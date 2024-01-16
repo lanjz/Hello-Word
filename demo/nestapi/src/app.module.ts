@@ -4,7 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './resource/user/user.module';
-import { User } from './resource/user/entities/user.entity';
+import { UserEntity } from './resource/user/entities/user.entity';
 import { Article } from './resource/article/entities/article.entity';
 import { Role } from './resource/role/entities/role.entity';
 import { ArticleModule } from './resource/article/article.module';
@@ -23,7 +23,7 @@ import { RoleModule } from '@/resource/role/role.module';
       username: 'root',
       password: '55555yyy',
       database: 'template',
-      entities: [User, Article, Role],
+      entities: [UserEntity, Article, Role],
       synchronize: true,
       autoLoadEntities: true,
     }),
