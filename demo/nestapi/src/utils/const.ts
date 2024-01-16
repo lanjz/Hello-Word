@@ -4,3 +4,6 @@ export enum Role {
 	admin = 'admin',
 	root = 'root',
 }
+
+
+export const  Gender  = [1,2]

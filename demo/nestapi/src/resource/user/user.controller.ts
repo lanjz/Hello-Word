@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from './dto/user.dto';
-import { User } from './entities/user.entity';
-import { HttpStatusError } from '@/utils/httpStatus.service';
+import { CreateUserDto } from './dto/create-user.dto';
 import { Roles, Role } from '@/resource/auth/role.guard'
+import { UpdateResultInterceptor } from '@/interceptor/transform.interceptor'
+import { UpdateUserDto } from '@/resource/user/dto/update-user.dto'
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -21,32 +21,27 @@ export class UserController {
   remove(@Body() userId: Record<'id', number | number[]>) {
     return this.userService.remove(userId.id);
   }
-  @Post()
-  async create(@Body() createUserDto: UserDto): Promise<User> {
-    const { id } = createUserDto;
-    return id ? this.updateData(createUserDto) : this.createData(createUserDto);
+  @Post('create')
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.insert(createUserDto);
   }
-  private async createData(createUserDto: UserDto): Promise<User> {
-/*    const existingUsername = await this.userService.findOneByUsername(
-      createUserDto.username,
-    );
-    if (existingUsername) {
-      HttpStatusError.fail(`${createUserDto.username}已存在`);
-    }*/
-    return this.userService.save(createUserDto);
-  }
-
-  private async updateData(createUserDto: UserDto): Promise<User> {
-    const { id } = createUserDto;
-    const existingUser = await this.userService.findOne(id);
-    if (!existingUser) {
-      HttpStatusError.fail(`用户${id}不存在`);
-    }
-    delete createUserDto.username;
-    return this.userService.save(createUserDto);
+  @Post('update')
+  @UseInterceptors(UpdateResultInterceptor)
+  update(@Body() updateUser: UpdateUserDto){
+    const { id } = updateUser;
+    return this.userService.update(id, updateUser);
   }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
   }
+/*  private async createData(createUserDto: CreateUserDto): Promise<User> {
+    const existingUsername = await this.userService.findOneByUsername(
+      createUserDto.username,
+    );
+    if (existingUsername) {
+      HttpStatusError.fail(`${createUserDto.username}已存在`);
+    }
+    return this.userService.save(createUserDto);
+  }*/
 }

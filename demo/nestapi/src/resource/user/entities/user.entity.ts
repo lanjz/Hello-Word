@@ -8,6 +8,7 @@ import {
 import { CommonEntity } from '@/extends/common.entity'
 import { Article } from '../../article/entities/article.entity';
 import { Role } from '../../role/entities/role.entity'
+import { Gender } from '@/utils/const'
 
 @Entity()
 export class User extends CommonEntity{
@@ -21,7 +22,7 @@ export class User extends CommonEntity{
   username: string;
 
   // 0-女  1-男
-  @Column({ default: 1, type: 'enum', enum: [0, 1] })
+  @Column({ default: 1, type: 'enum', enum: Gender })
   gender: number;
 
   @ManyToMany(() => Role, (role) => role.users)
