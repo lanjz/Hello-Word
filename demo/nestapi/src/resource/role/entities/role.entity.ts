@@ -1,7 +1,7 @@
 import { CommonEntity } from '@/extends/common.entity';
 import { Column, Entity, ManyToMany } from 'typeorm'
 import { User } from '../../user/entities/user.entity'
-import { Role as RoleEnum } from '@/utils/const'
+import { RoleEnum } from '@/utils/const'
 
 @Entity()
 export class Role extends CommonEntity{

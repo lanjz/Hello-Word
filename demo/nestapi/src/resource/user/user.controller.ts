@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Roles, Role } from '@/resource/auth/role.guard'
+import { Roles, RoleEnum } from '@/resource/auth/role.guard'
 import { UpdateResultInterceptor } from '@/interceptor/transform.interceptor'
 import { UpdateUserDto } from '@/resource/user/dto/update-user.dto'
 @Controller('user')
@@ -9,7 +9,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @Roles(Role.admin)
+  @Roles(RoleEnum.admin)
   findAll() {
     return this.userService.findAll();
   }

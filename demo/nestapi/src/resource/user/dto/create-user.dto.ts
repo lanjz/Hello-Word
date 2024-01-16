@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsIn, ValidateIf, IsOptional } from 'class-validator';
 import { validateIf } from '@/utils';
-import { Gender } from '@/utils/const'
+import { GenderEnum } from '@/utils/const'
 export class CreateUserDto {
   @IsNotEmpty()
   aliasName: string;
@@ -13,6 +13,6 @@ export class CreateUserDto {
 
   // @ValidateIf(validateIf)
   @IsOptional()
-  @IsIn(Gender, {message: '性别格式不正确'} )
+  @IsIn(GenderEnum, {message: '性别格式不正确'} )
   gender?: number;
 }

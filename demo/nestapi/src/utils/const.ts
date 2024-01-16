@@ -1,9 +1,8 @@
-export enum Role {
+export enum RoleEnum {
 	visitor = 'visitor',
 	user = 'user',
 	admin = 'admin',
 	root = 'root',
 }
 
-
-export const  Gender  = [1,2]
+export const  GenderEnum  = [1,2]
