@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { UpdateResultInterceptor } from '@/interceptor/transform.interceptor'
 
 @Controller('role')
 export class RoleController {
@@ -12,6 +13,7 @@ export class RoleController {
     return this.roleService.insert(createDto);
   }
   @Post('update')
+  @UseInterceptors(UpdateResultInterceptor)
   async update(@Body() updateDto: UpdateRoleDto) {
     const { id } = updateDto;
     return this.roleService.update(id, updateDto);

@@ -3,6 +3,7 @@ import {
     UpdateDateColumn,
     CreateDateColumn,
     DeleteDateColumn, Column,
+    BeforeInsert
 } from 'typeorm';
 export abstract class CommonEntity {
     @PrimaryGeneratedColumn()
@@ -33,4 +34,8 @@ export abstract class CommonEntity {
 
     @Column({ default: 1, type: 'enum', enum: [0, 1] })
     status: number;
+    @BeforeInsert()
+    setBeforeInsert() {
+        delete this.id
+    }
 }

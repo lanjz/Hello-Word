@@ -12,7 +12,9 @@ export class RoleService {
     private readonly repository: Repository<Role>,
   ) {}
   insert(createRDto: CreateRoleDto) {
-    return this.repository.insert(createRDto);
+    // 第二种触发 entity->beforeUpdate 钩子的方法
+    // const entity = plainToClass(Role, createRDto);
+    return this.repository.insert(Object.assign(new Role(), createRDto))
   }
   update(id: number, updateDto: UpdateRoleDto) {
     return this.repository.update(id, updateDto);
