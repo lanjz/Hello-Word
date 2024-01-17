@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { Role } from './entities/role.entity'
+import RoleEntity from './entities/role.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository} from 'typeorm'
 
 @Injectable()
 export class RoleService {
   constructor(
-    @InjectRepository(Role)
-    private readonly repository: Repository<Role>,
+    @InjectRepository(RoleEntity)
+    private readonly repository: Repository<RoleEntity>,
   ) {}
   insert(createRDto: CreateRoleDto) {
     // 第二种触发 entity->beforeUpdate 钩子的方法
     // const entity = plainToClass(Role, createRDto);
-    return this.repository.insert(Object.assign(new Role(), createRDto))
+    return this.repository.insert(Object.assign(new RoleEntity(), createRDto))
   }
   update(id: number, updateDto: UpdateRoleDto) {
     return this.repository.update(id, updateDto);
@@ -26,7 +26,7 @@ export class RoleService {
       total,
     };
   }
-  findOne(id: number): Promise<Role> {
+  findOne(id: number): Promise<RoleEntity> {
     return this.repository.findOneBy({ id });
   }
   remove(id: number | number[]) {

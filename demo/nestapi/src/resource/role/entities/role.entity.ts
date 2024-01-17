@@ -4,8 +4,8 @@ import { UserEntity } from '../../user/entities/user.entity'
 import { RoleEnum } from '@/utils/const'
 
 @Entity()
-export class Role extends CommonEntity{
-	@Column({name: 'role_code',  unique: true, update: false, enum: RoleEnum })
+export default class Role extends CommonEntity{
+	@Column({name: 'role_code', type: 'enum',  unique: true, update: false, enum: RoleEnum })
 	roleCode: string;
 
 	@Column({name: 'role_name',  unique: true})

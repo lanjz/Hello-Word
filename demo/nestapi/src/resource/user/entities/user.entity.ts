@@ -6,8 +6,8 @@ import {
   JoinTable,
 } from 'typeorm';
 import { CommonEntity } from '@/extends/common.entity'
-import { Article } from '../../article/entities/article.entity';
-import { Role } from '../../role/entities/role.entity'
+import ArticleEntity from '../../article/entities/article.entity';
+import RoleEntity from '../../role/entities/role.entity'
 import { GenderEnum } from '@/utils/const'
 
 @Entity()
@@ -25,9 +25,9 @@ export class UserEntity extends CommonEntity{
   @Column({ default: 1, type: 'enum', enum: GenderEnum })
   gender: number;
 
-  @ManyToMany(() => Role, (role) => role.users)
+  @ManyToMany(() => RoleEntity, (role) => role.users)
   @JoinTable()
-  roles: Role[];
+  roles: RoleEntity[];
 
   // @OneToMany(() => Article, (article) => article.user)
   // articles: Article[];
