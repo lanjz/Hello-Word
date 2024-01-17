@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult, ILike } from 'typeorm';
-import { UserEntity } from './entities/user.entity';
+import UserEntity from './entities/user.entity';
 import { ListResponse } from '@/utils/Types';
 import { findDataWhere } from '@/utils/index';
 import { CreateUserDto } from './dto/create-user.dto';

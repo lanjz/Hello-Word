@@ -10,8 +10,8 @@ import ArticleEntity from '../../article/entities/article.entity';
 import RoleEntity from '../../role/entities/role.entity'
 import { GenderEnum } from '@/utils/const'
 
-@Entity()
-export class UserEntity extends CommonEntity{
+@Entity('user')
+export default class User extends CommonEntity{
   @Column({name: 'alias_name'})
   aliasName: string;
 

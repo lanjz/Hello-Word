@@ -4,7 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './resource/user/user.module';
-import { UserEntity } from './resource/user/entities/user.entity';
+import UserEntity from './resource/user/entities/user.entity';
 import ArticleEntity from './resource/article/entities/article.entity';
 import RoleEntity from './resource/role/entities/role.entity';
 import { ArticleModule } from './resource/article/article.module';
