@@ -14,19 +14,15 @@ export class UserService {
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  async save(createUserDto: CreateUserDto): Promise<UserEntity> {
+  save(createUserDto: CreateUserDto): Promise<UserEntity> {
     const user = Object.assign(new UserEntity(), createUserDto);
     return this.usersRepository.save(user);
   }
-  async insert(createUserDto: CreateUserDto) {
-    const connection = this.usersRepository.manager.connection
-    await connection.transaction((async transactionalEntityManager =>{
-      const user = Object.assign(new UserEntity(), createUserDto)
-      return transactionalEntityManager.save(user)
-    }))
+  insert(createUserDto: CreateUserDto) {
+    return this.usersRepository.insert(Object.assign(new UserEntity(), createUserDto));
   }
   update(id: number, updateUserDto: UpdateUserDto) {
-    // return this.usersRepository.update(id);
+    return this.usersRepository.update(id, updateUserDto);
   }
   findAll(): Promise<UserEntity[]> {
     return this.usersRepository.find();
@@ -42,7 +38,7 @@ export class UserService {
     };
   }
   findOne(id: number): Promise<UserEntity> {
-    return this.usersRepository.findOne({where: {id}, relations: ['roles'] });
+    return this.usersRepository.findOneBy({ id: id });
   }
   findOneByUsername(username: string): Promise<UserEntity> {
     return this.usersRepository.findOneBy({ username });
