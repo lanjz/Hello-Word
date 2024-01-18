@@ -1,6 +1,6 @@
-import { IsNotEmpty, IsIn, ValidateIf, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsIn, ValidateIf, IsOptional, IsArray, ArrayNotContains } from 'class-validator';
 import { validateIf } from '@/utils';
-import { GenderEnum } from '@/utils/const'
+import { GenderEnum, RoleEnum } from '@/utils/const'
 export class CreateUserDto {
   @IsNotEmpty()
   aliasName: string;
@@ -15,4 +15,8 @@ export class CreateUserDto {
   @IsOptional()
   @IsIn(GenderEnum, {message: '性别格式不正确'} )
   gender?: number;
+
+  @IsOptional()
+  // @ArrayNotContains([RoleEnum], {message: '无效角色'} )
+  roles: any[];
 }

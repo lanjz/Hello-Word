@@ -6,23 +6,34 @@ import { ListResponse } from '@/utils/Types';
 import { findDataWhere } from '@/utils/index';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto'
+import { RoleEnum } from '@/utils/const'
+import RoleEntity from '@/resource/role/entities/role.entity'
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
   ) {}
 
-  save(createUserDto: CreateUserDto): Promise<UserEntity> {
+  async save(createUserDto: CreateUserDto): Promise<UserEntity> {
     const user = Object.assign(new UserEntity(), createUserDto);
     return this.usersRepository.save(user);
   }
-  insert(createUserDto: CreateUserDto) {
-    return this.usersRepository.insert(Object.assign(new UserEntity(), createUserDto));
+  async insert(createUserDto: CreateUserDto) {
+    const connection = this.usersRepository.manager.connection
+    await connection.transaction((async transactionalEntityManager =>{
+      const user = Object.assign(new UserEntity(), createUserDto)
+      const findRole = await this.roleRepository.findOneBy({roleCode: 'admin'})
+      // console.log('user', findRole)
+      user.roles = [findRole]
+      return transactionalEntityManager.save(user)
+    }))
   }
   update(id: number, updateUserDto: UpdateUserDto) {
-    return this.usersRepository.update(id, updateUserDto);
+    // return this.usersRepository.update(id);
   }
   findAll(): Promise<UserEntity[]> {
     return this.usersRepository.find();
@@ -38,7 +49,7 @@ export class UserService {
     };
   }
   findOne(id: number): Promise<UserEntity> {
-    return this.usersRepository.findOneBy({ id: id });
+    return this.usersRepository.findOne({where: {id}, relations: ['roles'] });
   }
   findOneByUsername(username: string): Promise<UserEntity> {
     return this.usersRepository.findOneBy({ username });

@@ -8,6 +8,7 @@ import {
 import { CommonEntity } from '@/extends/common.entity'
 import ArticleEntity from '../../article/entities/article.entity';
 import RoleEntity from '../../role/entities/role.entity'
+import NoteEntity from '../../note/entities/note.entity'
 import { GenderEnum } from '@/utils/const'
 
 @Entity('user')
@@ -28,6 +29,9 @@ export default class User extends CommonEntity{
   @ManyToMany(() => RoleEntity, (role) => role.users)
   @JoinTable()
   roles: RoleEntity[];
+
+  @OneToMany(() => NoteEntity, (note) => note.users)
+  notes: NoteEntity[];
 
   // @OneToMany(() => Article, (article) => article.user)
   // articles: Article[];
