@@ -3,6 +3,7 @@ import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { UpdateResultInterceptor } from '@/interceptor/transform.interceptor'
+import { HttpStatusError } from '@/utils/httpStatus.service'
 
 @Controller('role')
 export class RoleController {
@@ -25,6 +26,9 @@ export class RoleController {
 
   @Post('delete')
   remove(@Body() body: Record<'id', number | number[]>) {
+    if(body.id == 1) {
+      HttpStatusError.fail(`无权限`);
+    }
     return this.roleService.remove(body.id);
   }
 }
