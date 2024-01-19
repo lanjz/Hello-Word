@@ -20,6 +20,9 @@ export class UserController {
   }
   @Post('delete')
   remove(@Body() userId: Record<'id', number | number[]>) {
+    if(userId.id == 1) {
+      HttpStatusError.fail(`无权限`);
+    }
     return this.userService.remove(userId.id);
   }
   @Post('create')
