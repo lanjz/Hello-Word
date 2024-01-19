@@ -1,15 +1,9 @@
 import {
   Entity,
   Column,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
 } from 'typeorm';
 import { CommonEntity } from '@/extends/common.entity'
-import ArticleEntity from '../../article/entities/article.entity';
-import RoleEntity from '../../role/entities/role.entity'
-import NoteEntity from '../../note/entities/note.entity'
-import { GenderEnum } from '@/utils/const'
+import { GenderEnum, RoleEnum } from '@/utils/const'
 
 @Entity('user')
 export default class User extends CommonEntity{
@@ -26,12 +20,8 @@ export default class User extends CommonEntity{
   @Column({ default: 1, type: 'enum', enum: GenderEnum })
   gender: number;
 
-  @ManyToMany(() => RoleEntity, (role) => role.users)
-  @JoinTable()
-  roles: RoleEntity[];
-
-  @OneToMany(() => NoteEntity, (note) => note.users)
-  notes: NoteEntity[];
+  @Column({type: 'simple-array', enum: RoleEnum})
+  roles: RoleEnum[];
 
   // @OneToMany(() => Article, (article) => article.user)
   // articles: Article[];

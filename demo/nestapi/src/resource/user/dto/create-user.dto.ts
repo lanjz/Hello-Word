@@ -1,5 +1,13 @@
-import { IsNotEmpty, IsIn, ValidateIf, IsOptional, IsArray, ArrayNotContains } from 'class-validator';
-import { validateIf } from '@/utils';
+import {
+  IsNotEmpty,
+  IsIn,
+  ValidateIf,
+  IsOptional,
+  IsArray,
+  ArrayNotContains,
+  ArrayMinSize,
+  ArrayUnique
+} from 'class-validator';
 import { GenderEnum, RoleEnum } from '@/utils/const'
 export class CreateUserDto {
   @IsNotEmpty()
@@ -16,7 +24,10 @@ export class CreateUserDto {
   @IsIn(GenderEnum, {message: '性别格式不正确'} )
   gender?: number;
 
-  @IsOptional()
-  // @ArrayNotContains([RoleEnum], {message: '无效角色'} )
-  roles: any[];
+  @IsOptional() // 表示可选
+  @IsArray() // 表示只能是数组
+  @ArrayMinSize(0) // 允许空数据
+  @ArrayNotContains([RoleEnum], {message: '无效角色'} )
+  @ArrayUnique() // 不允许重复
+  roles?: RoleEnum[];
 }
