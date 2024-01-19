@@ -1,6 +1,7 @@
 import {
   IsNotEmpty,
   IsIn,
+  IsEnum,
   ValidateIf,
   IsOptional,
   IsArray,
@@ -24,10 +25,9 @@ export class CreateUserDto {
   @IsIn(GenderEnum, {message: '性别格式不正确'} )
   gender?: number;
 
-  @IsOptional() // 表示可选
-  @IsArray() // 表示只能是数组
-  @ArrayMinSize(0) // 允许空数据
-  @ArrayNotContains([RoleEnum], {message: '无效角色'} )
-  @ArrayUnique() // 不允许重复
-  roles?: RoleEnum[];
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsEnum(RoleEnum, { each: true })
+  roles: RoleEnum[];
 }

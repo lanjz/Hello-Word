@@ -20,8 +20,8 @@ export default class User extends CommonEntity{
   @Column({ default: 1, type: 'enum', enum: GenderEnum })
   gender: number;
 
-  @Column({type: 'simple-array', enum: RoleEnum})
-  roles: RoleEnum[];
+  @Column({type: 'simple-array', nullable: true, })
+  roles: RoleEnum[]| null;
 
   // @OneToMany(() => Article, (article) => article.user)
   // articles: Article[];

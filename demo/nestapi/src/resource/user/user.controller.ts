@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { HttpStatusError } from '@/utils/httpStatus.service';
 import { Roles, RoleEnum } from '@/resource/auth/role.guard'
 import { UpdateResultInterceptor } from '@/interceptor/transform.interceptor'
 import { UpdateUserDto } from '@/resource/user/dto/update-user.dto'
@@ -32,8 +33,13 @@ export class UserController {
     return this.userService.update(id, updateUser);
   }
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const result = await this.userService.findOne(+id)
+    if(!result) {
+      HttpStatusError.fail(`用户${id}不存在`);
+    }
+    result.roles = result.roles || []
+    return result;
   }
 /*  private async createData(createUserDto: CreateUserDto) {
     const existingUsername = await this.userService.findOneByUsername(

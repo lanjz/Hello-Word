@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsIn, ValidateIf, IsOptional, IsArray, ArrayNotContains } from 'class-validator';
-import { validateIf } from 'demo/nestapi/src/utils';
 import { GenderEnum, RoleEnum } from '@/utils/const'
+import { validateIf } from 'demo/nestapi/src/utils';
 export class CreateUserDto {
   @IsNotEmpty()
   aliasName: string;
