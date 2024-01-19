@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult, ILike } from 'typeorm';
 import UserEntity from './entities/user.entity';
-import { ListResponse } from '@/utils/Types';
-import { findDataWhere } from '@/utils/index';
+import { ListResponse } from 'demo/nestapi/src/utils/Types';
+import { findDataWhere } from 'demo/nestapi/src/utils';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto'
-import { RoleEnum } from '@/utils/const'
-import RoleEntity from '@/resource/role/entities/role.entity'
+import { RoleEnum } from 'demo/nestapi/src/utils/const'
+import RoleEntity from 'demo/nestapi/src/resource/role/entities/role.entity'
 
 @Injectable()
 export class UserService {

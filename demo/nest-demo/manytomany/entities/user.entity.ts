@@ -5,11 +5,11 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { CommonEntity } from '@/extends/common.entity'
-import ArticleEntity from '../../article/entities/article.entity';
-import RoleEntity from '../../role/entities/role.entity'
+import { CommonEntity } from 'demo/nestapi/src/extends/common.entity'
+import ArticleEntity from 'demo/nestapi/src/resource/article/entities/article.entity';
+import RoleEntity from 'demo/nestapi/src/resource/role/entities/role.entity'
 import NoteEntity from '../../note/entities/note.entity'
-import { GenderEnum } from '@/utils/const'
+import { GenderEnum } from 'demo/nestapi/src/utils/const'
 
 @Entity('user')
 export default class User extends CommonEntity{

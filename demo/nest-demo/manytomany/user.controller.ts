@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Param, UseInterceptors } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Roles, RoleEnum } from '@/resource/auth/role.guard'
-import { UpdateResultInterceptor } from '@/interceptor/transform.interceptor'
-import { UpdateUserDto } from '@/resource/user/dto/update-user.dto'
+import { Roles, RoleEnum } from 'demo/nestapi/src/resource/auth/role.guard'
+import { UpdateResultInterceptor } from 'demo/nestapi/src/interceptor/transform.interceptor'
+import { UpdateUserDto } from 'demo/nestapi/src/resource/user/dto/update-user.dto'
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

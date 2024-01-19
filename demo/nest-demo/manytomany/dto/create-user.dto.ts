@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsIn, ValidateIf, IsOptional, IsArray, ArrayNotContains } from 'class-validator';
-import { validateIf } from '@/utils';
+import { validateIf } from 'demo/nestapi/src/utils';
 import { GenderEnum, RoleEnum } from '@/utils/const'
 export class CreateUserDto {
   @IsNotEmpty()
@@ -17,6 +17,6 @@ export class CreateUserDto {
   gender?: number;
 
   @IsOptional()
-  // @ArrayNotContains([RoleEnum], {message: '无效角色'} )
-  roles: any[];
+  @ArrayNotContains([RoleEnum], {message: '无效角色'} )
+  roles: RoleEnum[];
 }
