@@ -1,26 +1,32 @@
-import { LitElement, html, css } from 'lit-element'
+import { LitElement, html, css, cssResult } from 'lit-element'
 import { customElement, property } from 'lit/decorators.js'
-import { styleMap } from 'lit/directives/style-map.js';
+import { styleMap } from 'lit/directives/style-map.js'
 import { litName } from '../../utils'
+
+interface SvgFiles {
+  [key: string]: string
+}
+
 const loadSvgFiles = async () => {
-  const svgFiles = {}; // 创建空对象用于保存SVG文件
+  const svgFiles: SvgFiles = {}
 
-  // 获取"./svgs"目录下的所有SVG文件
-  const files = await import.meta.glob('./svgs/*.svg');
+  const files = await import.meta.glob('./svgs/*.svg')
 
-  // 遍历每个文件并进行导入
   for (const path in files) {
     if (files.hasOwnProperty(path)) {
-      const module = await files[path]();
-      const fileName = path.match(/\.\/svgs\/(.+)\.svg$/)[1];
-      svgFiles[fileName] = module.default; // 将SVG模块保存到对象中，对象的Key为文件名
+      const module:any = await files[path]()
+      const fileName = path.match(/\.\/svgs\/(.+)\.svg$/)?.[1]
+      if (fileName) {
+        svgFiles[fileName] = module.default
+      }
     }
   }
-  return svgFiles;
-};
+  return svgFiles
+}
+
 @customElement(litName('icon'))
 export default class Icon extends LitElement {
-  static styles = [
+  static styles: cssResult[] = [
     css`
       .fin-icon {
         width: 1em;
@@ -29,38 +35,43 @@ export default class Icon extends LitElement {
         fill: currentColor;
         overflow: hidden;
       }
-  `,
+    `
   ]
+
   @property({ type: String, reflect: true }) name = ''
   @property({ type: String, reflect: true }) color = ''
   @property({ type: String, reflect: true }) size = ''
   @property({ type: String, reflect: true }) iconClass = ''
-  private _icons = {}
+
+  private _icons: SvgFiles = {}
+
   async connectedCallback() {
-    super.connectedCallback();
-    // 异步执行的方法
-    await this.loadSvg();
-    // 数据加载成功后重新渲染组件
-    this.requestUpdate();
+    super.connectedCallback()
+    await this.loadSvg()
+    this.requestUpdate()
   }
-  loadSvg() {
-    return new Promise(resolve => {
-      loadSvgFiles()
-        .then(svgFiles => {
-          this._icons = svgFiles || {}
-          resolve(svgFiles)
-        })
-        .catch(() => resolve({}));
-    })
+
+  async loadSvg() {
+    try {
+      this._icons = await loadSvgFiles()
+    } catch (error) {
+      console.error('Error loading SVG files:', error)
+    }
   }
+
   render() {
     const styles = {
       color: this.color,
-      width: this.size,
+      width: this.size
     }
-    const svgContent = this._icons[this.name] || '';
+    const svgContent = this._icons[this.name] || ''
     return html`
-      <img src="${this._icons[this.name]}" alt="" class="fin-icon ${this.iconClass}" style=${styleMap(styles)}>
-    `;
+      <img
+        src="${svgContent}"
+        alt=""
+        class="fin-icon ${this.iconClass}"
+        style=${styleMap(styles)}
+      />
+    `
   }
 }
