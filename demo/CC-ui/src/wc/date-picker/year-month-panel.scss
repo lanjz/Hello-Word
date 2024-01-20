@@ -1,0 +1,32 @@
+.fin-year-item, .fin-month-item{
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  font-size: 12px;
+  text-align: center;
+  color: var(--fin-text-color-regular);
+  cursor: pointer;
+  span.date-text{
+    border-radius: 40px;
+    width: 100%;
+    height: 100%;
+    line-height: 40px;
+    display: inline-block;
+  }
+  &.is-toyear, &.is-tomonth {
+    .date-text{
+      background: #ededed;
+    }
+  }
+  &.is-active{
+    .date-text{
+      background: #409eff;
+      color: #fff;
+    }
+  }
+}
+
+.fin-date-row:not(:last-child){
+  margin-bottom: 30px;
+  margin-top: 20px;
+}
