@@ -1,4 +1,4 @@
-import {LitElement, css, unsafeCSS, html, PropertyValues} from 'lit'
+import {LitElement, css, unsafeCSS, html} from 'lit'
 import { FinInject } from '../../mixins/index.ts'
 import {
   customElement,
@@ -39,23 +39,23 @@ export default class View extends FinInject(LitElement) {
   @property({ type: Boolean }) 'collapse-tags' = true
   @property({ type: Boolean }) multiple = true
   private _selected: OptionItem[] = []
-  private _open: Boolean = false
+  private _open: boolean = false
   @queryAssignedElements({ selector: 'fin-option', flatten: true })
   _slotNodes!: Array<Node>
   constructor() {
     super()
     this.toggleOpenOption = this.toggleOpenOption.bind(this)
   }
-  initValue(value) {
+  initValue(value:any) {
     if(!value) return;
     const getValue = Array.isArray(value) ? value: [value]
-    const initSelected = []
+    const initSelected: OptionItem[] = [];
     getValue.forEach(item => {
-      const fin = this.options.find(it => it.value === item)
-      if(fin) {
-        initSelected.push({...fin})
+      const foundOption = this.options.find(it => it.value === item)
+      if(foundOption) {
+        initSelected.push({...foundOption})
       } else {
-        initSelected.push({value: item})
+        initSelected.push({value: item, label: item})
       }
     })
     this._selected = initSelected
@@ -163,7 +163,6 @@ export default class View extends FinInject(LitElement) {
             @click="${this.handleClearable}"
           >
             <fin-icon
-              @click="${() => this.removeSelected(firstData)}"
               name="close"
               size="12px"
             />
@@ -177,7 +176,7 @@ export default class View extends FinInject(LitElement) {
   addEvent(){
     document.addEventListener('click', this.toggleOpenOption)
   }
-  toggleOpenOption(e) {
+  toggleOpenOption(e:Event) {
     if(this.contains(e.target)){
       return
     } else {
@@ -188,7 +187,7 @@ export default class View extends FinInject(LitElement) {
   handleOpen(){
     this.optionVisibleChange(true)
   }
-  async optionVisibleChange(visible) {
+  async optionVisibleChange(visible: boolean) {
     if(this.disabled) return
     this._open = visible
     this.emitEventMX('visible-change', this._open )
@@ -196,30 +195,31 @@ export default class View extends FinInject(LitElement) {
     await this.updateComplete;
     this.broadcast()
   }
-  handleClearable(e) {
+  handleClearable(e: Event) {
     e.stopPropagation()
     this._selected = []
     this.broadcast()
     this.requestUpdate()
   }
-  changeInput(e: Event) {
-    if(this.filterable) {
-      const { value } = e.target
-      if( this['remote-method']) {
-        this['remote-method'](value)
-      } else if(typeof this['filter-method'] === 'function'){
-        this['filter-method'](value)
+  private changeInput(e: Event): void {
+    if (this.filterable) {
+      const { value } = e.target as HTMLInputElement;
+      if (this['remote-method']) {
+        this['remote-method'](value);
+      } else if (typeof this['filter-method'] === 'function') {
+        this['filter-method'](value);
       } else {
-        this._slotNodes.forEach((item) => {
-          item.handleFilter(value)
-        })
+        this._slotNodes.forEach(item => {
+          if ('handleFilter' in item) {
+            (item as any).handleFilter(value);
+          }
+        });
       }
     }
-
   }
 // 利用事件委托的形式，监听 option 点击事件
   handleOptionClick(e: Event) {
-    const targetOption = findTargetDelegation(e, 'fin-option')
+    const targetOption:any = findTargetDelegation(e, 'fin-option')
     if (targetOption) {
       const value = targetOption.value
       const label = targetOption.label
@@ -238,9 +238,9 @@ export default class View extends FinInject(LitElement) {
       }
     }
   }
-  removeSelected({value}) {
+  removeSelected(electedItem: OptionItem) {
     const findIndex = this._selected.findIndex(
-      (item) => item.value === value,
+      (item) => item.value === electedItem.value,
     )
     if (findIndex > -1) {
       this._selected.splice(findIndex, 1)
@@ -250,9 +250,8 @@ export default class View extends FinInject(LitElement) {
   }
 // 更新 option 选中数据
   broadcast() {
-    const value = this.multiple ? this._selected.map(item => item.value) : this._selected[0].value
     this._slotNodes.forEach((item) => {
-      item.updateSelected(this._selected)
+      (item as any).updateSelected(this._selected);
     })
   }
 }

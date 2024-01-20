@@ -4,7 +4,7 @@ import { customElement } from 'lit/decorators.js';
 export const FinInject = <T extends new (...args: any[]) => LitElement>(superClass: T) => {
   @customElement('fin-injected') // 示例自定义元素名称
   class FinInjectedElement extends superClass {
-    emitEventMX(eventName: string, value: string | null) {
+    emitEventMX(eventName: string, value: string | null | boolean) {
       const event = new CustomEvent(eventName, { detail: value });
       this.dispatchEvent(event);
     }
