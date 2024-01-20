@@ -1,4 +1,4 @@
-import { LitElement, html, css, cssResult } from 'lit-element'
+import { LitElement, html, css, CSSResult } from 'lit-element'
 import { customElement, property } from 'lit/decorators.js'
 import { styleMap } from 'lit/directives/style-map.js'
 import { litName } from '../../utils'
@@ -26,7 +26,7 @@ const loadSvgFiles = async () => {
 
 @customElement(litName('icon'))
 export default class Icon extends LitElement {
-  static styles: cssResult[] = [
+  static styles: CSSResult[] = [
     css`
       .fin-icon {
         width: 1em;
