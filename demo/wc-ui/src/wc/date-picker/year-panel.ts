@@ -20,11 +20,6 @@ export default class YearPanel extends FinInject(LitElement) {
 
   private _actDate: string | Date = '';
   private _showDate = new Date();
-
-  private get _showMonth() {
-    return this._showDate.getMonth() + 1;
-  }
-
   private get _showYear() {
     return this._showDate.getFullYear();
   }
