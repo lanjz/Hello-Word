@@ -4,10 +4,11 @@ import { litName } from '../../utils/index'
 import style from './date-panel.scss?inline'
 import commonStyle from './common-panel.scss?inline'
 import { formatDate } from '../utils/index.ts'
+import { FinInject } from '../../mixins'
 
 const dayName = ['日', '一', '二', '三', '四', '五', '六']
 @customElement(litName('date-panel'))
-export default class View extends LitElement {
+export default class View extends FinInject(LitElement) {
   static styles = [
     css`
       ${unsafeCSS(commonStyle)}
