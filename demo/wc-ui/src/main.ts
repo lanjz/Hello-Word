@@ -12,7 +12,9 @@ const app = createApp(App)
   .component('MdDoc', MdDoc)
   .component('CForm', CForm)
   .component('DemoWrap', DemoWrap)
+
 // app.config.compilerOptions.isCustomElement = (tag) => tag.indexOf('fin-') === 0
+// 下面是测试代码代码
 app.directive('fin', {
   mounted(el, binding, vnode) {
     el.value = binding.value;

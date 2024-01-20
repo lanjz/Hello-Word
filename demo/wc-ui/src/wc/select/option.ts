@@ -46,7 +46,7 @@ export default class View extends LitElement {
     this._selected = data
     this.requestUpdate()
   }
-  handleFilter(key) {
+  handleFilter(key: any) {
     if(key === undefined || key === null) return this._show = true
     const value = String(this.value)
     const label = String(this.label)
