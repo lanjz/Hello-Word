@@ -3,8 +3,8 @@ import { customElement, property } from 'lit/decorators.js'
 import { litName } from '../../utils/index'
 import commonStyle from './common-panel.scss?inline'
 import style from './year-month-panel.scss?inline'
+import { FinInject } from '../../mixins'
 
-const renderNum = 12
 const monthName = [
   '一',
   '二',
@@ -20,7 +20,7 @@ const monthName = [
   '十二',
 ]
 @customElement(litName('month-panel'))
-export default class View extends LitElement {
+export default class View extends FinInject(LitElement) {
   static styles = [
     css`
       ${unsafeCSS(commonStyle)}
@@ -36,7 +36,7 @@ export default class View extends LitElement {
     this._actDate = val
   }
   @property({ type: String }) format = ''
-  _actDate = ''
+  _actDate:string | Date = ''
   _showDate = new Date()
   get _showMonth() {
     return this._showDate.getMonth() + 1
@@ -83,28 +83,37 @@ export default class View extends LitElement {
       </div>
     </div>`
   }
-  renderDateList() {
-    function oneDate(d) {
-      const year = this._showYear
-      const toyear = new Date().getFullYear()
-      const tomonth = new Date().getMonth()
-      const actYear = this._actDate.getFullYear()
-      const actMonth = this._actDate.getMonth()
-      return html `<div
-        class="fin-month-item ${year === actYear && actMonth === d ? 'is-active': '' } ${year === toyear && tomonth === d ? 'is-tomonth': '' }"
-      >
-        <span class="date-text">${monthName[d]}月</span>
-        <div>`
-    }
-    return html `
+  private renderDateList() {
+    const oneDate = (d: number) => {
+      const year = this._showYear;
+      const toyear = new Date().getFullYear();
+      const tomonth = new Date().getMonth();
+      const actYear = this._actDate instanceof Date ? this._actDate.getFullYear() : toyear;
+      const actMonth = this._actDate instanceof Date ? this._actDate.getMonth() : tomonth;
+
+      return html`
+        <div
+          class="fin-month-item ${year === actYear && actMonth === d ? 'is-active' : ''} ${
+        year === toyear && tomonth === d ? 'is-tomonth' : ''
+      }"
+        >
+          <span class="date-text">${monthName[d]}月</span>
+        </div>
+      `;
+    };
+
+    return html`
       <div class="fin-date-list-wrap">
         ${Array.from({ length: 3 }, (_, row) => {
-          return html `<div class="fin-date-row">${Array.from({ length: 4 }, (_, i) => oneDate.call(this, i + row*4))}</div>`
-        })}
-      </div>`
+      return html`<div class="fin-date-row">${Array.from({ length: 4 }, (_, i) =>
+        oneDate(i + row * 4)
+      )}</div>`;
+    })}
+      </div>
+    `;
   }
   // 选择年
-  changeYear(tag) {
+  changeYear(tag:string) {
     const toYear = tag === 'pre' ? this._showYear-1: this._showYear+1
     this._showDate = new Date(this._showDate.setFullYear(toYear))
     this.requestUpdate()
