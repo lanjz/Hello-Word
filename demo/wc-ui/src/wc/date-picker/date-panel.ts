@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js'
 import { litName } from '../../utils/index'
 import style from './date-panel.scss?inline'
 import commonStyle from './common-panel.scss?inline'
+import { formatDate } from '../utils/index.ts'
 
 const dayName = ['日', '一', '二', '三', '四', '五', '六']
 @customElement(litName('date-panel'))
@@ -23,12 +24,12 @@ export default class View extends LitElement {
     this._actDate = val
   }
   @property({ type: String }) format = ''
-  _actDate = ''
+  _actDate: Date | string = ''
   get _actWeekDate(){
     const actIns = new Date(this._actDate)
     const getDay = actIns.getDay()
     const date =  actIns.getDate()
-    return [this.parseTime(new Date(actIns.setDate(date-getDay))), this.parseTime(new Date(actIns.setDate(date+6-getDay)))]
+    return [formatDate(new Date(actIns.setDate(date-getDay))), formatDate(new Date(actIns.setDate(date+6-getDay)))]
   }
   _showDate = new Date()
   get _showMonth() {
@@ -122,14 +123,14 @@ export default class View extends LitElement {
       </div>`
   }
   renderDateList() {
-    function isActivity(curDate){
+    const isActivity = (curDate: Date) => {
       if(this.type === 'week') {
-        return this._actWeekDate.includes(this.parseTime(curDate))
+        return this._actWeekDate.includes(formatDate(curDate))
       }  else {
-        return this.parseTime(curDate) === this.parseTime(this._actDate)
+        return formatDate(curDate) === formatDate(this._actDate)
       }
     }
-    function oneDate(d) {
+    const oneDate = (d:number) => {
       const startDate = this._startRenderDate.getDate()
       const curDate = new Date(this._startRenderDate.setDate(startDate+d))
       const date = curDate.getDate()
@@ -137,7 +138,7 @@ export default class View extends LitElement {
       const today = new Date().getDate()
       const tomonth = new Date().getMonth() + 1
       return html `<div
-        class="fin-date-item ${isActivity.call(this, curDate) ? 'is-active': '' } ${this._showMonth === month ? 'is-cur-month': '' } ${today === date && tomonth === month ? 'is-today': '' }"
+        class="fin-date-item ${isActivity(curDate) ? 'is-active': '' } ${this._showMonth === month ? 'is-cur-month': '' } ${today === date && tomonth === month ? 'is-today': '' }"
       >
         <span class="date-text">${date}</span>
         <div>`
@@ -145,71 +146,19 @@ export default class View extends LitElement {
     return html `
       <div class="fin-date-list-wrap">
         ${Array.from({ length: 6 }, (_, row) => {
-          return html `<div class="fin-date-row ${row === this._weekOfMonth-1 ? 'is-activity': ''}">${Array.from({ length: 7 }, (_, i) => oneDate.call(this, i + row*7))}</div>`
+          return html `<div class="fin-date-row ${row === this._weekOfMonth-1 ? 'is-activity': ''}">${Array.from({ length: 7 }, (_, i) => oneDate(i + row*7))}</div>`
         })}
       </div>`
   }
   // 选择年
-  changeYear(tag) {
+  changeYear(tag:string) {
     const toYear = tag === 'pre' ? this._showYear-1: this._showYear+1
     this._showDate = new Date(this._showDate.setFullYear(toYear))
     this.requestUpdate()
   }
-  changeMonth(tag) {
+  changeMonth(tag:string) {
     const toMonth = tag === 'pre' ? this._showMonth-1-1: this._showMonth-1+1
     this._showDate = new Date(this._showDate.setMonth(toMonth))
     this.requestUpdate()
-  }
-  parseTime(time, cFormat) {
-    if (!time) return '';
-    if (arguments.length === 0) {
-      return null;
-    }
-    const format = cFormat || '{y}-{m}-{d}';
-    let date;
-    if (typeof time === 'object') {
-      date = time;
-    } else {
-      if (typeof time === 'string' && /^[0-9]+$/.test(time)) {
-        time = parseInt(time);
-      }
-      if (typeof time === 'number' && time.toString().length === 10) {
-        time = time * 1000;
-      }
-      date = new Date(time);
-    }
-    const formatObj = {
-      y: date.getFullYear(),
-      m: date.getMonth() + 1,
-      d: date.getDate(),
-      h: date.getHours(),
-      i: date.getMinutes(),
-      s: date.getSeconds(),
-      a: date.getDay(),
-    };
-    const time_str = format.replace(/{([ymdhisa])+}/g, (result, key) => {
-      const value = formatObj[key];
-      // Note: getDay() returns 0 on Sunday
-      if (key === 'a') {
-        return ['日', '一', '二', '三', '四', '五', '六'][value];
-      }
-      return value.toString().padStart(2, '0');
-    });
-    return time_str;
-  }
-  getDaysInMonth(date) {
-    date = new Date(date)
-    // 获取给定日期的年份和月份
-    const year = date.getFullYear();
-    const month = date.getMonth();
-
-    // 创建下个月的第一天
-    const nextMonthFirstDay = new Date(year, month + 1, 1);
-
-    // 将下个月的第一天减去一天，得到当前月份的最后一天
-    const currentMonthLastDay = new Date(nextMonthFirstDay.getTime() - (24 * 60 * 60 * 1000));
-
-    // 返回当前月份的天数
-    return currentMonthLastDay.getDate();
   }
 }
