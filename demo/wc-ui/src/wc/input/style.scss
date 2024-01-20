@@ -1,0 +1,95 @@
+:host{
+  display: inline-block;
+}
+.fin-input, .fin-textarea {
+  --fin-input-height: var(--fin-component-size);
+  position: relative;
+  font-size: var(--fin-font-size-base);
+  display: inline-flex;
+  width: var(--fin-input-width);
+  line-height: var(--fin-input-height);
+  box-sizing: border-box;
+  vertical-align: middle;
+  .fin-input-wrap, .fin-textarea-wrap{
+    display: inline-flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 11px;
+    background-color: var(--fin-border-radius-base);
+    background-image: none;
+    border-radius: var(--fin-border-radius-base);
+    cursor: text;
+    transition: var(--fin-transition-box-shadow);
+    transform: translateZ(0);
+    box-shadow: 0 0 0 1px var(--fin-border-color) inset;
+    position: relative;
+    .fin-input-inner{
+      --fin-input-inner-height: 32px;
+      width: 100%;
+      flex-grow: 1;
+      -webkit-appearance: none;
+      color: var(--fin-text-color-regular);
+      font-size: inherit;
+      height: var(--fin-input-inner-height);
+      line-height: var(--fin-input-inner-height);
+      padding: 0;
+      outline: none;
+      border: none;
+      background: none;
+      box-sizing: border-box;
+    }
+    .fin-textarea-inner{
+      font-size: inherit;
+      display: block;
+      flex-grow: 1;
+      transform: translateZ(0);
+      border-radius: var(--fin-border-radius-base);
+      padding: 0;
+      outline: none;
+      border: none;
+      background: none;
+      box-sizing: border-box;
+    }
+    .fin-limit-wrap{
+      position: absolute;
+      right: 10px;
+      bottom: 0px;
+    }
+  }
+  &.is-disabled {
+    cursor: not-allowed;
+    .fin-input-wrap {
+      background-color: var(--fin-disabled-bg-color);
+      box-shadow: 0 0 0 1px var(--fin-disabled-border-color) inset;
+      .fin-input-inner {
+        color: var(--fin-disabled-text-color);
+        -webkit-text-fill-color: var(--fin-disabled-text-color);
+        cursor: not-allowed;
+      }
+    }
+  }
+  .fin-clear {
+    &:after {
+      content: '+';
+      width: 14px;
+      height: 14px;
+      font-size: 16px;
+      border: solid 1px var(--fin-border-color);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 10px;
+      color: var(--fin-text-color-regular);
+      transform: rotate(45deg);
+      cursor: pointer;
+    }
+  }
+  .fin-inlay {
+    flex-shrink: 0;
+    * {
+      margin-right: 6px;
+    }
+  }
+}
