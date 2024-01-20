@@ -1,4 +1,4 @@
-export function formatDate(date: string | Date, format: string = ''): string {
+export function formatDate(date: string | Date, format: string = 'yyyy-WW-DD'): string {
   if (!date) return '';
 
   if (!(date instanceof Date)) {
