@@ -25,8 +25,8 @@ export class RoleController {
   }
 
   @Post('delete')
-  remove(@Body() body: Record<'id', string | string[]>) {
-    if(body.id == '1') {
+  remove(@Body() body: Record<'id', number | number[]>) {
+    if(body.id == 1) {
       HttpStatusError.fail(`无权限`);
     }
     return this.roleService.remove(body.id);

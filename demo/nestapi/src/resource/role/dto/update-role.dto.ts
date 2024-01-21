@@ -4,5 +4,5 @@ import { IsNotEmpty } from 'class-validator'
 
 export class UpdateRoleDto extends PartialType(CreateRoleDto){
 	@IsNotEmpty({message: 'id不能为空'})
-	id: string;
+	id: number;
 }

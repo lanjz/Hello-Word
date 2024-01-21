@@ -21,7 +21,7 @@ export class UserService {
   insert(createUserDto: CreateUserDto) {
     return this.usersRepository.insert(Object.assign(new UserEntity(), createUserDto));
   }
-  update(id: string, updateUserDto: UpdateUserDto) {
+  update(id: number, updateUserDto: UpdateUserDto) {
     return this.usersRepository.update(id, updateUserDto);
   }
   findAll(): Promise<UserEntity[]> {
@@ -37,13 +37,13 @@ export class UserService {
       pageSize: where.take,
     };
   }
-  findOne(id: string): Promise<UserEntity> {
+  findOne(id: number): Promise<UserEntity> {
     return this.usersRepository.findOneBy({ id: id });
   }
   findOneByUsername(username: string): Promise<UserEntity> {
     return this.usersRepository.findOneBy({ username });
   }
-  async remove(id: string | string[]): Promise<DeleteResult> {
+  async remove(id: number | number[]): Promise<DeleteResult> {
     // return this.usersRepository.softDelete(id); // 软删除
     return this.usersRepository.delete(id);
   }

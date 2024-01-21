@@ -16,7 +16,7 @@ export class RoleService {
     // const entity = plainToClass(Role, createRDto);
     return this.repository.insert(Object.assign(new RoleEntity(), createRDto))
   }
-  update(id: string, updateDto: UpdateRoleDto) {
+  update(id: number, updateDto: UpdateRoleDto) {
     return this.repository.update(id, updateDto);
   }
   async findAll() {
@@ -26,10 +26,10 @@ export class RoleService {
       total,
     };
   }
-  findOne(id: string): Promise<RoleEntity> {
+  findOne(id: number): Promise<RoleEntity> {
     return this.repository.findOneBy({ id });
   }
-  remove(id: string | string[]) {
+  remove(id: number | number[]) {
     return this.repository.delete(id)
   }
 }

@@ -4,5 +4,5 @@ import { IsNotEmpty } from 'class-validator'
 
 export class UpdateModuleDto extends PartialType(CreateModuleDto) {
 	@IsNotEmpty({message: 'id不能为空'})
-	id: string;
+	id: number;
 }

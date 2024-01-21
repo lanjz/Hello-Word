@@ -26,19 +26,23 @@ export class ModuleService {
     const data = await this.findOne(id)
     return this.repository.findAncestors(data);
   }
-  findOne(id: string) {
+  async findAllByParent(id) {
+    const data = await this.findOne(id)
+    return this.repository.findDescendantsTree(data);
+  }
+  findOne(id: number) {
     return this.repository.findOne({where: {id}, relations: ['children']});
   }
-  async update(id: string, updateData: UpdateModuleDto) {
+  async update(id: number, updateData: UpdateModuleDto) {
     const { parentId, ...data } = updateData
     const parentModule = !parentId ? null : await this.repository.findOneBy({ id: parentId });
-    return this.repository.update(id, {
+    return this.repository.save({
       ...data,
       parent: parentModule
     });
   }
 
-  remove(id: string) {
+  remove(id: number) {
     return this.repository.delete(id);
   }
 }

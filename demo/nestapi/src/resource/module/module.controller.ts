@@ -19,12 +19,16 @@ export class ModuleController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.moduleService.findOne(id);
   }
   @Get('/findParents/:id')
-  findParents(@Param('id') id: string) {
+  findParents(@Param('id') id: number) {
     return this.moduleService.findAllByChild(id);
+  }
+  @Get('/findAllByParent/:id')
+  findAllByParent(@Param('id') id: number) {
+    return this.moduleService.findAllByParent(id);
   }
   @Post('update')
   update(@Body() updateModule: UpdateModuleDto){

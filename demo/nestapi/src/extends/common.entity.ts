@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 export abstract class CommonEntity {
     @PrimaryGeneratedColumn()
-    id: string;
+    id: number;
 
     @CreateDateColumn({
         name: 'created_at',
@@ -34,6 +34,7 @@ export abstract class CommonEntity {
 
     @Column({ default: 1, type: 'enum', enum: [0, 1] })
     status: number;
+
     @BeforeInsert()
     setBeforeInsert() {
         delete this.id
