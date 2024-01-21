@@ -19,8 +19,8 @@ export class UserController {
     return this.userService.findList(userDto);
   }
   @Post('delete')
-  remove(@Body() userId: Record<'id', number | number[]>) {
-    if(userId.id == 1) {
+  remove(@Body() userId: Record<'id', string | string[]>) {
+    if(userId.id == '1') {
       HttpStatusError.fail(`无权限`);
     }
     return this.userService.remove(userId.id);
@@ -37,7 +37,7 @@ export class UserController {
   }
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const result = await this.userService.findOne(+id)
+    const result = await this.userService.findOne(id)
     if(!result) {
       HttpStatusError.fail(`用户${id}不存在`);
     }

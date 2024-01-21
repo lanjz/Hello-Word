@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 export abstract class CommonEntity {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: string;
 
     @CreateDateColumn({
         name: 'created_at',

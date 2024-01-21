@@ -15,7 +15,7 @@ import { AuthGuard } from '@/resource/auth/auth.guard'
 import { RolesGuard } from '@/resource/auth/role.guard'
 import { RoleModule } from '@/resource/role/role.module';
 import { ModuleModule } from '@/resource/module/module.module';
-
+import { CustomNamingStrategy } from './utils/helper';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -28,6 +28,7 @@ import { ModuleModule } from '@/resource/module/module.module';
       entities: [UserEntity, ArticleEntity, RoleEntity, ModuleEntity],
       synchronize: true,
       autoLoadEntities: true,
+      namingStrategy: new CustomNamingStrategy(),
     }),
     UserModule,
     ArticleModule,
