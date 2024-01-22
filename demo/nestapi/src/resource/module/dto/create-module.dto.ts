@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator'
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, Length } from 'class-validator'
 import { Column } from 'typeorm'
 
 export class CreateModuleDto {
@@ -20,6 +20,6 @@ export class CreateModuleDto {
 	icon: string
 
 	@IsOptional()
-	@IsString()
-	parentId?: string;
+	@IsNumber()
+	parentId?: number;
 }

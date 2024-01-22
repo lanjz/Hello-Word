@@ -16,7 +16,7 @@ export class ModuleService {
     const resetData = Object.assign(new ModuleEntity(), data)
     const parentModule = !parentId ? null : await this.repository.findOneBy({ id: parentId });
     resetData.parent = parentModule
-    return this.repository.insert(resetData);
+    return this.repository.save(resetData); // 使用 insert 和update 都不会自己在闭包表建立关系，save 内部做了更多事情
   }
 
   findAll() {
@@ -36,7 +36,7 @@ export class ModuleService {
   async update(id: number, updateData: UpdateModuleDto) {
     const { parentId, ...data } = updateData
     const parentModule = !parentId ? null : await this.repository.findOneBy({ id: parentId });
-    return this.repository.save({
+    return this.repository.save( {
       ...data,
       parent: parentModule
     });

@@ -28,7 +28,7 @@ import { CustomNamingStrategy } from './utils/helper';
       entities: [UserEntity, ArticleEntity, RoleEntity, ModuleEntity],
       synchronize: true,
       autoLoadEntities: true,
-      namingStrategy: new CustomNamingStrategy(),
+      // namingStrategy: new CustomNamingStrategy(), // 想使用这个修改 tree 闭包表自动生成的 parentId 字段，但是在调用 findTree 会有问题，如果放弃修改字段名
     }),
     UserModule,
     ArticleModule,
