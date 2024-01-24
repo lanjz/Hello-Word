@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core'
 import {HttpStatusError} from "@/utils/httpStatus.service";
 import {jwtConstants} from "@/resource/auth/constants";
+import { CookieKey } from '@/utils/const'
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const SkipAuth = () => SetMetadata(IS_PUBLIC_KEY, true);
@@ -22,13 +23,14 @@ export class AuthGuard implements CanActivate {
 			context.getClass(),
 		]);
 		console.log('isPublic', isPublic)
-		if (isPublic || true) {
+		if (isPublic) {
 			// 💡 查看此条件
 			return true;
 		}
 
 		const request = context.switchToHttp().getRequest();
-		const token = this.extractTokenFromHeader(request);
+		const tokenFromCookie = this.extractTokenFromCookie(request);
+		const token = tokenFromCookie || this.extractTokenFromHeader(request);
 		if (!token) {
 			HttpStatusError.fail(`未登录`, 'Unauthorized', -3)
 		}
@@ -48,5 +50,8 @@ export class AuthGuard implements CanActivate {
 	private extractTokenFromHeader(request: Request): string | undefined {
 		const [type, token] = request.headers.authorization?.split(' ') ?? [];
 		return type === 'Bearer' ? token : undefined;
+	}
+	private extractTokenFromCookie(request: Request): string | undefined {
+		return request.cookies[CookieKey];
 	}
 }

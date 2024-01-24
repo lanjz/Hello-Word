@@ -6,3 +6,5 @@ export enum RoleEnum {
 }
 
 export const  GenderEnum  = [1,2]
+
+export const CookieKey = 'oyo'
