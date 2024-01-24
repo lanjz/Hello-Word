@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Query } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { UpdateResultInterceptor } from '@/interceptor/transform.interceptor'
 import { HttpStatusError } from '@/utils/httpStatus.service'
+import { UpdateModuleDto } from '@/resource/module/dto/update-module.dto'
 
 @Controller('role')
 export class RoleController {
@@ -16,12 +17,16 @@ export class RoleController {
   @Post('update')
   @UseInterceptors(UpdateResultInterceptor)
   async update(@Body() updateDto: UpdateRoleDto) {
-    const { id } = updateDto;
-    return this.roleService.update(id, updateDto);
+    return this.roleService.update(updateDto);
   }
   @Get()
   findAll() {
     return this.roleService.findAll();
+  }
+
+  @Get('modules')
+  getRoleModules(@Query() query: UpdateModuleDto) {
+    return this.roleService.findRoleModule(query.id)
   }
 
   @Post('delete')

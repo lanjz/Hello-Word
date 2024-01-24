@@ -1,5 +1,6 @@
-import { Column, Entity, Tree, TreeChildren, TreeParent } from 'typeorm'
+import { Column, Entity, Tree, TreeChildren, TreeParent, ManyToMany, CreateDateColumn } from 'typeorm'
 import { CommonEntity } from '@/extends/common.entity'
+import Role from '../../role/entities/role.entity'
 
 @Entity('module')
 @Tree('closure-table')
@@ -21,4 +22,8 @@ export default class Module extends CommonEntity{
 
 	@TreeParent()
 	parent: Module;
+
+	@ManyToMany(() => Role, role => role.modules)
+	roles: Role[];
+
 }
