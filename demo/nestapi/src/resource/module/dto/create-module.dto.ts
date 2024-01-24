@@ -21,5 +21,9 @@ export class CreateModuleDto {
 
 	@IsOptional()
 	@IsNumber()
+	sort: number;
+
+	@IsOptional()
+	@IsNumber()
 	parentId: number;
 }

@@ -18,9 +18,20 @@ export class ModuleService {
     resetData.parent = parentModule
     return this.repository.save(resetData); // 使用 insert 和update 都不会自己在闭包表建立关系，save 内部做了更多事情
   }
-
-  findAll() {
-    return this.repository.findTrees();
+  sortModules(modules:ModuleEntity[]) {
+    if(modules.length) {
+      modules.forEach(item => {
+        if(item.children) {
+          item.children = this.sortModules(item.children)
+        }
+      })
+      return modules.sort((a, b) => (b.sort || 0) - (a.sort || 0))
+    }
+    return modules
+  }
+  async findAll() {
+    const ms = await this.repository.findTrees();
+    return this.sortModules(ms);
   }
   async findAllByChild(id) {
     const data = await this.findOne(id)

@@ -17,6 +17,9 @@ export default class Module extends CommonEntity{
 	@Column({ name: 'icon', length: 100, nullable: true })
 	icon: string
 
+	@Column({ name: 'sort', default: 0 })
+	sort: number
+
 	@TreeChildren()
 	children: Module[];
 

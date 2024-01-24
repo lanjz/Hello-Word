@@ -5,6 +5,7 @@ import RoleEntity from './entities/role.entity'
 import ModuleEntity from '../module/entities/module.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository} from 'typeorm'
+import { ModuleService } from '../module/module.service'
 
 @Injectable()
 export class RoleService {
@@ -13,6 +14,7 @@ export class RoleService {
     private readonly repository: Repository<RoleEntity>,
     @InjectRepository(ModuleEntity)
     private moduleRepository: Repository<ModuleEntity>,
+    private readonly moduleService: ModuleService
   ) {}
   insert(createRDto: CreateRoleDto) {
     // 第二种触发 entity->beforeUpdate 钩子的方法
@@ -49,7 +51,7 @@ export class RoleService {
       await this.addNodeAndAncestors(leaf, treeNodes, hasParentNodes); // 为每个叶子节点添加它的所有祖先
     }
     const rootModules = Array.from(treeNodes.values()).filter(node => !hasParentNodes.has(node));
-    return rootModules;
+    return this.moduleService.sortModules(rootModules);
   }
   async addNodeAndAncestors(node: ModuleEntity, nodeMap: Map<number,ModuleEntity>, hasParentNodes:Set<ModuleEntity>): Promise<void> {
     nodeMap.set(node.id, node);
