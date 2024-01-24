@@ -60,9 +60,10 @@ export class RoleService {
       if (!nodeMap.has(parent.id)) {
         await this.addNodeAndAncestors(parent, nodeMap, hasParentNodes);
       }
+      const weakParent = nodeMap.get(parent.id) || parent
       // 将当前节点添加到父节点的 children 数组中
-      parent.children = parent.children || [];
-      parent.children.push(node);
+      weakParent.children = weakParent.children || [];
+      weakParent.children.push(node);
       hasParentNodes.add(node)
     }
   }

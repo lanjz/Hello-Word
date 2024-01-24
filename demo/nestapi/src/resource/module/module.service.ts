@@ -46,10 +46,15 @@ export class ModuleService {
   }
   async update(id: number, updateData: UpdateModuleDto) {
     const { parentId, ...data } = updateData
-    const parentModule = !parentId ? null : await this.repository.findOneBy({ id: parentId });
+    if('parentId' in updateData ){
+      const parentModule = !parentId ? null : await this.repository.findOneBy({ id: parentId });
+      return this.repository.save( {
+        ...data,
+        parent: parentModule
+      });
+    }
     return this.repository.save( {
       ...data,
-      parent: parentModule
     });
   }
 
