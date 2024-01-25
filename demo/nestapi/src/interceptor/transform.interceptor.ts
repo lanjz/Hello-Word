@@ -16,7 +16,13 @@ export interface BaseResponse {
 export interface Response<T> extends BaseResponse {
   data: T;
 }
-
+export function resSucFormat<T>(data: T, successMessage = '成功'): Response<T> {
+  return {
+    responseCode: 1,
+    message: [successMessage],
+    data,
+  };
+}
 @Injectable()
 export class TransformInterceptor<T>
   implements NestInterceptor<T, Response<T>>
@@ -27,11 +33,7 @@ export class TransformInterceptor<T>
   ): Observable<Response<T>> {
     return next.handle().pipe(
       map((data: any) => {
-        return {
-          responseCode: 1,
-          message: ['成功'],
-          data,
-        };
+        return resSucFormat(data)
       }),
     );
   }

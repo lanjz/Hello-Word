@@ -24,4 +24,12 @@ export class AuthService {
 			access_token: await this.jwtService.signAsync(payload)
 		};
 	}
+	// todo
+	// 创建一个数据库表或集合来存储已撤销的令牌（撤销列表）。
+	// 在用户退出登录时，将该用户的访问令牌（Access Token）加入到撤销列表中。
+	// 在每次验证令牌时，先检查令牌是否在撤销列表中。如果在列表中，就认为令牌无效。
+	// 定期清理过期的令牌记录，以减小撤销列表的大小。
+	signOut(token) {
+		// this.jwtService.addToBlacklist(token);
+	}
 }

@@ -15,7 +15,7 @@ export class ResponseFormatMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     // 拦截所有路由，对响应进行格式化处理
     const originalSend = res.send;
-    console.log('res', res);
+    console.log('ResponseFormatMiddleware', res);
     res.send = function (body): any {
       if (Buffer.isBuffer(body)) {
         console.log('body----')
