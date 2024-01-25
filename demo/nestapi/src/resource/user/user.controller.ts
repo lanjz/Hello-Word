@@ -10,7 +10,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @Roles(RoleEnum.admin)
+  @Roles(RoleEnum.admin, RoleEnum.root)
   findAll() {
     return this.userService.findAll();
   }

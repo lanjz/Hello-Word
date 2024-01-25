@@ -18,6 +18,7 @@ export class AuthService {
 		const payload = {
 			sub: user.id,
 			username: user.username,
+			roles: user.roles
 		};
 		// 而不是返回一个用户对象
 		return {
