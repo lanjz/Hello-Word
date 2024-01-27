@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "自动接单",
+  "version": "1.0",
+  "permissions": ["contextMenus", "activeTab", "scripting"],
+  "host_permissions": ["https://v5.800best.com/*", "http://v5.800best.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "popup.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://v5.800best.com/*", "http://v5.800best.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
