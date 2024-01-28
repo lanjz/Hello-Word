@@ -188,6 +188,7 @@ import TaskList from '@tiptap/extension-task-list'
 import Placeholder from '@tiptap/extension-placeholder'
 import Code from '@tiptap/extension-code'
 import Typography from '@tiptap/extension-typography'
+import { FontSize} from './extends/FontSize'
 
 import { ColorHighlighter } from './ColorHighlighter'
 import { SmilieReplacer } from './SmilieReplacer'
@@ -316,7 +317,8 @@ export default {
         ColorHighlighter,
         SmilieReplacer,
         TextStyle,
-        FontFamily
+        FontFamily,
+        FontSize
       ],
     })
   }

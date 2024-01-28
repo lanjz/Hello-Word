@@ -6,13 +6,13 @@
       :tippy-options="{ duration: 100,placement: 'top-start', maxWidth: 'none', offset: [-10, 10] }"
       :editor="editor"
   >
-    <el-dropdown @command="handleCommand">
-    <button class="el-dropdown-link" :class="{'is-active': actFont}">
-      {{actFont || 'Inter'}}
-      <el-icon class="el-icon--right">
-        <arrow-down />
-      </el-icon>
-    </button>
+    <el-dropdown @command="handleFontFamily">
+      <button class="el-dropdown-link" :class="{'is-active': actFont}">
+        {{actFont || 'Inter'}}
+        <el-icon class="el-icon--right">
+          <arrow-down />
+        </el-icon>
+      </button>
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item
@@ -21,6 +21,25 @@
               :disabled="item.disabled"
               :class="{'is-act': actFont && item.value===actFont}"
               :key="item.value">{{item.label}}
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
+    <el-dropdown @command="handleFontSize">
+      <button class="el-dropdown-link" :class="{'is-active': actFontSize}">
+        {{FONT_SIZES_MAP[actFontSize] || 'Medium'}}
+        <el-icon class="el-icon--right">
+          <arrow-down />
+        </el-icon>
+      </button>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item
+              v-for="item in FONT_SIZES"
+              :command="item.value"
+              :class="{'is-act': actFontSize && item.value===actFontSize}"
+              :key="item.value">
+            {{item.label}}
           </el-dropdown-item>
         </el-dropdown-menu>
       </template>
@@ -51,6 +70,18 @@
 <script>
 import { BubbleMenu } from '@tiptap/vue-3'
 
+
+const FONT_SIZES = [
+  { label: 'Smaller', value: '12px' },
+  { label: 'Small', value: '14px' },
+  { label: 'Medium', value: '' },
+  { label: 'Large', value: '18px' },
+  { label: 'Extra Large', value: '24px' },
+]
+const FONT_SIZES_MAP = {}
+FONT_SIZES.forEach(item => {
+  FONT_SIZES_MAP[item.value] = item.label
+})
 const FONT_FAMILY_GROUPS = [
   {
     label: 'Sans Serif',
@@ -93,20 +124,32 @@ export default {
   data() {
     return {
       FONT_FAMILIES,
+      FONT_SIZES,
+      FONT_SIZES_MAP,
       currentFont: {}
     }
   },
   computed: {
     actFont() {
       return this.editor.getAttributes('textStyle')?.fontFamily || undefined
+    },
+    actFontSize() {
+      console.log('actFontSize', this.editor.getAttributes('textStyle'))
+      return this.editor.getAttributes('textStyle')?.fontSize || undefined
     }
   },
   methods: {
-    handleCommand(font){
+    handleFontFamily(font){
       if (!font || font.length === 0) {
         return this.editor.chain().focus().unsetFontFamily().run()
       }
       return this.editor.chain().focus().setFontFamily(font).run()
+    },
+    handleFontSize(size) {
+      if (!size || size.length === 0) {
+        return this.editor.chain().focus().unsetFontSize().run()
+      }
+      return this.editor.chain().focus().setFontSize(size).run()
     }
   },
 }
@@ -145,13 +188,13 @@ export default {
 }
 
 ::v-deep{
-  .dropdown-item.is-disabled{
+  .el-dropdown-menu__item.is-disabled{
     font-size: 12px;
     &:not(:first-child){
       border-top: solid 1px var(--el-dropdown-menuItem-hover-fill);
     }
   }
-  .dropdown-item.is-act{
+  .el-dropdown-menu__item.is-act{
     background-color: var(--el-dropdown-menuItem-hover-fill);
     color: var(--el-dropdown-menuItem-hover-color);
   }
