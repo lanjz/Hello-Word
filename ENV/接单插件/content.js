@@ -266,7 +266,7 @@ function beginWork() {
             if(getReceiveBtn) {
                 getReceiveBtn.click()
                 zzzShowLog(`接揽按钮触发,5秒后关闭弹窗`)
-                count += dataLength.length
+                count += dataLength
                 setTimeout(closeModal, 5000)
             }
         } catch(e){
