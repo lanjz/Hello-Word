@@ -1,9 +1,10 @@
 import sysManageRoutes from './sys-manage';
+import docManageRoutes from './doc-manage';
 import demoRoutes from './demo';
 
 export const LAYOUT_ROUTER_MAIN = 'main';
 export const HOME_PATH = '/';
-export const moduleRoutes = [...demoRoutes, ...sysManageRoutes];
+export const moduleRoutes = [...demoRoutes, ...sysManageRoutes, ...docManageRoutes];
 const mainRouter = [
     {
         path: HOME_PATH,
