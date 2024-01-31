@@ -175,6 +175,7 @@ import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
 import Document from '@tiptap/extension-document'
 import Dropcursor from '@tiptap/extension-dropcursor'
+import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
@@ -183,11 +184,15 @@ import Highlight from '@tiptap/extension-highlight'
 import FontFamily from '@tiptap/extension-font-family';
 import TextStyle from '@tiptap/extension-text-style'
 import TextAlign from '@tiptap/extension-text-align'
+import Color from '@tiptap/extension-color'
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import Placeholder from '@tiptap/extension-placeholder'
 import Code from '@tiptap/extension-code'
 import Typography from '@tiptap/extension-typography'
+import Underline from '@tiptap/extension-underline'
+import Superscript from '@tiptap/extension-superscript'
+import Subscript from '@tiptap/extension-subscript'
 import { FontSize} from './extends/FontSize'
 
 import { ColorHighlighter } from './ColorHighlighter'
@@ -289,7 +294,7 @@ export default {
         TextAlign.configure({
           types: ['heading', 'paragraph'],
         }),
-        Highlight,
+        Highlight.configure({ multicolor: true }),
         TableRow,
         TableHeader,
         // Default TableCell
@@ -300,6 +305,9 @@ export default {
         Paragraph,
         Text,
         Image,
+        Link.configure({
+          openOnClick: false,
+        }),
         Dropcursor,
         TaskList,
         CustomTaskItem,
@@ -313,10 +321,14 @@ export default {
           },
         }),
         Typography,
+        Underline,
+        Subscript,
+        Superscript,
         Code,
         ColorHighlighter,
         SmilieReplacer,
         TextStyle,
+        Color,
         FontFamily,
         FontSize
       ],

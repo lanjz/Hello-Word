@@ -13,7 +13,7 @@ const requireAll = (requireContext) => {
 requireAll(req);*/
 export default {
 	install(Vue) {
-		Vue.component('CSvgIcon', CIcon);
+		Vue.component('CIcon', CIcon);
 		Vue.component('CButton', CButton);
 		Vue.component('CTabs', CTabs);
 		Vue.component('OperateItem', OperateItem);

@@ -4,7 +4,7 @@
 		trigger="click"
 	>
 		<div class="top-bar-user-container">
-			<CSvgIcon
+			<CIcon
 				class="user-icon"
 				name="user-icon"
 			/>

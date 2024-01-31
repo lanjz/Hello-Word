@@ -5,6 +5,13 @@
 		class="svg-external-icon svg-icon"
 		v-bind="$attrs"
 	/>
+  <i
+      class="iconfont"
+      :class="iconName"
+      v-bind="$attrs"
+      :style="{color}"
+      v-else-if="isFont"
+  />
 	<svg
 		v-else
 		:class="svgClass"
@@ -20,7 +27,7 @@ export function isExternal(path) {
 	return /^(https?:|mailto:|tel:)/.test(path);
 }
 export default {
-	name: 'SvgIcon',
+	name: 'CIcon',
 	props: {
 		name: {
 			type: String,
@@ -30,13 +37,18 @@ export default {
 			type: String,
 			default: '',
 		},
+    color: {
+      type: String,
+      default: '',
+    },
+    isFont: Boolean
 	},
 	computed: {
 		isExternal() {
 			return isExternal(this.name);
 		},
 		iconName() {
-			return `#icon-${this.name}`;
+			return this.isFont ? this.name : `#icon-${this.name}`;
 		},
 		svgClass() {
 			if (this.className) {
@@ -68,5 +80,8 @@ export default {
 	background-color: currentColor;
 	mask-size: cover !important;
 	display: inline-block;
+}
+.iconfont{
+  color: #222
 }
 </style>

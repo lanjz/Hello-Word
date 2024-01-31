@@ -25,7 +25,7 @@
 				class="upload-drag"
 				v-else
 			>
-				<CSvgIcon
+				<CIcon
 					class="module-icon"
 					name="upload"
 				/>
