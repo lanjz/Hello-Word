@@ -3,10 +3,10 @@
     <InlineMenu :editor="editor"  />
     <floating-menu
         ref="InlineMenu"
-        class="floating-menu"
         :tippy-options="{
           duration: 100,
-          offset: [0, -160],
+          offset: [-50, 0],
+          maxWidth: 'none',
           popperOptions: { placement: 'top-start' },
       }"
         pluginKey="textMenu"

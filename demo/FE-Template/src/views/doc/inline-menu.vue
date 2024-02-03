@@ -330,8 +330,7 @@ export default {
   padding: 6px;
   align-items: center;
   border-radius: 0.5rem;
-  box-shadow: var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow);
-
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, .12);
   button {
     border: none;
     background: none;
