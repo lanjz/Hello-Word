@@ -47,12 +47,8 @@
   </div>
 </template>
 <script>
-import { BubbleMenu } from '@tiptap/vue-3'
 export default {
   props: ['editor'],
-  components: {
-    BubbleMenu,
-  },
   data() {
     return {
     }

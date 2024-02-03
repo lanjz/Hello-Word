@@ -1,86 +1,8 @@
 <template>
   <div v-if="editor">
-    <div>
-      <h2>格式</h2>
-      <div>
-        <button @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
-          left
-        </button>
-        <button @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
-          center
-        </button>
-        <button @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
-          right
-        </button>
-        <button @click="editor.chain().focus().setTextAlign('justify').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
-          justify
-        </button>
-      </div>
-    </div>
-    <div>
-      <h2>图片</h2>
-      <div>
-        <button @click="addImage">add image from URL</button>
-      </div>
-    </div>
-    <div>
-      <h2>表格</h2>
-      <div>
-        <button @click="editor.chain().focus().addColumnBefore().run()" :disabled="!editor.can().addColumnBefore()">
-          addColumnBefore
-        </button>
-        <button @click="editor.chain().focus().addColumnAfter().run()" :disabled="!editor.can().addColumnAfter()">
-          addColumnAfter
-        </button>
-        <button @click="editor.chain().focus().deleteColumn().run()" :disabled="!editor.can().deleteColumn()">
-          deleteColumn
-        </button>
-        <button @click="editor.chain().focus().addRowBefore().run()" :disabled="!editor.can().addRowBefore()">
-          addRowBefore
-        </button>
-        <button @click="editor.chain().focus().addRowAfter().run()" :disabled="!editor.can().addRowAfter()">
-          addRowAfter
-        </button>
-        <button @click="editor.chain().focus().deleteRow().run()" :disabled="!editor.can().deleteRow()">
-          deleteRow
-        </button>
-        <button @click="editor.chain().focus().deleteTable().run()" :disabled="!editor.can().deleteTable()">
-          deleteTable
-        </button>
-        <button @click="editor.chain().focus().mergeCells().run()" :disabled="!editor.can().mergeCells()">
-          mergeCells
-        </button>
-        <button @click="editor.chain().focus().splitCell().run()" :disabled="!editor.can().splitCell()">
-          splitCell
-        </button>
-        <button @click="editor.chain().focus().toggleHeaderColumn().run()" :disabled="!editor.can().toggleHeaderColumn()">
-          toggleHeaderColumn
-        </button>
-        <button @click="editor.chain().focus().toggleHeaderRow().run()" :disabled="!editor.can().toggleHeaderRow()">
-          toggleHeaderRow
-        </button>
-        <button @click="editor.chain().focus().toggleHeaderCell().run()" :disabled="!editor.can().toggleHeaderCell()">
-          toggleHeaderCell
-        </button>
-        <button @click="editor.chain().focus().mergeOrSplit().run()" :disabled="!editor.can().mergeOrSplit()">
-          mergeOrSplit
-        </button>
-        <button @click="editor.chain().focus().setCellAttribute('backgroundColor', '#FAF594').run()" :disabled="!editor.can().setCellAttribute('backgroundColor', '#FAF594')">
-          setCellAttribute
-        </button>
-        <button @click="editor.chain().focus().fixTables().run()" :disabled="!editor.can().fixTables()">
-          fixTables
-        </button>
-        <button @click="editor.chain().focus().goToNextCell().run()" :disabled="!editor.can().goToNextCell()">
-          goToNextCell
-        </button>
-        <button @click="editor.chain().focus().goToPreviousCell().run()" :disabled="!editor.can().goToPreviousCell()">
-          goToPreviousCell
-        </button>
-      </div>
-    </div>
-    <InlineMenu :editor="editor" />
+    <InlineMenu :editor="editor"  />
     <floating-menu
+        ref="InlineMenu"
         class="floating-menu"
         :tippy-options="{
           duration: 100,
@@ -92,25 +14,9 @@
     >
       <NodesMenu :editor="editor"></NodesMenu>
     </floating-menu>
-
-   <div>
-     <button @click="editor.chain().focus().unsetAllMarks().run()">
-       clear marks
-     </button>
-     <button @click="editor.chain().focus().clearNodes().run()">
-       clear nodes
-     </button>
-
-
-
-
-     <button @click="editor.chain().focus().undo().run()" :disabled="!editor.can().chain().focus().undo().run()">
-       undo
-     </button>
-     <button @click="editor.chain().focus().redo().run()" :disabled="!editor.can().chain().focus().redo().run()">
-       redo
-     </button>
-   </div>
+    <div class="nodes-menu-wrap">
+      <TableMenu ref="tableMenuRef" :editor="editor" v-if="editor" />
+    </div>
   </div>
   <editor-content :editor="editor" />
 </template>
@@ -146,11 +52,11 @@ import Underline from '@tiptap/extension-underline'
 import Superscript from '@tiptap/extension-superscript'
 import Subscript from '@tiptap/extension-subscript'
 import { FontSize} from './extends/FontSize'
-
 import { ColorHighlighter } from './ColorHighlighter'
 import { SmilieReplacer } from './SmilieReplacer'
 import InlineMenu from './inline-menu.vue'
 import NodesMenu from './comps/nodes-menu.vue'
+import TableMenu from './comps/TableMenu.vue'
 
 const CustomTableCell = TableCell.extend({
   addAttributes() {
@@ -178,10 +84,14 @@ export default {
     InlineMenu,
     NodesMenu,
     FloatingMenu,
+    TableMenu,
   },
   data() {
     return {
-      editor: null
+      editor: null,
+      showTableMenu: false,
+      tableMenuX: 0,
+      tableMenuY: 0
     }
   },
   methods: {
@@ -192,13 +102,47 @@ export default {
       // 返回 true 表示始终显示 BubbleMenu
       return true;
     },
-    addImage() {
-      const url = window.prompt('URL')
-
-      if (url) {
-        this.editor.chain().focus().setImage({ src: url }).run()
+    handleClickOutside(event) {
+      // 获取弹层 DOM 元素的引用
+      const popup = this.$refs.tableMenuRef.$el;
+      console.log('popup', popup)
+      // 检查点击事件的目标元素是否在弹层内
+      if (popup && !popup.contains(event.target)) {
+        // 如果点击事件的目标不在弹层内，则关闭弹层
+        this.showTableMenu = false;
       }
     },
+    handleRightClick(event) {
+      event.stopPropagation()
+      event.preventDefault(); // 阻止默认的右键菜单
+      const {clientX, clientY} = event;
+      // 使用 TipTap 的 API 获取点击位置的 ProseMirror 位置
+      const pos = this.editor.view.posAtCoords({left: clientX, top: clientY});
+      if (pos) {
+        const resolvedPos = this.editor.view.state.doc.resolve(pos.pos);
+        // 检查点击是否发生在表格节点内
+        let insideTable = false;
+        for (let i = resolvedPos.depth; i > 0; i--) {
+          const node = resolvedPos.node(i);
+          if (node.type.name === 'table') {
+            insideTable = true;
+            break;
+          }
+        }
+        if (insideTable) {
+          this.showTableMenu = true
+          this.tableMenuX = clientX
+          this.tableMenuY = clientY
+        } else {
+          this.showTableMenu = false
+        }
+      }
+    },
+    addLisEvent() {
+      // document.addEventListener('click', this.handleClickOutside)
+      // document.addEventListener('contextmenu', this.handleClickOutside)
+      // this.editor.view.dom.addEventListener('contextmenu', this.handleRightClick);
+    }
   },
   mounted() {
     this.editor = new Editor({
@@ -280,7 +224,14 @@ export default {
         FontSize,
       ],
     })
-  }
+    this.addLisEvent()
+  },
+  beforeDestroy() {
+    // document.removeEventListener('click', this.handleClickOutside);
+    // document.removeEventListener('contextmenu', this.handleClickOutside);
+    // this.editor.view.dom.removeEventListener('contextmenu', this.handleRightClick);
+    this.editor.destroy();
+  },
 }
 </script>
 
@@ -454,5 +405,13 @@ ul[data-type="taskList"] {
     background-color: var(--color);
   }
 }
-
+.nodes-menu-wrap{
+  position: fixed;
+  z-index: 22;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  max-height: 60%;
+  background: rgba(255,255,255,.7);
+}
 </style>

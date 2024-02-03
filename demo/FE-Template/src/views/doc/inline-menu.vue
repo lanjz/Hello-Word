@@ -10,8 +10,8 @@
         offset: [-10, 10],
         onHidden: onHiddenBubble
       }"
+      plugin-key="inlineBubbleMenu"
       :editor="editor"
-      id="inlineBubbleMenu"
   >
     <el-dropdown @command="handleFontFamily">
       <button class="el-dropdown-link" :class="{'is-active': actFont}">
@@ -99,14 +99,6 @@
       </button>
     </el-tooltip>
 
-    <el-tooltip effect="light" content="水平分割线" placement="top">
-      <template #content>
-        <InstructionPrompt title="水平分割线" />
-      </template>
-      <button  @click="editor.chain().focus().setHorizontalRule().run()">
-        <CIcon  name="icon-shanchu1" isFont />
-      </button>
-    </el-tooltip>
     <el-tooltip effect="light" content="文本颜色" placement="top">
       <template #content>
         <InstructionPrompt title="文本颜色" />

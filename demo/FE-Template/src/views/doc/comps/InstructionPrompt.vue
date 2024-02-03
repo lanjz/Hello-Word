@@ -17,6 +17,11 @@ export default {
       default: () => []
     }
   },
+  data() {
+    return {
+      isMac: typeof window !== 'undefined' ? navigator.platform.toUpperCase().indexOf('MAC') >= 0 : false
+    }
+  },
   methods: {
     shortcutValue(value) {
       if(value === 'Mod') {
@@ -29,11 +34,6 @@ export default {
       return value
     }
   },
-  data() {
-    return {
-      isMap: typeof window !== 'undefined' ? navigator.platform.toUpperCase().indexOf('MAC') >= 0 : false
-    }
-  }
 }
 </script>
 
