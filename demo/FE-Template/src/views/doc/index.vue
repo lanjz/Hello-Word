@@ -3,9 +3,6 @@
     <div>
       <h2>格式</h2>
       <div>
-        <button @click="editor.chain().focus().toggleHighlight().run()" :class="{ 'is-active': editor.isActive('highlight') }">
-          highlight
-        </button>
         <button @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
           left
         </button>
@@ -29,9 +26,6 @@
     <div>
       <h2>表格</h2>
       <div>
-        <button @click="editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()">
-          insertTable
-        </button>
         <button @click="editor.chain().focus().addColumnBefore().run()" :disabled="!editor.can().addColumnBefore()">
           addColumnBefore
         </button>
@@ -88,68 +82,26 @@
     <InlineMenu :editor="editor" />
     <floating-menu
         class="floating-menu"
-        :tippy-options="{ duration: 100, trigger: 'mouseenter focus', placement: 'top-start' }"
+        :tippy-options="{
+          duration: 100,
+          offset: [0, -160],
+          popperOptions: { placement: 'top-start' },
+      }"
+        pluginKey="textMenu"
         :editor="editor"
     >
-      <button @click="editor.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }">
-        H1
-      </button>
-      <button @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }">
-        H2
-      </button>
-      <button @click="editor.chain().focus().toggleBulletList().run()" :class="{ 'is-active': editor.isActive('bulletList') }">
-        Bullet List
-      </button>
+      <NodesMenu :editor="editor"></NodesMenu>
     </floating-menu>
 
    <div>
-     <button @click="editor.chain().focus().toggleBold().run()" :disabled="!editor.can().chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
-       bold
-     </button>
-     <button @click="editor.chain().focus().toggleItalic().run()" :disabled="!editor.can().chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }">
-       italic
-     </button>
-     <button @click="editor.chain().focus().toggleStrike().run()" :disabled="!editor.can().chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }">
-       strike
-     </button>
-
      <button @click="editor.chain().focus().unsetAllMarks().run()">
        clear marks
      </button>
      <button @click="editor.chain().focus().clearNodes().run()">
        clear nodes
      </button>
-     <button @click="editor.chain().focus().setParagraph().run()" :class="{ 'is-active': editor.isActive('paragraph') }">
-       paragraph
-     </button>
-     <button @click="editor.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }">
-       h1
-     </button>
-     <button @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }">
-       h2
-     </button>
-     <button @click="editor.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }">
-       h3
-     </button>
-     <button @click="editor.chain().focus().toggleHeading({ level: 4 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 4 }) }">
-       h4
-     </button>
-     <button @click="editor.chain().focus().toggleHeading({ level: 5 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 5 }) }">
-       h5
-     </button>
-     <button @click="editor.chain().focus().toggleHeading({ level: 6 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 6 }) }">
-       h6
-     </button>
-     <button @click="editor.chain().focus().toggleBulletList().run()" :class="{ 'is-active': editor.isActive('bulletList') }">
-       bullet list
-     </button>
-     <button @click="editor.chain().focus().toggleOrderedList().run()" :class="{ 'is-active': editor.isActive('orderedList') }">
-       ordered list
-     </button>
 
-     <button @click="editor.chain().focus().toggleBlockquote().run()" :class="{ 'is-active': editor.isActive('blockquote') }">
-       blockquote
-     </button>
+
 
 
      <button @click="editor.chain().focus().undo().run()" :disabled="!editor.can().chain().focus().undo().run()">
@@ -198,16 +150,7 @@ import { FontSize} from './extends/FontSize'
 import { ColorHighlighter } from './ColorHighlighter'
 import { SmilieReplacer } from './SmilieReplacer'
 import InlineMenu from './inline-menu.vue'
-
-
-const CustomDocument = Document.extend({
-  content: 'taskList',
-})
-
-const CustomTaskItem = TaskItem.extend({
-  content: 'inline*',
-})
-
+import NodesMenu from './comps/nodes-menu.vue'
 
 const CustomTableCell = TableCell.extend({
   addAttributes() {
@@ -233,6 +176,7 @@ export default {
   components: {
     EditorContent,
     InlineMenu,
+    NodesMenu,
     FloatingMenu,
   },
   data() {
@@ -310,7 +254,10 @@ export default {
         }),
         Dropcursor,
         TaskList,
-        CustomTaskItem,
+        TaskItem.extend({
+          content: 'inline*',
+          // nested: true,
+        }),
         Placeholder.configure({
           placeholder: ({ node }) => {
             if (node.type.name === 'heading') {
@@ -330,7 +277,7 @@ export default {
         TextStyle,
         Color,
         FontFamily,
-        FontSize
+        FontSize,
       ],
     })
   }
@@ -508,26 +455,4 @@ ul[data-type="taskList"] {
   }
 }
 
-
-
-.floating-menu {
-  display: flex;
-  background-color: #0D0D0D10;
-  padding: 0.2rem;
-  border-radius: 0.5rem;
-
-  button {
-    border: none;
-    background: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    padding: 0 0.2rem;
-    opacity: 0.6;
-
-    &:hover,
-    &.is-active {
-      opacity: 1;
-    }
-  }
-}
 </style>

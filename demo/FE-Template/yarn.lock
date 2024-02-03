@@ -743,15 +743,15 @@
   resolved "https://registry.npmmirror.com/@tiptap/extension-table/-/extension-table-2.1.16.tgz#d7ec0cd6658c95aacf55a095bcf14ad3f261df21"
   integrity sha512-Xvi0GyHYKBL3KQ5CiayDxjMecEIdokZDTjczPzDB1VYiHwM1/PFFWqJlhmSSOzGgcyjwV8/Pn6eumqM3rCqKFw==
 
-"@tiptap/extension-task-item@^2.1.16":
-  version "2.1.16"
-  resolved "https://registry.npmmirror.com/@tiptap/extension-task-item/-/extension-task-item-2.1.16.tgz#06e1c18f3de95bcd4c62a62238295e52c476099a"
-  integrity sha512-kqeoAPAh3TGhAiJMkFlVcRzI765MB4KzGL9fJEQY7oeZF8FG9mYcMlqD7SkpdmV5UOJ+uWByIca4yWwHoyBIUg==
+"@tiptap/extension-task-item@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.npmmirror.com/@tiptap/extension-task-item/-/extension-task-item-2.2.1.tgz#e4b13bb8341512c3c846c1e93a174bf5c7f514df"
+  integrity sha512-gu8XJ6OCw1VZNe/Q/bTzk214d9bq5B/zN4BR/l+2ogbb5eXi00yEiatqMX40Ee4HzVqVGHJhclDHYRK9k+oAIw==
 
-"@tiptap/extension-task-list@^2.1.16":
-  version "2.1.16"
-  resolved "https://registry.npmmirror.com/@tiptap/extension-task-list/-/extension-task-list-2.1.16.tgz#c0707d4bf3956ed58c85975f21361dd3e16c268f"
-  integrity sha512-NZzjK8SN3LZcjnwHLiCYPrNRs4nqax+b36GqB1o4GC1Vqmkt8ynW+MII09i08LhBYVJSX2yzRKPE2RDhCeAWig==
+"@tiptap/extension-task-list@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.npmmirror.com/@tiptap/extension-task-list/-/extension-task-list-2.2.1.tgz#775803e1c64abcb245b02a9c4b28ea4a79497872"
+  integrity sha512-hE/h7a2fYm0olWax7ywm+K10L4whyWZdlwDSTHiuE44++o+ANn4AcV/izz8/qFBbPUnf9qG0QZituzLQlTTenw==
 
 "@tiptap/extension-text-align@^2.1.16":
   version "2.1.16"
