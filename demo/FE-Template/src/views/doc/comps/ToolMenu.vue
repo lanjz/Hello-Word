@@ -229,6 +229,14 @@
         <CIcon class="ope-icon" name="icon-chexiaoyou" isFont />
       </el-button>
     </el-tooltip>
+    <el-tooltip effect="light" content="换行" placement="left">
+      <template #content>
+        <InstructionPrompt title="换行" :shortcut="['Mod', 'Enter']" />
+      </template>
+      <el-button class="menu-item-wrap" @click="editor.chain().focus().setHardBreak().run()">
+        <CIcon class="ope-icon" name="icon-multilinetext" isFont />
+      </el-button>
+    </el-tooltip>
 <!--    <el-button class="menu-item-wrap" @click="editor.chain().focus().toggleHeaderColumn().run()" :disabled="!editor.can().toggleHeaderColumn()">
       toggleHeaderColumn
     </el-button>

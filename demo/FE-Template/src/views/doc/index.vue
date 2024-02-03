@@ -224,7 +224,7 @@ export default {
         FontSize,
       ],
     })
-    this.addLisEvent()
+    // this.addLisEvent()
   },
   beforeDestroy() {
     // document.removeEventListener('click', this.handleClickOutside);
