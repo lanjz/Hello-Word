@@ -164,7 +164,7 @@
 </template>
 <script>
 import { BubbleMenu } from '@tiptap/vue-3'
-import InstructionPrompt from './comps/InstructionPrompt.vue'
+import InstructionPrompt from './InstructionPrompt.vue'
 import AppLink from '@/layouts/main/components/common/app-link.vue'
 
 const FONT_SIZES = [

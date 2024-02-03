@@ -12,10 +12,10 @@
         pluginKey="textMenu"
         :editor="editor"
     >
-      <NodesMenu :editor="editor"></NodesMenu>
+      <QuickMenu :editor="editor" />
     </floating-menu>
     <div class="nodes-menu-wrap">
-      <TableMenu ref="tableMenuRef" :editor="editor" v-if="editor" />
+      <ToolMenu ref="tableMenuRef" :editor="editor" v-if="editor" />
     </div>
   </div>
   <editor-content :editor="editor" />
@@ -54,9 +54,9 @@ import Subscript from '@tiptap/extension-subscript'
 import { FontSize} from './extends/FontSize'
 import { ColorHighlighter } from './ColorHighlighter'
 import { SmilieReplacer } from './SmilieReplacer'
-import InlineMenu from './inline-menu.vue'
-import NodesMenu from './comps/nodes-menu.vue'
-import TableMenu from './comps/TableMenu.vue'
+import InlineMenu from './comps/InlineMenu.vue'
+import QuickMenu from './comps/QuickMenu.vue'
+import ToolMenu from './comps/ToolMenu.vue'
 
 const CustomTableCell = TableCell.extend({
   addAttributes() {
@@ -82,9 +82,9 @@ export default {
   components: {
     EditorContent,
     InlineMenu,
-    NodesMenu,
+    QuickMenu,
     FloatingMenu,
-    TableMenu,
+    ToolMenu,
   },
   data() {
     return {
