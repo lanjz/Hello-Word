@@ -25,9 +25,6 @@
     <div class="menu-item-wrap" @click="editor.chain().focus().toggleBlockquote().run()" :class="{ 'is-active': editor.isActive('blockquote') }">
       <CIcon name="icon-blockquote" class="icon" isFont /><span>引用</span>
     </div>
-    <div class="menu-item-wrap" @click="addImage">
-      <CIcon name="icon-tupian1" class="icon" isFont /><span>图片</span>
-    </div>
     <div class="menu-item-wrap" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
       <CIcon  name="icon-code1" class="icon" isFont /> <span>代码块</span>
     </div>
@@ -57,13 +54,6 @@ export default {
 
   },
   methods: {
-    addImage() {
-      const url = window.prompt('URL')
-
-      if (url) {
-        this.editor.chain().focus().setImage({ src: url }).run()
-      }
-    },
   },
 }
 </script>

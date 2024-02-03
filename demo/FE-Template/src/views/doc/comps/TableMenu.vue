@@ -1,5 +1,84 @@
 <template>
   <div class="menu-wrap">
+    <el-tooltip popper-style="padding: 6px" effect="light" content="标题" placement="left-start">
+      <template #content>
+       <div>
+         <div class="inline-menu-item-wrap" @click="editor.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }">
+           <CIcon name="icon-h1" class="icon" isFont /><span>标题一</span>
+         </div>
+         <div class="inline-menu-item-wrap" @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }">
+           <CIcon name="icon-h2" class="icon" isFont /><span>标题二</span>
+         </div>
+         <div class="inline-menu-item-wrap" @click="editor.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }">
+           <CIcon name="icon-h3" class="icon" isFont /><span>标题三</span>
+         </div>
+         <div class="inline-menu-item-wrap" @click="editor.chain().focus().toggleHeading({ level: 4 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 4 }) }">
+           <CIcon name="icon-h4" class="icon" isFont /><span>标题四</span>
+         </div>
+         <div class="inline-menu-item-wrap" @click="editor.chain().focus().toggleHeading({ level: 5 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 5 }) }">
+           <CIcon name="icon-h5" class="icon" isFont /><span>标题五</span>
+         </div>
+         <div class="inline-menu-item-wrap" @click="editor.chain().focus().toggleHeading({ level: 6 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 6 }) }">
+           <CIcon name="icon-h-6" class="icon" isFont /><span>标题六</span>
+         </div>
+       </div>
+      </template>
+      <el-button class="menu-item-wrap" :class="{ 'is-active': editor.isActive('heading') }">
+        <CIcon class="ope-icon"  name="icon-biaotizhengwenqiehuan" isFont />
+      </el-button>
+    </el-tooltip>
+    <el-tooltip effect="light" content="段落" placement="left">
+      <template #content>
+        <InstructionPrompt title="段落" />
+      </template>
+      <el-button class="menu-item-wrap" @click="editor.chain().focus().setParagraph().run()" :class="{ 'is-active': editor.isActive('paragraph') }">
+        <CIcon class="ope-icon"  name="icon-duanla" isFont />
+      </el-button>
+    </el-tooltip>
+    <el-tooltip effect="light" content="引用" placement="left">
+      <template #content>
+        <InstructionPrompt title="引用" />
+      </template>
+      <el-button class="menu-item-wrap" @click="editor.chain().focus().toggleBlockquote().run()" :class="{ 'is-active': editor.isActive('blockquote') }">
+        <CIcon name="icon-blockquote" class="icon" isFont />
+      </el-button>
+    </el-tooltip>
+    <el-tooltip effect="light" content="代码块" placement="left">
+      <template #content>
+        <InstructionPrompt title="代码块" />
+      </template>
+      <el-button class="menu-item-wrap" @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
+        <CIcon  name="icon-code1" class="icon" isFont />
+      </el-button>
+    </el-tooltip>
+    <div class="split-line"></div>
+    <el-tooltip popper-style="padding: 6px" effect="light" content="列表" placement="left-start">
+      <template #content>
+        <div>
+          <div class="inline-menu-item-wrap" @click="editor.chain().focus().toggleBulletList().run()" :class="{ 'is-active': editor.isActive('bulletList') }">
+            <CIcon name="icon-unorderedList" class="icon" isFont /><span>无序列表</span>
+          </div>
+          <div class="inline-menu-item-wrap" @click="editor.chain().focus().toggleOrderedList().run()" :class="{ 'is-active': editor.isActive('orderedList') }">
+            <CIcon name="icon-orderedList" class="icon" isFont /><span>有序列表</span>
+          </div>
+          <div class="inline-menu-item-wrap" @click="editor.chain().focus().toggleTaskList().run()" :class="{ 'is-active': editor.isActive('taskList') }">
+            <CIcon name="icon-todo-list" class="icon" isFont /><span>待办列表</span>
+          </div>
+        </div>
+      </template>
+      <el-button class="menu-item-wrap" :class="{ 'is-active': editor.isActive('bulletList') || editor.isActive('orderedList') || editor.isActive('taskList') }">
+        <CIcon class="ope-icon"  name="icon-liebiao" isFont />
+      </el-button>
+    </el-tooltip>
+    <el-tooltip effect="light" content="插入表格" placement="left">
+      <template #content>
+        <InstructionPrompt title="插入表格" />
+      </template>
+      <el-button class="menu-item-wrap" @click="editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()">
+        <CIcon name="icon-biaoge" class="icon" isFont />
+      </el-button>
+    </el-tooltip>
+    <div class="split-line"></div>
     <el-tooltip effect="light" content="左对齐" placement="left">
       <template #content>
         <InstructionPrompt title="左对齐" />
@@ -259,6 +338,39 @@ export default {
   height: 1px;
   width: 20px;
   background: #dedede;
+}
+
+.inline-menu-item-wrap {
+  padding: 6px 8px;
+  white-space: nowrap;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  align-items: center;
+  display: flex;
+  color: #666;
+  .icon {
+    margin-right: 4px;
+    font-size: 14px;
+    color: #666;
+  }
+  &:not(:last-child) {
+    margin-bottom: 6px;
+  }
+  &:hover,
+  &.is-active {
+    opacity: 1;
+  }
+  &:hover {
+    background: #f5f4f4;
+  }
+  &.is-active {
+    background-color: #eee;
+  }
+  span{
+    font-size: 13px;
+  }
 }
 </style>
 <style lang="scss">
