@@ -78,58 +78,7 @@
         <CIcon name="icon-biaoge" class="icon" isFont />
       </el-button>
     </el-tooltip>
-    <div class="split-line"></div>
-    <el-tooltip effect="light" content="左对齐" placement="left">
-      <template #content>
-        <InstructionPrompt title="左对齐" />
-      </template>
-      <el-button class="menu-item-wrap" @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
-        <CIcon class="ope-icon"  name="icon-zuoduiqi-" isFont />
-      </el-button>
-    </el-tooltip>
 
-    <el-tooltip effect="light" content="居中对齐" placement="left">
-      <template #content>
-        <InstructionPrompt title="居中对齐" />
-      </template>
-      <el-button class="menu-item-wrap" @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
-        <CIcon class="ope-icon"  name="icon-juzhongduiqi" isFont />
-      </el-button>
-    </el-tooltip>
-    <el-tooltip effect="light" content="右对齐" placement="left">
-      <template #content>
-        <InstructionPrompt title="右对齐" />
-      </template>
-      <el-button class="menu-item-wrap" @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
-        <CIcon class="ope-icon"  name="icon-youduiqi-" isFont />
-      </el-button>
-    </el-tooltip>
-    <el-tooltip effect="light" content="两侧对齐" placement="left">
-      <template #content>
-        <InstructionPrompt title="两侧对齐" />
-      </template>
-      <el-button class="menu-item-wrap" @click="editor.chain().focus().setTextAlign('justify').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
-         <CIcon class="ope-icon"  name="icon-text-justify" isFont />
-      </el-button>
-    </el-tooltip>
-    <div class="split-line"></div>
-    <el-tooltip effect="light" content="插入图片" placement="left">
-      <template #content>
-        <InstructionPrompt title="插入图片" />
-      </template>
-      <el-button class="menu-item-wrap" @click="addImage">
-        <CIcon class="ope-icon"  name="icon-tupian" isFont />
-      </el-button>
-    </el-tooltip>
-    <el-tooltip effect="light" content="水平分割线" placement="left">
-      <template #content>
-        <InstructionPrompt title="水平分割线" />
-      </template>
-      <el-button class="menu-item-wrap"  @click="editor.chain().focus().setHorizontalRule().run()">
-        <CIcon  name="icon-shanchu1" isFont />
-      </el-button>
-    </el-tooltip>
-    <div class="split-line"></div>
     <template v-if="editor.isActive('table')">
       <el-tooltip effect="light" content="向前添加列" placement="left">
         <template #content>
@@ -203,8 +152,61 @@
           <CIcon class="ope-icon" name="icon-quxiaohebingdanyuange" isFont />
         </el-button>
       </el-tooltip>
-      <div class="split-line"></div>
     </template>
+    <template v-else>
+      <div class="split-line"></div>
+      <el-tooltip effect="light" content="左对齐" placement="left">
+        <template #content>
+          <InstructionPrompt title="左对齐" />
+        </template>
+        <el-button class="menu-item-wrap" @click="editor.chain().focus().setTextAlign('left').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'left' }) }">
+          <CIcon class="ope-icon"  name="icon-zuoduiqi-" isFont />
+        </el-button>
+      </el-tooltip>
+
+      <el-tooltip effect="light" content="居中对齐" placement="left">
+        <template #content>
+          <InstructionPrompt title="居中对齐" />
+        </template>
+        <el-button class="menu-item-wrap" @click="editor.chain().focus().setTextAlign('center').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'center' }) }">
+          <CIcon class="ope-icon"  name="icon-juzhongduiqi" isFont />
+        </el-button>
+      </el-tooltip>
+      <el-tooltip effect="light" content="右对齐" placement="left">
+        <template #content>
+          <InstructionPrompt title="右对齐" />
+        </template>
+        <el-button class="menu-item-wrap" @click="editor.chain().focus().setTextAlign('right').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'right' }) }">
+          <CIcon class="ope-icon"  name="icon-youduiqi-" isFont />
+        </el-button>
+      </el-tooltip>
+      <el-tooltip effect="light" content="两侧对齐" placement="left">
+        <template #content>
+          <InstructionPrompt title="两侧对齐" />
+        </template>
+        <el-button class="menu-item-wrap" @click="editor.chain().focus().setTextAlign('justify').run()" :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }">
+          <CIcon class="ope-icon"  name="icon-text-justify" isFont />
+        </el-button>
+      </el-tooltip>
+      <div class="split-line"></div>
+      <el-tooltip effect="light" content="插入图片" placement="left">
+        <template #content>
+          <InstructionPrompt title="插入图片" />
+        </template>
+        <el-button class="menu-item-wrap" @click="addImage">
+          <CIcon class="ope-icon"  name="icon-tupian" isFont />
+        </el-button>
+      </el-tooltip>
+      <el-tooltip effect="light" content="水平分割线" placement="left">
+        <template #content>
+          <InstructionPrompt title="水平分割线" />
+        </template>
+        <el-button class="menu-item-wrap"  @click="editor.chain().focus().setHorizontalRule().run()">
+          <CIcon  name="icon-shanchu1" isFont />
+        </el-button>
+      </el-tooltip>
+    </template>
+    <div class="split-line"></div>
     <el-tooltip effect="light" content="清除格式" placement="left">
       <template #content>
         <InstructionPrompt title="清除格式" />
@@ -305,6 +307,7 @@ export default {
   gap: 12px;
   align-items: center;
   flex-direction: column;
+  height: 100%;
 }
 .menu-item-wrap {
   padding: 0;

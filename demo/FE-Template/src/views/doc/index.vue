@@ -15,8 +15,10 @@
       <QuickMenu :editor="editor" />
     </floating-menu>
     <div class="nodes-menu-wrap">
-      <ToolMenu ref="tableMenuRef" :editor="editor" v-if="editor" />
-    </div>
+      <el-scrollbar max-height="80vh" >
+        <ToolMenu ref="tableMenuRef" :editor="editor" v-if="editor" />
+      </el-scrollbar>
+   </div>
   </div>
   <editor-content :editor="editor" />
 </template>
@@ -52,6 +54,7 @@ import Underline from '@tiptap/extension-underline'
 import Superscript from '@tiptap/extension-superscript'
 import Subscript from '@tiptap/extension-subscript'
 import { FontSize} from './extends/FontSize'
+import { SpaceEnterBreakExtension } from './extends/KeyboardShortcuts'
 import { ColorHighlighter } from './ColorHighlighter'
 import { SmilieReplacer } from './SmilieReplacer'
 import InlineMenu from './comps/InlineMenu.vue'
@@ -207,7 +210,6 @@ export default {
             if (node.type.name === 'heading') {
               return 'What’s the title?'
             }
-
             return 'Can you add some further context?'
           },
         }),
@@ -222,6 +224,7 @@ export default {
         Color,
         FontFamily,
         FontSize,
+        SpaceEnterBreakExtension
       ],
     })
     // this.addLisEvent()
@@ -411,7 +414,6 @@ ul[data-type="taskList"] {
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  max-height: 60%;
-  background: rgba(255,255,255,.7);
+  padding: 10px;
 }
 </style>
