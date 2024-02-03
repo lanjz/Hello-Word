@@ -1,5 +1,5 @@
 <template>
-  <div v-if="editor">
+  <div v-if="editor" class="wrap">
     <InlineMenu :editor="editor"  />
     <floating-menu
         ref="InlineMenu"
@@ -19,8 +19,8 @@
         <ToolMenu ref="tableMenuRef" :editor="editor" v-if="editor" />
       </el-scrollbar>
    </div>
+    <editor-content :editor="editor" />
   </div>
-  <editor-content :editor="editor" />
 </template>
 <script>
 import {
@@ -60,13 +60,13 @@ import { SmilieReplacer } from './SmilieReplacer'
 import InlineMenu from './comps/InlineMenu.vue'
 import QuickMenu from './comps/QuickMenu.vue'
 import ToolMenu from './comps/ToolMenu.vue'
+import {testContent} from './test-content'
 
 const CustomTableCell = TableCell.extend({
   addAttributes() {
     return {
       // extend the existing attributes …
       ...this.parent?.(),
-
       // and add a new one …
       backgroundColor: {
         default: null,
@@ -149,33 +149,13 @@ export default {
   },
   mounted() {
     this.editor = new Editor({
-      content: `
-             <h2>
-          Hi there,
-        </h2>
-           <ul data-type="taskList">
-          <li data-type="taskItem" data-checked="true">flour</li>
-          <li data-type="taskItem" data-checked="true">baking powder</li>
-          <li data-type="taskItem" data-checked="true">salt</li>
-          <li data-type="taskItem" data-checked="false">sugar</li>
-          <li data-type="taskItem" data-checked="false">milk</li>
-          <li data-type="taskItem" data-checked="false">eggs</li>
-          <li data-type="taskItem" data-checked="false">butter</li>
-        </ul>
-           <p>
-          You can also teach the editor new things. For example to recognize hex colors and add a color swatch on the fly: #FFF, #0D0D0D, #616161, #A975FF, #FB5151, #FD9170, #FFCB6B, #68CEF8, #80cbc4, #9DEF8F
-        </p>
-        <pre><code class="language-css">body {
-  display: none;
-}</code></pre>
+      content: testContent || `
+             <h1>
+          新建标题
+        </h1>
         <p>
-          I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
+          输入内容....
         </p>
-        <blockquote>
-          Wow, that’s amazing. Good work, boy! 👏
-          <br />
-          — Mom
-        </blockquote>
       `,
       extensions: [
         StarterKit,
@@ -240,7 +220,15 @@ export default {
 
 <style lang="scss">
 /* Basic editor styles */
+.wrap {
+  background: #fff;
+  margin-right: 40px;
+  min-height: calc(100vh - 100px);
+  border-radius: 10px;
+}
 .tiptap {
+  background: #fff;
+  padding: 10px 20px;
   > * + * {
     margin-top: 0.75em;
   }
@@ -411,9 +399,10 @@ ul[data-type="taskList"] {
 .nodes-menu-wrap{
   position: fixed;
   z-index: 22;
-  right: 0;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  padding: 10px;
+  background: #fff;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, .12);
 }
 </style>
