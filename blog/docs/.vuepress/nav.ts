@@ -88,7 +88,7 @@ export const sidebar = {
     '/JavaScript/闭包',
     '/JavaScript/全面解析Module模式',
     '/JavaScript/JS面象对象',
-    '/JavaScript/对象创建模式',
+    '/JavaScript/对象创建设计模式',
     '/JavaScript/设计模式',
     '/JavaScript/事件',
     '/JavaScript/正则',
