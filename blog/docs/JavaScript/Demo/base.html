@@ -90,6 +90,24 @@
     // console.log(t2.constructor)
 	var t3 = new t(11)
     // console.log(t3.constructor)
-
+    const itb = {
+        [Symbol.Iterable]() {
+            return {
+                i: 0,
+                next() {
+                    if (this.i < 3) {
+                        return { value: this.i++, done: false };
+                    }
+                    return { value: undefined, done: true };
+                }
+            }
+        }
+    }
+    function carrry(fn){
+        const arg = arguments.slice(1)
+        return function (arg1){
+            return fn(...arg1, ...arg)
+        }
+    }
 </script>
 </html>
