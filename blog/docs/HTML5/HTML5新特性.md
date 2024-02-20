@@ -161,7 +161,9 @@ var orignalSetItem = localStorage.setItem;
 
 ## sessionStorage
 
-`sessionStorage` 和 `localstorage` 类似，区别在于 `sessionStorage` 存在周期仅限于会话期间且**只有在同一浏览器的同一窗口下才能够共享**
+`sessionStorage` 和 `localstorage` 类似，区别在于 `sessionStorage` 存在周期仅限于会话期间且**只有在同一浏览器的同一窗口（浏览器标签页）下才能够共享**
+
+如果当前标签页关闭或者浏览器关闭，`sessionStorage` 将会消失
 
 ### 用法
 
@@ -172,6 +174,8 @@ var orignalSetItem = localStorage.setItem;
 - 移除值：`sessionStorage.removeItem('myCat')`
 
 - 移除所有的 `sessionStorage` 项: `sessionStorage.clear()`
+
+**注意 `sessionStorage` 仅存于同一标签中，意味着相同域名在不周标签下打开 `sessionStorage` 也是不共享的**
 
 ## IndexedDB
 
