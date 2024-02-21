@@ -1,77 +1,38 @@
 # keep-alive
 
-HTTP `keep-alive` 也称为 HTTP 长连接, 是一个通用消息头。它通过重用一个 TCP 连接来发送/接收多个 HTTP请求，来减少创建/关闭多个 TCP 连接的开销。
+## HTTP keep-alive
 
-在 Http 1.0 中，Keep-Alive是没有官方支持的，但是也有一些 Server 端支持
+HTTP Keep-Alive，也称为持久连接（Persistent Connection），是HTTP协议的一部分，用于控制在同一TCP连接上连续发送和接收多个HTTP请求和响应，而不是每个请求/响应都打开一个新的连接。它的目的是减少每次请求所需的握手次数，从而减少总体的延迟，提高网络通信的效率
 
-Http1.1 以后，Keep-Alive 已经默认支持并开启
+- 作用层次：应用层。
 
-## 使用`keep-alive`
+- 主要目的：减少因建立和关闭TCP连接所产生的开销和延迟，提高页面加载速度。
 
-客户端（包括但不限于浏览器）发送请求时会在 Header 中增加一个请求头 `Connection: Keep-Alive`，当服务器收到附带有 `Connection: Keep-Alive` 的请求时，也会在响应头中添加 `Keep-Alive`, 这样一来，客户端和服务器之间的 HTTP 连接就会被保持，不会断开（断开方式下面介绍），当客户端发送另外一个请求时，就可以复用已建立的连接。
+- 工作机制：在HTTP 1.1中，默认开启Keep-Alive。客户端和服务器在HTTP头部使用 `Connection: keep-alive` 标志来通知对方保持连接打开，以便后续的请求可以复用现有的连接。
 
-```js
-HTTP/1.1 200 OK
-Connection: Keep-Alive
-Content-Encoding: gzip
-Content-Type: text/html; charset=utf-8
-Date: Thu, 11 Aug 2016 15:23:13 GMT
-Keep-Alive: timeout=5, max=1000
-Last-Modified: Mon, 25 Jul 2016 04:32:39 GMT
-Server: Apache
+- 优点：减少TCP连接的建立和关闭次数，降低延迟，提高性能。
 
-(body)
+- 缺点：长时间保持连接可能会占用服务器资源，特别是在高并发环境下
 
-```
+**如何关闭 HTTP keep-alive**
 
-- `timeout`: 空闲时保持打开状态的最小时长（以秒为单位）
+1. 如果服务端 Response Header 设置了 `Keep-Alive:timeout={timeout}`，客户端会就会保持此连接 `timeout`（单位秒）时间，超时之后关闭连接。
+ 
+  `Keep-Alive: timeout=5, max=1000`
 
-- `max`: 在连接关闭之前，在此连接可以发送的请求的最大值
+2. 客户端发送Header头：`Connection: close`
 
-## `keep-alive`不足之处
-
-保持连接是比较浪费资源的，可能会非常影响性能，因为它在文件被请求之后还保持了不必要的连接很长时间，额外占用了服务端的连接数
-
-## Http 连接复用后怎样断开连接
-
-Http 协议规定了两种关闭复用连接的方式：
-
-**通过 Keep-Alive Timeout 标识**
-
-如果服务端 Response Header 设置了 `Keep-Alive:timeout={timeout}`，客户端会就会保持此连接 `timeout`（单位秒）时间，超时之后关闭连接。
-
-`Keep-Alive: timeout=5, max=1000`
-
-**Connection close**
-
-客户端发送Header头：`Connection: close`
-
-## 服务端开启keep-alive
-
-Httpd 守护进程，一般都提供了 `keep-alive timeout` 时间设置参数, `nginx` 本身仅支持一个` keepalive_timeout` 指令
-
-```js
-location /cqjt/ {   
-    alias /url/var/www/html/;   
-    keepalive_timeout  75;   
-    expires 5m;   
-} 
-```
 
 ## tcp keep-alive
 
-`tcp keep-alive` 与 `http keep-alive`，不是同一回事
+TCP Keep-Alive是一种网络协议机制，用于检测TCP连接上的另一端是否仍然可达，即对方是否还“活着”。它通过在连接上发送探测包来实现，如果在指定的时间内没有收到响应，就认为连接已经断开。
 
-`tcp keep-alive` 是TCP的一种检测TCP[连接]状况的保鲜机制,定时发送一个空的 TCP Segment，来监测连接是否存活
+- 作用层次：传输层。
 
-**如何设置它?**
+- 主要目的：检测死链接，确保连接的双方仍然可达。
 
-KeepAlive都支持哪些设置项
+- 工作机制：在TCP连接空闲一段时间后，通过发送探测包给对方。如果连续几次探测都没有响应，则认为连接已经断开，TCP层会关闭这个连接。
 
-- `tcp_keepalive_time: KeepAlive` 的空闲时长，或者说每次正常发送心跳的周期，默认值为`7200s（2小时）`
+- 优点：能够自动检测并关闭无效的连接，释放资源。
 
-- `tcp_keepalive_intvl`: KeepAlive探测包的发送间隔，默认值为75s
-
-- `tcp_keepalive_probes`: 在`tcp_keepalive_time`之后，没有接收到对方确认，继续发送保活探测包次数，默认值为9（次）
-
-[聊聊 TCP 中的 KeepAlive 机制](https://zhuanlan.zhihu.com/p/28894266)
+- 缺点：如果配置不当，可能会导致不必要的流量和功耗。
