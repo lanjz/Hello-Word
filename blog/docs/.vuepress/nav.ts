@@ -223,6 +223,8 @@ export const sidebar = {
     '/network/TCP',
     '/network/keep-alive',
     '/network/WebSocket',
+    '/network/Socket',
+    '/network/Cookie、Session、Token、JWT',
     '/network/网络层的优化'
   ],
   '/Node/基础/': [
