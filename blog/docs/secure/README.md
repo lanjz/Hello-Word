@@ -34,7 +34,35 @@ if(location.href.indexOf('default=') > -1) {
 
 防御方案：
 
-- 谨慎使用`eval`, `new Function()`，`document.write()`方法
+- 谨慎使用可以将内容解析成 html 语句的方法
+
+  1. `innerHTML`和 `outerHTML`。如前所述，`innerHTML` 和 `outerHTML` 属性允许开发者将字符串赋值为HTML元素的内部或外部HTML，如果这些字符串包含恶意脚本，那么脚本将被执行。
+     
+  `element.innerHTML = '<script>alert("XSS")</script>';`
+
+  2. `document.write`和`document.writeln`。`document.write`和`document.writeln`方法用于直接向文档写入HTML内容。如果包含恶意脚本，这些脚本将被浏览器解析和执行。
+
+  `document.write('<script>alert("XSS")</script>');`
+
+  3. eval函数。如果攻击者能够控制传递给eval的字符串，他们就可以执行任意脚本。
+
+      ```javascript
+      var userContent = 'alert("XSS")'; // 可能来自用户输入
+      eval(userContent);
+      ```
+4. setTimeout和setInterval。当setTimeout和setInterval的第一个参数为字符串时，这些字符串会被解析并执行为JavaScript代码。如果这些字符串是由用户控制的，就存在执行恶意脚本的风险。
+
+      `setTimeout("alert('XSS')", 1000);`
+
+5. Function构造函数。Function构造函数类似于eval，可以从字符串中创建新的函数。如果这个字符串是由用户提供的，那么同样存在安全风险。
+
+      ```javascript
+      var dynamicFunction = new Function("alert('XSS')");
+      dynamicFunction();
+      ```
+6. URL跳转和重定向。通过修改URL或执行重定向操作，攻击者可以利用JavaScript协议（如javascript:）来执行恶意代码。
+
+      `window.location = 'javascript:alert("XSS")'; // 非常危险`
 
 - 使用`escape()`方法对字符进行转义
 
