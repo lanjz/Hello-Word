@@ -50,39 +50,27 @@ if(location.href.indexOf('default=') > -1) {
       var userContent = 'alert("XSS")'; // 可能来自用户输入
       eval(userContent);
       ```
-4. setTimeout和setInterval。当setTimeout和setInterval的第一个参数为字符串时，这些字符串会被解析并执行为JavaScript代码。如果这些字符串是由用户控制的，就存在执行恶意脚本的风险。
+  4. setTimeout和setInterval。当setTimeout和setInterval的第一个参数为字符串时，这些字符串会被解析并执行为JavaScript代码。如果这些字符串是由用户控制的，就存在执行恶意脚本的风险。
 
       `setTimeout("alert('XSS')", 1000);`
 
-5. Function构造函数。Function构造函数类似于eval，可以从字符串中创建新的函数。如果这个字符串是由用户提供的，那么同样存在安全风险。
+  5. Function构造函数。Function构造函数类似于eval，可以从字符串中创建新的函数。如果这个字符串是由用户提供的，那么同样存在安全风险。
 
       ```javascript
       var dynamicFunction = new Function("alert('XSS')");
       dynamicFunction();
       ```
-6. URL跳转和重定向。通过修改URL或执行重定向操作，攻击者可以利用JavaScript协议（如javascript:）来执行恶意代码。
+  6. URL跳转和重定向。通过修改URL或执行重定向操作，攻击者可以利用JavaScript协议（如javascript:）来执行恶意代码。
 
       `window.location = 'javascript:alert("XSS")'; // 非常危险`
 
-- 使用`escape()`方法对字符进行转义
+- 使用内容安全政策（Content Security Policy, CSP）限制可执行的脚本
 
-   `escape()`可以对一些构成 HTML 标签的元素转义，比如 <，>，空格等
+- 对敏感操作使用HTTPOnly和Secure属性的Cookie，减少XSS攻击的影响
    
-给上例的中代码添加`escape()`
-
-```js
-<script>
-  if(location.href.indexOf('default=') > -1) {
-    let getDefault = decodeURI(location.href.substring(location.href.indexOf('default=') + 8))
-    console.log(getDefault)
-    getDefault = escape(getDefault)
-    console.log(getDefault)
-    document.write(getDefault);
-  }
-</script>
-```
-
-刷新页面，发现`alert`没有弹出
+:::warning
+类似 `escape`、`encodeURIComponent`这些字符转义不足以防御XSS,因为它不会对HTML所有相关的字符（如<、>、"、'等）进行编码
+:::
 
 ### 持久型XSS
 
