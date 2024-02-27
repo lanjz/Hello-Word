@@ -44,17 +44,17 @@ if(location.href.indexOf('default=') > -1) {
 
   `document.write('<script>alert("XSS")</script>');`
 
-  3. eval函数。如果攻击者能够控制传递给eval的字符串，他们就可以执行任意脚本。
+  3. `eval` 函数。如果攻击者能够控制传递给eval的字符串，他们就可以执行任意脚本。
 
       ```javascript
       var userContent = 'alert("XSS")'; // 可能来自用户输入
       eval(userContent);
       ```
-  4. setTimeout和setInterval。当setTimeout和setInterval的第一个参数为字符串时，这些字符串会被解析并执行为JavaScript代码。如果这些字符串是由用户控制的，就存在执行恶意脚本的风险。
+  4. `setTimeout` 和 `setInterval`。当 `setTimeout` 和 `setInterval` 的第一个参数为字符串时，这些字符串会被解析并执行为JavaScript代码。如果这些字符串是由用户控制的，就存在执行恶意脚本的风险。
 
       `setTimeout("alert('XSS')", 1000);`
 
-  5. Function构造函数。Function构造函数类似于eval，可以从字符串中创建新的函数。如果这个字符串是由用户提供的，那么同样存在安全风险。
+  5. `Function` 构造函数。`Function` 构造函数类似于 `eval`，可以从字符串中创建新的函数。如果这个字符串是由用户提供的，那么同样存在安全风险。
 
       ```javascript
       var dynamicFunction = new Function("alert('XSS')");
@@ -300,7 +300,7 @@ form表单可以跨域一个历史原因是要保持兼容性，因为form表单
 
 **Content Security Policy（CSP）：**
 
-CSP是一个额外的安全层，它可以用来减少XSS攻击的风险，并防止数据注入攻击。通过设置CSP的frame-ancestors指令，网站可以控制哪些网页可以将其作为<iframe>、<frame>或<object>等内容嵌入。
+CSP是一个额外的安全层，它可以用来减少XSS攻击的风险，并防止数据注入攻击。通过设置CSP的frame-ancestors指令，网站可以控制哪些网页可以将其作为`<iframe>`、`<frame>`或`<object>`等内容嵌入。
 
 **JS 防御**
 
