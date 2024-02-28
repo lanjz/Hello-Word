@@ -58,7 +58,7 @@ Vue 在更新视图的时候在，并不是直接 DOM 上进行更新，而是�
 
 - 如果 `vnode` 是文本节点，则直接更新成这个文本节点
 
-**`updateChildren` 是关键，这个过程可以概括如下:*
+**`updateChildren` 是关键，这个过程可以概括如下:**
 
 `oldCh` 和 `newCh` 各有两个头尾的变量 `StartIdx` 和 `EndIdx` ，它们的2个变量相互比较，一共有4种比较方式
 
