@@ -1,35 +1,58 @@
 # Vue-Router
 
-使用 `vue-router` 可以实现单页面模式切换 URL 地址。实质是通过 `hash` 与 `History interface` 两种 API 实现的，这两种模式都可以实现 URL 地址更新的同时页面无需重新加载。
+Vue Router 是基于 Vue.js 实现的前端路由管理器，它允许开发者构建单页面应用中的页面路由功能。Vue Router 的实现原理主要依赖于两大核心概念：路由模式和组件渲染。
 
-`vue-router` 针对两种模式分别封装了两个类：`HTML5History`，`HashHistory`
+## 路由模式
 
-### HashHistory
+Hash 模式：使用 URL 的 hash 来实现路由。这种模式下，当 URL 的 hash 部分改变时，页面不会重新加载，但可以触发 Vue Router 更新视图的逻辑。这是通过监听 `hashchange` 事件来实现的。
 
-**`hash`的使用**
+History 模式：利用 HTML5 History API（主要是 pushState 和 replaceState 方法）来实现路由。这种模式允许你操作浏览器历史记录栈，实现无刷新的页面跳转。Vue Router 在这种模式下通过监听 popstate 事件来响应 URL 的变化。
 
-- 监听地址 `hash` 的变化：`window.addEventListener("hashchange", funcRef, false)`
+Abstract 模式：主要用于不支持 Hash 模式和 History 模式的环境（如 Node.js 服务器端渲染），或者在某些旧的浏览器中。这种模式下，Vue Router 会在内存中模拟一个路由栈来管理路由的跳转。
 
-- 主动改变 `hash` ：`window.location.hash='/bar'`,每一次改变 `hash（window.location.hash）`，都会在浏览器的访问历史中增加一个记录
+## 组件渲染
 
-- `replace` `hash`: `window.location.replace(window.location.href#[hash])`, `url` 地址没变，只改变使用 `hash`, 此时不会重新加载页面，只会替换浏览器的访问历史中的最近一个记录
-
-**HashHistory.push()**
-
-源码定义：
+Vue Router 的组件渲染依赖于 Vue.js 的动态组件和 `<router-view>` 容器。每当路由变化时，Vue Router 将解析对应的路由配置，并将相应的组件渲染到 `<router-view>` 中
 
 ```js
-push (location: RawLocation, onComplete?: Function, onAbort?: Function) {
-  this.transitionTo(location, route => {
-    pushHash(route.fullPath)
-    onComplete && onComplete(route)
-  }, onAbort)
-}
+// router-view 组件的关键源码
+export default {
+  name: 'RouterView',
+  functional: true, // 指明这是一个功能性组件
+  render(h, { parent, data }) {
+    let depth = 0;
+    data.routerView = true; // 标记当前组件为 router-view
 
-function pushHash (path) {
-  window.location.hash = path
-}
+    // 通过 parent 查找当前 router-view 的深度
+    while (parent && parent._routerRoot !== parent) {
+      const vnodeData = parent.$vnode ? parent.$vnode.data : {};
+      if (vnodeData.routerView) {
+        depth++;
+      }
+      parent = parent.$parent;
+    }
+
+    // 根据深度获取对应的路由匹配对象
+    const matched = parent.$route.matched[depth];
+    if (!matched) {
+      return h(); // 如果没有匹配的路由，渲染空节点
+    }
+
+    // 获取要渲染的组件
+    const component = matched.components.default;
+
+    // 在 data 上设置组件的 key，用于优化重渲染性能
+    if (data.key === null && component) {
+      data.key = component.name || 'anonymous';
+    }
+
+    // 使用 createElement 函数渲染组件
+    return h(component, data);
+  },
+};
 ```
+
+从源码可以看到 `<router-view>` 是一个动态渲染的组件，他们根据当前路径找到对应的路由组件，再利用 `render` 方法进行渲染
 
 ## $route/$router属性
 
@@ -69,7 +92,7 @@ Vue.mixin({
 
 2. 否则取 `$parent` 父组件上的 `_routerRoot`
 
-所以每个组件都会有一个 `_routerRoot` 属性
+所以每个组件都会有一个 `_routerRoot` 属性并且指向同一个 router 实例对象
 
 然后在 `mixin` 下方有这么两行语句
 
@@ -83,7 +106,7 @@ Object.defineProperty(Vue.prototype, '$route', {
 });
 ```
 
-可以看到 `$route/$router` 定义在 Vue 原型中，实际上指向的是当前组件的 `this._routerRoot` 属性中
+可以看到 `$route/$router` 定义在 Vue 原型中，实际上指向的是当前组件的 `this._routerRoot` 对中的 `_router` 与 `_route` 属性
 
 ## $router实现响应机制
 
@@ -104,387 +127,81 @@ if (isDef(this.$options.router)) {
 
 上文通过 `Vue.util.defineReactive` 对 `_route` 属性进行的监听，以响应式机制的原理可以知道依赖的收集是在访问 `_route` 属性的时候添加的
 
-```js
-var View = {
-      name: 'RouterView',
-      functional: true,
-      props: {
-        name: {
-          type: String,
-          default: 'default'
-        }
-      },
-      render: function render (_, ref) {
-        // ....
-        var route = parent.$route;
-      }
-}
-```
-
 上代码是 `RouterView` 组件实现的函数式写法，当我们在页面中使用这个组件，并且渲染到 `RouterView` 组件时会触发对应的 `render` 方法，接着执行 `var route = parent.$route` 的时候就会被 `Object.defineProperty` 定义的 `get` 方法劫持，此时 `Dep.target` 就是 `RouterView` 所在的组件，会把这个组件 `render Watcher` 收集到 `_router` 的收集器 `Dep` 中,这一步就完成了对事件的收集
 
 之后当我们在组件调用 `this.$router.push` 方法改变路由时就会更新 `$route` 属性，就会触发依赖的更新方法从而更新视图了（`RouteLInk` 组件渲染时也会做同样的收集）
 
-## 路由更新（hash模式）
-
-以 `push` 方法为例
+## Push方法做哪些事？
 
 调用  `this.$router.push(location, onComplete, onAbort)` 时实际上执行的 ` this.history.push(location, onComplete, onAbort)` 方法
 
 ```js
-// HashHistory.prototype.push
-HashHistory.prototype.push = function push (location, onComplete, onAbort) {
-  var this$1 = this;
+// Vue Router 源码中的简化版本，具体实现可能会有所不同
+class VueRouter {
+  // ...
 
-  var ref = this;
-  var fromRoute = ref.current;
-  this.transitionTo(
-    location,
-    function (route) {
-      pushHash(route.fullPath);
-      handleScroll(this$1.router, route, fromRoute, false);
+  push(location, onComplete, onAbort) {
+    // this.history 指向当前使用的 History 实现（HTML5History, HashHistory, 或 AbstractHistory）
+    this.history.push(location, onComplete, onAbort);
+  }
+
+  // ...
+}
+
+class History {
+  // ...
+
+  push(location, onComplete, onAbort) {
+    // 确认导航，执行守卫和钩子
+    this.transitionTo(route, (route) => {
+      // 实际改变 URL
+      pushState(cleanPath(this.base + route.fullPath));
+      // 调用 onComplete
       onComplete && onComplete(route);
-    },
-    onAbort
-  );
-};
-
-// pushHash
-function pushHash (path) {
-  if (supportsPushState) {
-    pushState(getUrl(path));
-  } else {
-    window.location.hash = path;
+    }, onAbort);
   }
-}
-//  History.prototype.transitionTo
-transitionTo (location: RawLocation, onComplete?: Function, onAbort?: Function) {
-  // 获取匹配的路由信息
-  const route = this.router.match(location, this.current)
-  // 确认切换路由
-  this.confirmTransition(route, () => {
-    // 以下为切换路由成功或失败的回调
-    // 更新路由信息，对组件的 _route 属性进行赋值，触发组件渲染
-    // 调用 afterHooks 中的钩子函数
-    this.updateRoute(route)
-    // 添加 hashchange 监听
-    onComplete && onComplete(route)
-    // 更新 URL
-    this.ensureURL()
-    // 只执行一次 ready 回调
-    if (!this.ready) {
-      this.ready = true
-      this.readyCbs.forEach(cb => { cb(route) })
-    }
-  }, err => {
-  // 错误处理
-    if (onAbort) {
-      onAbort(err)
-    }
-    if (err && !this.ready) {
-      this.ready = true
-      this.readyErrorCbs.forEach(cb => { cb(err) })
-    }
-  })
+  transitionTo(location, onComplete, onAbort) {
+    // 根据 location 解析出新的路由对象
+    const route = this.router.match(location, this.current);
+
+    // 确认导航：检查要导航到的路由与当前路由是否相同，执行路由守卫等
+    this.confirmTransition(route, () => {
+      // 更新路由状态
+      this.updateRoute(route);
+      // 调用 HTML5 History API 或修改 hash 更新 URL
+      pushState(cleanPath(this.base + route.fullPath));
+      // 执行 onComplete 回调
+      onComplete && onComplete(route);
+      // 触发 afterEach 钩子
+      this.router.afterHooks.forEach(hook => {
+        hook && hook(route, this.current);
+      });
+    }, onAbort);
+  }
+
+  updateRoute(route) {
+    // 更新当前路由对象
+    this.current = route;
+    // 通知依赖此状态的 Vue 组件重新渲染
+    this.cb && this.cb(route);
+  }
+  // ...
 }
 
-// 确认切换路由
-confirmTransition(route: Route, onComplete: Function, onAbort?: Function) {
-  const current = this.current
-  // 中断跳转路由函数
-  const abort = err => {
-    if (isError(err)) {
-      if (this.errorCbs.length) {
-        this.errorCbs.forEach(cb => {
-          cb(err)
-        })
-      } else {
-        warn(false, 'uncaught error during route navigation:')
-        console.error(err)
-      }
-    }
-    onAbort && onAbort(err)
-  }
-  // 如果是相同的路由就不跳转
-  if (
-    isSameRoute(route, current) &&
-    route.matched.length === current.matched.length
-  ) {
-    this.ensureURL()
-    return abort()
-  }
-  // 通过对比路由解析出可复用的组件，需要渲染的组件，失活的组件
-  const { updated, deactivated, activated } = resolveQueue(
-    this.current.matched,
-    route.matched
-  )
-  
-  function resolveQueue(
-      current: Array<RouteRecord>,
-      next: Array<RouteRecord>
-    ): {
-      updated: Array<RouteRecord>,
-      activated: Array<RouteRecord>,
-      deactivated: Array<RouteRecord>
-    } {
-      let i
-      const max = Math.max(current.length, next.length)
-      for (i = 0; i < max; i++) {
-        // 当前路由路径和跳转路由路径不同时跳出遍历
-        if (current[i] !== next[i]) {
-          break
-        }
-      }
-      return {
-        // 可复用的组件对应路由
-        updated: next.slice(0, i),
-        // 需要渲染的组件对应路由
-        activated: next.slice(i),
-        // 失活的组件对应路由
-        deactivated: current.slice(i)
-      }
-  }
-  // 导航守卫数组
-  const queue: Array<?NavigationGuard> = [].concat(
-    // 失活的组件钩子
-    extractLeaveGuards(deactivated),
-    // 全局 beforeEach 钩子
-    this.router.beforeHooks,
-    // 在当前路由改变，但是该组件被复用时调用
-    extractUpdateHooks(updated),
-    // 需要渲染组件 enter 守卫钩子
-    activated.map(m => m.beforeEnter),
-    // 解析异步路由组件
-    resolveAsyncComponents(activated)
-  )
-  // 保存路由
-  this.pending = route
-  // 迭代器，用于执行 queue 中的导航守卫钩子
-  const iterator = (hook: NavigationGuard, next) => {
-  // 路由不相等就不跳转路由
-    if (this.pending !== route) {
-      return abort()
-    }
-    try {
-    // 执行钩子
-      hook(route, current, (to: any) => {
-        // 只有执行了钩子函数中的 next，才会继续执行下一个钩子函数
-        // 否则会暂停跳转
-        // 以下逻辑是在判断 next() 中的传参
-        if (to === false || isError(to)) {
-          // next(false) 
-          this.ensureURL(true)
-          abort(to)
-        } else if (
-          typeof to === 'string' ||
-          (typeof to === 'object' &&
-            (typeof to.path === 'string' || typeof to.name === 'string'))
-        ) {
-        // next('/') 或者 next({ path: '/' }) -> 重定向
-          abort()
-          if (typeof to === 'object' && to.replace) {
-            this.replace(to)
-          } else {
-            this.push(to)
-          }
-        } else {
-        // 这里执行 next
-        // 也就是执行下面函数 runQueue 中的 step(index + 1)
-          next(to)
-        }
-      })
-    } catch (e) {
-      abort(e)
-    }
-  }
-  // 经典的同步执行异步函数
-  runQueue(queue, iterator, () => {
-    const postEnterCbs = []
-    const isValid = () => this.current === route
-    // 当所有异步组件加载完成后，会执行这里的回调，也就是 runQueue 中的 cb()
-    // 接下来执行 需要渲染组件的导航守卫钩子
-    const enterGuards = extractEnterGuards(activated, postEnterCbs, isValid)
-    const queue = enterGuards.concat(this.router.resolveHooks)
-    runQueue(queue, iterator, () => {
-    // 跳转完成
-      if (this.pending !== route) {
-        return abort()
-      }
-      this.pending = null
-      onComplete(route)
-      if (this.router.app) {
-        this.router.app.$nextTick(() => {
-          postEnterCbs.forEach(cb => {
-            cb()
-          })
-        })
-      }
-    })
-  })
-}
-export function runQueue (queue: Array<?NavigationGuard>, fn: Function, cb: Function) {
-  const step = index => {
-  // 队列中的函数都执行完毕，就执行回调函数
-    if (index >= queue.length) {
-      cb()
-    } else {
-      if (queue[index]) {
-      // 执行迭代器，用户在钩子函数中执行 next() 回调
-      // 回调中判断传参，没有问题就执行 next()，也就是 fn 函数中的第二个参数
-        fn(queue[index], () => {
-          step(index + 1)
-        })
-      } else {
-        step(index + 1)
-      }
-    }
-  }
-  // 取出队列中第一个钩子函数
-  step(0)
-}
-
-```
-
-这里先关注 `this.confirmTransition` 方法第二个回调函数参数，里面会执行以下三个步骤：
-
-```js
-this.updateRoute(route)
-// 添加 hashchange 监听
-onComplete && onComplete(route)
-// 确定URL显示是否正确
-this.ensureURL()
-```
-
-```js
-History.prototype.updateRoute = function updateRoute (route) {
-  this.current = route;
-  this.cb && this.cb(route);
-};
-//  this.cb在是 `init()` 方法中设置的回调
-this.apps.forEach(function (app) {
-  app._route = route;
-});
-```
-
-在 `this.updateRoute(route)` 方法将更新 `_route` 属性，然后就会触发视图的更新
-
-**总结一下，从设置路由改变到视图更新的流程如下**
-
-`$router.push() --> HashHistory.push() --> History.transitionTo() --> History.updateRoute() --> {app._route = route} --> vm.render()`
-
-## HashHistory.replace()
-
-`replace()` 方法与 `push()` 方法不同之处在于，它并不是将新路由添加到浏览器访问历史的栈顶，而是替换掉当前的路由：
-
-```js
-replace (location: RawLocation, onComplete?: Function, onAbort?: Function) {
-  this.transitionTo(location, route => {
-    replaceHash(route.fullPath)
-    onComplete && onComplete(route)
-  }, onAbort)
-}
-  
-function replaceHash (path) {
-  const i = window.location.href.indexOf('#')
-  window.location.replace(
-    window.location.href.slice(0, i >= 0 ? i : 0) + '#' + path
-  )
+function pushState(url) {
+  // 使用 history.pushState API 更新浏览器地址栏
+  history.pushState({ key: Date.now().toFixed(3) }, '', url);
 }
 ```
 
-## 路由更新（history模式）
+关键步骤详解
 
-`history` 提供的方法：
-
-- `History.back()`: 前往上一页, 用户可点击浏览器左上角的返回按钮模拟此方法. 等价于 `history.go(-1)`
-
-- `History.forward()`: 前往上一页, 用户可点击浏览器左上角的返回按钮模拟此方法. 等价于 `history.go(1)`
-
-- `History.go()`: 通过当前页面的相对位置从浏览器历史记录( 会话记录 )加载页面。比如：参数为 `-1` 的时候为上一页，参数为 `1` 的时候为下一页. 当整数参数超出界限时例如: 如果当前页为第一页，前面/后面 已经没有页面了，传参的值为 `-1` 或者 `1` 都没有任何效果也不会报错。调用没有参数的 `go()` 方法或者不是整数的参数时也没有效果
-
-- `History.pushState(state, title[, url])`：按指定的名称和 URL（如果提供该参数）将数据 `push` 进会话历史栈
-
-  ```js
-  const state = { 'page_id': 1, 'user_id': 5 }
-  const title = ''
-  const url = 'hello-world.html'
-
-  history.pushState(state, title, url)
-  ```
-
-- `History.replaceState()`: 按指定的数据，名称和 URL (如果提供该参数)，更新历史栈上最新的入口，用法同 `History.pushState`
-
-**`History.pushState` 和 `History.replaceState()`都不会刷新页面**
-
-`history` 属性：
-
-`History.state`: 返回一个表示历史堆栈顶部的状态的值，获取 `History.pushState` 和 `History.replaceState()` 添加的 `state` 值 
-
-`vue-router` 相关的处理逻辑跟 `hash` 模式差不多，只是更新地址的具体实现方法换成 `history` 的相关方法罢了
-
-- `window.location.hash` => `history.pushState()`
-
-- `window.location.replace()` => `history.replaceState()`
-
-```js
-push (location: RawLocation, onComplete?: Function, onAbort?: Function) {
-  const { current: fromRoute } = this
-  this.transitionTo(location, route => {
-    pushState(cleanPath(this.base + route.fullPath))
-    handleScroll(this.router, route, fromRoute, false)
-    onComplete && onComplete(route)
-  }, onAbort)
-}
-
-replace (location: RawLocation, onComplete?: Function, onAbort?: Function) {
-  const { current: fromRoute } = this
-  this.transitionTo(location, route => {
-    replaceState(cleanPath(this.base + route.fullPath))
-    handleScroll(this.router, route, fromRoute, false)
-    onComplete && onComplete(route)
-  }, onAbort)
-}
-
-// src/util/push-state.js
-export function pushState (url?: string, replace?: boolean) {
-  saveScrollPosition()
-  // try...catch the pushState call to get around Safari
-  // DOM Exception 18 where it limits to 100 pushState calls
-  const history = window.history
-  try {
-    if (replace) {
-      history.replaceState({ key: _key }, '', url)
-    } else {
-      _key = genKey()
-      history.pushState({ key: _key }, '', url)
-    }
-  } catch (e) {
-    window.location[replace ? 'replace' : 'assign'](url)
-  }
-}
-
-export function replaceState (url?: string) {
-  pushState(url, true)
-}
-```
-
-`history` 模式下的监听 `url` 的变化
-
-```js
-constructor (router: Router, base: ?string) {
-
-  window.addEventListener('popstate', e => {
-    const current = this.current
-    this.transitionTo(getLocation(this.base), route => {
-      if (expectScroll) {
-        handleScroll(router, route, current, true)
-      }
-    })
-  })
-}
-```
-
-需要注意的是调用`history.pushState()`或`history.replaceState()`不会触发`popstate`事件。只有在做出浏览器动作时，才会触发该事件，如用户点击浏览器的回退按钮（或者在Javascript代码中调用 `history.back()` , `history.forward()` 或者 `history.go()` 方法
+1. `push` 方法调用：当你调用 `$router.push` 时，实际上是在调用 History 类的实例方法 `push`。   
+2. 路由解析：方法内部首先解析传入的 `location` 参数，将其转换为一个标准的路由位置对象。   
+3. 执行 `transitionTo`：这个方法负责执行路由的过渡操作。它会检查目标路由与当前路由的差异，执行相应的导航守卫和钩子函数，最后确认是否进行导航。   
+4. 更新 URL：确认导航后，使用 HTML5 的 `history.pushState` 方法（或在 Hash 模式下修改 hash），更新浏览器的地址栏，而不会触发页面重载。   
+5. 更新路由状态：更新 Vue Router 的内部状态，包括当前路由对象 $route，触发 Vue 的响应式系统更新对应的视图
+6. 调用回调：导航完成后，如果提供了 `onComplete` 回调函数，则调用之。
 
 ## RouterView/RouterLink
 
@@ -628,7 +345,7 @@ beforeRouteLeave (to, from, next) {
 
 ```
 
-### 完整的导航解析流程
+### 完整的导航守卫执行顺序
 
 1. 导航被触发。
 
@@ -656,26 +373,8 @@ beforeRouteLeave (to, from, next) {
 
 ## 总结
 
-- 先实例一个 `router`，这个  `router` 包含了我们平时使用的 `$route` 和 `$router` 两个属性
+- 利用浏览器的 History API 或 hash 变化来监听 URL 的变化。
 
-- 在项目初始化传入这个 `router` 实例 `new Vue({router})`，这样就可以 `this.$options.router` 访问这个 `router` 实例
+- 通过匹配 URL 到预定义的路由配置，动态渲染相应的组件到 `<router-view>`。
 
-- 使用 `vue-minxin` 给所有 vue 混入 `beforeCreate` 钩子，在 `beforeCreate` 钩子中主要有两个关键步骤：
-
-   - 给每个组件添加 `_routerRoot` 属性
-   
-   - 使用 `Vue.util.defineReactive` 给当前的 `_route($route)` 添加响应机制
- 
-- 全局注册 `RouterView` 和 `RouterLink` 两个组件
-
-- 之后就根 `data` 属性的响应式机制同理：当渲染这两个组件的时候，就会访问 `$router` 信息，然后收集当前 `render Watcher`，这里就完成了响应式收集部分
-
-注意一下 `$router`, `_routerRoot`， `_router` 的关系
-
-- `$router => this._routerRoot._router`
-
-- `this._routerRoot = this`
-
-[从vue-router看前端路由的两种实现](https://zhuanlan.zhihu.com/p/27588422)
-
-[VueRouter 源码深度解析](https://juejin.im/post/5b5697675188251b11097464#heading-0)
+- 结合 Vue.js 的响应式系统，使路由状态变化能够驱动视图自动更新。
