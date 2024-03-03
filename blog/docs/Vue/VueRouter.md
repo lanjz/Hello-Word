@@ -33,6 +33,7 @@ export default {
     }
 
     // 根据深度获取对应的路由匹配对象
+    // 同时访问 parent.$route 时会被 Object.defineProperty 定义的 get 方法劫持，将当前 RouterView 渲染事件进行收集
     const matched = parent.$route.matched[depth];
     if (!matched) {
       return h(); // 如果没有匹配的路由，渲染空节点
@@ -127,9 +128,9 @@ if (isDef(this.$options.router)) {
 
 上文通过 `Vue.util.defineReactive` 对 `_route` 属性进行的监听，以响应式机制的原理可以知道依赖的收集是在访问 `_route` 属性的时候添加的
 
-上代码是 `RouterView` 组件实现的函数式写法，当我们在页面中使用这个组件，并且渲染到 `RouterView` 组件时会触发对应的 `render` 方法，接着执行 `var route = parent.$route` 的时候就会被 `Object.defineProperty` 定义的 `get` 方法劫持，此时 `Dep.target` 就是 `RouterView` 所在的组件，会把这个组件 `render Watcher` 收集到 `_router` 的收集器 `Dep` 中,这一步就完成了对事件的收集
+之前提到 `RouterView` 组件的实现源码中，在渲染 `RouterView` 组件时会访问 `parent.$route` 属性，此时会被 `Object.defineProperty` 定义的 `get` 方法劫持，此时 `Dep.target` 就是 `RouterView` 所在的组件，会把这个组件 `render Watcher` 收集到父组件的 `_router` 的收集器 `Dep` 中,这一步就完成了对事件的收集
 
-之后当我们在组件调用 `this.$router.push` 方法改变路由时就会更新 `$route` 属性，就会触发依赖的更新方法从而更新视图了（`RouteLInk` 组件渲染时也会做同样的收集）
+之后当我们在组件调用 `this.$router.push` 方法改变路由时就会更新 `$route` 属性，就会触发依赖的更新方法从而更新视图了
 
 ## Push方法做哪些事？
 
@@ -192,6 +193,13 @@ function pushState(url) {
   // 使用 history.pushState API 更新浏览器地址栏
   history.pushState({ key: Date.now().toFixed(3) }, '', url);
 }
+
+// cb 的作用 更新 组件中的 ._route 属性
+history.listen(function (route) {
+    this$1.apps.forEach(function (app) {
+        app._route = route;
+    });
+});
 ```
 
 关键步骤详解
